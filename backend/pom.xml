@@ -63,10 +63,10 @@
                         <phase>validate</phase>
                         <goals><goal>copy-resources</goal></goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/classes/resources/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/classes/resources/static/</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.parent.basedir}/frontend/dist/frakton/</directory>
+                                    <directory>${project.parent.basedir}/frontend/dist/frontend/</directory>
                                 </resource>
                             </resources>
                         </configuration>

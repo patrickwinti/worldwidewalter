@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
+import {testDTO} from "./models/testDTO";
 
 @Component({
   selector: 'app-root',
@@ -9,13 +10,21 @@ import {firstValueFrom} from "rxjs";
 })
 export class AppComponent {
   title = 'www-ui';
-  displayText: string = '';
+  testDTO = {
+    value: '',
+    id: 0
+  } as testDTO;
 
   constructor(private http: HttpClient) {
   }
 
-  async onClick() {
+  async onClickWorld() {
     console.log('clicked');
-    this.displayText = await firstValueFrom(this.http.get<string>('http://localhost:8080'));
+    this.testDTO = await firstValueFrom(this.http.get<testDTO>('http://localhost:8080/world'));
+  }
+  async onClickMoon() {
+    console.log('clicked');
+    this.testDTO = await firstValueFrom(this.http.get<testDTO>('http://localhost:8080/moon'));
+    console.log('received: ', this.testDTO.value);
   }
 }

@@ -4,27 +4,36 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <artifactId>frontend</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <name>www-frontend</name>
+  <description>WorldWideWalter Frontend</description>
+
   <parent>
     <groupId>ch.zhaw</groupId>
     <artifactId>www</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>frontend</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-
   <build>
-    <resources>
-      <resource>
-        <directory>./dist/www</directory>
-        <targetPath>static</targetPath>
-      </resource>
-    </resources>
     <plugins>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.2.0</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>dist</directory>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
-        <version>1.7.6</version>
+        <version>1.12.1</version>
         <configuration>
           <workingDirectory>./</workingDirectory>
           <nodeVersion>v18.14.2</nodeVersion>
@@ -56,5 +65,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

@@ -1,8 +1,9 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-test',
-  templateUrl: './test.component.html'
+  templateUrl: './test.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TestComponent implements OnInit{
   @Input() displayText = 'initial test';

@@ -3,20 +3,20 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>ch.zhaw</groupId>
+    <artifactId>www</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>www</name>
+    <description>WorldWideWalter App</description>
+
+    <packaging>pom</packaging>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.0.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
-    <groupId>ch.zhaw</groupId>
-    <artifactId>www</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>www</name>
-    <description>PM3 project</description>
-
-    <packaging>pom</packaging>
 
     <modules>
         <module>backend</module>

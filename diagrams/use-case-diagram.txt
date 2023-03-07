@@ -1,0 +1,16 @@
+@startuml
+left to right direction
+actor Player as p
+actor Sphinx as s
+p..s
+package WorldwideWalter{
+  usecase Start game as UC1
+  usecase Join game as UC2
+  usecase Play round as UC3
+}
+p -- UC1
+p -- UC2
+p -- UC3
+s -- UC2
+s -- UC3
+@enduml

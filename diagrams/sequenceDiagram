@@ -1,0 +1,63 @@
+@startuml
+
+actor       player1
+actor       player2
+actor       playerN
+
+
+player1 -> system: Open new game (username)
+system --> player1: confirm (sessionID)
+
+player2 -> system: join session (sessionID, username)
+system --> player2: confirm
+
+playerN -> system: join session (sessionID, username)
+system --> playerN: confirm
+
+player1 -> system: start game
+system --> player1: notification, game started
+system --> player2: notification, game started
+system --> playerN: notification, game started
+
+loop until players end the game
+    player1 -> system: request new sphinx selection
+
+    system --> player1: announce sphinx (playerId: player2)
+    system --> player2: announce sphinx (playerId: player2)
+    system --> playerN: announce sphinx (playerId: player2)
+
+    system --> player1: send statement (statementText)
+    system --> player2: send statement (statementText)
+    system --> playerN: send statement (statementText)
+
+    player1 -> system: submit proposition (propositionText)
+    player2 -> system: submit proposition (propositionText)
+    playerN -> system: submit proposition (propositionText)
+
+    system --> player1: send all propositions (listOfPropositions)
+    system --> player2: send all propositions (listOfPropositions)
+    system --> playerN: send all propositions (listOfPropositions)
+
+    player1 -> system: select proposition (propositionText)
+    playerN -> system: select proposition (propositionText)
+
+    system --> player1: reveal solution (propositionText)
+    system --> player2: reveal solution (propositionText)
+    system --> playerN: reveal solution (propositionText)
+
+    system --> player1: send ranking (listOfUsersWithPoints)
+    system --> player2: send ranking (listOfUsersWithPoints)
+    system --> playerN: send ranking (listOfUsersWithPoints)
+end
+
+player1 -> system: end the game
+
+system --> player1: send ranking (listOfUsersWithPoints)
+system --> player2: send ranking (listOfUsersWithPoints)
+system --> playerN: send ranking (listOfUsersWithPoints)
+
+player1 -> system: leave session
+player2 -> system: leave session
+playerN -> system: leave session
+
+@enduml

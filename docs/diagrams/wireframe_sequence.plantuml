@@ -1,0 +1,134 @@
+@startuml
+skinparam dpi 200
+(*) --> "
+{{
+salt
+{
+    <b> Worldwide walter
+    Bonding through WALTER
+    sentences since 2022.
+    Minimum 4 player needed
+     to play game
+    [Start game]
+    [Join game]
+}
+}}
+" as create_game
+
+create_game -down-> "
+{{
+salt
+{
+    <b>Game session created
+    ID: >gB2-59l
+    <&share> share with other players
+    [Join game]
+}
+}}
+" as game_session_created
+
+create_game -down-> "
+{{
+salt
+{
+    <b>Join session
+    ID: | "Session ID "
+    User name| "           "
+    [Join game]
+}
+}}
+" as join_session
+
+game_session_created -down-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to join
+    To start game ask other players to join
+    <&share> share with other players
+}
+}}
+" as waiting_room_inactive
+join_session -down-> waiting_room_inactive
+
+waiting_room_inactive -down->"
+{{
+salt
+{
+    <b>You are the Sphinx
+    ..
+    <&double-quote-serif-left>
+    I always wanted to learn //WALTER//.
+    <&double-quote-serif-right>
+    [Start round]
+}
+}}
+" as start_round
+
+start_round -right->"
+{{
+salt
+{
+    <b>Round 2
+    ~~
+    **Reto** is the Sphinx
+    ~~
+    <&double-quote-serif-left>
+    I always wanted to learn //WALTER//.
+    <&double-quote-serif-right>
+    "           "
+    [Submit]
+}
+}}
+" as submit_proposition
+
+submit_proposition -right-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to send proposition
+    Lennox-Luis and Noah-Jakob are writing their proposition
+}
+}}
+" as waiting_room_waiting_players
+waiting_room_waiting_players  -right->"
+{{
+salt
+{
+    <b>Choose 1
+    Select proposition that **Reto** wrote
+    {T#
+     Quidditch
+     Tapdance
+     Pizzabox-origami
+     Walking on hands
+    }
+    [Confirm selection]
+}
+}}
+" as selection_proposition
+selection_proposition  -right->"
+{{
+salt
+{
+    <b>Ranking
+    1. Lennox-Luis
+    2. Reto
+    3. Noah-Jakob
+    4. Marvin-Gerold
+    [Next round]
+}
+}}
+" as ranking
+
+ranking -down-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to join
+    Next round will start when all player confirm next round
+}
+}}
+" as waiting_room_next_round
+waiting_room_next_round -left->start_round
+@enduml

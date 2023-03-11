@@ -13,21 +13,22 @@ salt
     [Join game]
 }
 }}
-" as create_game
+" as start_page
 
-create_game -down-> "
+start_page -right->[Start game] "
 {{
 salt
 {
     <b>Game session created
     ID: >gB2-59l
     <&share> share with other players
+    User name| "           "
     [Join game]
 }
 }}
 " as game_session_created
 
-create_game -down-> "
+start_page -left->[Join game] "
 {{
 salt
 {
@@ -39,19 +40,21 @@ salt
 }}
 " as join_session
 
-game_session_created -down-> "
+join_session -down-> "
 {{
 salt
 {
     <b><&clock> Waiting for other players to join
-    To start game ask other players to join
+    The game will start as soon as four players have joined (2/4)
     <&share> share with other players
 }
 }}
 " as waiting_room_inactive
-join_session -down-> waiting_room_inactive
+game_session_created -down-> waiting_room_inactive
+game_session_created -> Send link (out of scope)
+waiting_room_inactive ->Send link (out of scope)
 
-waiting_room_inactive -down->"
+waiting_room_inactive -down->[Sphinx]"
 {{
 salt
 {
@@ -81,6 +84,7 @@ salt
 }
 }}
 " as submit_proposition
+waiting_room_inactive -down->[Other players]submit_proposition
 
 submit_proposition -right-> "
 {{
@@ -91,11 +95,11 @@ salt
 }
 }}
 " as waiting_room_waiting_players
-waiting_room_waiting_players  -right->"
+waiting_room_waiting_players  -down->[Other players]"
 {{
 salt
 {
-    <b>Choose 1
+    <b>Choose one
     Select proposition that **Reto** wrote
     {T#
      Quidditch
@@ -107,7 +111,8 @@ salt
 }
 }}
 " as selection_proposition
-selection_proposition  -right->"
+
+selection_proposition  -down->"
 {{
 salt
 {
@@ -121,6 +126,8 @@ salt
 }}
 " as ranking
 
+waiting_room_waiting_players -->[Sphinx] ranking
+
 ranking -down-> "
 {{
 salt
@@ -130,5 +137,6 @@ salt
 }
 }}
 " as waiting_room_next_round
-waiting_room_next_round -left->start_round
+waiting_room_next_round ->[New Sphinx] start_round
+waiting_room_next_round ->[Other players] submit_proposition
 @enduml

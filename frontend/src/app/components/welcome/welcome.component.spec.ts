@@ -38,6 +38,5 @@ describe('TestComponent', () => {
 
     // assert
     expect(httpMock.get).toHaveBeenCalledWith('http://localhost:8080/create-game')
-    expect(httpMock.get).toEqual('a');
   })
 });

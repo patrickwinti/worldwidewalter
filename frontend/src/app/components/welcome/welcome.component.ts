@@ -4,7 +4,7 @@ import {firstValueFrom} from "rxjs";
 import {Session} from "../../models/session";
 
 @Component({
-  selector: 'www-welcome-component',
+  selector: 'www-welcome',
   templateUrl: './welcome.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

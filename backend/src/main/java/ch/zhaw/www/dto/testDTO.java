@@ -1,4 +1,4 @@
-package ch.zhaw.www;
+package ch.zhaw.www.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

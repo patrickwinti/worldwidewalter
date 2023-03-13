@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
-import {Session} from "../../models/session";
+import {Session} from "../../model/session";
 
 @Component({
   selector: 'www-welcome',

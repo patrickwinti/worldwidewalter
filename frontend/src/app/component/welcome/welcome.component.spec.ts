@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { WelcomeComponent } from './welcome.component';
 import {HttpClient} from "@angular/common/http";
-import {getHttpClientMock} from "src/app/shared/mock-testing"
+import {getHttpClientMock} from "src/app/testing/mock-services"
 import {of} from "rxjs";
 
 describe('TestComponent', () => {

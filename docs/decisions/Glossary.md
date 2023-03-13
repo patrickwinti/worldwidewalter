@@ -2,7 +2,7 @@
 
 ## Game Related
 
-**der Wahre Walter:** "Der wahre Walter" is a popular guessing game played at social gatherings since its creation in the 1990s. The goal of the game is to correctly guess the word that one of the players has used to fill a gap in a statement, marked with WALTER.
+**der Wahre Walter:** "der wahre Walter" is a popular guessing game played at social gatherings since its creation in the 1990s. The goal of the game is to correctly guess the word that one of the players has used to fill a gap in a statement, marked with WALTER.
 
 **WALTER Statement:** a phrase or sentence(s) in which at least one word is replaced with the word WALTER. Also known as prompt. 
 

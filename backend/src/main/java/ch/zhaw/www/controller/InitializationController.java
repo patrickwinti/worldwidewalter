@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
 public class InitializationController {
+    /**
+     * Create game endpoint
+     *
+     * @return the newly game session
+     */
     @GetMapping(value = "/create-game", produces = "application/json")
     public ResponseEntity createGame() {
         System.out.println("called create game");

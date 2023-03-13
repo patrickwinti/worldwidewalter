@@ -14,6 +14,9 @@ export class WelcomeComponent {
   constructor(private http: HttpClient) {
   }
 
+  /**
+   * Requests new game from backend and emits new game session object to parent container
+   */
   async createGame() {
     await firstValueFrom(this.http.get<Session>('http://localhost:8080/create-game')).then(
       (value) => this.newGameSession.emit(value),

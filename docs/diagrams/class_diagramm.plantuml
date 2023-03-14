@@ -1,7 +1,7 @@
 @startuml
 package backend{
     class GameController{
-      createGame(): GameResponse
+      createGame(): GameDto
     }
     class GameDto{
         id: String

@@ -1,0 +1,142 @@
+@startuml
+skinparam dpi 200
+(*) --> "
+{{
+salt
+{
+    <b> Worldwide walter
+    Bonding through WALTER
+    sentences since 2022.
+    Minimum 4 player needed
+     to play game
+    [Start game]
+    [Join game]
+}
+}}
+" as start_page
+
+start_page -right->[Start game] "
+{{
+salt
+{
+    <b>Game session created
+    ID: >gB2-59l
+    <&share> share with other players
+    User name| "           "
+    [Join game]
+}
+}}
+" as game_session_created
+
+start_page -left->[Join game] "
+{{
+salt
+{
+    <b>Join session
+    ID: | "Session ID "
+    User name| "           "
+    [Join game]
+}
+}}
+" as join_session
+
+join_session -down-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to join
+    The game will start as soon as four players have joined (2/4)
+    <&share> share with other players
+}
+}}
+" as waiting_room_inactive
+game_session_created -down-> waiting_room_inactive
+game_session_created -> Send link (out of scope)
+waiting_room_inactive ->Send link (out of scope)
+
+waiting_room_inactive -down->[Sphinx]"
+{{
+salt
+{
+    <b>You are the Sphinx
+    ..
+    <&double-quote-serif-left>
+    I always wanted to learn //WALTER//.
+    <&double-quote-serif-right>
+    [Start round]
+}
+}}
+" as start_round
+
+start_round -right->"
+{{
+salt
+{
+    <b>Round 2
+    ~~
+    **Reto** is the Sphinx
+    ~~
+    <&double-quote-serif-left>
+    I always wanted to learn //WALTER//.
+    <&double-quote-serif-right>
+    "           "
+    [Submit]
+}
+}}
+" as submit_proposition
+waiting_room_inactive -down->[Other players]submit_proposition
+
+submit_proposition -right-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to send proposition
+    Lennox-Luis and Noah-Jakob are writing their proposition
+}
+}}
+" as waiting_room_waiting_players
+waiting_room_waiting_players  -down->[Other players]"
+{{
+salt
+{
+    <b>Choose one
+    Select proposition that **Reto** wrote
+    {T#
+     Quidditch
+     Tapdance
+     Pizzabox-origami
+     Walking on hands
+    }
+    [Confirm selection]
+}
+}}
+" as selection_proposition
+
+selection_proposition  -down->"
+{{
+salt
+{
+    <b>Ranking
+    1. Lennox-Luis
+    2. Reto
+    3. Noah-Jakob
+    4. Marvin-Gerold
+    [Next round]
+}
+}}
+" as ranking
+
+waiting_room_waiting_players -->[Sphinx] ranking
+
+ranking -down-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to join
+    Next round will start when all player confirm next round
+}
+}}
+" as waiting_room_next_round
+waiting_room_next_round ->[New Sphinx] start_round
+waiting_room_next_round ->[Other players] submit_proposition
+@enduml

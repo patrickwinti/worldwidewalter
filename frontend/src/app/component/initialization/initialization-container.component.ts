@@ -8,6 +8,5 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
 export class InitializationContainerComponent {
 
   newGameCreated() {
-
   }
 }

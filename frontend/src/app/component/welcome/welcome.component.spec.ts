@@ -1,23 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { WelcomeComponent } from './welcome.component';
-import {HttpClient} from "@angular/common/http";
-import {getHttpClientMock} from "src/app/testing/mock-services"
-import {of} from "rxjs";
+import {WelcomeComponent} from './welcome.component';
+import {getGameServiceMock} from "src/app/testing/mock-services"
+import {firstValueFrom, of} from "rxjs";
+import {GameService} from "../../service/game.service";
+import {Session} from "../../model/session";
 
 describe('TestComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
-  let httpMock = getHttpClientMock();
+  let gameService = getGameServiceMock();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WelcomeComponent ],
+      declarations: [WelcomeComponent],
       providers: [
-        {provide: HttpClient, useValue: httpMock}
+        {provide: GameService, useValue: gameService}
       ]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(WelcomeComponent);
     component = fixture.componentInstance;
@@ -29,14 +30,14 @@ describe('TestComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call http.get on click createGame', () => {
+  it('createGame should call gameService', () => {
     // arrange
-    httpMock.get.and.returnValue(of(undefined));
+    gameService.requestNewGame.and.returnValue(firstValueFrom(of({} as Session)));
 
     // act
     component.createGame();
 
     // assert
-    expect(httpMock.get).toHaveBeenCalledWith('http://localhost:8080/create-game')
+    expect(gameService.requestNewGame).toHaveBeenCalled();
   })
 });

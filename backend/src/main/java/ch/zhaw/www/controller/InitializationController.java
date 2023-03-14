@@ -13,7 +13,7 @@ public class InitializationController {
      *
      * @return the newly game session
      */
-    @GetMapping(value = "/create-game", produces = "application/json")
+    @GetMapping(value = "/api/games", produces = "application/json")
     public ResponseEntity createGame() {
         System.out.println("called create game");
         return ResponseEntity.ok().build();

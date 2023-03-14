@@ -1,7 +1,6 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {firstValueFrom} from "rxjs";
 import {Session} from "../../model/session";
+import {GameService} from "../../service/game.service";
 
 @Component({
   selector: 'www-welcome',
@@ -11,14 +10,14 @@ import {Session} from "../../model/session";
 export class WelcomeComponent {
   @Output() newGameSession = new EventEmitter<Session>()
 
-  constructor(private http: HttpClient) {
+  constructor(private gameService: GameService) {
   }
 
   /**
    * Requests new game from backend and emits new game session object to parent container
    */
   async createGame() {
-    await firstValueFrom(this.http.get<Session>('http://localhost:8080/create-game')).then(
+    await this.gameService.requestNewGame().then(
       (value) => this.newGameSession.emit(value),
       () => this.newGameSession.emit(undefined)
     );

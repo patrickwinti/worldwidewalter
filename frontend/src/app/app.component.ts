@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
-import {testDTO} from "./models/testDTO";
+import {testDTO} from "./model/testDTO";
 
 @Component({
   selector: 'app-root',

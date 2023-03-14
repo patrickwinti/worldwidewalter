@@ -1,9 +1,9 @@
 package ch.zhaw.www.controller;
 
 
-import ch.zhaw.www.dto.GameResponse;
-import ch.zhaw.www.models.Game;
-import ch.zhaw.www.services.GameService;
+import ch.zhaw.www.dto.GameDto;
+import ch.zhaw.www.model.Game;
+import ch.zhaw.www.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -36,8 +36,8 @@ public class GameController {
     })
     @PostMapping(value = "/games", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GameResponse> createGame() {
+    public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
-        return ResponseEntity.ok(new GameResponse(newGame.getId(), String.format("/games/%s", newGame.getId())));
+        return ResponseEntity.ok(new GameDto(newGame.getId(), String.format("/games/%s", newGame.getId())));
     }
 }

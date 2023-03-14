@@ -1,6 +1,6 @@
-package ch.zhaw.www.models;
+package ch.zhaw.www.model;
 
-import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,6 +11,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class Game {
-    @Nonnull
+    @NotNull
     String id;
 }

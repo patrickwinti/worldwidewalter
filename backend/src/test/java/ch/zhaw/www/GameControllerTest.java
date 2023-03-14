@@ -1,8 +1,8 @@
 package ch.zhaw.www;
 
 
-import ch.zhaw.www.models.Game;
-import ch.zhaw.www.services.GameService;
+import ch.zhaw.www.model.Game;
+import ch.zhaw.www.service.GameService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;

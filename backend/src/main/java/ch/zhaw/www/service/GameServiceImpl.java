@@ -1,6 +1,6 @@
-package ch.zhaw.www.services;
+package ch.zhaw.www.service;
 
-import ch.zhaw.www.models.Game;
+import ch.zhaw.www.model.Game;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

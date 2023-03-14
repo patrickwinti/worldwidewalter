@@ -1,0 +1,21 @@
+@startuml
+package backend{
+    class GameController{
+      createGame(): GameDto
+    }
+    class GameDto{
+        id: String
+        path: String
+    }
+    class Game{
+        id: String
+    }
+    interface GameService{
+        createGame(): Game
+    }
+
+
+    GameController ..> GameDto
+    GameService ..> Game
+}
+@enduml

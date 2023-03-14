@@ -3,7 +3,7 @@ package backend{
     class GameController{
       createGame(): GameResponse
     }
-    class GameResponse{
+    class GameDto{
         id: String
         path: String
     }

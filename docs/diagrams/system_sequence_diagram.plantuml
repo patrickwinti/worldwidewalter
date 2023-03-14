@@ -5,8 +5,8 @@ actor       player2
 actor       playerN
 
 
-player1 -> system: Open new game (username)
-system --> player1: confirm (sessionID)
+player1 -> system: createGame()
+system --> player1: confirm():gameID
 
 player2 -> system: join session (sessionID, username)
 system --> player2: confirm

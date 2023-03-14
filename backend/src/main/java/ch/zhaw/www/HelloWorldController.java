@@ -1,6 +1,5 @@
-package ch.zhaw.www.controller;
+package ch.zhaw.www;
 
-import ch.zhaw.www.dto.testDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;

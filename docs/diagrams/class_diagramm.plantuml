@@ -15,7 +15,7 @@ package backend{
     }
 
 
-    GameController ..> GameResponse
+    GameController ..> GameDto
     GameService ..> Game
 }
 @enduml

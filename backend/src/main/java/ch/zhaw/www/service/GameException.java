@@ -19,13 +19,8 @@ public abstract class GameException extends RuntimeException {
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     public static class FullCapacity extends GameException {
-        /**
-         * Constructor for exception with message
-         *
-         * @param message message for clarification in the exception
-         */
-        public FullCapacity(String message) {
-            super(message);
+        FullCapacity() {
+            super("Game it at capacity");
         }
     }
 
@@ -34,29 +29,8 @@ public abstract class GameException extends RuntimeException {
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     public static class NotEnoughPlayers extends GameException {
-        /**
-         * Constructor for exception with message
-         *
-         * @param message message for clarification in the exception
-         */
-        public NotEnoughPlayers(String message) {
-            super(message);
-        }
-    }
-
-
-    /**
-     * Round is in wrong state to be started
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class RoundOngoing extends GameException {
-        /**
-         * Constructor for exception with message
-         *
-         * @param message message for clarification in the exception
-         */
-        public RoundOngoing(String message) {
-            super(message);
+        NotEnoughPlayers() {
+            super("Game has not enough players to start game");
         }
     }
 

@@ -1,10 +1,7 @@
 package ch.zhaw.www.controller;
 
 
-import ch.zhaw.www.dto.GameDto;
-import ch.zhaw.www.dto.PlayerDto;
-import ch.zhaw.www.dto.PlayerJoinDto;
-import ch.zhaw.www.dto.RoundDto;
+import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
@@ -26,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Validated
 public class GameController {
+    private static final String JOIN_DELIMITER = " - ";
     private final GameService gameService;
 
     GameController(GameService gameService) {
@@ -45,6 +43,7 @@ public class GameController {
         return ResponseEntity.ok(new GameDto(newGame.getId(), String.format("/api/games/%s", newGame.getId())));
     }
 
+    //region Game-Player endpoints
     @Operation(summary = "Player joins an existing game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Player has joined the game"),
@@ -70,6 +69,20 @@ public class GameController {
     public void leaveGame(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
     }
+    //endregion
+
+    @Operation(summary = "Player submits propositions")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Proposition submitted to round"),
+            @ApiResponse(responseCode = "404", description = "Either game, round or player has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/rounds/{roundId}/proposition", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public void submitProposition(@PathVariable String roundId, @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
+        gameService.submitProposition(roundId, playerId, String.join(JOIN_DELIMITER, proposition.getGaps()));
+    }
+
 
     @Operation(summary = "Player requested to start new round")
     @ApiResponses(value = {

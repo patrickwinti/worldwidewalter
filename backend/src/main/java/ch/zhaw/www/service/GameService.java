@@ -16,6 +16,7 @@ public interface GameService {
 
     void leaveGame(@NotNull String gameId, @NotNull String playerName) throws GameException.NotFound;
 
-    Round startNextRound(String gameId) throws GameException.NotFound, GameException.RoundOngoing, GameException.NotEnoughPlayers;
+    Round startNextRound(@NotNull String gameId) throws GameException.NotFound, RoundException.Ongoing, GameException.NotEnoughPlayers;
 
+    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String text) throws GameException.NotFound, RoundException.NotFound, PlayerException.NotFound;
 }

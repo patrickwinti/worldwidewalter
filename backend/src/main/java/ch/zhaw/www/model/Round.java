@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Model class with turn information
+ * Model class with round information
  */
 @AllArgsConstructor
 @Data

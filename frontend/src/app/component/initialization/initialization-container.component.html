@@ -1,3 +1,8 @@
-<www-welcome (newGameSession) = "newGameCreated()">
+<www-welcome (newGameEmitter) = "setGame($event)">
 
 </www-welcome>
+<ng-container *ngIf="game">
+  <div>
+    id of the game is: {{game.id}}
+  </div>
+</ng-container>

@@ -8,18 +8,18 @@ import {GameDto} from "../../dto/GameDto";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WelcomeComponent {
-  @Output() newGameSession = new EventEmitter<GameDto>()
+  @Output() newGameEmitter = new EventEmitter<GameDto>()
 
   constructor(private gameService: GameService) {
   }
 
   /**
-   * Requests new game from backend and emits new game session object to parent container
+   * Requests new game from backend and emits new game to parent container
    */
-  async createGame() {
+  async requestNewGame() {
     await this.gameService.requestNewGame().then(
-      (value) => this.newGameSession.emit(value),
-      () => this.newGameSession.emit(undefined)
+      (value) => this.newGameEmitter.emit(value),
+      () => this.newGameEmitter.emit(undefined)
     );
   }
 }

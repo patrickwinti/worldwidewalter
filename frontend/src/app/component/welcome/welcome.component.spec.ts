@@ -1,4 +1,4 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
 
 import {WelcomeComponent} from './welcome.component';
 import {getGameServiceMock} from "src/app/testing/mock-services"
@@ -35,9 +35,29 @@ describe('TestComponent', () => {
     gameService.requestNewGame.and.returnValue(firstValueFrom(of({} as GameDto)));
 
     // act
-    component.createGame();
+    component.requestNewGame();
 
     // assert
     expect(gameService.requestNewGame).toHaveBeenCalled();
   })
+
+  it('createGame should emit gameDto on successful http call', fakeAsync(() => {
+    // arrange
+    gameService.requestNewGame.and.returnValue(firstValueFrom(of({
+      id: 'gameId',
+      path: 'path'
+    } as GameDto)));
+    spyOn(component.newGameEmitter, 'emit');
+
+    // act
+    component.requestNewGame();
+    tick();
+
+    // assert
+    expect(gameService.requestNewGame).toHaveBeenCalled();
+    expect(component.newGameEmitter.emit).toHaveBeenCalledOnceWith({
+      id: 'gameId',
+      path: 'path'
+    } as GameDto);
+  }))
 });

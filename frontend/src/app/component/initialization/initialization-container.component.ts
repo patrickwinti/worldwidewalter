@@ -1,4 +1,5 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {GameDto} from "../../dto/GameDto";
 
 @Component({
   selector: 'www-initialization-container',
@@ -6,7 +7,13 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class InitializationContainerComponent {
+  private _game: GameDto;
 
-  newGameCreated() {
+  setGame(gameDto: GameDto) {
+    this._game = gameDto;
+  }
+
+  get game(): GameDto {
+    return this._game;
   }
 }

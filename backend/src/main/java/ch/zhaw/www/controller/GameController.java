@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.logging.Logger;
+
 /**
  * Controller for "games" resource.
  **/
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class GameController {
     private static final String JOIN_DELIMITER = " - ";
+    private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
 
     GameController(GameService gameService) {
@@ -40,6 +43,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
+        logger.info("created game " + newGame);
         return ResponseEntity.ok(new GameDto(newGame.getId(), String.format("/api/games/%s", newGame.getId())));
     }
 
@@ -55,6 +59,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinDto playerDto) {
         Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
+        logger.info("entered game " + player);
         return ResponseEntity.ok(new PlayerDto(player.getId()));
     }
 
@@ -68,6 +73,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void leaveGame(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
+        logger.info("left game successfully");
     }
     //endregion
 
@@ -81,6 +87,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public void submitProposition(@PathVariable String roundId, @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
         gameService.submitProposition(roundId, playerId, String.join(JOIN_DELIMITER, proposition.getGaps()));
+        logger.info("proposition submitted successfully");
     }
 
 
@@ -96,6 +103,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoundDto> startNextRound(@PathVariable String gameId) {
         Round round = gameService.startNextRound(gameId);
+        logger.info("started next round " + round);
         return ResponseEntity.ok(new RoundDto(round.getId()));
     }
 }

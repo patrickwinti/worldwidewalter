@@ -4,8 +4,10 @@ package ch.zhaw.www.controller;
 import ch.zhaw.www.dto.GameDto;
 import ch.zhaw.www.dto.PlayerDto;
 import ch.zhaw.www.dto.PlayerJoinDto;
+import ch.zhaw.www.dto.RoundDto;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -43,18 +45,44 @@ public class GameController {
         return ResponseEntity.ok(new GameDto(newGame.getId(), String.format("/api/games/%s", newGame.getId())));
     }
 
-
-    @Operation(summary = "Register user and join them to an existing game")
+    @Operation(summary = "Player joins an existing game")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Player has been added to game"),
+            @ApiResponse(responseCode = "200", description = "Player has joined the game"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game has reached max capacity"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<PlayerDto> registerPlayer(@PathVariable String gameId, @Valid @RequestBody PlayerJoinDto playerDto) {
-        Player player = gameService.registerUser(gameId, playerDto.getPlayerName());
+    public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinDto playerDto) {
+        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
         return ResponseEntity.ok(new PlayerDto(player.getId()));
+    }
+
+    @Operation(summary = "Player leaves game gracefully")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Player left game"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @DeleteMapping(value = "/games/{gameId}/players/{playerId}", produces = "application/json")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void leaveGame(@PathVariable String gameId, @Valid @PathVariable String playerId) {
+        gameService.leaveGame(gameId, playerId);
+    }
+
+    @Operation(summary = "Player requested to start new round")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player has been added to game"),
+            @ApiResponse(responseCode = "400", description = "Game is in an invalid state to start new round"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "409", description = "Game has not enough players to continue"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games/{gameId}/round", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<RoundDto> startNextRound(@PathVariable String gameId) {
+        Round round = gameService.startNextRound(gameId);
+        return ResponseEntity.ok(new RoundDto(round.getId()));
     }
 }

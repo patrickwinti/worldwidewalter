@@ -30,6 +30,37 @@ public abstract class GameException extends RuntimeException {
     }
 
     /**
+     * Game has gone below the minimum required amount of players
+     */
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class NotEnoughPlayers extends GameException {
+        /**
+         * Constructor for exception with message
+         *
+         * @param message message for clarification in the exception
+         */
+        public NotEnoughPlayers(String message) {
+            super(message);
+        }
+    }
+
+
+    /**
+     * Round is in wrong state to be started
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class RoundOngoing extends GameException {
+        /**
+         * Constructor for exception with message
+         *
+         * @param message message for clarification in the exception
+         */
+        public RoundOngoing(String message) {
+            super(message);
+        }
+    }
+
+    /**
      * Exception for cases where there is no game for
      * the given ID
      */

@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
-import {Session} from "../../model/session";
 import {GameService} from "../../service/game.service";
+import {GameDto} from "../../dto/GameDto";
 
 @Component({
   selector: 'www-welcome',
@@ -8,7 +8,7 @@ import {GameService} from "../../service/game.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WelcomeComponent {
-  @Output() newGameSession = new EventEmitter<Session>()
+  @Output() newGameSession = new EventEmitter<GameDto>()
 
   constructor(private gameService: GameService) {
   }

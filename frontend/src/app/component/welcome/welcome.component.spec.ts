@@ -4,7 +4,7 @@ import {WelcomeComponent} from './welcome.component';
 import {getGameServiceMock} from "src/app/testing/mock-services"
 import {firstValueFrom, of} from "rxjs";
 import {GameService} from "../../service/game.service";
-import {Session} from "../../model/session";
+import {GameDto} from "../../dto/GameDto";
 
 describe('TestComponent', () => {
   let component: WelcomeComponent;
@@ -32,7 +32,7 @@ describe('TestComponent', () => {
 
   it('createGame should call gameService', () => {
     // arrange
-    gameService.requestNewGame.and.returnValue(firstValueFrom(of({} as Session)));
+    gameService.requestNewGame.and.returnValue(firstValueFrom(of({} as GameDto)));
 
     // act
     component.createGame();

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
-import {Session} from "../model/session";
 import {AppConfigService} from "./app-config.service";
+import {GameDto} from "../dto/GameDto";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +13,7 @@ export class GameService {
               private appConfigService: AppConfigService) {
   }
 
-  requestNewGame(): Promise<Session> {
-    return firstValueFrom(this.http.post<Session>(this.appConfigService.getBaseUrl() + '/api/games', {}));
+  requestNewGame(): Promise<GameDto> {
+    return firstValueFrom(this.http.post<GameDto>(this.appConfigService.getBaseUrl() + '/api/games', {}));
   }
 }

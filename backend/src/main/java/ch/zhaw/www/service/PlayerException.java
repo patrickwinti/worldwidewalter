@@ -12,7 +12,7 @@ public abstract class PlayerException extends RuntimeException {
      * Player ID passed has not been found
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class NotFound extends GameException {
+    public static class NotFound extends GameError {
         /**
          * Constructor for exception with message
          *

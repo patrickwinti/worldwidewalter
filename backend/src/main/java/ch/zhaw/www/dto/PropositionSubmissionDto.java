@@ -8,6 +8,10 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Data object representing the submission of the
+ * player proposition.
+ */
 @Data
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)

@@ -21,5 +21,13 @@ public class GameDto {
     String id;
     @Valid
     @NotNull
-    String path;
+    GameDto.State gameState;
+
+    /**
+     * Lifecycle of the game. It is either ready with enough players
+     * or waiting for players to join
+     */
+    public enum State {
+        WAITING_FOR_PLAYERS, READY
+    }
 }

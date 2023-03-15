@@ -15,9 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.async.DeferredResult;
 
-import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,9 +26,6 @@ import java.util.logging.Logger;
 @RestController
 @Validated
 public class GameController {
-    private static final String JOIN_DELIMITER = " - ";
-    private static final String TIME_OUT_RESPONSE = "Time Out.";
-    private static final long TIME_OUT_IN_MS = 100_000L;
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
 
@@ -50,7 +45,21 @@ public class GameController {
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
         logger.log(Level.INFO, "created game {0}", newGame);
-        return ResponseEntity.ok(new GameDto(newGame.getId(), String.format("/api/games/%s", newGame.getId())));
+        return ResponseEntity.ok(new GameDto(newGame.getId(), GameDto.State.WAITING_FOR_PLAYERS));
+    }
+
+
+    @Operation(summary = "Creates a new game")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Game created"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/games/{gameId}", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<GameDto> getGame(@PathVariable String gameId) {
+        Game exitingGame = gameService.getGame(gameId);
+        logger.log(Level.INFO, "game found {0}", exitingGame);
+        return ResponseEntity.ok(new GameDto(gameId, GameDto.State.WAITING_FOR_PLAYERS));
     }
 
     //region Game-Player endpoints
@@ -63,9 +72,9 @@ public class GameController {
     })
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinDto playerDto) {
+    public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
         Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
-        logger.info("entered game " + player);
+        logger.log(Level.INFO, "entered game {0}", player);
         return ResponseEntity.ok(new PlayerDto(player.getId()));
     }
 
@@ -75,7 +84,7 @@ public class GameController {
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @DeleteMapping(value = "/games/{gameId}/players/{playerId}", produces = "application/json")
+    @DeleteMapping(value = "/games/{gameId}/players/{playerId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void leaveGame(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
@@ -92,7 +101,7 @@ public class GameController {
     @PostMapping(value = "/rounds/{roundId}/proposition", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public void submitProposition(@PathVariable String roundId, @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
-        gameService.submitProposition(roundId, playerId, String.join(JOIN_DELIMITER, proposition.getGaps()));
+        gameService.submitProposition(roundId, playerId, proposition.getGaps());
         logger.log(Level.INFO, "proposition submitted successfully");
     }
 
@@ -102,7 +111,7 @@ public class GameController {
             @ApiResponse(responseCode = "404", description = "Either game, round, proposition or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/rounds/{roundId}/proposition/{propositionId}", produces = "application/json")
+    @PostMapping(value = "/rounds/{roundId}/proposition/{propositionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void selectProposition(@PathVariable String roundId, @PathVariable String propositionId, @RequestHeader("X-PLAYER-ID") String playerId) {
         gameService.selectProposition(roundId, playerId, propositionId);
@@ -122,6 +131,6 @@ public class GameController {
     public ResponseEntity<RoundDto> startNextRound(@PathVariable String gameId) {
         Round round = gameService.startNextRound(gameId);
         logger.log(Level.INFO, "started next round {0}", round);
-        return ResponseEntity.ok(new RoundDto(round.getId()));
+        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPromt()));
     }
 }

@@ -12,4 +12,6 @@ import lombok.Data;
 public class Round {
     @NotNull
     String id;
+    @NotNull
+    String promt;
 }

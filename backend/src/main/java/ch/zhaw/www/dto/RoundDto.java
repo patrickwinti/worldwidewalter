@@ -5,14 +5,21 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
+/**
+ * Data object representing the new round
+ * with it's prompt
+ */
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundDto {
     @Valid
     @NotNull
-    String id;
+    final String id;
+    @Valid
+    @NotNull
+    final String prompt;
 }

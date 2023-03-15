@@ -12,7 +12,7 @@ public abstract class RoundException extends RuntimeException {
      * Round is in wrong state to be started
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class Ongoing extends GameException {
+    public static class Ongoing extends GameError {
         public Ongoing() {
             super("Round is ongoing and cannot start a new one");
         }
@@ -22,7 +22,7 @@ public abstract class RoundException extends RuntimeException {
      * Round ID passed has not been found
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class NotFound extends GameException {
+    public static class NotFound extends GameError {
         /**
          * Constructor for exception with message
          *

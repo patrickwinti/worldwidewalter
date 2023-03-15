@@ -36,6 +36,6 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/games")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"1\",\"path\":\"/games/1\"}"));
+                .andExpect(content().json("{\"id\":\"1\",\"path\":\"/api/games/1\"}"));
     }
 }

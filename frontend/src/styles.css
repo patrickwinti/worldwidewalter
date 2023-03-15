@@ -3,7 +3,7 @@
 /* Set global styles */
 body {
   background-color: black;
-  color: blue;
+  color: azure;
   font-family: Arial, sans-serif;
   font-size: 16px;
 }
@@ -12,18 +12,16 @@ body {
 .textbox {
   font-size: 20px;
   color: black;
-  background-color: wheat;
+  background-color: yellow;
   padding: 3px;
-  border-radius: 5px;
-  margin: 2px 0;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 200px;
-  margin-left: 30px;
+  margin: 2px 0 2px 30px;
 }
 
 .special-margin1 {
-  margin-left: 0px;
+  margin-left: 0;
 }
 .special-margin2 {
   margin-left: 50px;
@@ -34,13 +32,13 @@ body {
 
 /* Style button element */
 button {
-  background-color: #f6e5d4;
+  top:50%;
+  background-color: yellow;
   color: #142241;
   border: none;
   padding: 3px 3px;
   font-size: 20px;
   cursor: pointer;
-  border-radius: 5px;
   margin: 20px 20px 20px 10px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   width: 200px;
@@ -85,7 +83,7 @@ body {
 .topnav a {
   float: left;
   display: block;
-  color: #f2f2f2;
+  color: #333;
   text-align: center;
   padding: 14px 16px;
   text-decoration: none;
@@ -93,7 +91,7 @@ body {
 
 /* Change color on hover */
 .topnav a:hover {
-  background-color: #ddd;
+  background-color: #333;
   color: black;
 }
 
@@ -117,6 +115,11 @@ body {
     width: 100%;
   }
 }
-
+/* Style the footer */
+.footer {
+  background-color: #333;
+  padding: 10px;
+  text-align: center;
+}
 
 

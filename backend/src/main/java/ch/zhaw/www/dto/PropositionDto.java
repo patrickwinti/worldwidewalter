@@ -9,8 +9,11 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PlayerDto {
+public class PropositionDto {
     @Valid
     @NotNull
     String id;
+    @Valid
+    @NotNull
+    String gap;
 }

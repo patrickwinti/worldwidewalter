@@ -31,17 +31,17 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Round startNextRound(String gameId) throws GameError.NotFoundException, RoundException.Ongoing, GameError.NotEnoughPlayers {
+    public Round startNextRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException, GameError.NotEnoughPlayersException {
         return new Round(UUID.randomUUID().toString(), "I always wanted to WALTER");
     }
 
     @Override
-    public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException, RoundException.NotFound, PlayerException.NotFound {
-        
+    public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException {
+
     }
 
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException, RoundException.NotFound, PlayerException.NotFound {
+    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException {
 
     }
 }

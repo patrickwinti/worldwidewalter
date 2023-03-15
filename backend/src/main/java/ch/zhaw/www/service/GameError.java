@@ -28,8 +28,8 @@ public abstract class GameError extends RuntimeException {
      * Game has gone below the minimum required amount of players
      */
     @ResponseStatus(HttpStatus.CONFLICT)
-    public static class NotEnoughPlayers extends GameError {
-        NotEnoughPlayers() {
+    public static class NotEnoughPlayersException extends GameError {
+        NotEnoughPlayersException() {
             super("Game has not enough players to start game");
         }
     }

@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * All exceptions related to round  and round state
  */
-public abstract class RoundException extends RuntimeException {
+public abstract class RoundError extends RuntimeException {
     /**
      * Round is in wrong state to be started
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class Ongoing extends GameError {
-        public Ongoing() {
+    public static class OngoingException extends GameError {
+        public OngoingException() {
             super("Round is ongoing and cannot start a new one");
         }
     }
@@ -22,13 +22,13 @@ public abstract class RoundException extends RuntimeException {
      * Round ID passed has not been found
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class NotFound extends GameError {
+    public static class NotFoundException extends GameError {
         /**
          * Constructor for exception with message
          *
          * @param roundId roundId for clarification in the exception
          */
-        public NotFound(@NotNull String roundId) {
+        public NotFoundException(@NotNull String roundId) {
             super(String.format("Round with ID = %s could not be found", roundId));
         }
     }

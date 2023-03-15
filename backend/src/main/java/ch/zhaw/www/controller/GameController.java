@@ -15,7 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -26,8 +29,11 @@ import java.util.logging.Logger;
 @Validated
 public class GameController {
     private static final String JOIN_DELIMITER = " - ";
+    private static final String TIME_OUT_RESPONSE = "Time Out.";
+    private static final long TIME_OUT_IN_MS = 100_000L;
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
+
 
     GameController(GameService gameService) {
         this.gameService = gameService;
@@ -43,7 +49,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
-        logger.info("created game " + newGame);
+        logger.log(Level.INFO, "created game {0}", newGame);
         return ResponseEntity.ok(new GameDto(newGame.getId(), String.format("/api/games/%s", newGame.getId())));
     }
 
@@ -73,7 +79,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void leaveGame(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
-        logger.info("left game successfully");
+        logger.log(Level.INFO, "left game successfully");
     }
     //endregion
 
@@ -87,23 +93,35 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public void submitProposition(@PathVariable String roundId, @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
         gameService.submitProposition(roundId, playerId, String.join(JOIN_DELIMITER, proposition.getGaps()));
-        logger.info("proposition submitted successfully");
+        logger.log(Level.INFO, "proposition submitted successfully");
     }
 
+    @Operation(summary = "Player selects proposition")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Proposition choice saved"),
+            @ApiResponse(responseCode = "404", description = "Either game, round, proposition or player has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/rounds/{roundId}/proposition/{propositionId}", produces = "application/json")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void selectProposition(@PathVariable String roundId, @PathVariable String propositionId, @RequestHeader("X-PLAYER-ID") String playerId) {
+        gameService.selectProposition(roundId, playerId, propositionId);
+        logger.log(Level.INFO, "proposition selected successfully");
+    }
 
     @Operation(summary = "Player requested to start new round")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Player has been added to game"),
+            @ApiResponse(responseCode = "200", description = "New round started"),
             @ApiResponse(responseCode = "400", description = "Game is in an invalid state to start new round"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game has not enough players to continue"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/games/{gameId}/round", produces = "application/json")
+    @PostMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoundDto> startNextRound(@PathVariable String gameId) {
         Round round = gameService.startNextRound(gameId);
-        logger.info("started next round " + round);
+        logger.log(Level.INFO, "started next round {0}", round);
         return ResponseEntity.ok(new RoundDto(round.getId()));
     }
 }

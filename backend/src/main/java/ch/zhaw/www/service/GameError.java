@@ -18,8 +18,8 @@ public abstract class GameError extends RuntimeException {
      * Registrations cannot be accepted anymore
      */
     @ResponseStatus(HttpStatus.CONFLICT)
-    public static class FullCapacity extends GameError {
-        FullCapacity() {
+    public static class FullCapacityException extends GameError {
+        public FullCapacityException() {
             super("Game it at capacity");
         }
     }
@@ -29,7 +29,7 @@ public abstract class GameError extends RuntimeException {
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     public static class NotEnoughPlayersException extends GameError {
-        NotEnoughPlayersException() {
+        public NotEnoughPlayersException() {
             super("Game has not enough players to start game");
         }
     }

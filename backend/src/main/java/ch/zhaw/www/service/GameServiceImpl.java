@@ -21,7 +21,7 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacity {
+    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         return new Player(playerName);
     }
 

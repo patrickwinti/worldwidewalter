@@ -34,10 +34,10 @@ public interface GameService {
      * @param gameId     game requested to enter
      * @param playerName desired player name to register to game
      * @return new player
-     * @throws GameError.NotFoundException if game is not found
-     * @throws GameError.FullCapacity      if game has no available seats
+     * @throws GameError.NotFoundException     if game is not found
+     * @throws GameError.FullCapacityException if game has no available seats
      */
-    Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacity;
+    Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
 
     /**
      * Request to leave a game

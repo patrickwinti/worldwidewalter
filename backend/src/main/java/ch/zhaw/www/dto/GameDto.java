@@ -21,7 +21,7 @@ public class GameDto {
     String id;
     @Valid
     @NotNull
-    GameDto.State gameState;
+    GameDto.State state;
 
     /**
      * Lifecycle of the game. It is either ready with enough players

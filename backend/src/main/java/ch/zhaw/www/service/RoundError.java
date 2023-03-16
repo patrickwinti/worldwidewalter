@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * All exceptions related to round  and round state
  */
 public abstract class RoundError extends RuntimeException {
+    private RoundError(String message) {
+        super(message);
+    }
+
     /**
      * Round is in wrong state to be started
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class OngoingException extends GameError {
+    public static class OngoingException extends RoundError {
         public OngoingException() {
             super("Round is ongoing and cannot start a new one");
         }
@@ -22,7 +26,7 @@ public abstract class RoundError extends RuntimeException {
      * Round ID passed has not been found
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class NotFoundException extends GameError {
+    public static class NotFoundException extends RoundError {
         /**
          * Constructor for exception with message
          *

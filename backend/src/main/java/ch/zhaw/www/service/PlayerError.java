@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * All exceptions related to players
  */
 public abstract class PlayerError extends RuntimeException {
+    private PlayerError(String message) {
+        super(message);
+    }
+
     /**
      * Player ID passed has not been found
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public static class NotFoundException extends GameError {
+    public static class NotFoundException extends PlayerError {
         /**
          * Constructor for exception with message
          *

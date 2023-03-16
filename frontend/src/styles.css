@@ -1,125 +1,91 @@
-/* You can add global styles to this file, and also import other style files */
-
 /* Set global styles */
 body {
-  background-color: black;
-  color: azure;
-  font-family: Arial, sans-serif;
-  font-size: 16px;
+background-color: #181818; /* Set the background color to a dark gray */
+color: #FFFFFF; /* Set the font color to white */
+font-family: Arial, sans-serif; /* Set the font family to Arial or a sans-serif font */
+font-size: 14px; /* Set the default font size to 14 pixels */
 }
 
 /* Style box element */
 .textbox {
-  font-size: 20px;
-  color: black;
-  background-color: yellow;
-  padding: 3px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 200px;
-  margin: 2px 0 2px 30px;
+font-size: 16px; /* Set the font size to 16 pixels */
+color: black; /* Set the font color to black */
+background-color: yellow; /* Set the background color to yellow */
+padding: 2px; /* Add 2 pixels of padding */
+box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
+text-align: center; /* Center the text */
+width: 150px; /* Set the width to 150 pixels */
+margin: 2px 0 2px 20px; /* Set the margin */
 }
-
 .special-margin1 {
   margin-left: 0;
 }
 .special-margin2 {
-  margin-left: 50px;
+  margin-left: 30px;
 }
 .special-margin3 {
-  margin-left: 100px;
+  margin-left: 60px;
 }
-
 /* Style button element */
 button {
-  top:50%;
-  background-color: yellow;
-  color: #142241;
-  border: none;
-  padding: 3px 3px;
-  font-size: 20px;
-  cursor: pointer;
-  margin: 20px 20px 20px 10px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  width: 200px;
-
+top:50%; /* Position the button in the middle of the page */
+background-color: #FFD700; /* Set the background color to gold */
+color: #333333; /* Set the font color to a dark gray */
+border: none; /* Remove the border */
+padding: 2px 2px; /* Add 2 pixels of padding */
+font-size: 16px; /* Set the font size to 16 pixels */
+cursor: pointer; /* Add a cursor on hover */
+margin: 10px 10px 10px 5px; /* Set the margin */
+box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
+width: 150px; /* Set the width to 150 pixels */
 }
 
 /* Set width for input element */
 input[type="text"] {
-  width: 50%;
-  height: 40px;
-  margin-left: 10px;
-  padding: 10px;
-  font-size: 20px;
-  border-radius: 5px;
-  border: none;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-
-
+width: 70%; /* Set the width to 70% */
+height: 30px; /* Set the height to 30 pixels */
+margin-left: 10px; /* Set the left margin to 10 pixels */
+padding: 5px; /* Add 5 pixels of padding */
+font-size: 16px; /* Set the font size to 16 pixels */
+border-radius: 5px; /* Add a border radius */
+border: none; /* Remove the border */
+box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
 }
-* {
+
+/* Set box-sizing for all elements */
+
+{
   box-sizing: border-box;
 }
-
+/* Set margin to 0 for the body */
 body {
   margin: 0;
 }
 
 /* Style the header */
 .header {
-  background-color: black;
-  padding: 20px;
-  text-align: center;
+background-color: #333333; /* Set the background color to a dark gray */
+padding: 10px; /* Add 5 pixels of padding */
+text-align: center; /* Center the text */
+
 }
 
 /* Style the top navigation bar */
 .topnav {
-  overflow: hidden;
-  background-color: #333;
+overflow: hidden; /* Hide any overflow */
+background-color: #333333; /* Set the background color to a dark gray */
 }
 
 /* Style the topnav links */
 .topnav a {
-  float: left;
-  display: block;
-  color: #333;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-/* Change color on hover */
-.topnav a:hover {
-  background-color: #333;
-  color: black;
-}
-
+float: left; /* Float the links to the left */
+display: block; /* Set the display to block */
+color: #FFFFFF; /*Set the font color to white */
+text-align: center;}
 /* Create three equal columns that floats next to each other */
+
 .column {
   float: left;
-  width: 50%;
-  padding: 15px;
-}
-
-/* Clear floats after the columns */
-.row::after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
-@media screen and (max-width:600px) {
-  .column {
-    width: 100%;
-  }
-}
-/* Style the footer */
-.footer {
-  background-color: #333;
+  width: 100%;
   padding: 10px;
-  text-align: center;
 }
-
-

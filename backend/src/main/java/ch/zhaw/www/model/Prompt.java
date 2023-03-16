@@ -11,9 +11,9 @@ public class Prompt {
     private int totalPlaceholders;
     private String  statement;
 
-    public Prompt (int totalPlaceholders, String statement) {
-        this.totalPlaceholders = totalPlaceholders;
-        this.statement = statement;
+    public Prompt (String sentence) {
+        this.statement = sentence;
+        totalPlaceholders = countPlaceholders(sentence);
     }
 
     public int getTotalPlaceholders () {

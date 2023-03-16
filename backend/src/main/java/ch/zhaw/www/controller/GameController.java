@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 @RestController
 @Validated
+@CrossOrigin(origins = "http://localhost:4200")
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;

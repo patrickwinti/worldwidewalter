@@ -1,11 +1,12 @@
 @startuml
 package backend{
+    hide empty members
     class GameController{
       createGame(): GameDto
     }
     class GameDto{
-        id: String
-        path: String
+        -id: String
+        -state: State
     }
     class Game{
         id: String
@@ -13,9 +14,45 @@ package backend{
     interface GameService{
         createGame(): Game
     }
+    class PlayerDto{
+        -id: String
+    }
+    class PlayerJoinRequestDto{
+        -playerName:String
+    }
+    class PropositionSubmissionDto{
+        -gaps: List<String>
+    }
+    class RoundDto{
+        -id: String
+        -prompt: String
+    }
+    exception GameError{
+        FullCapacityException
+        NotEnoughPlayersException
+        NotFoundException
+    }
+    exception RoundError{
+        OngoingException
+        NotFoundException
+    }
+    exception PropositionError{
+        NotFoundException
+    }
+    exception PlayerError{
+        NotFoundException
+    }
 
+    GameController..>PlayerDto
+    GameController..>PlayerJoinRequestDto
+    GameController..>PropositionSubmissionDto
+    GameController..>RoundDto
 
     GameController ..> GameDto
     GameService ..> Game
+    GameService ..> GameError
+    GameService ..> RoundError
+    GameService ..> PlayerError
+    GameService ..> PropositionError
 }
 @enduml

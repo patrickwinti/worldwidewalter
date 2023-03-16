@@ -3,7 +3,6 @@ package ch.zhaw.www.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -13,15 +12,14 @@ import lombok.Data;
  * game.
  */
 @Data
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameDto {
     @Valid
     @NotNull
-    String id;
+    private final String id;
     @Valid
     @NotNull
-    GameDto.State state;
+    private final GameDto.State state;
 
     /**
      * Lifecycle of the game. It is either ready with enough players

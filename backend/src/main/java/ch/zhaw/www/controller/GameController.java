@@ -7,7 +7,6 @@ import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;

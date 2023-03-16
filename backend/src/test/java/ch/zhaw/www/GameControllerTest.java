@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,7 +55,7 @@ class GameControllerTest {
     @Test
     void testGetGame_200() throws Exception {
         when(gameService.getGame(any())).then(invocationOnMock -> new Game(GAME_ID));
-        mvc.perform(MockMvcRequestBuilders.get("/api/games"))
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}", GAME_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + GAME_ID + "\",\"state\":\"WAITING_FOR_PLAYERS\"}"));
     }
@@ -66,7 +68,7 @@ class GameControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"playerName\":\"Ulisses\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"x1\"}"));
+                .andExpect(content().json("{\"id\":\"" + PLAYER_ID + "\"}"));
         verify(gameService).enterGame(GAME_ID, "Ulisses");
     }
 
@@ -119,7 +121,7 @@ class GameControllerTest {
                         .header(HEADER_PLAYER, PLAYER_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
-        verify(gameService).submitProposition(ROUND_ID, PLAYER_ID, eq(List.of("one")));
+        verify(gameService).submitProposition(eq(ROUND_ID), eq(PLAYER_ID), eq(List.of("one")));
     }
 
     @Test
@@ -130,7 +132,7 @@ class GameControllerTest {
                         .header(HEADER_PLAYER, PLAYER_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-        verify(gameService).submitProposition(ROUND_ID, PLAYER_ID, eq(List.of("one")));
+        verify(gameService).submitProposition(eq(ROUND_ID), eq(PLAYER_ID), eq(List.of("one")));
     }
 
     @Test
@@ -141,7 +143,7 @@ class GameControllerTest {
                         .header(HEADER_PLAYER, PLAYER_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-        verify(gameService).submitProposition(ROUND_ID, PLAYER_ID, eq(List.of("one")));
+        verify(gameService).submitProposition(eq(ROUND_ID), eq(PLAYER_ID), eq(List.of("one")));
     }
 
     @Test
@@ -152,7 +154,7 @@ class GameControllerTest {
                         .header(HEADER_PLAYER, PLAYER_ID)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
-        verify(gameService).submitProposition(ROUND_ID, PLAYER_ID, eq(List.of("one")));
+        verify(gameService).submitProposition(eq(ROUND_ID), eq(PLAYER_ID), eq(List.of("one")));
     }
 
     @Test
@@ -161,6 +163,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/proposition/{propositionId}", ROUND_ID, PROPOSITION_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNoContent());
+
         verify(gameService).selectProposition(ROUND_ID, PLAYER_ID, PROPOSITION_ID);
     }
 
@@ -211,7 +214,7 @@ class GameControllerTest {
     void testStartNextRound_400() throws Exception {
         when(gameService.startNextRound(any())).thenThrow(new RoundError.OngoingException());
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/rounds", GAME_ID))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
         verify(gameService).startNextRound(GAME_ID);
     }
 

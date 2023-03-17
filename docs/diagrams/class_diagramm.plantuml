@@ -1,21 +1,80 @@
 @startuml
 package backend{
-    class GameController{
-      createGame(): GameDto
+    hide empty members
+    class GameController {
+        -gameService: GameService
+        +createGame(): GameDto
+        +getGame(gameId: String) : GameDto
+        +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+        +leaveGame(gameId: String, playerId: String) : void
+        +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto) : void
+        +selectProposition(roundId: String, propositionId: String, playerId: String) : void
+        +startNextRound(gameId: String) : RoundDto
     }
-    class GameDto{
-        id: String
-        path: String
+    class GameDto {
+        -id: String
+        -state: State
     }
-    class Game{
+    class Game {
         id: String
     }
     interface GameService{
-        createGame(): Game
+       §createGame(): Game
+       §leaveGame(gameId: String, playerId: String): void
+       §submitProposition(roundId: String, playerId: String, gaps: List<String>): void
+       §selectProposition(roundId: String, playerId: String, propositionId: String): void
+       §getGame(gameId: String) : Game
+       §enterGame(gameId: String, playerName: String) : Player
+       §startNextRound(gameId: String) : Round
+    }
+    class PlayerDto {
+        -id: String
+    }
+    class PlayerJoinRequestDto {
+        -playerName:String
+    }
+    class PropositionSubmissionDto {
+        -gaps: List<String>
+    }
+    class RoundDto {
+        -id: String
+        -prompt: String
+    }
+    class Player {
+        -id: String
+    }
+    class Round {
+        -id: String
+        -prompt: String
+    }
+    exception GameError {
+        FullCapacityException
+        NotEnoughPlayersException
+        NotFoundException
+    }
+    exception RoundError {
+        OngoingException
+        NotFoundException
+    }
+    exception PropositionError {
+        NotFoundException
+    }
+    exception PlayerError {
+        NotFoundException
     }
 
-
+    GameController..>PlayerDto
+    GameController..>PlayerJoinRequestDto
+    GameController..>PropositionSubmissionDto
+    GameController..>RoundDto
     GameController ..> GameDto
+
     GameService ..> Game
+    GameService ..> Round
+    GameService ..> Player
+    GameService ..> GameError
+    GameService ..> RoundError
+    GameService ..> PlayerError
+    GameService ..> PropositionError
 }
 @enduml

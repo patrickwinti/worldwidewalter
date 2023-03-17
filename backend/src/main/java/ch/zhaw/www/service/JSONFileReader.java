@@ -1,0 +1,51 @@
+package ch.zhaw.www.service;
+
+import ch.zhaw.www.model.Prompt;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Public class to read Files of JSON type.
+ * Class implements readFile method from the FileReader interface.
+ */
+public class JSONFileReader implements FileReader {
+    /**
+     * Method to read file and return a list of Prompts
+     * @param filePath Path to the file to be read
+     * @return List with Prompts
+     */
+    @Override
+    public List<Prompt> readFile(Path filePath) {
+
+        File file = new File(filePath.toUri());
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<Prompt> prompts = new ArrayList<>();
+
+        try {
+            JsonNode jsonNode = objectMapper.readTree(file);
+
+            JsonNode cardsNode = jsonNode.get("cards");
+
+            // Loop over the child nodes of the "cards" field
+            for (JsonNode cardNode : cardsNode) {
+
+                // Access the fields of each card using the get() method
+                prompts.add(new Prompt(cardNode.get("1").asText()));
+                prompts.add(new Prompt(cardNode.get("2").asText()));
+                prompts.add(new Prompt(cardNode.get("3").asText()));
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return prompts;
+    }
+}
+

@@ -41,7 +41,7 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException {
+    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
 
     }
 }

@@ -80,5 +80,5 @@ public interface GameService {
      * @throws RoundError.NotFoundException  if round is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
-    void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException;
+    void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
 }

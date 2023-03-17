@@ -3,9 +3,7 @@ package ch.zhaw.www.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Response object for API call
@@ -14,14 +12,20 @@ import lombok.NoArgsConstructor;
  * game.
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GameDto {
     @Valid
     @NotNull
-    String id;
+    private final String id;
     @Valid
     @NotNull
-    String path;
+    private final GameDto.State state;
+
+    /**
+     * Lifecycle of the game. It is either ready with enough players
+     * or waiting for players to join
+     */
+    public enum State {
+        WAITING_FOR_PLAYERS, READY
+    }
 }

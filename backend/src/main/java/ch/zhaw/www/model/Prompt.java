@@ -1,5 +1,8 @@
 package ch.zhaw.www.model;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Prompt Class stores a sentence with a statements that has one or more "placeholder" words to be completed
  * by the players' proposition.
@@ -30,16 +33,15 @@ public class Prompt {
      * @return total number of "WALTER" words.
      */
     private int countPlaceholders(String input) {
-        String[] words = input.split("\\s+");
+        // Match "WALTER", "WALTERN", "WALTERTE", "WALTERT", or "WALTERTEN"
+        Pattern pattern = Pattern.compile("\\bWALTER(TEN|TE|N)?\\b");
+        Matcher matcher = pattern.matcher(input);
+
         int count = 0;
-
-        for (String word : words) {
-            if (word.equals("WALTER") || word.equals("WALTERN") || word.equals("WALTERTE")) {
-                count++;
-            }
+        while (matcher.find()) {
+            count++;
         }
 
-            return count;
+        return count;
         }
-
 }

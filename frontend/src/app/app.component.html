@@ -1,4 +1,8 @@
-<div>
-  <www-initialization-container>
+<ng-container [ngSwitch]="appState">
+  <www-initialization-container *ngSwitchCase="AppState.INITIALIZATION"
+                                (startGameEmitter)="startGame()">
   </www-initialization-container>
-</div>
+
+  <www-game-container *ngSwitchCase="AppState.GAME">
+  </www-game-container>
+</ng-container>

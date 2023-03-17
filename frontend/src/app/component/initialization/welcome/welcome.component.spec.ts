@@ -4,7 +4,7 @@ import {WelcomeComponent} from './welcome.component';
 import {getGameServiceMock} from "src/app/testing/mock-services"
 import {firstValueFrom, of} from "rxjs";
 import {GameService} from "../../../service/game.service";
-import {GameDto} from "../../../dto/GameDto";
+import {GameDto} from "../../../dto/game-dto";
 
 describe('TestComponent', () => {
   let component: WelcomeComponent;

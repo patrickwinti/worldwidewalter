@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
 import {GameService} from "../../../service/game.service";
-import {GameDto} from "../../../dto/GameDto";
-import {AppState} from "../../../app-state";
+import {GameDto} from "../../../dto/game-dto";
+import {InitializationState} from "../../../model/initialization-state";
 
 @Component({
   selector: 'www-welcome',
@@ -10,7 +10,7 @@ import {AppState} from "../../../app-state";
 })
 export class WelcomeComponent {
   @Output() newGameEmitter = new EventEmitter<GameDto>()
-  @Output() appStateEmitter = new EventEmitter<AppState>()
+  @Output() initializationStateEmitter = new EventEmitter<InitializationState>()
 
   constructor(private gameService: GameService) {
   }
@@ -25,11 +25,11 @@ export class WelcomeComponent {
     );
     if (newGame !== undefined) {
       this.newGameEmitter.emit(newGame);
-      this.appStateEmitter.emit(AppState.JOIN_GAME);
+      this.initializationStateEmitter.emit(InitializationState.JOIN_GAME);
     }
   }
 
   goToJoinPage() {
-    this.appStateEmitter.emit(AppState.JOIN_GAME);
+    this.initializationStateEmitter.emit(InitializationState.JOIN_GAME);
   }
 }

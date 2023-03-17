@@ -57,8 +57,8 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GameDto> getGame(@PathVariable String gameId) {
-        Game exitingGame = gameService.getGame(gameId);
-        logger.log(Level.INFO, "game found {0}", exitingGame);
+        Game existingGame = gameService.getGame(gameId);
+        logger.log(Level.INFO, "game found {0}", existingGame);
         return ResponseEntity.ok(new GameDto(gameId, GameDto.State.WAITING_FOR_PLAYERS));
     }
 

@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.List;
 
 
-public class JSONFileReader implements FileReader{
+public class TXTFileReader implements FileReader{
     @Override
     public List<Prompt> readFile(File file) {
         return null;

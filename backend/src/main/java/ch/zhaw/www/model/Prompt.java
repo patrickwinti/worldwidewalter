@@ -25,16 +25,16 @@ public class Prompt {
     }
 
     /**
-     * Method to count the total number of WALTER (or WALTER related) words that appear in one statement.
+     * Method to count the total number of WALTER words (or variations) that appear in one statement.
      * @param input: sentece to be analysed.
      * @return total number of "WALTER" words.
      */
-    public int countPlaceholders(String input) {
+    private int countPlaceholders(String input) {
         String[] words = input.split("\\s+");
         int count = 0;
 
         for (String word : words) {
-            if (word.equals("WALTER") || word.equals("WALTERN")) {
+            if (word.equals("WALTER") || word.equals("WALTERN") || word.equals("WALTERTE")) {
                 count++;
             }
         }

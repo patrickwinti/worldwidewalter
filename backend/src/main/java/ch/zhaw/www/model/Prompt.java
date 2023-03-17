@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 public class Prompt {
 
-    private int totalPlaceholders;
-    private String  statement;
+    private final int totalPlaceholders;
+    private final String  statement;
 
     public Prompt (String sentence) {
         this.statement = sentence;
@@ -34,7 +34,7 @@ public class Prompt {
      */
     private int countPlaceholders(String input) {
         // Match "WALTER", "WALTERN", "WALTERTE", "WALTERT", or "WALTERTEN"
-        Pattern pattern = Pattern.compile("\\bWALTER(TEN|TE|N)?\\b");
+        Pattern pattern = Pattern.compile("\\bWALTER(TEN|TE|N|ST|chen)?\\b");
         Matcher matcher = pattern.matcher(input);
 
         int count = 0;

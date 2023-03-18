@@ -1,4 +1,4 @@
-import {GameState} from "../model/game-state";
+import { GameState } from "../model/game-state";
 
 export interface GameDto {
   id: string;

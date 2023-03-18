@@ -14,7 +14,7 @@ export class JoinComponent implements OnInit {
   @Output() initializationStateEmitter = new EventEmitter<InitializationState>();
   gameIdIsReadOnly: boolean;
   gameId: string;
-  userName: string;
+  playerName: string;
 
   constructor(private gameService: GameService) {
   }
@@ -30,9 +30,9 @@ export class JoinComponent implements OnInit {
   }
 
   async joinGame() {
-    if (this.userName != undefined && this.userName != '') {
+    if (this.playerName != undefined && this.playerName != '') {
       const playerDto = await this.gameService.joinGame({
-          playerName: this.userName
+          playerName: this.playerName
         } as PlayerJoinRequestDto,
         this.gameId)
         .then(
@@ -44,6 +44,6 @@ export class JoinComponent implements OnInit {
         );
     }
 
-    console.log('joining game: ' + this.gameId + 'with username: ' + this.userName);
+    console.log('joining game: ' + this.gameId + 'with username: ' + this.playerName);
   }
 }

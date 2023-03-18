@@ -1,13 +1,13 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {GameDto} from "../../dto/GameDto";
-import {AppState} from "../../app-state";
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { GameDto } from "../../dto/GameDto";
+import { AppState } from "../../app-state";
 
 @Component({
   selector: 'www-initialization-container',
   templateUrl: './initialization-container.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InitializationContainerComponent implements OnInit{
+export class InitializationContainerComponent implements OnInit {
   state: AppState;
   presetGameId: string;
   private _game: GameDto;

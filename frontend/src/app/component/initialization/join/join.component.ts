@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'www-join',
@@ -8,10 +8,10 @@ export class JoinComponent implements OnInit {
   @Input() presetGameId: string;
   gameIdIsReadOnly: boolean;
   gameId: string;
-  userName: string;
+  playerName: string;
 
   joinGame() {
-    console.log('joining game: ' + this.gameId + 'with username: ' + this.userName);
+    console.log('joining game: ' + this.gameId + ' with player name: ' + this.playerName);
   }
 
   ngOnInit(): void {

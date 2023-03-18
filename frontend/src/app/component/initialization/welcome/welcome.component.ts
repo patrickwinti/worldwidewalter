@@ -1,7 +1,7 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, Output} from '@angular/core';
-import {GameService} from "../../../service/game.service";
-import {GameDto} from "../../../dto/GameDto";
-import {AppState} from "../../../app-state";
+import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
+import { GameService } from "../../../service/game.service";
+import { GameDto } from "../../../dto/GameDto";
+import { AppState } from "../../../app-state";
 
 @Component({
   selector: 'www-welcome',
@@ -20,8 +20,8 @@ export class WelcomeComponent {
    */
   async requestNewGame() {
     let newGame = await this.gameService.requestNewGame().then(
-      (value) => {return value},
-      () => {return undefined}
+      (value) => value,
+      () => undefined
     );
     if (newGame !== undefined) {
       this.newGameEmitter.emit(newGame);

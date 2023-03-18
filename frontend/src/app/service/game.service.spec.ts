@@ -1,8 +1,8 @@
-import {TestBed} from '@angular/core/testing';
-import {GameService} from './game.service';
-import {of} from "rxjs";
-import {getHttpClientMock} from "../testing/mock-services";
-import {HttpClient} from "@angular/common/http";
+import { TestBed } from '@angular/core/testing';
+import { GameService } from './game.service';
+import { of } from "rxjs";
+import { getHttpClientMock } from "../testing/mock-services";
+import { HttpClient } from "@angular/common/http";
 
 describe('GameService', () => {
   let service: GameService;

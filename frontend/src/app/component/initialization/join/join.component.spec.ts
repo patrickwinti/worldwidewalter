@@ -29,7 +29,7 @@ describe('JoinComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('ngOninit', () => {
+  describe('ngOnInit', () => {
     it('should set gameIdIsReadOnly to true if gameId presetValue present', () => {
       // arrange
       component.presetGameId = 'presetId';

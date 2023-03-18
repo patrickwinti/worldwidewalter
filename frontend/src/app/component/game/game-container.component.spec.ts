@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GameContainerComponent } from './game-container.component';
 import { NO_ERRORS_SCHEMA } from "@angular/core";
+import { GameState } from "../../model/game-state";
 
 describe('GameContainerComponent', () => {
   let component: GameContainerComponent;
@@ -22,4 +23,15 @@ describe('GameContainerComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('ngOnInit', () => {
+    it('should set game state to START', () => {
+      // arrange && act
+      component.ngOnInit();
+
+      // assert
+      expect(component.gameState).toBe(GameState.START);
+    });
+  })
+
 });

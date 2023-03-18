@@ -40,7 +40,7 @@ export class JoinComponent implements OnInit {
             this.playerEmitter.emit(value);
             this.initializationStateEmitter.emit(InitializationState.WAITING_ROOM);
           },
-          () => undefined // error joining the game. How do we handle errors in frontend? how to display?
+          () => undefined // TODO: error handling when joining the game. How do we handle errors in frontend? how to display?
         );
     }
 

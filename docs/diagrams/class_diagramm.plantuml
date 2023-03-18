@@ -10,12 +10,35 @@ package backend{
     class Game{
         id: String
     }
+    class Prompt{
+        statement: String
+        totalPlaceholders: int
+        hasBeenUsed: boolean
+        getStatement(): String
+        getTotalPlaceholders(): int
+        isHasBeenUsed(): boolean
+        setHasBeenUsed(): void
+    }
+
     interface GameService{
         createGame(): Game
+    }
+
+    interface FileReader{
+        readFile(): List<Prompt>
+    }
+
+    class JSONFileReader{
+    }
+    class TXTFileReader{
     }
 
 
     GameController ..> GameDto
     GameService ..> Game
+
+    FileReader ..> JSONFileReader
+    FileReader ..> TXTFilerReader
+
 }
 @enduml

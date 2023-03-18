@@ -2,10 +2,10 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Prompt;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.List;
 
 public interface FileReader {
-    List<Prompt> readFile(Path filePath);
+    List<Prompt> readFile(File file);
 }
 

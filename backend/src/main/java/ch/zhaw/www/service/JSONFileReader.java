@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +16,13 @@ import java.util.List;
 public class JSONFileReader implements FileReader {
     /**
      * Method to read file and return a list of Prompts
-     * @param filePath Path to the file to be read
+     *
+     * @param file Path to the file to be read
      * @return List with Prompts
      */
     @Override
-    public List<Prompt> readFile(Path filePath) {
+    public List<Prompt> readFile(File file) {
 
-        File file = new File(filePath.toUri());
         ObjectMapper objectMapper = new ObjectMapper();
         List<Prompt> prompts = new ArrayList<>();
 

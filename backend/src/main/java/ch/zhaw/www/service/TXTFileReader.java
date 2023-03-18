@@ -2,10 +2,10 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Prompt;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,20 +17,19 @@ public class TXTFileReader implements FileReader {
 
     /**
      * Method to read file and return a list of Prompts
-     * @param filePath Path to the file to be read
+     *
+     * @param file Path to the file to be read
      * @return List with Prompts
      */
     @Override
-    public List<Prompt> readFile(Path filePath) {
+    public List<Prompt> readFile(File file) {
         // Path to be hard coded for first iteration.
-        filePath = Paths.get(filePath.toUri());
-
         List<String> lines;
         List<Prompt> prompts = new ArrayList<>();
 
         try {
             // Read all lines from the file
-            lines = Files.readAllLines(filePath);
+            lines = Files.readAllLines(Path.of(file.getPath()));
 
             // Print out each line
             for (String line : lines) {
@@ -42,5 +41,6 @@ public class TXTFileReader implements FileReader {
 
         return prompts;
     }
+
 }
 

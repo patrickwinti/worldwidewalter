@@ -16,13 +16,13 @@ import java.util.List;
 public class TXTFileReader implements FileReader {
 
     /**
-     * Method to read file and return a list of Prompts
+     * Method to read file and return a list of Prompts from a JSON file
      *
-     * @param file Path to the file to be read
-     * @return List with Prompts
+     * @param file TXT file input
+     * @return List with parsed prompts
      */
     @Override
-    public List<Prompt> readFile(File file) {
+    public List<Prompt> readFile (File file) {
         // Path to be hard coded for first iteration.
         List<String> lines;
         List<Prompt> prompts = new ArrayList<>();

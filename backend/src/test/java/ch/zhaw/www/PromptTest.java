@@ -7,16 +7,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PromptTest {
 
-    private Prompt example1 = new Prompt("Vielleicht habe ich in einem früheren Leben schon mal gelebt - bestimmt war ich aber nicht unter den Leuten, die WALTERTEN.");
-    private Prompt example2 = new Prompt("Auszug aus dem Parteiprogramm der Grünen in zehn Jahren: \"Wir verlangen, dass WALTER\".");
-    private Prompt example3 = new Prompt("Viele Männer reden ihre Geliebten mit \"Mäuschen\" oder \"Spätchen\" an. Ich finde das beleidigend. Wenn schon, so möchte ich bitteschön mit \"WALTERchen\" angeredet werden!");
-    private Prompt example4 = new Prompt("WALTER ist ein unvorstellbar dummes Lebewesen; es WALTERT.");
-    private Prompt example5 = new Prompt("Manchmal verspüre ich den seltsamen Drang, WALTER zu WALTERN.");
-    private Prompt example6 = new Prompt("Ein guter Rat: Küss nie ein(e/n) WALTER!");
-    private Prompt example7 = new Prompt("Die nächste Pandemie-Panik wird wegen des WALTER-Virus ausbrechen.");
-    private Prompt example8 = new Prompt("Mir schwebt ein noch nie gesehener technischer Gag für den nächsten James Bond-Film vor: 007 Walter.");
-    private Prompt example9 = new Prompt("WALTER WALTERN WARTERTE WALTERT Walter.");
-    private Prompt example10 = new Prompt("Hallo ich heisse WALTER");
+    // Creating several prompts with different variations of WALTER words
+    private final Prompt example1 = new Prompt("Vielleicht habe ich in einem früheren Leben schon mal gelebt - bestimmt war ich aber nicht unter den Leuten, die WALTERTEN.");
+    private final Prompt example2 = new Prompt("Auszug aus dem Parteiprogramm der Grünen in zehn Jahren: \"Wir verlangen, dass WALTER\".");
+    private final Prompt example3 = new Prompt("Viele Männer reden ihre Geliebten mit \"Mäuschen\" oder \"Spätchen\" an. Ich finde das beleidigend. Wenn schon, so möchte ich bitteschön mit \"WALTERchen\" angeredet werden!");
+    private final Prompt example4 = new Prompt("WALTER ist ein unvorstellbar dummes Lebewesen; es WALTERT.");
+    private final Prompt example5 = new Prompt("Manchmal verspüre ich den seltsamen Drang, WALTER zu WALTERN.");
+    private final Prompt example6 = new Prompt("Ein guter Rat: Küss nie ein(e/n) WALTER!");
+    private final Prompt example7 = new Prompt("Die nächste Pandemie-Panik wird wegen des WALTER-Virus ausbrechen.");
+    private final Prompt example8 = new Prompt("Mir schwebt ein noch nie gesehener technischer Gag für den nächsten James Bond-Film vor: 007 Walter.");
+    private final Prompt example9 = new Prompt("WALTER WALTERN WARTERTE WALTERT Walter.");
+    private final Prompt example10 = new Prompt("Hallo ich heisse WALTER");
 
     /**
      * Checks that the correct ammount of placeholders has been set.
@@ -48,7 +49,6 @@ class PromptTest {
     @Test
     void setHasBeenUsed() {
         example1.setHasBeenUsed(true);
-
         assertTrue(example1.isHasBeenUsed());
     }
 }

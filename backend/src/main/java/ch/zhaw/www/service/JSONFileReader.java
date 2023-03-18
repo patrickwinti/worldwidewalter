@@ -11,17 +11,17 @@ import java.util.List;
 
 /**
  * Public class to read Files of JSON type.
- * Class implements readFile method from the FileReader interface.
+ * Class implements FileReader interface.
  */
 public class JSONFileReader implements FileReader {
     /**
-     * Method to read file and return a list of Prompts
+     * Method to read file and return a list of Prompts from a JSON file
      *
-     * @param file Path to the file to be read
-     * @return List with Prompts
+     * @param file JSON file input
+     * @return List with parsed prompts
      */
     @Override
-    public List<Prompt> readFile(File file) {
+    public List<Prompt> readFile (File file) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<Prompt> prompts = new ArrayList<>();

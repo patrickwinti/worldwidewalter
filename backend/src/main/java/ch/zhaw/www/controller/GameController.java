@@ -135,6 +135,6 @@ public class GameController {
     public ResponseEntity<RoundDto> startNextRound(@PathVariable String gameId) {
         Round round = gameService.startNextRound(gameId);
         logger.log(Level.INFO, "started next round {0}", round);
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPromt()));
+        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt()));
     }
 }

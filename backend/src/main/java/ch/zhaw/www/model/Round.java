@@ -13,5 +13,5 @@ public class Round {
     @NotNull
     String id;
     @NotNull
-    String promt;
+    String prompt;
 }

@@ -9,7 +9,7 @@ class PromptTest {
 
     private Prompt example1 = new Prompt("Vielleicht habe ich in einem früheren Leben schon mal gelebt - bestimmt war ich aber nicht unter den Leuten, die WALTERTEN.");
     private Prompt example2 = new Prompt("Auszug aus dem Parteiprogramm der Grünen in zehn Jahren: \"Wir verlangen, dass WALTER\".");
-    private Prompt example3 = new Prompt("Mit meinem Flair für klare Handzeichen kann ich auch als Börsenmakler an der Wall Street arbeiten: Zeige ich dort mit dem kleinen Finger auf einen Kollegen, so will ich damit sagen, dass dieser WALTERE.");
+    private Prompt example3 = new Prompt("Viele Männer reden ihre Geliebten mit \"Mäuschen\" oder \"Spätchen\" an. Ich finde das beleidigend. Wenn schon, so möchte ich bitteschön mit \"WALTERchen\" angeredet werden!");
     private Prompt example4 = new Prompt("WALTER ist ein unvorstellbar dummes Lebewesen; es WALTERT.");
     private Prompt example5 = new Prompt("Manchmal verspüre ich den seltsamen Drang, WALTER zu WALTERN.");
     private Prompt example6 = new Prompt("Ein guter Rat: Küss nie ein(e/n) WALTER!");

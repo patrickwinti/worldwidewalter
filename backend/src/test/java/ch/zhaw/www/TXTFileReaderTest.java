@@ -21,7 +21,7 @@ class TXTFileReaderTest {
 
         assertEquals(5, prompts.size());
         assertNotEquals(10, prompts.size());
-        assertEquals("\"WALTER WALTERN WALTER\"", prompts.get(4).getStatement());
+        assertEquals("WALTER WALTERN WALTER", prompts.get(4).getStatement());
         assertEquals(3, prompts.get(4).getTotalPlaceholders());
     }
 

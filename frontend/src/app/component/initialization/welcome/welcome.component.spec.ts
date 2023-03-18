@@ -1,10 +1,10 @@
-import {ComponentFixture, fakeAsync, TestBed, tick} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import {WelcomeComponent} from './welcome.component';
-import {getGameServiceMock} from "src/app/testing/mock-services"
-import {firstValueFrom, of} from "rxjs";
-import {GameService} from "../../../service/game.service";
-import {GameDto} from "../../../dto/game-dto";
+import { WelcomeComponent } from './welcome.component';
+import { getGameServiceMock } from "src/app/testing/mock-services"
+import { firstValueFrom, of } from "rxjs";
+import { GameService } from "../../../service/game.service";
+import { GameDto } from "../../../dto/game-dto";
 
 describe('TestComponent', () => {
   let component: WelcomeComponent;
@@ -44,8 +44,7 @@ describe('TestComponent', () => {
   it('createGame should emit gameDto on successful http call', fakeAsync(() => {
     // arrange
     gameService.requestNewGame.and.returnValue(firstValueFrom(of({
-      id: 'gameId',
-      path: 'path'
+      id: 'gameId'
     } as GameDto)));
     spyOn(component.newGameEmitter, 'emit');
 
@@ -56,8 +55,7 @@ describe('TestComponent', () => {
     // assert
     expect(gameService.requestNewGame).toHaveBeenCalled();
     expect(component.newGameEmitter.emit).toHaveBeenCalledOnceWith({
-      id: 'gameId',
-      path: 'path'
+      id: 'gameId'
     } as GameDto);
   }))
 });

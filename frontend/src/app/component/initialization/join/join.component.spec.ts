@@ -1,7 +1,7 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import {JoinComponent} from './join.component';
-import {NO_ERRORS_SCHEMA} from "@angular/core";
+import { JoinComponent } from './join.component';
+import { NO_ERRORS_SCHEMA } from "@angular/core";
 
 describe('JoinComponent', () => {
   let component: JoinComponent;
@@ -12,7 +12,7 @@ describe('JoinComponent', () => {
       declarations: [JoinComponent],
       schemas: [NO_ERRORS_SCHEMA]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(JoinComponent);
     component = fixture.componentInstance;

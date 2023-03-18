@@ -1,8 +1,8 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {GameService} from "../../../service/game.service";
-import {PlayerJoinRequestDto} from "../../../dto/player-join-request-dto";
-import {PlayerDto} from "../../../dto/player-dto";
-import {InitializationState} from "../../../model/initialization-state";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { GameService } from "../../../service/game.service";
+import { PlayerJoinRequestDto } from "../../../dto/player-join-request-dto";
+import { PlayerDto } from "../../../dto/player-dto";
+import { InitializationState } from "../../../model/initialization-state";
 
 @Component({
   selector: 'www-join',

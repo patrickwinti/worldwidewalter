@@ -1,14 +1,14 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {GameDto} from "../../dto/game-dto";
-import {PlayerDto} from "../../dto/player-dto";
-import {InitializationState} from "../../model/initialization-state";
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { GameDto } from "../../dto/game-dto";
+import { PlayerDto } from "../../dto/player-dto";
+import { InitializationState } from "../../model/initialization-state";
 
 @Component({
   selector: 'www-initialization-container',
   templateUrl: './initialization-container.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InitializationContainerComponent implements OnInit{
+export class InitializationContainerComponent implements OnInit {
   @Output() startGameEmitter = new EventEmitter<GameDto>();
   state: InitializationState;
   presetGameId: string;

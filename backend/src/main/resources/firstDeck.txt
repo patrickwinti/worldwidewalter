@@ -63,7 +63,7 @@
 "Ich habe noch in keiner Bibliothek ein Buch über WALTER gefunden.",
 "Viele Arbeitslose sind WALTER.",
 "Wenn ich das Wort \"Tempo\" höre, denke ich unwillkürlich an WALTER.",
-"Mir schwebt ein noch nie gesehener technischer Gag für den nächsten James Bond-Film vor: 007 Walter.",
+"Mir schwebt ein noch nie gesehener technischer Gag für den nächsten James Bond-Film vor: 007 WALTER.",
 "Ich halte nichts von auffälligem Make-Up - aber wenn schon, dann würde ich meine Fingernägel WALTER bemalen.",
 "Die unangenehmste Pflicht einer Kinderkrankenschwester ist gewiss das WALTERN.",
 "Ich habe die Idee zu einem Bestseller-Roman: \"Liebe auf Abwegen - die Geschichte eines Mannes und WALTER\".",

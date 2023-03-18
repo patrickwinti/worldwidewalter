@@ -12,29 +12,39 @@ import java.util.regex.Pattern;
 public class Prompt {
 
     private final int totalPlaceholders;
-    private final String  statement;
+    private final String statement;
+    private boolean hasBeenUsed;
 
-    public Prompt (String sentence) {
+    public Prompt(String sentence) {
         this.statement = sentence;
         totalPlaceholders = countPlaceholders(sentence);
+        hasBeenUsed = false;
     }
 
-    public int getTotalPlaceholders () {
+    public int getTotalPlaceholders() {
         return totalPlaceholders;
     }
 
-    public String getStatement () {
+    public String getStatement() {
         return statement;
+    }
+
+    public boolean isHasBeenUsed() {
+        return hasBeenUsed;
+    }
+
+    public void setHasBeenUsed(boolean hasBeenUsed) {
+        this.hasBeenUsed = hasBeenUsed;
     }
 
     /**
      * Method to count the total number of WALTER words (or variations) that appear in one statement.
+     *
      * @param input: sentece to be analysed.
      * @return total number of "WALTER" words.
      */
     private int countPlaceholders(String input) {
-        // Match "WALTER", "WALTERN", "WALTERTE", "WALTERT", or "WALTERTEN"
-        Pattern pattern = Pattern.compile("\\bWALTER(TEN|TE|N|ST|chen)?\\b");
+        Pattern pattern = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
         Matcher matcher = pattern.matcher(input);
 
         int count = 0;
@@ -43,5 +53,5 @@ public class Prompt {
         }
 
         return count;
-        }
+    }
 }

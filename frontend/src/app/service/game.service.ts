@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { firstValueFrom, Observable, of } from "rxjs";
+import { filter, firstValueFrom, Observable, retry, switchMap, take, timer } from "rxjs";
 import { AppConfigService } from "./app-config.service";
 import { GameDto } from "../dto/game-dto";
 import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
@@ -28,8 +28,15 @@ export class GameService {
     return firstValueFrom(this.http.get<GameDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId));
   }
 
-  getGameAsSoonAsInGivenState(gameId: string, gameState: GameState): Observable<GameDto> {
-    return of({} as GameDto);
+  getGameAsSoonAsInGivenState(gameId: string, gameState: GameState, retries: number, interval: number): Observable<GameDto> {
+    return timer(1, interval).pipe(
+      switchMap(() => this.getGame(gameId)),
+      filter((game: GameDto) => {
+        return game.state === gameState;
+      }),
+      retry(retries),
+      take(1)
+    );
   }
 
 }

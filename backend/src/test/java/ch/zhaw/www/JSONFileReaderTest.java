@@ -28,4 +28,6 @@ class JSONFileReaderTest {
         assertEquals("Ich möchte mal irgendwo leben, wo es kein(e/n) WALTER gibt.", prompts.get(10).getStatement());
         assertEquals(3, prompts.get(11).getTotalPlaceholders());
     }
+
+    //todo add negative tests
 }

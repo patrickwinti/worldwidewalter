@@ -18,6 +18,7 @@ class PromptTest {
     private final Prompt example8 = new Prompt("WALTER WALTERN WARTERTE WALTERT Walter.");
     private final Prompt example9 = new Prompt("Hallo ich heisse WALTER");
 
+
     /**
      * Checks that the correct ammount of placeholders has been set.
      */
@@ -49,4 +50,6 @@ class PromptTest {
         example1.setHasBeenUsed(true);
         assertTrue(example1.isHasBeenUsed());
     }
+
+    //todo check if negative tests necessary
 }

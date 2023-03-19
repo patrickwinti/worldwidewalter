@@ -200,7 +200,7 @@ class GameControllerTest {
         when(gameService.startNextRound(any())).then(o -> new Round(ROUND_ID, PROMPT));
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/rounds", GAME_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + ROUND_ID + "\",\"prompt\":\"" + PROMPT + "\"}"));
+                .andExpect(content().json("{\"id\":\"" + ROUND_ID + "\",\"prompt\":\"prompt\"}"));
         verify(gameService).startNextRound(GAME_ID);
     }
 

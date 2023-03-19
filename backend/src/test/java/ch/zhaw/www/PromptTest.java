@@ -23,7 +23,7 @@ class PromptTest {
      * Checks that the correct ammount of placeholders has been set.
      */
     @Test
-    void getTotalPlaceholders() {
+    void testGetTotalPlaceholders() {
 
         assertEquals(1, example1.getTotalPlaceholders());
         assertEquals(1, example2.getTotalPlaceholders());
@@ -37,17 +37,17 @@ class PromptTest {
     }
 
     @Test
-    void getStatement() {
+    void testGetStatement() {
         assertEquals("Hallo ich heisse WALTER", example10.getStatement());
     }
 
     @Test
-    void isHasBeenUsed() {
+    void testHasBeenUsed() {
         assertFalse(example3.isHasBeenUsed());
     }
 
     @Test
-    void setHasBeenUsed() {
+    void testUpdateHasBeenUsed() {
         example1.setHasBeenUsed(true);
         assertTrue(example1.isHasBeenUsed());
     }

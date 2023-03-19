@@ -6,14 +6,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Public class to read Files of TXT type.
  * Class implements readFile method from the FileReader interface.
  */
-public class TXTFileReader implements FileReader {
+public class TextFileReader implements FileReader {
 
     /**
      * Method to read file and return a list of Prompts from a JSON file
@@ -23,23 +22,15 @@ public class TXTFileReader implements FileReader {
      */
     @Override
     public List<Prompt> readFile (File file) {
-        // Path to be hard coded for first iteration.
-        List<String> lines;
-        List<Prompt> prompts = new ArrayList<>();
-
         try {
-            // Read all lines from the file
-            lines = Files.readAllLines(Path.of(file.getPath()));
-
-            // Print out each line
-            for (String line : lines) {
-                prompts.add(new Prompt(line));
-            }
+            return Files.readAllLines(Path.of(file.getPath()))
+                        .stream()
+                        .filter(line -> !line.trim().isEmpty())
+                        .map(Prompt::new)
+                        .toList();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        return prompts;
     }
 
 }

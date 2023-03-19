@@ -1,9 +1,14 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Prompt;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +26,13 @@ public class TextFileReader implements FileReader {
      * @return List with parsed prompts
      */
     @Override
+    @Operation(summary = "Creates a new game")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public List<Prompt> readFile(File file) {
         List<Prompt> prompts = new ArrayList<>();
         try {

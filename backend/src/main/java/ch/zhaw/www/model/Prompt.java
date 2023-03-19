@@ -2,7 +2,14 @@ package ch.zhaw.www.model;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.Data;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Prompt Class stores a statement that has one or more "placeholder" words. These placeholders are to be completed
@@ -30,6 +37,13 @@ public class Prompt {
      * @param input: sentence to be analysed.
      * @return total number of "WALTER" words.
      */
+    @Operation(summary = "Creates a new game")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     static private int countPlaceholders (String input) {
         Matcher matcher = pattern.matcher(input);
 
@@ -38,7 +52,6 @@ public class Prompt {
         if (count == 0) {
             throw new RuntimeException("No WALTER matches found");
         }
-
         return (int) count;
     }
 }

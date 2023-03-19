@@ -15,9 +15,8 @@ class PromptTest {
     private final Prompt example5 = new Prompt("Manchmal verspüre ich den seltsamen Drang, WALTER zu WALTERN.");
     private final Prompt example6 = new Prompt("Ein guter Rat: Küss nie ein(e/n) WALTER!");
     private final Prompt example7 = new Prompt("Die nächste Pandemie-Panik wird wegen des WALTER-Virus ausbrechen.");
-    private final Prompt example8 = new Prompt("Mir schwebt ein noch nie gesehener technischer Gag für den nächsten James Bond-Film vor: 007 Walter.");
-    private final Prompt example9 = new Prompt("WALTER WALTERN WARTERTE WALTERT Walter.");
-    private final Prompt example10 = new Prompt("Hallo ich heisse WALTER");
+    private final Prompt example8 = new Prompt("WALTER WALTERN WARTERTE WALTERT Walter.");
+    private final Prompt example9 = new Prompt("Hallo ich heisse WALTER");
 
     /**
      * Checks that the correct ammount of placeholders has been set.
@@ -32,13 +31,12 @@ class PromptTest {
         assertEquals(2, example5.getTotalPlaceholders());
         assertEquals(1, example6.getTotalPlaceholders());
         assertEquals(1, example7.getTotalPlaceholders());
-        assertEquals(0, example8.getTotalPlaceholders());
-        assertEquals(3, example9.getTotalPlaceholders());
+        assertEquals(3, example8.getTotalPlaceholders());
     }
 
     @Test
     void testGetStatement() {
-        assertEquals("Hallo ich heisse WALTER", example10.getStatement());
+        assertEquals("Hallo ich heisse WALTER", example9.getStatement());
     }
 
     @Test

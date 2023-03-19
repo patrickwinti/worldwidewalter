@@ -3,9 +3,14 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Prompt;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +26,18 @@ public class JSONFileReader implements FileReader {
      * @return List with parsed prompts
      */
     @Override
+    @Operation(summary = "Creates a new game")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
     public List<Prompt> readFile (File file) {
 
         ObjectMapper objectMapper = new ObjectMapper();
         List<Prompt> prompts = new ArrayList<>();
-
+// todo add expected format checker
         try {
             JsonNode jsonNode = objectMapper.readTree(file);
 
@@ -42,7 +54,7 @@ public class JSONFileReader implements FileReader {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return prompts;
     }

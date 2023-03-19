@@ -1,16 +1,19 @@
 package ch.zhaw.www.model;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import nonapi.io.github.classgraph.json.Id;
+import org.springframework.data.keyvalue.annotation.KeySpace;
+
 
 /**
  * Model class with all the current state
  * of a game.
  */
-@AllArgsConstructor
-@Data
+@Getter
+@KeySpace("running_games")
 public class Game {
+    @Id
     @NotNull
     String id;
 }

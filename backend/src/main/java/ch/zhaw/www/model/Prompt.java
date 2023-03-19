@@ -16,6 +16,7 @@ public class Prompt {
     private final int totalPlaceholders;
     private final String statement;
     private boolean hasBeenUsed;
+    private static Pattern pattern = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
 
     public Prompt (String sentence) {
         this.statement = sentence;
@@ -30,7 +31,6 @@ public class Prompt {
      * @return total number of "WALTER" words.
      */
     static private int countPlaceholders (String input) {
-        Pattern pattern = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
         Matcher matcher = pattern.matcher(input);
 
         long count = matcher.results().count();

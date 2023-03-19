@@ -17,15 +17,15 @@ class JSONFileReaderTest {
         File testFile = new File("src/test/resources/testDeck.json");
         JSONFileReader jsonFileReader = new JSONFileReader();
 
-        List<Prompt> prompts = null;
+        List<Prompt> prompts;
         try {
             prompts = new ArrayList<>(jsonFileReader.readFile(testFile));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        assertEquals(11, prompts.size());
-        assertEquals("Ich möchte mal irgendwo leben, wo es kein(e/n) WALTER gibt.", prompts.get(9).getStatement());
-        assertEquals(3, prompts.get(10).getTotalPlaceholders());
+        assertEquals(12, prompts.size());
+        assertEquals("Ich möchte mal irgendwo leben, wo es kein(e/n) WALTER gibt.", prompts.get(10).getStatement());
+        assertEquals(3, prompts.get(11).getTotalPlaceholders());
     }
 }

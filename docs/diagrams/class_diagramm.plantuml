@@ -43,9 +43,16 @@ package backend{
     class Player {
         -id: String
     }
+    class Turn {
+        -id: String
+        -player: Player
+        -round: Rounds[]
+    }
     class Round {
         -id: String
-        -prompt: String
+        -prompt: Prompt
+        -propositions: Map<Proposition>
+        -selections: Map<Selection>
     }
     exception GameError {
         FullCapacityException

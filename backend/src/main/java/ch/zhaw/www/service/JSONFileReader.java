@@ -41,7 +41,7 @@ public class JSONFileReader implements FileReader {
 
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return prompts;

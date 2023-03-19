@@ -5,7 +5,7 @@ import ch.zhaw.www.model.Prompt;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,17 +21,22 @@ public class TextFileReader implements FileReader {
      * @return List with parsed prompts
      */
     @Override
-    public List<Prompt> readFile (File file) {
+    public List<Prompt> readFile(File file) {
+        List<Prompt> prompts = new ArrayList<>();
         try {
-            return Files.readAllLines(Path.of(file.getPath()))
-                        .stream()
-                        .filter(line -> !line.trim().isEmpty())
-                        .map(Prompt::new)
-                        .toList();
-        } catch (IOException e) {
+            Files.lines(file.toPath())
+                    .filter(line -> !line.trim().isEmpty())
+                    .forEach(line -> {
+                        try {
+                            prompts.add(new Prompt(line));
+                        } catch (Exception e) {
+                            System.err.println("Error processing line: " + line + ". No WALTER placeholders found");
+                        }
+                    });
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return prompts;
     }
-
 }
 

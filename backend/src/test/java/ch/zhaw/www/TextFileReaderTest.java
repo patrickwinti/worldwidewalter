@@ -17,11 +17,16 @@ class TextFileReaderTest {
         File testFile = new File("src/test/resources/testDeck.txt");
         TextFileReader txtFileReader = new TextFileReader();
 
-        List<Prompt> prompts = new ArrayList(txtFileReader.readFile(testFile));
+        List<Prompt> prompts = null;
+        try {
+            prompts = new ArrayList<>(txtFileReader.readFile(testFile));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-        assertEquals(5, prompts.size());
+        assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
-        assertEquals("WALTER WALTERN WALTER", prompts.get(4).getStatement());
-        assertEquals(3, prompts.get(4).getTotalPlaceholders());
+        assertEquals("WALTER WALTERN WALTER", prompts.get(3).getStatement());
+        assertEquals(3, prompts.get(3).getTotalPlaceholders());
     }
 }

@@ -2,9 +2,7 @@ package ch.zhaw.www.model;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NonNull;
 
 /**
  * Prompt Class stores a statement that has one or more "placeholder" words. These placeholders are to be completed
@@ -31,13 +29,15 @@ public class Prompt {
      * @param input: sentence to be analysed.
      * @return total number of "WALTER" words.
      */
-    private int countPlaceholders (String input) {
+    static private int countPlaceholders (String input) {
         Pattern pattern = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
         Matcher matcher = pattern.matcher(input);
 
         long count = matcher.results().count();
 
-        // Todo: Handle case when 0 matches
+        if (count == 0) {
+            throw new RuntimeException("No WALTER matches found");
+        }
 
         return (int) count;
     }

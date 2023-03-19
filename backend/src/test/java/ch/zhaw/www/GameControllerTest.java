@@ -3,6 +3,7 @@ package ch.zhaw.www;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
@@ -38,6 +39,7 @@ class GameControllerTest {
     private static final String ROUND_ID = "789";
     private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
+    private static final Prompt PROMPT = new Prompt("prompt");
 
     @Autowired
     private MockMvc mvc;
@@ -195,10 +197,10 @@ class GameControllerTest {
 
     @Test
     void testStartNextRound_200() throws Exception {
-        when(gameService.startNextRound(any())).then(o -> new Round(ROUND_ID, "WALTER WALTER"));
+        when(gameService.startNextRound(any())).then(o -> new Round(ROUND_ID, PROMPT));
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/rounds", GAME_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + ROUND_ID + "\",\"prompt\":\"WALTER WALTER\"}"));
+                .andExpect(content().json("{\"id\":\"" + ROUND_ID + "\",\"prompt\":\"" + PROMPT + "\"}"));
         verify(gameService).startNextRound(GAME_ID);
     }
 

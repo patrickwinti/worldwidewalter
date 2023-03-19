@@ -50,7 +50,7 @@ package backend{
     }
     class Round {
         -id: String
-        -prompt: String
+        -prompt: Prompt
         -propositions: Map<Proposition>
         -selections: Map<Selection>
     }

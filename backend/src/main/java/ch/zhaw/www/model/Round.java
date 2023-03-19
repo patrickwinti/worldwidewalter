@@ -1,15 +1,15 @@
 package ch.zhaw.www.model;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
 /**
  * Model class with round information
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Data
 public class Round {
     Map<Player, String> propositions;
@@ -18,7 +18,7 @@ public class Round {
     @NotNull
     final String id;
     @NotNull
-    String prompt;
+   final Prompt prompt;
 
 
 }

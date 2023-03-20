@@ -2,6 +2,7 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
@@ -31,17 +32,20 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Round startNextRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException, GameError.NotEnoughPlayersException {
-        return new Round(UUID.randomUUID().toString(), "I always wanted to WALTER");
+    public Round startNextRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException,
+            GameError.NotEnoughPlayersException {
+        return new Round(UUID.randomUUID().toString(), new Prompt("I've always wanted to WALTER"));
     }
 
     @Override
-    public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException {
+    public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
+            RoundError.NotFoundException, PlayerError.NotFoundException {
 
     }
 
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
+    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
+            RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
 
     }
 }

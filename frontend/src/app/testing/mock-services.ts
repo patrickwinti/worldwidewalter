@@ -1,5 +1,5 @@
-import {HttpClient} from "@angular/common/http";
-import {GameService} from "../service/game.service";
+import { HttpClient } from "@angular/common/http";
+import { GameService } from "../service/game.service";
 
 export function getHttpClientMock(): jasmine.SpyObj<HttpClient> {
   return jasmine.createSpyObj(

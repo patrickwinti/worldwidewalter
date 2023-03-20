@@ -133,4 +133,40 @@ text-align: center;}
     transform: scale(0);
     opacity: 0;
   }
+
+}
+.scoreboard {
+  width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  background-color: yellow;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.team1, .team2 {
+  display: inline-block;
+  width: 130px;
+  margin: 10px;
+  padding: 10px;
+  background-color: black;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.team1 h3, .team2 h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.team1 p, .team2 p {
+  font-size: 18px;
+  margin: 0;
+}
+
+.team1 span, .team2 span {
+  font-weight: bold;
+  font-size: 36px;
+  color: #ff6347;
 }

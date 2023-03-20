@@ -60,6 +60,16 @@
             </goals>
           </execution>
           <execution>
+            <id>run frontend tests</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <arguments>run test-headless</arguments>
+            </configuration>
+          </execution>
+          <execution>
             <id>npm run build</id>
             <goals>
               <goal>npm</goal>

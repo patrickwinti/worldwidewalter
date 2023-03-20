@@ -3,12 +3,6 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Prompt;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,14 +19,7 @@ public class JSONFileReader implements FileReader {
      * @param file JSON file input
      * @return List with parsed prompts
      */
-    @Override
-    @Operation(summary = "Creates a new game")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "500", description = "Unknown error")
-    })
-    @PostMapping(value = "/games", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
+
     public List<Prompt> readFile (File file) {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -50,11 +37,10 @@ public class JSONFileReader implements FileReader {
                 prompts.add(new Prompt(cardNode.get("1").asText()));
                 prompts.add(new Prompt(cardNode.get("2").asText()));
                 prompts.add(new Prompt(cardNode.get("3").asText()));
-
             }
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new FileReaderError.WrongFileFormatError();
         }
         return prompts;
     }

@@ -1,8 +1,12 @@
 package ch.zhaw.www.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.zhaw.www.controller.GameController;
+import ch.zhaw.www.service.FileReaderError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,6 +28,7 @@ public class Prompt {
     private final String statement;
     private boolean hasBeenUsed;
     private static Pattern pattern = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
+    private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
 
     public Prompt (String sentence) {
         this.statement = sentence;
@@ -37,20 +42,14 @@ public class Prompt {
      * @param input: sentence to be analysed.
      * @return total number of "WALTER" words.
      */
-    @Operation(summary = "Creates a new game")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "500", description = "Unknown error")
-    })
-    @PostMapping(value = "/games", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    static private int countPlaceholders (String input) {
+    private int countPlaceholders (String input) {
         Matcher matcher = pattern.matcher(input);
 
         long count = matcher.results().count();
 
         if (count == 0) {
-            throw new RuntimeException("No WALTER matches found");
+            logger.log(Level.WARNING, "No placeholder match found");
+            throw new FileReaderError.NoPlaceholderError(input);
         }
         return (int) count;
     }

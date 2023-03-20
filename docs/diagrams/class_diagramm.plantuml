@@ -73,6 +73,15 @@ package backend{
         NotFoundException
     }
 
+    interface FileReader{
+        readFile(): List<Prompt>
+    }
+
+    class JSONFileReader{
+    }
+    class TextFileReader{
+    }
+
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
@@ -86,5 +95,7 @@ package backend{
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
-}
+
+    FileReader..>JSONFileReader
+    FileReader..>TextFileReader
 @enduml

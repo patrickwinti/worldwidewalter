@@ -8,13 +8,19 @@ import { HttpClientModule } from "@angular/common/http";
 import { InitializationContainerComponent } from './component/initialization/initialization-container.component';
 import { JoinComponent } from './component/initialization/join/join.component';
 import { FormsModule } from "@angular/forms";
+import { GameContainerComponent } from './component/game/game-container.component';
+import { StartGameComponent } from './component/game/start-game/start-game.component';
+import { WaitingPageComponent } from './component/initialization/waiting-page/waiting-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     WelcomeComponent,
     InitializationContainerComponent,
-    JoinComponent
+    JoinComponent,
+    GameContainerComponent,
+    StartGameComponent,
+    WaitingPageComponent
   ],
   imports: [
     BrowserModule,

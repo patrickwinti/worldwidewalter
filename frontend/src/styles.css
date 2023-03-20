@@ -103,6 +103,9 @@ text-align: center;}
   border-radius: 100%;
   animation: pulse 2s ease-in-out infinite;
 }
+.sphinx{
+  animation: pulse 10s ease-in-out infinite;
+}
 
 /* Define the pulse animation */
 @keyframes pulse {

@@ -8,10 +8,10 @@ actor       playerN
 player1 -> system: createGame()
 system --> player1: confirm():gameID
 
-player2 -> system: join session (sessionID, username)
+player2 -> system: join session (sessionID, playerName)
 system --> player2: confirm
 
-playerN -> system: join session (sessionID, username)
+playerN -> system: join session (sessionID, playerName)
 system --> playerN: confirm
 
 player1 -> system: start game

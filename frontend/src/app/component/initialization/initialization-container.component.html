@@ -1,8 +1,10 @@
-<www-welcome (newGameEmitter) = "setGame($event)">
+<ng-container [ngSwitch]="state">
+  <www-welcome *ngSwitchCase="AppState.WELCOME_PAGE"
+               (newGameEmitter)="setGame($event)"
+               (appStateEmitter)="setState($event)">
+  </www-welcome>
 
-</www-welcome>
-<ng-container *ngIf="game">
-  <div>
-    id of the game is: {{game.id}}
-  </div>
+  <www-join *ngSwitchCase="AppState.JOIN_GAME"
+            [presetGameId]="presetGameId">
+  </www-join>
 </ng-container>

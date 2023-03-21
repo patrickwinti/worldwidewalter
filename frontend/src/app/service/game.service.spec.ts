@@ -1,6 +1,6 @@
-import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { GameService } from './game.service';
-import { Observer, of } from "rxjs";
+import { BehaviorSubject, Observer, of } from "rxjs";
 import { getHttpClientMock } from "../testing/mock-services";
 import { HttpClient } from "@angular/common/http";
 import { GameState } from "../model/game-state";
@@ -39,31 +39,41 @@ describe('GameService', () => {
     it('should send http requests until condition is met', fakeAsync(() => {
       // arrange
       let gameReady = {
-        state: GameState.READY
+        state: GameState.READY,
+        id: '1'
       } as GameDto;
       let gameWaiting = {
-        state: GameState.WAITING_FOR_PLAYERS
+        state: GameState.WAITING_FOR_PLAYERS,
+        id: '2'
       } as GameDto;
 
-      httpMock.get.calls.reset();
       httpMock.get.and.returnValues(
-        of(gameWaiting),
-        of(gameWaiting),
-        of(gameReady),
-        of(gameReady)
+        of(
+          gameWaiting,
+          gameWaiting,
+          gameWaiting,
+          gameReady,
+          gameWaiting
+        )
       );
+
+      let res = new BehaviorSubject<GameDto>({} as GameDto);
 
       // act
       service.getGameAsSoonAsInGivenState('1', GameState.READY, 5, 0)
         .subscribe({
-          complete: () => {
-            // assert
-            expect(httpMock.get).toHaveBeenCalledTimes(5);
+          next: (val) => {
+            res.next(val);
           }
         });
 
       tick(1000);
-      flush();
+
+      let game = res.getValue();
+
+      // assert
+      expect(game.state).toBe(GameState.READY);
+      expect(game.id).toBe('1');
     }));
 
 
@@ -78,28 +88,33 @@ describe('GameService', () => {
         state: GameState.WAITING_FOR_PLAYERS
       } as GameDto;
       httpMock.get.and.returnValues(
-        of(gameWaiting1),
-        of(gameWaiting1),
-        of(gameWaiting1),
-        of(gameWaiting2),
-        of(gameWaiting1)
+        of(
+          gameWaiting1,
+          gameWaiting1,
+          gameWaiting1,
+          gameWaiting2,
+          gameWaiting1
+        )
       );
+
+      let res = new BehaviorSubject<GameDto>({} as GameDto);
 
       // act
       let game$ = service.getGameAsSoonAsInGivenState('1', GameState.READY, 4, 1);
 
       game$.subscribe({
         next: (val) => {
-          expect(val.id).toBe('2');
-        },
-        complete: () => {
-          // assert
-          expect(httpMock).toHaveBeenCalledTimes(4);
+          res.next(val);
         }
       } as Observer<GameDto>);
 
       tick(1000);
-      flush();
+
+      let game = res.getValue();
+
+      // assert
+      expect(game.state).toBe(GameState.WAITING_FOR_PLAYERS);
+      expect(game.id).toBe('2');
     }));
   });
 });

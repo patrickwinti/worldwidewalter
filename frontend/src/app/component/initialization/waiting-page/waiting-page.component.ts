@@ -18,13 +18,23 @@ export class WaitingPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.game$ = this.gameService.getGameAsSoonAsInGivenState(this.game.id, GameState.READY, 10, 5000);
-    this.game$.subscribe({
+    this.game$ = this.gameService.getGameAsSoonAsInGivenState(this.game.id, GameState.READY, 3, 1000);
+    this.startPollingGame();
+  };
+
+  private startPollingGame() {
+    this.gameSubscription = this.game$.subscribe({
       next: (val) => {
+        console.log('game: ' + val.id + ' state: ' + val.state);
       },
       complete: () => {
+        console.log('completed');
+      },
+      error: () => {
+        console.log('error');
       }
-  })};
+    })
+  }
 
   ngOnDestroy() {
     this.stopPolling();
@@ -35,5 +45,6 @@ export class WaitingPageComponent implements OnInit, OnDestroy {
   }
 
   restartPolling() {
+    this.startPollingGame();
   }
 }

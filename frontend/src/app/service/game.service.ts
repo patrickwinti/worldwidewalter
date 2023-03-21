@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { concatMap, EMPTY, expand, Observable, timer } from "rxjs";
+import { filter, Observable, of, repeat, switchMap, take, tap } from "rxjs";
 import { AppConfigService } from "./app-config.service";
 import { GameDto } from "../dto/game-dto";
 import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
@@ -28,21 +28,18 @@ export class GameService {
     return this.http.get<GameDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId);
   }
 
-  getGameAsSoonAsInGivenState(gameId: string, gameState: GameState, retries: number, interval: number): Observable<GameDto> {
-    let remainingRetries = retries;
-
-    return this.getGame(gameId).pipe(
-      expand((result) => {
-        if (result.state !== gameState && remainingRetries > 0) {
-          remainingRetries--;
-          return timer(interval).pipe(
-            concatMap(() => this.getGame(gameId)),
-          )
-        } else {
-          return EMPTY
-        }
+  getGameAsSoonAsInGivenState(gameId: string, gameState: GameState, maxRetries: number, interval: number): Observable<GameDto> {
+    let retries = 0;
+    return of({}).pipe(
+      switchMap(() => {
+        return this.getGame(gameId).pipe(
+          tap(() => retries++),
+          filter((res: GameDto) => res.state === gameState || retries > maxRetries),
+          tap(() => retries = 0),
+          repeat({delay: interval}),
+          take(1)
+        );
       })
     );
   }
-
 }

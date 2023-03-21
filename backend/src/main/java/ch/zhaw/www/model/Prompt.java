@@ -7,13 +7,8 @@ import java.util.regex.Pattern;
 
 import ch.zhaw.www.controller.GameController;
 import ch.zhaw.www.service.FileReaderError;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+
 
 /**
  * Prompt Class stores a statement that has one or more "placeholder" words. These placeholders are to be completed

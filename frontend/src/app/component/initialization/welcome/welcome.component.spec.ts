@@ -2,7 +2,7 @@ import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testin
 
 import { WelcomeComponent } from './welcome.component';
 import { getGameServiceMock } from "src/app/testing/mock-services"
-import { firstValueFrom, of } from "rxjs";
+import { of } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { GameDto } from "../../../dto/game-dto";
 
@@ -32,7 +32,7 @@ describe('TestComponent', () => {
 
   it('createGame should call gameService', () => {
     // arrange
-    gameService.requestNewGame.and.returnValue(firstValueFrom(of({} as GameDto)));
+    gameService.requestNewGame.and.returnValue(of({} as GameDto));
 
     // act
     component.requestNewGame();
@@ -43,9 +43,9 @@ describe('TestComponent', () => {
 
   it('createGame should emit gameDto on successful http call', fakeAsync(() => {
     // arrange
-    gameService.requestNewGame.and.returnValue(firstValueFrom(of({
+    gameService.requestNewGame.and.returnValue(of({
       id: 'gameId'
-    } as GameDto)));
+    } as GameDto));
     spyOn(component.newGameEmitter, 'emit');
 
     // act

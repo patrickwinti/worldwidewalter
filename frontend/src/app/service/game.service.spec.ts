@@ -68,7 +68,6 @@ describe('GameService', () => {
         });
 
       tick(1000);
-
       let game = res.getValue();
 
       // assert
@@ -87,6 +86,7 @@ describe('GameService', () => {
         id: '2',
         state: GameState.WAITING_FOR_PLAYERS
       } as GameDto;
+
       httpMock.get.and.returnValues(
         of(
           gameWaiting1,
@@ -109,7 +109,6 @@ describe('GameService', () => {
       } as Observer<GameDto>);
 
       tick(1000);
-
       let game = res.getValue();
 
       // assert

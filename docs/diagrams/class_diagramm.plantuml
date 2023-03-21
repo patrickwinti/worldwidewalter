@@ -29,14 +29,15 @@ package backend{
     }
 
     interface GameService{
-       §createGame(): Game
-       §leaveGame(gameId: String, playerId: String): void
-       §submitProposition(roundId: String, playerId: String, gaps: List<String>): void
-       §selectProposition(roundId: String, playerId: String, propositionId: String): void
-       §getGame(gameId: String) : Game
-       §enterGame(gameId: String, playerName: String) : Player
-       §startNextRound(gameId: String) : Round
+       createGame(): Game
+       leaveGame(gameId: String, playerId: String): void
+       submitProposition(roundId: String, playerId: String, gaps: List<String>): void
+       selectProposition(roundId: String, playerId: String, propositionId: String): void
+       getGame(gameId: String) : Game
+       enterGame(gameId: String, playerName: String) : Player
+       startNextRound(gameId: String) : Round
     }
+    interface GameRepository
     class PlayerDto {
         -id: String
     }
@@ -102,7 +103,8 @@ package backend{
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
+    GameService --> GameRepository
+}
 
-    FileReader..>JSONFileReader
-    FileReader..>TextFileReader
+    FileReader<|-TextFileReader
 @enduml

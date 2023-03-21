@@ -1,10 +1,8 @@
+<ng-container [ngSwitch]="appState">
+  <www-initialization-container *ngSwitchCase="AppState.INITIALIZATION"
+                                (startGameEmitter)="startGame()">
+  </www-initialization-container>
 
-<div>
-  <button (click)="onClickWorld()">click me</button>
-  <button (click)="onClickMoon()">or click me</button>
-  <app-test displayText="{{testDTO.value}}">
-
-  </app-test>
-</div>
-
-<router-outlet></router-outlet>
+  <www-game-container *ngSwitchCase="AppState.GAME">
+  </www-game-container>
+</ng-container>

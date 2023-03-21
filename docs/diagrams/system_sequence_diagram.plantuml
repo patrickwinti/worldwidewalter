@@ -11,7 +11,7 @@ system --> player1: confirm():gameID
 player2 -> system: join session (sessionID, playerName)
 system --> player2: confirm
 
-playerN -> system: join session (sessionID, playerName)
+playerN -> system: join session (sessionID, username)
 system --> playerN: confirm
 
 player1 -> system: start game

@@ -6,58 +6,58 @@ actor       playerN
 
 
 player1 -> system: createGame()
-system --> player1: confirm():gameID
+system --> player1: new game created, gameId
 
-player2 -> system: join session (sessionID, playerName)
-system --> player2: confirm
+player2 -> system: enterGame(gameId, playerName)
+system --> player2: added to game, playerId
 
-playerN -> system: join session (sessionID, playerName)
+playerN -> system: join session (sessionID, username)
 system --> playerN: confirm
 
-player1 -> system: start game
-system --> player1: notification, game started
-system --> player2: notification, game started
-system --> playerN: notification, game started
+playerN -> system: enterGame(gameId, playerName)
+system --> playerN: added to game, playerId
 
 loop until players end the game
-    player1 -> system: request new sphinx selection
+    player1 -> system: startNextRound(gameId)
+    player2 -> system: startNextRound(gameId)
+    playerN -> system: startNextRound(gameId)
 
-    system --> player1: announce sphinx (playerId: player2)
-    system --> player2: announce sphinx (playerId: player2)
-    system --> playerN: announce sphinx (playerId: player2)
+    system --> player1: announce sphinx, playerId
+    system --> player2: announce sphinx, playerId
+    system --> playerN: announce sphinx, playerId
 
-    system --> player1: send statement (statementText)
-    system --> player2: send statement (statementText)
-    system --> playerN: send statement (statementText)
+    system --> player1: prompt
+    system --> player2: prompt
+    system --> playerN: prompt
 
-    player1 -> system: submit proposition (propositionText)
-    player2 -> system: submit proposition (propositionText)
-    playerN -> system: submit proposition (propositionText)
+    player1 -> system: submitProposition(proposition)
+    player2 -> system: submitProposition(proposition)
+    playerN -> system: submitProposition(proposition)
 
-    system --> player1: send all propositions (listOfPropositions)
-    system --> player2: send all propositions (listOfPropositions)
-    system --> playerN: send all propositions (listOfPropositions)
+    system --> player1: list of propositions
+    system --> player2: list of propositions
+    system --> playerN: list of propositions
 
-    player1 -> system: select proposition (propositionText)
-    playerN -> system: select proposition (propositionText)
+    player1 -> system: selectProposition(propositionText)
+    playerN -> system: selectProposition(propositionText)
 
-    system --> player1: reveal solution (propositionText)
-    system --> player2: reveal solution (propositionText)
-    system --> playerN: reveal solution (propositionText)
+    system --> player1: reveal solution, proposition
+    system --> player2: reveal solution, proposition
+    system --> playerN: reveal solution, proposition
 
-    system --> player1: send ranking (listOfUsersWithPoints)
-    system --> player2: send ranking (listOfUsersWithPoints)
-    system --> playerN: send ranking (listOfUsersWithPoints)
+    system --> player1: ranking
+    system --> player2: ranking
+    system --> playerN: ranking
 end
 
-player1 -> system: end the game
+player1 -> system: endGame(gameId)
 
-system --> player1: send ranking (listOfUsersWithPoints)
-system --> player2: send ranking (listOfUsersWithPoints)
-system --> playerN: send ranking (listOfUsersWithPoints)
+system --> player1: ranking
+system --> player2: ranking
+system --> playerN: ranking
 
-player1 -> system: leave session
-player2 -> system: leave session
-playerN -> system: leave session
+player1 -> system: leaveGame(gameId)
+player2 -> system: leaveGame(gameId)
+playerN -> system: leaveGame(gameId)
 
 @enduml

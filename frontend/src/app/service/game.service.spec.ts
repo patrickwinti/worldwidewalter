@@ -44,7 +44,9 @@ describe('GameService', () => {
       let gameWaiting = {
         state: GameState.WAITING_FOR_PLAYERS
       } as GameDto;
-      let spy = spyOn(service, 'getGame').and.returnValues(
+
+      httpMock.get.calls.reset();
+      httpMock.get.and.returnValues(
         of(gameWaiting),
         of(gameWaiting),
         of(gameReady),
@@ -52,17 +54,15 @@ describe('GameService', () => {
       );
 
       // act
-      service.getGameAsSoonAsInGivenState('1', GameState.READY, 5, 1)
+      service.getGameAsSoonAsInGivenState('1', GameState.READY, 5, 0)
         .subscribe({
-          next: (val) => {
-            expect(val.state === GameState.READY);
-          },
           complete: () => {
-            expect(spy).toHaveBeenCalledTimes(3);
+            // assert
+            expect(httpMock.get).toHaveBeenCalledTimes(5);
           }
         });
 
-      tick(10);
+      tick(1000);
       flush();
     }));
 
@@ -77,35 +77,29 @@ describe('GameService', () => {
         id: '2',
         state: GameState.WAITING_FOR_PLAYERS
       } as GameDto;
-      let spy = spyOn(service, 'getGame').and.returnValues(
-        of(gameWaiting1),
+      httpMock.get.and.returnValues(
         of(gameWaiting1),
         of(gameWaiting1),
         of(gameWaiting1),
         of(gameWaiting2),
-        of(gameWaiting1),
+        of(gameWaiting1)
       );
 
       // act
       let game$ = service.getGameAsSoonAsInGivenState('1', GameState.READY, 4, 1);
 
-      let count = 0;
       game$.subscribe({
         next: (val) => {
-          count++;
-          if (count < 5) {
-            expect(val.id).toBe('1');
-          } else {
-            expect(val.id).toBe('2');
-          }
+          expect(val.id).toBe('2');
         },
         complete: () => {
           // assert
-          expect(spy).toHaveBeenCalledTimes(5);
+          expect(httpMock).toHaveBeenCalledTimes(4);
         }
       } as Observer<GameDto>);
 
       tick(1000);
+      flush();
     }));
   });
 });

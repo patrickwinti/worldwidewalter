@@ -28,14 +28,14 @@ export class GameService {
     return this.http.get<GameDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId);
   }
 
-  getGameAsSoonAsInGivenState(gameId: string, gameState: GameState, maxRetries: number, interval: number): Observable<GameDto> {
-    let retries = 0;
+  getGameAsSoonAsInGivenState(gameId: string, gameState: GameState, maxTries: number, interval: number): Observable<GameDto> {
+    let tries = 0;
     return of({}).pipe(
       switchMap(() => {
         return this.getGame(gameId).pipe(
-          tap(() => retries++),
-          filter((res: GameDto) => res.state === gameState || retries > maxRetries),
-          tap(() => retries = 0),
+          tap(() => tries++),
+          filter((res: GameDto) => res.state === gameState || tries >= maxTries),
+          tap(() => tries = 0),
           repeat({delay: interval}),
           take(1)
         );

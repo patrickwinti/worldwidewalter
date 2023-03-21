@@ -1,12 +1,6 @@
 package ch.zhaw.www.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import ch.zhaw.www.controller.GameController;
-import ch.zhaw.www.service.FileReaderError;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 
@@ -18,34 +12,8 @@ import lombok.Data;
  */
 @Data
 public class Prompt {
-
-    private final int totalPlaceholders;
+    @NotNull
     private final String statement;
-    private boolean hasBeenUsed;
-    private static Pattern pattern = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
-    private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
-
-    public Prompt (String sentence) {
-        this.statement = sentence;
-        totalPlaceholders = countPlaceholders(sentence);
-        hasBeenUsed = false;
-    }
-
-    /*
-     * Method to count the total number of WALTER words (or variations) that appear in one statement.
-     *
-     * @param input: sentence to be analysed.
-     * @return total number of "WALTER" words.
-     */
-    private int countPlaceholders (String input) {
-        Matcher matcher = pattern.matcher(input);
-
-        long count = matcher.results().count();
-
-        if (count == 0) {
-            logger.log(Level.WARNING, "No placeholder match found");
-            throw new FileReaderError.NoPlaceholderError(input);
-        }
-        return (int) count;
-    }
+    private final long totalPlaceholders;
+    private boolean hasBeenUsed = false;
 }

@@ -8,34 +8,33 @@ font-size: 14px; /* Set the default font size to 14 pixels */
 
 /* Style box element */
 .textbox {
-font-size: 16px; /* Set the font size to 16 pixels */
+font-size: 20px; /* Set the font size to 16 pixels */
 color: black; /* Set the font color to black */
-background-color: yellow; /* Set the background color to yellow */
-padding: 2px; /* Add 2 pixels of padding */
-box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
+background-color: #fcc603; /* Set the background color to yellow */
+padding: 1px; /* Add 2 pixels of padding */
 text-align: center; /* Center the text */
-width: 150px; /* Set the width to 150 pixels */
-margin: 2px 0 2px 20px; /* Set the margin */
+width: 140px; /* Set the width to 150 pixels */
+margin: 1px 0 2px 10px; /* Set the margin */
 }
 .special-margin1 {
-  margin-left: 0;
+  margin-left: 60px;
 }
 .special-margin2 {
-  margin-left: 30px;
+  margin-left: 20px;
 }
 .special-margin3 {
-  margin-left: 60px;
+  width: 200px
 }
 /* Style button element */
 button {
 top:50%; /* Position the button in the middle of the page */
-background-color: #FFD700; /* Set the background color to gold */
-color: #333333; /* Set the font color to a dark gray */
+background-color: #fcc603; /* Set the background color to gold */
+color: black; /* Set the font color to a dark gray */
 border: none; /* Remove the border */
 padding: 2px 2px; /* Add 2 pixels of padding */
-font-size: 16px; /* Set the font size to 16 pixels */
+font-size: 20px; /* Set the font size to 16 pixels */
 cursor: pointer; /* Add a cursor on hover */
-margin: 10px 10px 10px 5px; /* Set the margin */
+/*margin: 10px 10px 10px 5px; /* Set the margin */
 box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
 width: 150px; /* Set the width to 150 pixels */
 }

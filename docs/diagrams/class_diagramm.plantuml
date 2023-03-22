@@ -27,6 +27,7 @@ package backend{
        §enterGame(gameId: String, playerName: String) : Player
        §startNextRound(gameId: String) : Round
     }
+    interface GameRepository
     class PlayerDto {
         -id: String
     }
@@ -83,5 +84,6 @@ package backend{
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
+    GameService --> GameRepository
 }
 @enduml

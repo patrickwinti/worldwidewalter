@@ -7,44 +7,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="src/styles.css">
+  <style>
+    /* add some basic styling to the table */
+    table {
+      border-collapse: collapse;
+      font-size: 1.2em;
+      border: 2px solid #ccc;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5em;
+    }
+    th {
+      background-color: #eee;
+    }
+  </style>
 </head>
 <body>
 
 <div class="header">
   <div class="textbox special-margin1">Worldwide</div>
   <div class="textbox special-margin2">WALTER</div>
-
 </div>
 
-<div class="topnav">
+<div class="topnav"></div>
 
-</div>
+<table>
+  <thead>
+  <tr>
+    <th><div class="textbox special-margin2">Benutzer</div></th>
+    <th><div class="textbox special-margin2">Punkte</div></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Apple</td>
+    <td>$0.50</td>
+  </tr>
+  <tr>
+    <td>Orange</td>
+    <td>$0.75</td>
+  </tr>
+  <tr>
+    <td>Banana</td>
+    <td>$0.35</td>
+  </tr>
+  </tbody>
+</table>
 
-<div class="column">
-  <div>
-    <div>Punkteverteilung</div>
-    <div class="scoreboard">
-      <div class="team1">
-        <h3>Team 1</h3>
-        <p>Score: <span id="team1-score">0</span></p>
-      </div>
-
-      <div class="team2">
-        <h3>Team 2</h3>
-        <p>Score: <span id="team2-score">0</span></p>
-      </div>
-    </div>
-
-    <p>
-    <h2></h2>
-  </div>
-
-  <div class="column">
-    <h2></h2>
-    <p></p>
-  </div>
-
-  <p></p>
-</div>
 </body>
 </html>

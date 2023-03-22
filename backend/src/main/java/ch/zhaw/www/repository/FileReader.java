@@ -3,6 +3,7 @@ package ch.zhaw.www.repository;
 import ch.zhaw.www.model.Prompt;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -16,6 +17,6 @@ public interface FileReader {
      * @param file TXT file input
      * @return List with parsed prompts
      */
-    List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatError;
+    List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatError, IOException;
 }
 

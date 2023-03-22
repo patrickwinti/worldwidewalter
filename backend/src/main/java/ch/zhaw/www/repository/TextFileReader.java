@@ -3,6 +3,7 @@ package ch.zhaw.www.repository;
 import ch.zhaw.www.model.Prompt;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +22,7 @@ class TextFileReader implements FileReader {
     private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
 
     @Override
-    public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatError {
+    public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatError, IOException {
         try (Stream<String> stream = Files.lines(file.toPath())) {
             return stream
                     .filter(Objects::nonNull)
@@ -36,8 +37,10 @@ class TextFileReader implements FileReader {
                     })
                     .filter(Objects::nonNull)
                     .toList();
-        } catch (Exception e) {
+        } catch (FileReaderError e) {
             throw new FileReaderError.WrongFileFormatError();
+        } catch (IOException e) {
+            throw e;
         }
     }
 
@@ -57,7 +60,6 @@ class TextFileReader implements FileReader {
         }
         return count;
     }
-
 }
 
 

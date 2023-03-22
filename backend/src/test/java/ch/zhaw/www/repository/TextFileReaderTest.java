@@ -15,15 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TextFileReaderTest {
     @TempDir
     private Path tempDir;
 
     @Test
-    void readFile() {
+    void readFile() throws IOException {
         File testFile = new File("src/test/resources/testDeck.txt");
         TextFileReader txtFileReader = new TextFileReader();
 
@@ -75,4 +74,14 @@ class TextFileReaderTest {
         assertEquals(1, prompts.size());
         assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getTotalPlaceholders());
     }
+
+    @Test
+    void testReadFileIOExceptionThrowing() {
+        File nonExistingFile = new File("nonExistingFile.txt");
+        TextFileReader txtFileReader = new TextFileReader();
+        assertThrows(IOException.class, () -> {
+            List<Prompt> prompts = txtFileReader.readFile(nonExistingFile);
+        });
+    }
+
 }

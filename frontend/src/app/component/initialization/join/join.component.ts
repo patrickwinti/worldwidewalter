@@ -3,6 +3,7 @@ import { GameService } from "../../../service/game.service";
 import { PlayerJoinRequestDto } from "../../../dto/player-join-request-dto";
 import { PlayerDto } from "../../../dto/player-dto";
 import { InitializationState } from "../../../model/initialization-state";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: 'www-join',
@@ -31,10 +32,10 @@ export class JoinComponent implements OnInit {
 
   async joinGame() {
     if (this.playerName != undefined && this.playerName != '') {
-      const playerDto = await this.gameService.joinGame({
+      const playerDto = await firstValueFrom(this.gameService.joinGame({
           playerName: this.playerName
         } as PlayerJoinRequestDto,
-        this.gameId)
+        this.gameId))
         .then(
           (value) => {
             this.playerEmitter.emit(value);

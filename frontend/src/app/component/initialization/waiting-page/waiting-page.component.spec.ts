@@ -23,7 +23,6 @@ describe('WaitingPageComponent', () => {
 
     fixture = TestBed.createComponent(WaitingPageComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

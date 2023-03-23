@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angul
 import { GameService } from "../../../service/game.service";
 import { GameDto } from "../../../dto/game-dto";
 import { InitializationState } from "../../../model/initialization-state";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: 'www-welcome',
@@ -19,7 +20,7 @@ export class WelcomeComponent {
    * Requests new game from backend and emits new game to parent container
    */
   async requestNewGame() {
-    let newGame = await this.gameService.requestNewGame().then(
+    let newGame = await firstValueFrom(this.gameService.requestNewGame()).then(
       (value) => value,
       () => undefined
     );

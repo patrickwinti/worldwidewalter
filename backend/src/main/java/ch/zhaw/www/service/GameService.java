@@ -8,8 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 /**
- * Service to handle changes to state
- * and lifecycle of a game.
+ * Service to handle changes to state and lifecycle of a game.
  */
 public interface GameService {
     /**
@@ -18,7 +17,7 @@ public interface GameService {
      * @return new game
      */
     Game createGame();
-
+    
     /**
      * Fetches the current state of the game for given game ID
      *
@@ -27,7 +26,7 @@ public interface GameService {
      * @throws GameError.NotFoundException if game is not found
      */
     Game getGame(@NotNull String gameId) throws GameError.NotFoundException;
-
+    
     /**
      * Registration of a new player to a running game
      *
@@ -38,7 +37,7 @@ public interface GameService {
      * @throws GameError.FullCapacityException if game has no available seats
      */
     Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
-
+    
     /**
      * Request to leave a game
      *
@@ -47,7 +46,7 @@ public interface GameService {
      * @throws GameError.NotFoundException if game is not found
      */
     void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException;
-
+    
     /**
      * Player requested to start round.
      *
@@ -57,8 +56,8 @@ public interface GameService {
      * @throws RoundError.OngoingException         if round can not be started
      * @throws GameError.NotEnoughPlayersException if there are not enough players anymore
      */
-    Round startNextRound(@NotNull String gameId) throws GameError.NotFoundException, RoundError.OngoingException, GameError.NotEnoughPlayersException;
-
+    Round getRound(@NotNull String gameId) throws GameError.NotFoundException, RoundError.OngoingException, GameError.NotEnoughPlayersException;
+    
     /**
      * Player submitted their propositions for the prompt
      *
@@ -69,7 +68,7 @@ public interface GameService {
      * @throws PlayerError.NotFoundException if player is not found
      */
     void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException;
-
+    
     /**
      * Player has chosen a proposition id. The given player id is anonymized and only valid for the round
      *

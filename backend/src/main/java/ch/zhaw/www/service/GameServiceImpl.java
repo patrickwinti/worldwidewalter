@@ -5,6 +5,7 @@ import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +42,7 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Round getRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException,
+    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.OngoingException,
             GameError.NotEnoughPlayersException {
         return new Round(UUID.randomUUID().toString(), new Prompt("I've always wanted to WALTER"));
     }

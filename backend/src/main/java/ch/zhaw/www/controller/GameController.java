@@ -128,8 +128,8 @@ public class GameController {
     })
     @GetMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<RoundDto> getRound(@PathVariable String gameId) {
-        Round round = gameService.getRound(gameId);
+    public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        Round round = gameService.getRound(gameId, playerId);
         logger.log(Level.INFO, "started next round {0}", round);
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
     }

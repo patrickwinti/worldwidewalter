@@ -25,7 +25,6 @@ hs_err_pid*
 .idea/shelf/
 .idea/httpRequests/
 /.idea/compiler.xml
-/.idea/codeStyles/codeStyleConfig.xml
 /.idea/jarRepositories.xml
 /.idea/misc.xml
 /.idea/encodings.xml

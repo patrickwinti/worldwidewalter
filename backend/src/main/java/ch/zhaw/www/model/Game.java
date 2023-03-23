@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import nonapi.io.github.classgraph.json.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Model class with all the current state
@@ -18,4 +21,5 @@ public class Game {
     @Id
     @NotNull
     private final String id;
+    private Map<String, Player> waitingRoom = new HashMap<>();
 }

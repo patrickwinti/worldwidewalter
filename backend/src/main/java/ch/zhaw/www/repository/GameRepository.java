@@ -1,13 +1,37 @@
 package ch.zhaw.www.repository;
 
 import ch.zhaw.www.model.Game;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import ch.zhaw.www.service.GameError;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.function.UnaryOperator;
 
 /**
- * CRUD repository with all the methods necessary
- * to save, retrieve or delete games
+ * Game repository with protected access to game instances
  */
-@Repository
-public interface GameRepository extends CrudRepository<Game, String> {
+public interface GameRepository {
+    /**
+     * Gets a read only instance of the game. This game can not be read and is subject to dirty reads.
+     *
+     * @param gameId the game required
+     * @return an existing game
+     * @throws GameError.NotFoundException if game does not exist
+     */
+    Game getGame(@NotNull String gameId) throws GameError.NotFoundException;
+    
+    /**
+     * Fetches the game for the provided ID. Changes needed to the game state can be done through the edit operator.
+     *
+     * @param gameId the required game ID
+     * @param editor the changes on the game
+     * @throws GameError.NotFoundException if game does not exist
+     */
+    void editGame(@NotNull String gameId, UnaryOperator<Game> editor) throws GameError.NotFoundException;
+    
+    /**
+     * Saves a new game. If game is already saved it will throw an exception.
+     *
+     * @param game to be saved
+     */
+    void saveNewGame(Game game);
 }

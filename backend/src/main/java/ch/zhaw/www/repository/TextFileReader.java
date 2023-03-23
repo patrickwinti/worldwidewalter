@@ -22,7 +22,7 @@ class TextFileReader implements FileReader {
     private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
 
     @Override
-    public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatError, IOException {
+    public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatException, IOException {
         try (Stream<String> stream = Files.lines(file.toPath())) {
             return stream
                     .filter(Objects::nonNull)
@@ -38,9 +38,7 @@ class TextFileReader implements FileReader {
                     .filter(Objects::nonNull)
                     .toList();
         } catch (FileReaderError e) {
-            throw new FileReaderError.WrongFileFormatError();
-        } catch (IOException e) {
-            throw e;
+            throw new FileReaderError.WrongFileFormatException();
         }
     }
 

@@ -17,6 +17,6 @@ public interface FileReader {
      * @param file TXT file input
      * @return List with parsed prompts
      */
-    List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatError, IOException;
+    List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatException, IOException;
 }
 

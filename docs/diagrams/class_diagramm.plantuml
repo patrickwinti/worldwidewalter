@@ -1,5 +1,7 @@
 @startuml
 package backend{
+    left to right direction
+
     hide empty members
     class GameController {
         -gameService: GameService
@@ -9,7 +11,7 @@ package backend{
         +leaveGame(gameId: String, playerId: String) : void
         +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto) : void
         +selectProposition(roundId: String, propositionId: String, playerId: String) : void
-        +startNextRound(gameId: String) : RoundDto
+        +getRound(gameId: String) : RoundDto
     }
     class GameDto {
         -id: String

@@ -48,7 +48,7 @@ public interface GameService {
     void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException;
     
     /**
-     * Player requested to start round.
+     * Player requested to be added to round.
      *
      * @param gameId game requested to enter
      * @return new or existing round

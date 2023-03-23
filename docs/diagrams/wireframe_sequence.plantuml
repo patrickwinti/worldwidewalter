@@ -54,7 +54,7 @@ game_session_created -down-> waiting_room_inactive
 game_session_created -> Send link (out of scope)
 waiting_room_inactive ->Send link (out of scope)
 
-waiting_room_inactive -down->[Sphinx]"
+waiting_room_inactive -down->"
 {{
 salt
 {
@@ -84,7 +84,6 @@ salt
 }
 }}
 " as submit_proposition
-waiting_room_inactive -down->[Other players]submit_proposition
 
 submit_proposition -right-> "
 {{
@@ -95,7 +94,7 @@ salt
 }
 }}
 " as waiting_room_waiting_players
-waiting_room_waiting_players  -down->[Other players]"
+waiting_room_waiting_players  -down->"
 {{
 salt
 {
@@ -126,8 +125,6 @@ salt
 }}
 " as ranking
 
-waiting_room_waiting_players -->[Sphinx] ranking
-
 ranking -down-> "
 {{
 salt
@@ -137,6 +134,8 @@ salt
 }
 }}
 " as waiting_room_next_round
-waiting_room_next_round ->[New Sphinx] start_round
-waiting_room_next_round ->[Other players] submit_proposition
+waiting_room_next_round -> start_round
+waiting_room_next_round -> submit_proposition
+
+ranking->[Leave game](*)
 @enduml

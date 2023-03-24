@@ -62,7 +62,7 @@ class GameControllerTest {
     
     @Test
     void testEnterGame_200() throws Exception {
-        when(gameService.enterGame(any(), any())).then(m -> new Player(PLAYER_ID));
+        when(gameService.enterGame(any(), any())).then(m -> new Player(PLAYER_ID, "Ulisses"));
         
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/players", GAME_ID)
                         .contentType(MediaType.APPLICATION_JSON)

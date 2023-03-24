@@ -34,19 +34,21 @@ class GameServiceImpl implements GameService {
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
 
-        if (findGame(gameId).getWaitingRoom().containsKey(playerName)) {
-            playerName = playerName + "+1";
-            enterGame(gameId, playerName);
+        if (doesPlayerNameExist(gameId, playerName)) {
+            while (doesPlayerNameExist(gameId, playerName)) {
+                playerName = playerName + "+1";
+            }
         }
-        Player tempPlayer = new Player(playerName, UUID.randomUUID().toString());
+
+        Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
         findGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
 
-        return findGame(gameId).getWaitingRoom().get(playerName);
+        return tempPlayer;
     }
 
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-    
+
     }
 
     @Override
@@ -73,4 +75,14 @@ class GameServiceImpl implements GameService {
     private void saveGame(Game game) {
         gameRepository.save(game);
     }
+
+    private boolean doesPlayerNameExist(String gameId, String playerName) {
+        for (Player player : findGame(gameId).getWaitingRoom().values()) {
+            if (player.getName().equals(playerName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

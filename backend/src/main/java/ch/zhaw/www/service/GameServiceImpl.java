@@ -33,20 +33,16 @@ class GameServiceImpl implements GameService {
 
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-
         if (findGame(gameId).getWaitingRoom().size() >= 12) {
             throw new GameError.FullCapacityException();
         }
-
         if (doesPlayerNameExistInGame(gameId, playerName)) {
             while (doesPlayerNameExistInGame(gameId, playerName)) {
                 playerName = playerName + "+1";
             }
         }
-
         Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
         findGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
-
         return tempPlayer;
     }
 

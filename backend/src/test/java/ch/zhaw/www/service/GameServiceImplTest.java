@@ -46,7 +46,6 @@ class GameServiceImplTest {
 
     @Test
     void enterGame() {
-
         // 1. mock a game in the repository
         var game = mockGameInRepository();
         // 2. call the method under test
@@ -58,20 +57,18 @@ class GameServiceImplTest {
         game.getWaitingRoom().remove(player1.getId());
         // 5. add another player with the same name
         var player3 = gameService.enterGame(game.getId(), "Nora");
-        // 3. verify that 3 players were added to the game
+        // 6. verify that 3 players were added to the game
         assertEquals(2, game.getWaitingRoom().size());
         assertEquals(1, game.getActivePlayers().size());
         assertEquals(player1, game.getActivePlayers().get(player1.getId()));
         assertEquals(player2, game.getWaitingRoom().get(player2.getId()));
         assertEquals(player3, game.getWaitingRoom().get(player3.getId()));
-
+        // 7. verify that player 1 is in activePlayers and player 2 and 3 are in waitingRoom
         assertFalse(game.getWaitingRoom().containsKey(player1.getId()));
         assertTrue(game.getActivePlayers().containsKey(player1.getId()));
         assertTrue(game.getWaitingRoom().containsKey(player2.getId()));
         assertTrue(game.getWaitingRoom().containsKey(player3.getId()));
-
-
-        // 4. verify that the name of player 2 was changed to "Nora+1"
+        // 8. verify that the name of player 2 was changed to "Nora+1" and the name of player 3 was changed to "Nora+1+1"
         assertEquals("Nora", game.getActivePlayers().get(player1.getId()).getName());
         assertEquals("Nora+1", game.getWaitingRoom().get(player2.getId()).getName());
         assertEquals("Nora+1+1", game.getWaitingRoom().get(player3.getId()).getName());

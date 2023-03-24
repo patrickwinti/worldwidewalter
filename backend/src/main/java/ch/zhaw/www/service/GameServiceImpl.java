@@ -84,7 +84,7 @@ class GameServiceImpl implements GameService {
      * Support method for enterGame.
      * Checks if a playerName already exists in a game.
      *
-     * @param gameId    gameId to find the game and clarify the id in exception
+     * @param gameId     gameId to find the game and clarify the id in exception
      * @param playerName playerName to check if it already exists
      * @return true if the player name already exists in the game
      */

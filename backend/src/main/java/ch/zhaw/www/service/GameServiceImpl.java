@@ -50,7 +50,7 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Round startNextRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException,
+    public Round getRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException,
             GameError.NotEnoughPlayersException {
         return new Round(UUID.randomUUID().toString(), new Prompt("I've always wanted to WALTER"));
     }

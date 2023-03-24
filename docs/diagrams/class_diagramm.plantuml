@@ -18,6 +18,7 @@ package backend{
     class Game {
         id: String
         waitingRoom: Map<Player>
+        activePlayers: Map<Player>
     }
     interface GameService{
        §createGame(): Game

@@ -4,13 +4,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WelcomeComponent } from "./component/initialization/welcome/welcome.component";
-import { HttpClientModule } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { InitializationContainerComponent } from './component/initialization/initialization-container.component';
 import { JoinComponent } from './component/initialization/join/join.component';
 import { FormsModule } from "@angular/forms";
 import { GameContainerComponent } from './component/game/game-container.component';
 import { StartGameComponent } from './component/game/start-game/start-game.component';
 import { WaitingPageComponent } from './component/initialization/waiting-page/waiting-page.component';
+import { HttpPollingInterceptor } from "./service/http-polling.interceptor";
 
 @NgModule({
   declarations: [
@@ -28,7 +29,13 @@ import { WaitingPageComponent } from './component/initialization/waiting-page/wa
     HttpClientModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpPollingInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

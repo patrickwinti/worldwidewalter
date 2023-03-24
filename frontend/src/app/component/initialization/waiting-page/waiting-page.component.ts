@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { GameService } from "../../../service/game.service";
 import { GameDto } from "../../../dto/game-dto";
-import { Observable, Subscription } from "rxjs";
-import { GameState } from "../../../model/game-state";
+import { Observable, Observer, Subscription } from "rxjs";
+import { RoundDto } from "../../../dto/round-dto";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: 'www-waiting-page',
@@ -12,28 +13,27 @@ export class WaitingPageComponent implements OnInit, OnDestroy {
   @Input() game: GameDto;
   @Output() gameStartEmitter = new EventEmitter<GameDto>();
   private gameSubscription = new Subscription;
-  private game$: Observable<GameDto>;
+  private round$: Observable<RoundDto>;
 
   constructor(private gameService: GameService) {
   }
 
   ngOnInit(): void {
-    this.game$ = this.gameService.getGameAsSoonAsInGivenState(this.game.id, GameState.READY, 3, 1000);
-    this.startPollingGame();
+    this.round$ = this.gameService.getRound(this.game.id);
+    this.startPollingForRound();
   };
 
-  private startPollingGame() {
-    this.gameSubscription = this.game$.subscribe({
+  private startPollingForRound() {
+    this.gameSubscription = this.round$.subscribe({
       next: (val) => {
-        console.log('game: ' + val.id + ' state: ' + val.state);
+        console.log('round: ' + val.id + ' prompt: ' + val.prompt);
       },
-      complete: () => {
-        console.log('completed');
-      },
-      error: () => {
-        console.log('error');
+      error: (err: HttpErrorResponse) => {
+        console.log('error status: ' + err.status);
+        console.log('error: ' + err.error);
+        console.log(err);
       }
-    })
+    } as Observer<RoundDto>)
   }
 
   ngOnDestroy() {
@@ -45,6 +45,6 @@ export class WaitingPageComponent implements OnInit, OnDestroy {
   }
 
   restartPolling() {
-    this.startPollingGame();
+    this.startPollingForRound();
   }
 }

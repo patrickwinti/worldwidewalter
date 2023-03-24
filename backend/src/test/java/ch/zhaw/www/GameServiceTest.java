@@ -1,7 +1,7 @@
 package ch.zhaw.www;
 
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.repository.RunningGamesRepository;
+import ch.zhaw.www.repository.GameRepository;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ class GameServiceTest {
     @Autowired
     private GameService gameService;
     @MockBean
-    private RunningGamesRepository gameRepository;
+    private GameRepository gameRepository;
     
     @Test
     void testAddGameSavesItToRepository() {

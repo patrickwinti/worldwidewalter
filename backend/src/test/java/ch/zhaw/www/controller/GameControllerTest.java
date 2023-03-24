@@ -37,13 +37,8 @@ class GameControllerTest {
     private static final String ROUND_ID = "789";
     private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
-<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/controller/GameControllerTest.java
     private static final Prompt PROMPT = new Prompt("prompt", 0);
 
-=======
-    private static final Prompt PROMPT = new Prompt("prompt");
-    
->>>>>>> main:backend/src/test/java/ch/zhaw/www/GameControllerTest.java
     @Autowired
     private MockMvc mvc;
     @MockBean

@@ -38,8 +38,8 @@ class GameServiceImpl implements GameService {
             throw new GameError.FullCapacityException();
         }
 
-        if (doesPlayerNameExist(gameId, playerName)) {
-            while (doesPlayerNameExist(gameId, playerName)) {
+        if (doesPlayerNameExistInGame(gameId, playerName)) {
+            while (doesPlayerNameExistInGame(gameId, playerName)) {
                 playerName = playerName + "+1";
             }
         }
@@ -80,13 +80,27 @@ class GameServiceImpl implements GameService {
         gameRepository.save(game);
     }
 
-    private boolean doesPlayerNameExist(String gameId, String playerName) {
+    /**
+     * Support method for enterGame.
+     * Checks if a playerName already exists in a game.
+     *
+     * @param gameId    gameId to find the game and clarify the id in exception
+     * @param playerName playerName to check if it already exists
+     * @return true if the player name already exists in the game
+     */
+    private boolean doesPlayerNameExistInGame(String gameId, String playerName) {
         for (Player player : findGame(gameId).getWaitingRoom().values()) {
+            if (player.getName().equals(playerName)) {
+                return true;
+            }
+        }
+        for (Player player : findGame(gameId).getActivePlayers().values()) {
             if (player.getName().equals(playerName)) {
                 return true;
             }
         }
         return false;
     }
+
 
 }

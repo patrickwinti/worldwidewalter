@@ -52,15 +52,27 @@ class GameServiceImplTest {
         // 2. call the method under test
         var player1 = gameService.enterGame(game.getId(), "Nora");
         var player2 = gameService.enterGame(game.getId(), "Nora");
+        // 3. add player1 to the game in activePlayers
+        game.getActivePlayers().put(player1.getId(), player1);
+        // 4. remove player1 from the game in waitingRoom
+        game.getWaitingRoom().remove(player1.getId());
+        // 5. add another player with the same name
         var player3 = gameService.enterGame(game.getId(), "Nora");
-
         // 3. verify that 3 players were added to the game
-        assertEquals(3, game.getWaitingRoom().size());
-        assertTrue(game.getWaitingRoom().containsKey(player1.getId()));
-        assertEquals(player1, game.getWaitingRoom().get(player1.getId()));
+        assertEquals(2, game.getWaitingRoom().size());
+        assertEquals(1, game.getActivePlayers().size());
+        assertEquals(player1, game.getActivePlayers().get(player1.getId()));
+        assertEquals(player2, game.getWaitingRoom().get(player2.getId()));
+        assertEquals(player3, game.getWaitingRoom().get(player3.getId()));
+
+        assertFalse(game.getWaitingRoom().containsKey(player1.getId()));
+        assertTrue(game.getActivePlayers().containsKey(player1.getId()));
+        assertTrue(game.getWaitingRoom().containsKey(player2.getId()));
+        assertTrue(game.getWaitingRoom().containsKey(player3.getId()));
+
 
         // 4. verify that the name of player 2 was changed to "Nora+1"
-        assertEquals("Nora", game.getWaitingRoom().get(player1.getId()).getName());
+        assertEquals("Nora", game.getActivePlayers().get(player1.getId()).getName());
         assertEquals("Nora+1", game.getWaitingRoom().get(player2.getId()).getName());
         assertEquals("Nora+1+1", game.getWaitingRoom().get(player3.getId()).getName());
     }

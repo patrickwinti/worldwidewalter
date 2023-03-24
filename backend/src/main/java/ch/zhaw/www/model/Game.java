@@ -22,4 +22,5 @@ public class Game {
     @NotNull
     private final String id;
     private Map<String, Player> waitingRoom = new HashMap<>();
+    private Map<String, Player> activePlayers = new HashMap<>();
 }

@@ -38,13 +38,15 @@ class GameServiceImpl implements GameService {
             playerName = playerName + "+1";
             enterGame(gameId, playerName);
         }
-        findGame(gameId).getWaitingRoom().put(playerName, new Player(playerName, UUID.randomUUID().toString()));
+        Player tempPlayer = new Player(playerName, UUID.randomUUID().toString());
+        findGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
+
         return findGame(gameId).getWaitingRoom().get(playerName);
     }
 
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-
+    
     }
 
     @Override

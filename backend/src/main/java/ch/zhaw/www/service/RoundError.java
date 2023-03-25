@@ -11,17 +11,7 @@ public abstract class RoundError extends RuntimeException {
     private RoundError(String message) {
         super(message);
     }
-
-    /**
-     * Round is in wrong state to be started
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class OngoingException extends RoundError {
-        public OngoingException() {
-            super("Round is ongoing and cannot start a new one");
-        }
-    }
-
+    
     /**
      * Round ID passed has not been found
      */

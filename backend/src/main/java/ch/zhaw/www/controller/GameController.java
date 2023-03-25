@@ -121,15 +121,14 @@ public class GameController {
     @Operation(summary = "Player requested to start new round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
-            @ApiResponse(responseCode = "400", description = "Game is in an invalid state to start new round"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "425", description = "Game has not enough players to continue"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<RoundDto> getRound(@PathVariable String gameId) {
-        Round round = gameService.getRound(gameId);
+    public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        Round round = gameService.getRound(gameId, playerId);
         logger.log(Level.INFO, "started next round {0}", round);
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
     }

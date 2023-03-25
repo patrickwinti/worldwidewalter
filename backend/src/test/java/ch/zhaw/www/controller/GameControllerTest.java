@@ -38,7 +38,7 @@ class GameControllerTest {
     private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
     private static final Prompt PROMPT = new Prompt("prompt", 0);
-
+    
     @Autowired
     private MockMvc mvc;
     @MockBean
@@ -195,34 +195,29 @@ class GameControllerTest {
     
     @Test
     void testGetRound_200() throws Exception {
-        when(gameService.getRound(any())).then(o -> new Round(ROUND_ID, PROMPT));
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID))
+        when(gameService.getRound(any(), any())).then(o -> new Round(ROUND_ID, PROMPT));
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + ROUND_ID + "\",\"prompt\":\"prompt\"}"));
-        verify(gameService).getRound(GAME_ID);
+        verify(gameService).getRound(GAME_ID, PLAYER_ID);
     }
     
     @Test
     void testGetRound_404() throws Exception {
-        when(gameService.getRound(any())).thenThrow(new GameError.NotFoundException(GAME_ID));
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID))
+        when(gameService.getRound(any(), any())).thenThrow(new GameError.NotFoundException(GAME_ID));
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
-        verify(gameService).getRound(GAME_ID);
-    }
-    
-    @Test
-    void testGetRound_400() throws Exception {
-        when(gameService.getRound(any())).thenThrow(new RoundError.OngoingException());
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID))
-                .andExpect(status().isBadRequest());
-        verify(gameService).getRound(GAME_ID);
+        verify(gameService).getRound(GAME_ID, PLAYER_ID);
     }
     
     @Test
     void testGetRound_425() throws Exception {
-        when(gameService.getRound(any())).thenThrow(new GameError.NotEnoughPlayersException());
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID))
+        when(gameService.getRound(any(), any())).thenThrow(new GameError.NotEnoughPlayersException());
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isTooEarly());
-        verify(gameService).getRound(GAME_ID);
+        verify(gameService).getRound(GAME_ID, PLAYER_ID);
     }
 }

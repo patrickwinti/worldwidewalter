@@ -1,4 +1,4 @@
-package ch.zhaw.www;
+package ch.zhaw.www.controller;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
@@ -37,8 +37,8 @@ class GameControllerTest {
     private static final String ROUND_ID = "789";
     private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
-    private static final Prompt PROMPT = new Prompt("prompt");
-    
+    private static final Prompt PROMPT = new Prompt("prompt", 0);
+
     @Autowired
     private MockMvc mvc;
     @MockBean

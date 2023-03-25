@@ -42,9 +42,10 @@ export class WaitingForPlayersComponent implements OnInit, OnDestroy {
 
   private startPollingForRound() {
     this.gameSubscription = this.round$.subscribe({
-      next: (val) => {
+      next: (nextRound) => {
         this.stateService.goToNextState();
-        console.log('round: ' + val.id + ' prompt: ' + val.prompt);
+        this.stateService.setRound(nextRound);
+        console.log('round: ' + nextRound.id + ' prompt: ' + nextRound.prompt);
       },
       error: (err: HttpErrorResponse) => {
         console.log('error status: ' + err.status);

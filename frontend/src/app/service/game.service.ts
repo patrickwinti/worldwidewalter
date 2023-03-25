@@ -6,6 +6,7 @@ import { GameDto } from "../dto/game-dto";
 import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
 import { PlayerDto } from "../dto/player-dto";
 import { RoundDto } from "../dto/round-dto";
+import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +31,10 @@ export class GameService {
 
   getRound(gameId: string): Observable<RoundDto> {
     return this.http.get<RoundDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/rounds');
+  }
+
+  submitProposition(roundId: string, proposition: PropositionSubmissionDto): Observable<void> {
+    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/proposition',
+      proposition);
   }
 }

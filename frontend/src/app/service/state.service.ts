@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from "rxjs";
 import { GameState } from "../model/game-state";
+import { RoundDto } from "../dto/round-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,7 @@ export class StateService {
   private state = new BehaviorSubject<GameState>(GameState.WAITING_FOR_PLAYERS);
   private gameId: string;
   private playerId: string;
+  private round: RoundDto;
 
   getGameId(): string {
     return this.gameId ?? '';
@@ -24,6 +26,14 @@ export class StateService {
 
   setPlayerId(value: string) {
     this.playerId = value;
+  }
+
+  getRound(): RoundDto {
+    return this.round;
+  }
+
+  setRound(round: RoundDto): void {
+    this.round = round;
   }
 
   goToNextState() {

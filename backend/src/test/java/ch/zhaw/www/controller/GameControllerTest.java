@@ -38,7 +38,7 @@ class GameControllerTest {
     private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
     private static final Prompt PROMPT = new Prompt("prompt", 0);
-
+    
     @Autowired
     private MockMvc mvc;
     @MockBean
@@ -209,15 +209,6 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
-        verify(gameService).getRound(GAME_ID, PLAYER_ID);
-    }
-    
-    @Test
-    void testGetRound_400() throws Exception {
-        when(gameService.getRound(any(), any())).thenThrow(new RoundError.OngoingException());
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isBadRequest());
         verify(gameService).getRound(GAME_ID, PLAYER_ID);
     }
     

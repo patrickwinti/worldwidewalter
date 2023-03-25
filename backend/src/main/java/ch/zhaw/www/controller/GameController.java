@@ -121,7 +121,6 @@ public class GameController {
     @Operation(summary = "Player requested to start new round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
-            @ApiResponse(responseCode = "400", description = "Game is in an invalid state to start new round"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "425", description = "Game has not enough players to continue"),
             @ApiResponse(responseCode = "500", description = "Unknown error")

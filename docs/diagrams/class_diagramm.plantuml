@@ -18,14 +18,20 @@ package backend{
     class Game {
         id: String
     }
+    class Prompt{
+        -statement: String
+        -totalPlaceholders: int
+        -hasBeenUsed: boolean
+    }
+
     interface GameService{
-       §createGame(): Game
-       §leaveGame(gameId: String, playerId: String): void
-       §submitProposition(roundId: String, playerId: String, gaps: List<String>): void
-       §selectProposition(roundId: String, playerId: String, propositionId: String): void
-       §getGame(gameId: String) : Game
-       §enterGame(gameId: String, playerName: String) : Player
-       §startNextRound(gameId: String) : Round
+       createGame(): Game
+       leaveGame(gameId: String, playerId: String): void
+       submitProposition(roundId: String, playerId: String, gaps: List<String>): void
+       selectProposition(roundId: String, playerId: String, propositionId: String): void
+       getGame(gameId: String) : Game
+       enterGame(gameId: String, playerName: String) : Player
+       startNextRound(gameId: String) : Round
     }
     interface GameRepository
     class PlayerDto {
@@ -71,6 +77,12 @@ package backend{
         NotFoundException
     }
 
+    interface FileReader{
+        readFile(file: File): List<Prompt>
+    }
+
+    class TextFileReader
+
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
@@ -85,5 +97,9 @@ package backend{
     GameService ..> PlayerError
     GameService ..> PropositionError
     GameService --> GameRepository
+
+    TextFileReader ..> Prompt
 }
+
+    FileReader<|-TextFileReader
 @enduml

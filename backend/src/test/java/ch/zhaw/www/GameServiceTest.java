@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +25,7 @@ class GameServiceTest {
     @Test
     void testAddGameSavesItToRepository() {
         var game = gameService.createGame();
-        verify(gameRepository).save(game);
+        verify(gameRepository).saveNewGame(game);
         assertNotNull(game.getId());
     }
     
@@ -34,26 +33,30 @@ class GameServiceTest {
     void testGetGameReadsFromRepository_Found() {
         var expectedGame = mockGameInRepository();
         var actualGame = gameService.getGame(expectedGame.getId());
-        
         assertEquals(expectedGame, actualGame);
     }
     
     @Test
     void testGetGameReadsFromRepository_NotFound() {
-        var gameId = "Kjölasjflksdf";
+        var gameId = "jibberish";
         mockGameNotFoundInRepository(gameId);
         assertThrows(GameError.NotFoundException.class, () -> gameService.getGame(gameId));
-        
     }
     
     private Game mockGameInRepository() {
         var game = new Game(UUID.randomUUID().toString());
-        when(gameRepository.findById(game.getId())).thenReturn(Optional.of(game));
+        
+        doNothing().when(gameRepository).editGame(eq(game.getId()), any());
+        when(gameRepository.getGame(game.getId())).thenReturn(game);
+        
         return game;
     }
     
     private void mockGameNotFoundInRepository(String gameId) {
         doThrow(GameError.NotFoundException.class)
-                .when(gameRepository).findById(gameId);
+                .when(gameRepository).editGame(eq(gameId), any());
+        
+        doThrow(GameError.NotFoundException.class)
+                .when(gameRepository).getGame(gameId);
     }
 }

@@ -1,5 +1,6 @@
 package ch.zhaw.www.service;
 
+import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Prompt;
@@ -14,21 +15,23 @@ import java.util.UUID;
 @Service
 class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
+    private final GameProperties gameProperties;
     
-    GameServiceImpl(GameRepository gameRepository) {
+    GameServiceImpl(GameRepository gameRepository, GameProperties gameProperties) {
         this.gameRepository = gameRepository;
+        this.gameProperties = gameProperties;
     }
     
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString());
-        saveGame(game);
+        gameRepository.saveNewGame(game);
         return game;
     }
     
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
-        return findGame(gameId);
+        return gameRepository.getGame(gameId);
     }
     
     @Override
@@ -43,7 +46,7 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException {
-        return new Round(UUID.randomUUID().toString(), new Prompt("I've always wanted to WALTER", 1));
+        return gameRepository.getGame(gameId).getRunningRound();
     }
     
     @Override
@@ -57,11 +60,15 @@ class GameServiceImpl implements GameService {
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }
     
-    private Game findGame(String gameId) {
-        return gameRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
+    private void startNewRound(@NotNull Game game) {
+        if (game.needsNewRound()) {
+            game.addRound(new Round(generateId(),
+                    new Prompt("I've always wanted to WALTER"),
+                    gameProperties.getPropositionSubmissionInterval()));
+        }
     }
     
-    private void saveGame(Game game) {
-        gameRepository.save(game);
+    private String generateId() {
+        return UUID.randomUUID().toString();
     }
 }

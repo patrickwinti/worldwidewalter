@@ -48,15 +48,15 @@ public interface GameService {
     void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException;
     
     /**
-     * Player requested to start round.
+     * Player requested to be added to round.
      *
-     * @param gameId game requested to enter
+     * @param gameId   game requested to enter
+     * @param playerId player requesting round
      * @return new or existing round
      * @throws GameError.NotFoundException         if game is not found
-     * @throws RoundError.OngoingException         if round can not be started
      * @throws GameError.NotEnoughPlayersException if there are not enough players anymore
      */
-    Round getRound(@NotNull String gameId) throws GameError.NotFoundException, RoundError.OngoingException, GameError.NotEnoughPlayersException;
+    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException;
     
     /**
      * Player submitted their propositions for the prompt

@@ -7,10 +7,10 @@ import org.springframework.stereotype.Repository;
 import java.util.function.UnaryOperator;
 
 @Repository
-public class GameRepositoryImpl implements GameRepository {
+class GameRepositoryImpl implements GameRepository {
     private final RunningGamesRepository gamesRepository;
     
-    public GameRepositoryImpl(RunningGamesRepository gamesRepository) {
+    GameRepositoryImpl(RunningGamesRepository gamesRepository) {
         this.gamesRepository = gamesRepository;
     }
     
@@ -21,8 +21,8 @@ public class GameRepositoryImpl implements GameRepository {
     
     @Override
     public void editGame(String gameId, UnaryOperator<Game> editor) throws GameError.NotFoundException {
-        var game = getGame(gameId);
-        synchronized (game) {
+        synchronized (gamesRepository) {
+            var game = getGame(gameId);
             gamesRepository.save(editor.apply(game));
         }
     }

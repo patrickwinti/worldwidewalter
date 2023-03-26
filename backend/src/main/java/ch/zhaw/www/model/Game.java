@@ -31,7 +31,9 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     
-    public void addRound(Round round) {
+    public void newRound(Round round) {
+        waitingRoom.putAll(activePlayers);
+        activePlayers.clear();
         rounds.add(round);
     }
     
@@ -61,9 +63,9 @@ public class Game {
      */
     public State getGameState() {
         var round = getRunningRound();
-        if (round == null) {
+        if (waitingRoom.isEmpty()) {
             return State.NO_VALID_ROUND;
-        } else if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS) {
+        } else if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS || round == null) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.propositionsSent() < activePlayers.size() && round.canPropositionsBeSubmitted()) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;

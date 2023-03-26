@@ -35,8 +35,13 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        gameRepository.editGame(gameId, this::startNewRound);
-        return new Player(playerName);
+        var player = new Player(playerName);
+        gameRepository.editGame(gameId, game -> {
+            startNewRound(game);
+            game.getWaitingRoom().put(player.getId(), player);
+            return game;
+        });
+        return player;
     }
     
     @Override
@@ -64,14 +69,13 @@ class GameServiceImpl implements GameService {
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }
     
-    private @NotNull Game startNewRound(@NotNull Game game) {
+    private void startNewRound(@NotNull Game game) {
         if (game.getGameState() == Game.State.NO_VALID_ROUND) {
-            game.addRound(new Round(generateId(),
+            game.newRound(new Round(generateId(),
                     game.getNextPrompt(),
                     gameProperties.getPropositionSubmissionDuration(),
                     gameProperties.getRoundEnterLimit()));
         }
-        return game;
     }
     
     private String generateId() {

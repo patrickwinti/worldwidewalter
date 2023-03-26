@@ -16,9 +16,22 @@ class GameTest {
     private static final Prompt PROMPT = new Prompt("I am WALTER", 1);
     private static final int DURATION = 4;
     
-    private static void addPlayer(Game game) {
-        Player player = new Player(getId());
+    private static Round getRound(int propositionDuration) {
+        return new Round(getId(), PROMPT, propositionDuration, 1);
+    }
+    
+    private static void addToWaitingRoom(Game game) {
+        Player player = getPlayer();
+        game.getWaitingRoom().put(player.getId(), player);
+    }
+    
+    private static void addToActive(Game game) {
+        Player player = getPlayer();
         game.getActivePlayers().put(player.getId(), player);
+    }
+    
+    private static Player getPlayer() {
+        return new Player(getId());
     }
     
     private static String getId() {
@@ -26,8 +39,9 @@ class GameTest {
     }
     
     private static void addRoundOpenForPropositionSubmission(Game game) {
-        Round round = new Round(getId(), PROMPT, DURATION, 1);
-        game.addRound(round);
+        Round round = getRound(DURATION);
+        game.newRound(round);
+        game.getActivePlayers().putAll(game.getWaitingRoom());
         round.setSphinx(game.getActivePlayers().values().iterator().next());
         round.openForPropositionSubmission();
     }
@@ -35,31 +49,34 @@ class GameTest {
     @Test
     void testGameState_WaitingForPlayers() {
         Game game = new Game(getId());
+        assertEquals(Game.State.NO_VALID_ROUND, game.getGameState());
+        addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
-        addPlayer(game);
+        addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
-        addPlayer(game);
+        addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
-        addPlayer(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
-        addPlayer(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
-        
-        Round round = new Round(getId(), PROMPT, 2, 1);
-        game.addRound(round);
+        addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
         
-        round.setSphinx(game.getActivePlayers().values().iterator().next());
+        game.getActivePlayers().putAll(game.getWaitingRoom());
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
+        
+        Round round = getRound(2);
+        game.newRound(round);
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
+        
+        round.setSphinx(game.getWaitingRoom().values().iterator().next());
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
     }
     
     @Test
     void testGameState_WaitingForPropositions() {
         Game game = new Game(getId());
-        addPlayer(game);
-        addPlayer(game);
-        addPlayer(game);
-        addPlayer(game);
+        addToWaitingRoom(game);
+        addToWaitingRoom(game);
+        addToWaitingRoom(game);
+        addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getGameState());
         
         addRoundOpenForPropositionSubmission(game);
@@ -69,10 +86,10 @@ class GameTest {
     @Test
     void testGameState_WaitingForSelections() {
         Game game = new Game(getId());
-        addPlayer(game);
-        addPlayer(game);
-        addPlayer(game);
-        addPlayer(game);
+        addToActive(game);
+        addToActive(game);
+        addToActive(game);
+        addToActive(game);
         
         addRoundOpenForPropositionSubmission(game);
         var round = game.getRunningRound();
@@ -94,14 +111,33 @@ class GameTest {
         Game game = new Game(getId());
         assertNull(game.getRunningRound());
         
-        Round round = new Round(getId(), PROMPT, 3, 1);
-        game.addRound(round);
+        Round round = getRound(3);
+        game.newRound(round);
         assertNull(game.getRunningRound());
         
-        Player sphinx = new Player(getId());
+        Player sphinx = getPlayer();
         round.setSphinx(sphinx);
         
         assertSame(round, game.getRunningRound());
     }
     
+    @Test
+    void testNewRound() {
+        Game game = new Game(getId());
+        addToWaitingRoom(game);
+        addToWaitingRoom(game);
+        addToWaitingRoom(game);
+        addToWaitingRoom(game);
+        assertEquals(4, game.getWaitingRoom().size());
+        addToActive(game);
+        addToActive(game);
+        addToActive(game);
+        addToActive(game);
+        assertEquals(4, game.getActivePlayers().size());
+        
+        game.newRound(getRound(2));
+        
+        assertEquals(8, game.getWaitingRoom().size());
+        assertEquals(0, game.getActivePlayers().size());
+    }
 }

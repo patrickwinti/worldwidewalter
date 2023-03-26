@@ -66,7 +66,7 @@ class GameServiceTest {
         var game = mockGameInRepository();
         
         Round round = getRound();
-        game.addRound(round);
+        game.newRound(round);
         
         Player player1 = addPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, player1.getId()));
@@ -93,7 +93,7 @@ class GameServiceTest {
     void testGetRound_UnknownPlayer() {
         var game = mockGameInRepository();
         Round round = getRound();
-        game.addRound(round);
+        game.newRound(round);
         addPlayer(game);
         addPlayer(game);
         addPlayer(game);
@@ -108,7 +108,7 @@ class GameServiceTest {
     void testGetRound_ValidRound() {
         var game = mockGameInRepository();
         Round round = getRound();
-        game.addRound(round);
+        game.newRound(round);
         Player player1 = addPlayer(game);
         Player player2 = addPlayer(game);
         Player player3 = addPlayer(game);

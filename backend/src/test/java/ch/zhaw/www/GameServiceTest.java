@@ -63,9 +63,8 @@ class GameServiceTest {
     
     @Test
     void testGetRound_IllegalState() {
-        mockGameInRepository();
+        var game = mockGameInRepository();
         
-        var game = gameService.getGame(GAME_ID);
         Round round = getRound();
         game.addRound(round);
         
@@ -92,8 +91,7 @@ class GameServiceTest {
     
     @Test
     void testGetRound_UnknownPlayer() {
-        mockGameInRepository();
-        var game = gameService.getGame(GAME_ID);
+        var game = mockGameInRepository();
         Round round = getRound();
         game.addRound(round);
         addPlayer(game);
@@ -107,9 +105,8 @@ class GameServiceTest {
     }
     
     @Test
-    void testGetRound_Found() {
-        mockGameInRepository();
-        var game = gameService.getGame(GAME_ID);
+    void testGetRound_ValidRound() {
+        var game = mockGameInRepository();
         Round round = getRound();
         game.addRound(round);
         Player player1 = addPlayer(game);
@@ -123,6 +120,13 @@ class GameServiceTest {
         assertEquals(round, gameService.getRound(GAME_ID, player2.getId()));
         assertEquals(round, gameService.getRound(GAME_ID, player3.getId()));
         assertEquals(round, gameService.getRound(GAME_ID, player4.getId()));
+    }
+    
+    @Test
+    void testGetRound_GameNotFound() {
+        mockGameNotFoundInRepository(GAME_ID);
+        
+        assertThrows(GameError.NotFoundException.class, () -> gameService.getRound(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     private Player addPlayer(Game game) {

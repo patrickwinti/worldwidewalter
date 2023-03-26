@@ -31,10 +31,6 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     
-    public boolean needsNewRound() {
-        return getGameState() == State.WAITING_FOR_PLAYERS;
-    }
-    
     public void addRound(Round round) {
         rounds.add(round);
     }

@@ -61,7 +61,9 @@ public class Game {
      */
     public State getGameState() {
         var round = getRunningRound();
-        if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS || round == null) {
+        if (round == null) {
+            return State.NO_VALID_ROUND;
+        } else if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.propositionsSent() < activePlayers.size() && round.canPropositionsBeSubmitted()) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
@@ -77,6 +79,6 @@ public class Game {
     }
     
     public enum State {
-        WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_SELECTIONS
+        NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_SELECTIONS
     }
 }

@@ -65,7 +65,7 @@ class GameServiceImpl implements GameService {
     }
     
     private @NotNull Game startNewRound(@NotNull Game game) {
-        if (game.getGameState() == Game.State.WAITING_FOR_PLAYERS) {
+        if (game.getGameState() == Game.State.NO_VALID_ROUND) {
             game.addRound(new Round(generateId(),
                     game.getNextPrompt(),
                     gameProperties.getPropositionSubmissionDuration(),

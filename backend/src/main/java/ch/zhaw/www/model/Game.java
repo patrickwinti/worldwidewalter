@@ -39,6 +39,12 @@ public class Game {
         rounds.add(round);
     }
     
+    /**
+     * Gets last running round. A round counts as running
+     * when the Sphinx has been selected
+     *
+     * @return {@link Round} or null
+     */
     @Nullable
     public Round getRunningRound() {
         if (rounds.isEmpty()) {
@@ -49,15 +55,29 @@ public class Game {
         }
     }
     
+    /**
+     * Returns state of the current game:
+     * - Waiting for player: Not enough players active or no valid round
+     * - Waiting for propositions: Not all players send propositions
+     * - Waiting for selections: Not all players send propositions
+     *
+     * @return {@link Game.State}
+     */
     public State getGameState() {
         var round = getRunningRound();
         if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS || round == null) {
             return State.WAITING_FOR_PLAYER;
-        } else if (round.waitingForPropositions()) {
+        } else if (round.propositionsSent() < activePlayers.size()) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else {
+        } else if (round.selectionsSent() < activePlayers.size()) {
             return State.WAITING_FOR_SELECTIONS;
+        } else {
+            return State.WAITING_FOR_PLAYER;
         }
+    }
+    
+    public Prompt getNextPrompt() {
+        return new Prompt("I've always wanted to WALTER", 1);
     }
     
     public enum State {

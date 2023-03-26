@@ -195,7 +195,7 @@ class GameControllerTest {
     
     @Test
     void testGetRound_200() throws Exception {
-        when(gameService.getRound(any(), any())).then(o -> new Round(ROUND_ID, PROMPT, 2000));
+        when(gameService.getRound(any(), any())).then(o -> new Round(ROUND_ID, PROMPT, 4, 2));
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())

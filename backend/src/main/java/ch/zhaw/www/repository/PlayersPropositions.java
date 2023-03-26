@@ -1,44 +1,46 @@
 package ch.zhaw.www.repository;
 
 import ch.zhaw.www.model.Proposition;
+import lombok.Data;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Data
 public class PlayersPropositions {
 
     private List<Proposition> propositions = new ArrayList<>();
-
-    /**
-     * Creates a list of Proposition out of a String input
-     * @param gaps User generated input
-     */
-    public PlayersPropositions(List<String> gaps) {
-        propositions = stringToProposition(gaps);
-    }
 
     /*
      * This method converts the string proposition submission to a Proposition object.
      * It creates a unique ID for each string input, if two or more inputs are identical,
      * it adds the proposition to the duplicates list of the identical proposition submission
      */
-    private List<Proposition> stringToProposition(List<String> gaps) {
-        List<Proposition> props = new ArrayList<>();
-        for (String gap : gaps) {
-            String id = UUID.randomUUID().toString();
-            Proposition temp = new Proposition(id, gap);
+    public void updatePropositions(List<String> gaps) {
+        String id = UUID.randomUUID().toString();
+        Proposition temp = new Proposition(id, gaps);
 
-            if (props.isEmpty()) {
-                props.add(temp);
-            }
-
-            for (int i = 0; i <= props.size(); i++) {
-                if (gap.equalsIgnoreCase(props.get(i).getGap())) {
-                    props.get(i).getDuplicates().add(temp);
-                }
-                props.add(temp);
+        if (propositions.isEmpty()) {
+            propositions.add(temp);
+            return;
+        }
+        for (Proposition proposition : propositions) {
+            if (checkForDuplicates(proposition.getGap(), gaps)) {
+                proposition.getDuplicates().add(temp);
+                return;
             }
         }
-        return props;
+        propositions.add(temp);
+    }
+
+    private boolean checkForDuplicates(List<String> list1, List<String> list2) {
+        return list1.size() == list2.size() &&
+                list1.stream()
+                        .map(String::toLowerCase)
+                        .toList()
+                        .equals(list2.stream()
+                                .map(String::toLowerCase)
+                                .collect(Collectors.toList()));
     }
 
 }

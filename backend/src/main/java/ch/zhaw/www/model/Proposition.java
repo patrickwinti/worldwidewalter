@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import java.util.List;
 import java.util.Map;
 
-
+//todo implement as a list
 /**
  * Model class for the proposition sent by players
  */
@@ -16,7 +16,7 @@ public class Proposition {
     @Id
     @NotNull
     private final String id;
-    private final String gap;
+    private final List<String> gap;
     private List<Proposition> duplicates;
 
 

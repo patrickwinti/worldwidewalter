@@ -9,8 +9,8 @@ public class PlayersPropositions {
     private List<Proposition> propositions = new ArrayList<>();
 
     /**
-     * Creates a list of
-     * @param gaps
+     * Creates a list of Proposition out of a String input
+     * @param gaps User generated input
      */
     public PlayersPropositions(List<String> gaps) {
         propositions = stringToProposition(gaps);

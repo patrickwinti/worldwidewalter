@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+/**
+ * Container for environment properties
+ */
 @Getter
 @Configuration
 @PropertySource("classpath:config.properties")

@@ -53,7 +53,8 @@ export class GameService {
   }
 
   submitSelection(id: string): Observable<void> {
-    return of();
+    return new Observable<void>((res) => {
+      res.next()
+    });
   }
-
 }

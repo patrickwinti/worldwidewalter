@@ -67,7 +67,7 @@ public class Game {
         var round = getRunningRound();
         if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS || round == null) {
             return State.WAITING_FOR_PLAYER;
-        } else if (round.propositionsSent() < activePlayers.size()) {
+        } else if (round.propositionsSent() < activePlayers.size() && round.canPropositionsBeSubmitted()) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
         } else if (round.selectionsSent() < activePlayers.size()) {
             return State.WAITING_FOR_SELECTIONS;

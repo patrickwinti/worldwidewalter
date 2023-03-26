@@ -88,6 +88,20 @@ class RoundTest {
         assertFalse(round.canPropositionsBeSubmitted());
     }
     
+    @Test
+    void selectionsCanBeSubmitted() {
+        Round round = getRound();
+        
+        assertFalse(round.canSelectionsBeSubmitted());
+        round.setSphinx(new Player(UUID.randomUUID().toString()));
+        assertFalse(round.canSelectionsBeSubmitted());
+        
+        round.getPropositions().put("1", "Joseph");
+        round.getPropositions().put("2", "Maria");
+        
+        assertTrue(round.canSelectionsBeSubmitted());
+    }
+    
     private void tick(Clock clock, int minutes) {
         InstantWrapper.clock = Clock.offset(clock, Duration.of(minutes, ChronoUnit.MINUTES));
     }

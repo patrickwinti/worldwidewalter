@@ -32,7 +32,7 @@ public class Game {
     private final Map<String, Player> activePlayers = new HashMap<>();
     
     public boolean needsNewRound() {
-        return getGameState() == State.WAITING_FOR_PLAYER;
+        return getGameState() == State.WAITING_FOR_PLAYERS;
     }
     
     public void addRound(Round round) {
@@ -66,13 +66,13 @@ public class Game {
     public State getGameState() {
         var round = getRunningRound();
         if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS || round == null) {
-            return State.WAITING_FOR_PLAYER;
+            return State.WAITING_FOR_PLAYERS;
         } else if (round.propositionsSent() < activePlayers.size() && round.canPropositionsBeSubmitted()) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else if (round.selectionsSent() < activePlayers.size()) {
+        } else if (round.selectionsSent() < activePlayers.size() && round.canSelectionsBeSubmitted()) {
             return State.WAITING_FOR_SELECTIONS;
         } else {
-            return State.WAITING_FOR_PLAYER;
+            return State.WAITING_FOR_PLAYERS;
         }
     }
     
@@ -81,6 +81,6 @@ public class Game {
     }
     
     public enum State {
-        WAITING_FOR_PLAYER, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_SELECTIONS
+        WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_SELECTIONS
     }
 }

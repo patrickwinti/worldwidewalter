@@ -2,9 +2,7 @@ package ch.zhaw.www.model;
 
 import ch.zhaw.www.utils.InstantWrapper;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 
 import java.time.Instant;
 import java.util.Map;
@@ -21,9 +19,7 @@ public class Round {
     private final Prompt prompt;
     private final int propositionDuration;
     private final int enterLimit;
-    @Getter(AccessLevel.NONE)
     private final Map<String, String> propositions = new ConcurrentHashMap<>();
-    @Getter(AccessLevel.NONE)
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     @NotNull
     private Player sphinx;
@@ -35,6 +31,10 @@ public class Round {
     
     int selectionsSent() {
         return selections.size();
+    }
+    
+    boolean canSelectionsBeSubmitted() {
+        return sphinx != null && !propositions.isEmpty();
     }
     
     boolean canPropositionsBeSubmitted() {

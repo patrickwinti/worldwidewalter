@@ -9,6 +9,8 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @PropertySource("classpath:config.properties")
 public class GameProperties {
-    @Value("${round.proposition-interval}")
-    private int propositionSubmissionInterval;
+    @Value("${round.proposition-duration}")
+    private int propositionSubmissionDuration;
+    @Value("${round.enter-limit}")
+    private int roundEnterLimit;
 }

@@ -3,7 +3,6 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
 import jakarta.validation.constraints.NotNull;
@@ -46,7 +45,11 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException {
-        return gameRepository.getGame(gameId).getRunningRound();
+        Game game = gameRepository.getGame(gameId);
+        if (game.getGameState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || game.getActivePlayers().containsKey(playerId)) {
+            throw new GameError.NotFoundException(playerId);
+        }
+        return game.getRunningRound();
     }
     
     @Override
@@ -63,8 +66,9 @@ class GameServiceImpl implements GameService {
     private void startNewRound(@NotNull Game game) {
         if (game.needsNewRound()) {
             game.addRound(new Round(generateId(),
-                    new Prompt("I've always wanted to WALTER"),
-                    gameProperties.getPropositionSubmissionInterval()));
+                    game.getNextPrompt(),
+                    gameProperties.getPropositionSubmissionDuration(),
+                    gameProperties.getRoundEnterLimit()));
         }
     }
     

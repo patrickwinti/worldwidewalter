@@ -13,15 +13,11 @@ import java.util.Map;
  */
 @Data
 public class Proposition {
-
-    private final List<String> gaps;
-    private Map<String, String> duplicates;
     @Id
     @NotNull
     private final String id;
+    private final String gap;
+    private List<Proposition> duplicates;
 
-    public static boolean checkForDuplicate (List<Proposition> propositionsA, List<Proposition> propositionsB) {
-            return propositionsA.size() == propositionsB.size() &&
-                    propositionsA.stream().allMatch(propositionsB::contains);
-    }
+
 }

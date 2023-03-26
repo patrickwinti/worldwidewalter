@@ -44,10 +44,10 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException {
+    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameRepository.getGame(gameId);
-        if (game.getGameState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || game.getActivePlayers().containsKey(playerId)) {
-            throw new GameError.NotFoundException(playerId);
+        if (game.getGameState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
+            throw new RoundError.IllegalStateException();
         }
         return game.getRunningRound();
     }

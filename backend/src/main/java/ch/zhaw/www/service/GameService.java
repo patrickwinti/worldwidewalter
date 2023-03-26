@@ -53,10 +53,10 @@ public interface GameService {
      * @param gameId   game requested to enter
      * @param playerId player requesting round
      * @return new or existing round
-     * @throws GameError.NotFoundException         if game is not found
-     * @throws GameError.NotEnoughPlayersException if there are not enough players anymore
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
-    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException;
+    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
     
     /**
      * Player submitted their propositions for the prompt

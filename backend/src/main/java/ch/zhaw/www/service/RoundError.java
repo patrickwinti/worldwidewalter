@@ -26,4 +26,14 @@ public abstract class RoundError extends RuntimeException {
             super(String.format("Round with ID = %s could not be found", roundId));
         }
     }
+    
+    /**
+     * Round has not enough players os is currently running
+     */
+    @ResponseStatus(HttpStatus.TOO_EARLY)
+    public static class IllegalStateException extends RoundError {
+        public IllegalStateException() {
+            super("Round has not enough players os is currently running");
+        }
+    }
 }

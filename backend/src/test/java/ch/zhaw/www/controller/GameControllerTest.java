@@ -213,7 +213,7 @@ class GameControllerTest {
     
     @Test
     void testGetRound_425() throws Exception {
-        when(gameService.getRound(any(), any())).thenThrow(new GameError.NotEnoughPlayersException());
+        when(gameService.getRound(any(), any())).thenThrow(new RoundError.IllegalStateException());
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isTooEarly());

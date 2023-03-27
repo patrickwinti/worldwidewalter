@@ -25,12 +25,8 @@ public class PlayersPropositions {
         String id = UUID.randomUUID().toString();
         Proposition temp = new Proposition(id, gaps);
 
-        if (propositions.isEmpty()) {
-            propositions.add(temp);
-            return;
-        }
         for (Proposition proposition : propositions) {
-            if (checkForDuplicates(proposition.getGap(), gaps)) {
+            if (checkForDuplicates(proposition.getGaps(), gaps)) {
                 proposition.getDuplicates().add(temp);
                 return;
             }

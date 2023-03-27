@@ -11,7 +11,7 @@ import java.util.UUID;
 @Service
 class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
-    private final NamePostFixStack namePostFixStack = new NamePostFixStack();
+    private final NamePostfixStack namePostFixStack = new NamePostfixStack();
 
     GameServiceImpl(GameRepository gameRepository) {
         this.gameRepository = gameRepository;

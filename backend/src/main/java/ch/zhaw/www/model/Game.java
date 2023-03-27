@@ -73,7 +73,8 @@ public class Game {
         } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
                 round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else if (round.getState() == Round.State.OPEN_FOR_SELECTIONS &&
+        } else if ((round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
+                round.getState() == Round.State.OPEN_FOR_SELECTIONS) &&
                 round.getNumberOfSelectionsSubmitted() < numberOfActivePlayers) {
             return State.WAITING_FOR_ALL_SELECTIONS;
         } else {

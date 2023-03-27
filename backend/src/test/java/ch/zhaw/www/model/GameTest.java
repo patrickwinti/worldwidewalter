@@ -52,6 +52,9 @@ class GameTest {
     void testGameState_WaitingForPlayers() {
         Game game = new Game(getId());
         assertEquals(Game.State.NO_VALID_ROUND, game.getState());
+        
+        game.addRound(getRound(2));
+        
         addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         addToWaitingRoom(game);
@@ -62,7 +65,7 @@ class GameTest {
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         game.getActivePlayers().putAll(game.getWaitingRoom());
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertEquals(Game.State.NO_VALID_ROUND, game.getState());
         
         Round round = getRound(2);
         game.addRound(round);
@@ -75,6 +78,8 @@ class GameTest {
     @Test
     void testGameState_WaitingForPropositions() {
         Game game = new Game(getId());
+        game.addRound(getRound(2));
+        
         addToWaitingRoom(game);
         addToWaitingRoom(game);
         addToWaitingRoom(game);
@@ -101,9 +106,9 @@ class GameTest {
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
-        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, Duration.of(DURATION, ChronoUnit.MINUTES));
         var player = game.getActivePlayers().values().stream().findAny().get();
         game.getCurrentRound().getPropositions().put(player.getId(), List.of("Walter " + player.getId()));
+        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, Duration.of(DURATION, ChronoUnit.MINUTES));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
     }

@@ -53,7 +53,7 @@ public class Round {
     }
     
     int getNumberOfPropositionsSubmitted() {
-        return selections.size();
+        return propositions.size();
     }
     
     enum State {

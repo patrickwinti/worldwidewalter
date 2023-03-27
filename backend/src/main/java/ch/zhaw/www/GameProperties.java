@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.time.Duration;
+
 /**
  * Container for environment properties
  */
@@ -12,8 +14,8 @@ import org.springframework.context.annotation.PropertySource;
 @Configuration
 @PropertySource("classpath:config.properties")
 public class GameProperties {
-    @Value("${round.proposition-duration}")
-    private int propositionSubmissionDuration;
-    @Value("${round.enter-limit}")
-    private int roundEnterLimit;
+    @Value("${round.proposition-submission-duration}")
+    private Duration propositionSubmissionDuration;
+    @Value("${round.enter-limit-duration}")
+    private Duration roundEnterLimitDuration;
 }

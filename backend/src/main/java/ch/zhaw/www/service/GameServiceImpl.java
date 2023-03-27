@@ -73,8 +73,8 @@ class GameServiceImpl implements GameService {
         if (game.getGameState() == Game.State.NO_VALID_ROUND) {
             game.newRound(new Round(generateId(),
                     game.getNextPrompt(),
-                    gameProperties.getPropositionSubmissionDuration(),
-                    gameProperties.getRoundEnterLimit()));
+                    gameProperties.getPropositionSubmissionDuration().getSeconds(),
+                    gameProperties.getRoundEnterLimitDuration().getSeconds()));
         }
     }
     

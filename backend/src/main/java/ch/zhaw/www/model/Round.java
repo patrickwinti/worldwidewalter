@@ -12,13 +12,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Data
 public class Round {
-    Map<Player, String> propositions;
+    Map<Player, Proposition> propositions;
     Map<Player, String> selections;
 
     @NotNull
     final String id;
     @NotNull
-   final Prompt prompt;
+    final Prompt prompt;
 
 
 }

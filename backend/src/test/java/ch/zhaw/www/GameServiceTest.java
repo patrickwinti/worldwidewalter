@@ -61,27 +61,32 @@ class GameServiceTest {
         return new Round("1", new Prompt("WALTER!", 1), ROUND_DURATION, 1);
     }
     
+    private static Player getRandomPlayer(Game game) {
+        return game.getWaitingRoom().values().iterator().next();
+    }
+    
     @Test
     void testGetRound_IllegalState() {
         var game = mockGameInRepository();
         
         Round round = getRound();
-        game.newRound(round);
+        game.addRound(round);
         
-        Player player1 = addPlayer(game);
+        Player player1 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, player1.getId()));
-        addPlayer(game);
+        Player player2 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, player1.getId()));
-        addPlayer(game);
+        Player player3 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, player1.getId()));
-        addPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, player1.getId()));
-        
-        round.setSphinx(game.getActivePlayers().values().iterator().next());
+        Player player4 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, player1.getId()));
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
-        round.openForPropositionSubmission();
+        round.setSphinx(getRandomPlayer(game));
+        addActivePlayer(game, player1);
+        addActivePlayer(game, player2);
+        addActivePlayer(game, player3);
+        addActivePlayer(game, player4);
         assertEquals(round, gameService.getRound(GAME_ID, player1.getId()));
         
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, Duration.of(ROUND_DURATION, ChronoUnit.MINUTES));
@@ -93,33 +98,14 @@ class GameServiceTest {
     void testGetRound_UnknownPlayer() {
         var game = mockGameInRepository();
         Round round = getRound();
-        game.newRound(round);
-        addPlayer(game);
-        addPlayer(game);
-        addPlayer(game);
-        addPlayer(game);
-        round.setSphinx(game.getActivePlayers().values().iterator().next());
-        round.openForPropositionSubmission();
+        game.addRound(round);
+        addWaitingRoomPlayer(game);
+        addWaitingRoomPlayer(game);
+        addWaitingRoomPlayer(game);
+        addWaitingRoomPlayer(game);
+        round.setSphinx(getRandomPlayer(game));
         
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRound(GAME_ID, UNKNOWN_PLAYER_ID));
-    }
-    
-    @Test
-    void testGetRound_ValidRound() {
-        var game = mockGameInRepository();
-        Round round = getRound();
-        game.newRound(round);
-        Player player1 = addPlayer(game);
-        Player player2 = addPlayer(game);
-        Player player3 = addPlayer(game);
-        Player player4 = addPlayer(game);
-        round.setSphinx(game.getActivePlayers().values().iterator().next());
-        round.openForPropositionSubmission();
-        
-        assertEquals(round, gameService.getRound(GAME_ID, player1.getId()));
-        assertEquals(round, gameService.getRound(GAME_ID, player2.getId()));
-        assertEquals(round, gameService.getRound(GAME_ID, player3.getId()));
-        assertEquals(round, gameService.getRound(GAME_ID, player4.getId()));
     }
     
     @Test
@@ -129,9 +115,30 @@ class GameServiceTest {
         assertThrows(GameError.NotFoundException.class, () -> gameService.getRound(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
-    private Player addPlayer(Game game) {
+    @Test
+    void testGetRound_ValidRound() {
+        var game = mockGameInRepository();
+        Round round = getRound();
+        game.addRound(round);
+        Player player1 = addWaitingRoomPlayer(game);
+        Player player2 = addWaitingRoomPlayer(game);
+        Player player3 = addWaitingRoomPlayer(game);
+        Player player4 = addWaitingRoomPlayer(game);
+        round.setSphinx(getRandomPlayer(game));
+        addActivePlayer(game, player1);
+        addActivePlayer(game, player2);
+        addActivePlayer(game, player3);
+        addActivePlayer(game, player4);
+        
+        assertEquals(round, gameService.getRound(GAME_ID, player1.getId()));
+        assertEquals(round, gameService.getRound(GAME_ID, player2.getId()));
+        assertEquals(round, gameService.getRound(GAME_ID, player3.getId()));
+        assertEquals(round, gameService.getRound(GAME_ID, player4.getId()));
+    }
+    
+    private Player addWaitingRoomPlayer(Game game) {
         Player player = new Player(UUID.randomUUID().toString());
-        game.getActivePlayers().put(player.getId(), player);
+        game.getWaitingRoom().put(player.getId(), player);
         return player;
     }
     
@@ -142,6 +149,10 @@ class GameServiceTest {
         when(gameEntityService.getGame(game.getId())).thenReturn(game);
         
         return game;
+    }
+    
+    private void addActivePlayer(Game game, Player player) {
+        game.getActivePlayers().put(player.getId(), player);
     }
     
     private void mockGameNotFoundInRepository(String gameId) {

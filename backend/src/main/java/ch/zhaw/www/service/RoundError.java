@@ -33,7 +33,7 @@ public abstract class RoundError extends RuntimeException {
     @ResponseStatus(HttpStatus.TOO_EARLY)
     public static class IllegalStateException extends RoundError {
         public IllegalStateException() {
-            super("Round has not enough players os is currently running");
+            super("Round has not enough players or is currently running");
         }
     }
 }

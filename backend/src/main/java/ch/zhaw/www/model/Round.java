@@ -1,10 +1,12 @@
 package ch.zhaw.www.model;
 
 import ch.zhaw.www.utils.InstantWrapper;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,36 +19,44 @@ public class Round {
     private final String id;
     @NotNull
     private final Prompt prompt;
+    
     private final long propositionDuration;
     private final long enterLimit;
-    private final Map<String, String> propositions = new ConcurrentHashMap<>();
+    
+    private final Map<String, List<String>> propositions = new ConcurrentHashMap<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
-    @NotNull
+    
+    @Nullable
     private Player sphinx;
+    @Nullable
     private Instant propositionSubmissionEnd;
     
-    int propositionsSent() {
-        return propositions.size();
+    public void setSphinx(Player sphinx) {
+        this.sphinx = sphinx;
+        this.propositionSubmissionEnd = InstantWrapper.offsetNowMinutes(propositionDuration);
     }
     
-    int selectionsSent() {
+    State getState() {
+        if (sphinx == null) {
+            return State.CREATED;
+        } else if (InstantWrapper.isAfterNow(propositionSubmissionEnd, -enterLimit)) {
+            return State.OPEN_FOR_SUBMISSIONS;
+        } else if (!propositions.isEmpty()) {
+            return State.OPEN_FOR_SELECTIONS;
+        } else {
+            return State.FINISHED;
+        }
+    }
+    
+    int getNumberOfSelectionsSubmitted() {
         return selections.size();
     }
     
-    boolean canSelectionsBeSubmitted() {
-        return sphinx != null && !propositions.isEmpty();
+    int getNumberOfPropositionsSubmitted() {
+        return selections.size();
     }
     
-    boolean canPropositionsBeSubmitted() {
-        return sphinx != null && InstantWrapper.isAfterNow(propositionSubmissionEnd, 0);
+    enum State {
+        CREATED, OPEN_FOR_SUBMISSIONS, OPEN_FOR_SELECTIONS, FINISHED
     }
-    
-    boolean canEnterRound() {
-        return InstantWrapper.isAfterNow(propositionSubmissionEnd, -enterLimit);
-    }
-    
-    public void openForPropositionSubmission() {
-        propositionSubmissionEnd = InstantWrapper.offsetNowMinutes(propositionDuration);
-    }
-    
 }

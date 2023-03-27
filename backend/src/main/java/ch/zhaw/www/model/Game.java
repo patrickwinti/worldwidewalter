@@ -31,56 +31,62 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     
-    public void newRound(Round round) {
+    private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
+    
+    public void addRound(Round round) {
         waitingRoom.putAll(activePlayers);
         activePlayers.clear();
         rounds.add(round);
     }
     
     /**
-     * Gets last running round. A round counts as running
+     * Gets current round,
      * when the Sphinx has been selected
      *
      * @return {@link Round} or null
      */
     @Nullable
-    public Round getRunningRound() {
+    public Round getCurrentRound() {
         if (rounds.isEmpty()) {
             return null;
         } else {
             var round = rounds.get(rounds.size() - 1);
-            return round.getSphinx() != null ? round : null;
+            return round.getState() != Round.State.FINISHED ? round : null;
         }
     }
     
     /**
      * Returns state of the current game:
      * - Waiting for player: Not enough players active or no valid round
-     * - Waiting for propositions: Not all players send propositions
-     * - Waiting for selections: Not all players send propositions
+     * - Waiting for propositions: Not all players did send propositions and is in time for sending any
+     * - Waiting for selections: Not all players did send propositions
      *
      * @return {@link Game.State}
      */
-    public State getGameState() {
-        var round = getRunningRound();
-        if (waitingRoom.isEmpty()) {
+    public State getState() {
+        var round = getCurrentRound();
+        var numberOfActivePlayers = activePlayers.size();
+        if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (activePlayers.size() < MINIMUM_AMOUNT_OF_PLAYERS || round == null) {
+        } else if (numberOfActivePlayers < MINIMUM_AMOUNT_OF_PLAYERS) {
             return State.WAITING_FOR_PLAYERS;
-        } else if (round.propositionsSent() < activePlayers.size() && round.canPropositionsBeSubmitted()) {
+        } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
+                round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else if (round.selectionsSent() < activePlayers.size() && round.canSelectionsBeSubmitted()) {
-            return State.WAITING_FOR_SELECTIONS;
+        } else if (round.getState() == Round.State.OPEN_FOR_SELECTIONS &&
+                round.getNumberOfSelectionsSubmitted() < numberOfActivePlayers) {
+            return State.WAITING_FOR_ALL_SELECTIONS;
         } else {
-            return State.WAITING_FOR_PLAYERS;
+            return State.NO_VALID_ROUND;
         }
     }
     
-    public Prompt getNextPrompt() {
-        return new Prompt("I've always wanted to WALTER", 1);
+    public Prompt consumePrompt() {
+        //return prompts.remove(0) ;
+        return prompts.get(0);
     }
     
     public enum State {
-        NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_SELECTIONS
+        NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
     }
 }

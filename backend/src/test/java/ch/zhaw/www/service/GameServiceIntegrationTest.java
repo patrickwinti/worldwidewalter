@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,14 +24,14 @@ class GameServiceIntegrationTest {
     void enterGame_StartsNewRound() throws InterruptedException {
         String gameId = gameService.createGame().getId();
         
-        assertNull(gameService.getGame(gameId).getRunningRound());
+        assertNull(gameService.getGame(gameId).getCurrentRound());
         assertEquals(0, gameService.getGame(gameId).getRounds().size());
         
-        int numberOfThreads = 5;
+        int numberOfThreads = Runtime.getRuntime().availableProcessors() * 2;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         
         var callables = IntStream.range(0, numberOfThreads)
-                .mapToObj(operand -> (Callable<Player>) () -> gameService.enterGame(gameId, "Enrique"))
+                .mapToObj(operand -> (Callable<Player>) () -> gameService.enterGame(gameId, "Enrique-" + UUID.randomUUID()))
                 .toList();
         
         service.invokeAll(callables);

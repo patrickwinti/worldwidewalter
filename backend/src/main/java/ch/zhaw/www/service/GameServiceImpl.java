@@ -51,10 +51,10 @@ class GameServiceImpl implements GameService {
     @Override
     public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
-        if (game.getGameState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
+        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
             throw new RoundError.IllegalStateException();
         }
-        return game.getRunningRound();
+        return game.getCurrentRound();
     }
     
     @Override
@@ -69,9 +69,9 @@ class GameServiceImpl implements GameService {
     }
     
     private void startNewRound(@NotNull Game game) {
-        if (game.getGameState() == Game.State.NO_VALID_ROUND) {
-            game.newRound(new Round(generateId(),
-                    game.getNextPrompt(),
+        if (game.getState() == Game.State.NO_VALID_ROUND) {
+            game.addRound(new Round(generateId(),
+                    game.consumePrompt(),
                     gameProperties.getPropositionSubmissionDuration().getSeconds(),
                     gameProperties.getRoundEnterLimitDuration().getSeconds()));
         }

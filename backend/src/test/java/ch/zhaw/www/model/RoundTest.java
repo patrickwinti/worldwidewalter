@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +23,7 @@ class RoundTest {
     private static final Prompt PROMPT = new Prompt("WALTER", 1);
     private static final int PROPOSITION_DURATION = 40;
     private static final int PROPOSITION_ENTER_LIMIT = 10;
-    private final Instant instant = Instant.parse("2022-12-22T10:15:30Z");
+    private final Instant instant = Instant.parse("2022-12-22T10:00:00Z");
     private final Clock fixedClock = Clock.fixed(instant, ZoneId.of("UTC"));
     
     private static Round getRound() {
@@ -34,13 +35,17 @@ class RoundTest {
         InstantWrapper.clock = fixedClock;
     }
     
+    private static Player getSphinx() {
+        return new Player(UUID.randomUUID().toString());
+    }
+    
     @Test
     void whenStartingRoundForPropositionSubmissionTheConfiguredValueIsAddedToNow() {
         Round round = getRound();
         
         assertNull(round.getPropositionSubmissionEnd());
         
-        round.openForPropositionSubmission();
+        round.setSphinx(getSphinx());
         
         assertNotNull(round.getPropositionSubmissionEnd());
         assertEquals(instant.plus(PROPOSITION_DURATION, ChronoUnit.MINUTES), round.getPropositionSubmissionEnd());
@@ -49,61 +54,51 @@ class RoundTest {
     @Test
     void roundCanNotBeEnteredIfAMinuteBeforePropositionSubmissionEnd() {
         Round round = getRound();
-        round.openForPropositionSubmission();
+        round.setSphinx(getSphinx());
         
-        assertTrue(round.canEnterRound());
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION - PROPOSITION_ENTER_LIMIT - 1);
-        assertTrue(round.canEnterRound());
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION - PROPOSITION_ENTER_LIMIT);
-        assertFalse(round.canEnterRound());
-    }
-    
-    @Test
-    void propositionsCanBeSubmittedIfSphinxIsSet() {
-        Round round = getRound();
-        round.openForPropositionSubmission();
-        
-        assertFalse(round.canPropositionsBeSubmitted());
-        
-        round.setSphinx(new Player(UUID.randomUUID().toString()));
-        assertTrue(round.canPropositionsBeSubmitted());
+        assertEquals(Round.State.FINISHED, round.getState());
     }
     
     @Test
     void propositionsCanBeSubmittedIf_PropositionEndTimePassed() {
         Round round = getRound();
-        round.setSphinx(new Player(UUID.randomUUID().toString()));
+        round.setSphinx(getSphinx());
         
-        assertFalse(round.canPropositionsBeSubmitted());
-        
-        round.openForPropositionSubmission();
-        assertTrue(round.canPropositionsBeSubmitted());
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
         tick(fixedClock, PROPOSITION_DURATION - 1);
         
-        assertTrue(round.canPropositionsBeSubmitted());
+        assertEquals(Round.State.FINISHED, round.getState());
+        round.getPropositions().put("1", List.of("Fish"));
         
-        tick(fixedClock, PROPOSITION_DURATION);
-        
-        assertFalse(round.canPropositionsBeSubmitted());
+        assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
+    }
+    
+    private void tick(Clock clock, int minutes) {
+        InstantWrapper.clock = Clock.offset(clock, Duration.of(minutes, ChronoUnit.MINUTES));
     }
     
     @Test
     void selectionsCanBeSubmitted() {
         Round round = getRound();
         
-        assertFalse(round.canSelectionsBeSubmitted());
-        round.setSphinx(new Player(UUID.randomUUID().toString()));
-        assertFalse(round.canSelectionsBeSubmitted());
+        assertEquals(Round.State.CREATED, round.getState());
         
-        round.getPropositions().put("1", "Joseph");
-        round.getPropositions().put("2", "Maria");
+        round.setSphinx(getSphinx());
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        assertTrue(round.canSelectionsBeSubmitted());
-    }
-    
-    private void tick(Clock clock, int minutes) {
-        InstantWrapper.clock = Clock.offset(clock, Duration.of(minutes, ChronoUnit.MINUTES));
+        round.getPropositions().put("1", List.of("Joseph"));
+        
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        tick(fixedClock, PROPOSITION_DURATION);
+        
+        round.getPropositions().put("2", List.of("Maria"));
+        
+        assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
     
 }

@@ -4,7 +4,6 @@ import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
-import ch.zhaw.www.repository.GameRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -13,30 +12,30 @@ import java.util.UUID;
 
 @Service
 class GameServiceImpl implements GameService {
-    private final GameRepository gameRepository;
+    private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
     
-    GameServiceImpl(GameRepository gameRepository, GameProperties gameProperties) {
-        this.gameRepository = gameRepository;
+    GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
+        this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
     }
     
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString());
-        gameRepository.saveNewGame(game);
+        gameEntityService.saveNewGame(game);
         return game;
     }
     
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
-        return gameRepository.getGame(gameId);
+        return gameEntityService.getGame(gameId);
     }
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         var player = new Player(playerName);
-        gameRepository.editGame(gameId, game -> {
+        gameEntityService.editGame(gameId, game -> {
             startNewRound(game);
             game.getWaitingRoom().put(player.getId(), player);
             return game;
@@ -51,7 +50,7 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        Game game = gameRepository.getGame(gameId);
+        Game game = gameEntityService.getGame(gameId);
         if (game.getGameState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
             throw new RoundError.IllegalStateException();
         }

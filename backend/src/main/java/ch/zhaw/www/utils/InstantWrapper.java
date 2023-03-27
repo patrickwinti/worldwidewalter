@@ -19,7 +19,7 @@ public class InstantWrapper {
      * @param minutes number of minutes to offset
      * @return now with minutes offset
      */
-    public static Instant offsetNowMinutes(int minutes) {
+    public static Instant offsetNowMinutes(long minutes) {
         return getNow().plus(minutes, ChronoUnit.MINUTES);
     }
     
@@ -30,7 +30,7 @@ public class InstantWrapper {
      * @param offsetInMinutes instant can be offset by the passed minutes. To remove offset pass it negative
      * @return true if instant is in the future
      */
-    public static boolean isAfterNow(Instant instant, int offsetInMinutes) {
+    public static boolean isAfterNow(Instant instant, long offsetInMinutes) {
         return instant != null && instant.plus(offsetInMinutes, ChronoUnit.MINUTES).isAfter(getNow());
     }
     

@@ -17,8 +17,8 @@ public class Round {
     private final String id;
     @NotNull
     private final Prompt prompt;
-    private final int propositionDuration;
-    private final int enterLimit;
+    private final long propositionDuration;
+    private final long enterLimit;
     private final Map<String, String> propositions = new ConcurrentHashMap<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     @NotNull

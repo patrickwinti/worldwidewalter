@@ -4,7 +4,7 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
-import ch.zhaw.www.repository.GameRepository;
+import ch.zhaw.www.service.GameEntityService;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.RoundError;
@@ -34,12 +34,12 @@ class GameServiceTest {
     @Autowired
     private GameService gameService;
     @MockBean
-    private GameRepository gameRepository;
+    private GameEntityService gameEntityService;
     
     @Test
     void testAddGameSavesItToRepository() {
         var game = gameService.createGame();
-        verify(gameRepository).saveNewGame(game);
+        verify(gameEntityService).saveNewGame(game);
         assertNotNull(game.getId());
     }
     
@@ -138,17 +138,17 @@ class GameServiceTest {
     private Game mockGameInRepository() {
         var game = new Game(GAME_ID);
         
-        doNothing().when(gameRepository).editGame(eq(game.getId()), any());
-        when(gameRepository.getGame(game.getId())).thenReturn(game);
+        doNothing().when(gameEntityService).editGame(eq(game.getId()), any());
+        when(gameEntityService.getGame(game.getId())).thenReturn(game);
         
         return game;
     }
     
     private void mockGameNotFoundInRepository(String gameId) {
         doThrow(GameError.NotFoundException.class)
-                .when(gameRepository).editGame(eq(gameId), any());
+                .when(gameEntityService).editGame(eq(gameId), any());
         
         doThrow(GameError.NotFoundException.class)
-                .when(gameRepository).getGame(gameId);
+                .when(gameEntityService).getGame(gameId);
     }
 }

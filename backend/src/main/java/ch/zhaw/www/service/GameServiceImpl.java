@@ -35,7 +35,7 @@ class GameServiceImpl implements GameService {
             throw new GameError.FullCapacityException();
         }
         if (doesPlayerNameExistInGame(gameId, playerName)) {
-            playerName = playerName + namePostFixStack.getNamePostFix();
+            playerName = playerName + namePostFixStack.popNamePostFix();
         }
         Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
         findGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);

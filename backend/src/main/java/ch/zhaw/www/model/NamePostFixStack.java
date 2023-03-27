@@ -21,7 +21,7 @@ public class NamePostFixStack {
         namePostFix.push(" 😎");
     }
 
-    public String getNamePostFix() {
+    public String popNamePostFix() {
         return namePostFix.pop();
     }
 

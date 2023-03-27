@@ -1,9 +1,6 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.model.Round;
+import ch.zhaw.www.model.*;
 import ch.zhaw.www.repository.GameRepository;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -14,6 +11,7 @@ import java.util.UUID;
 @Service
 class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
+    private final NamePostFixStack namePostFixStack = new NamePostFixStack();
 
     GameServiceImpl(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
@@ -37,9 +35,7 @@ class GameServiceImpl implements GameService {
             throw new GameError.FullCapacityException();
         }
         if (doesPlayerNameExistInGame(gameId, playerName)) {
-            while (doesPlayerNameExistInGame(gameId, playerName)) {
-                playerName = playerName + "+1";
-            }
+            playerName = playerName + namePostFixStack.getNamePostFix();
         }
         Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
         findGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);

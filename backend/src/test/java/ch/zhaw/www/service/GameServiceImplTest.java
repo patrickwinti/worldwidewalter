@@ -70,8 +70,8 @@ class GameServiceImplTest {
         assertTrue(game.getWaitingRoom().containsKey(player3.getId()));
         // 8. verify that the name of player 2 was changed to "Nora+1" and the name of player 3 was changed to "Nora+1+1"
         assertEquals("Nora", game.getActivePlayers().get(player1.getId()).getName());
-        assertEquals("Nora+1", game.getWaitingRoom().get(player2.getId()).getName());
-        assertEquals("Nora+1+1", game.getWaitingRoom().get(player3.getId()).getName());
+        assertEquals("Nora 😎", game.getWaitingRoom().get(player2.getId()).getName());
+        assertEquals("Nora 😋", game.getWaitingRoom().get(player3.getId()).getName());
     }
 
     private Game mockGameInRepository() {

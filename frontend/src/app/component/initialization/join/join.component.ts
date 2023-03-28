@@ -1,50 +1,69 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { GameService } from "../../../service/game.service";
 import { PlayerJoinRequestDto } from "../../../dto/player-join-request-dto";
-import { PlayerDto } from "../../../dto/player-dto";
 import { InitializationState } from "../../../model/initialization-state";
 import { firstValueFrom } from "rxjs";
+import { StateService } from "../../../service/state.service";
+import { PlayerDto } from "../../../dto/player-dto";
+import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 
 @Component({
   selector: 'www-join',
-  templateUrl: './join.component.html'
+  templateUrl: './join.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class JoinComponent implements OnInit {
-  @Input() presetGameId: string;
-  @Output() playerEmitter = new EventEmitter<PlayerDto>();
   @Output() initializationStateEmitter = new EventEmitter<InitializationState>();
   gameIdIsReadOnly: boolean;
-  gameId: string;
   playerName: string;
+  joinGameId: string;
+  error = false;
+  errorText = '';
 
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService,
+              private stateService: StateService,
+              private cd: ChangeDetectorRef) {
+  }
+
+  get gameId(): string {
+    return this.stateService.getGameId();
   }
 
   ngOnInit(): void {
-    if (this.presetGameId !== undefined) {
-      this.gameId = this.presetGameId;
+    if (this.gameId !== '') {
       this.gameIdIsReadOnly = true;
+      this.joinGameId = this.gameId;
     } else {
-      this.gameId = '';
       this.gameIdIsReadOnly = false;
+      this.joinGameId = '';
     }
   }
 
   async joinGame() {
     if (this.playerName != undefined && this.playerName != '') {
-      const playerDto = await firstValueFrom(this.gameService.joinGame({
+      await firstValueFrom(this.gameService.joinGame({
           playerName: this.playerName
         } as PlayerJoinRequestDto,
-        this.gameId))
+        this.joinGameId))
         .then(
-          (value) => {
-            this.playerEmitter.emit(value);
-            this.initializationStateEmitter.emit(InitializationState.WAITING_ROOM);
+          (player: PlayerDto) => {
+            this.stateService.setPlayerId(player.id);
+            this.stateService.setGameId(this.joinGameId);
+            this.initializationStateEmitter.emit(InitializationState.DONE);
+            console.log('joining game: ' + this.joinGameId + 'with username: ' + this.playerName);
           },
-          () => undefined // TODO: error handling when joining the game. How do we handle errors in frontend? how to display?
+          (error: HttpErrorResponse) => {
+            this.error = true;
+            if (error.status === HttpStatusCode.NotFound) {
+              this.joinGameId = '';
+              this.gameIdIsReadOnly = false;
+              this.errorText = 'game not found';
+            } else {
+              this.errorText = 'unknown error. Try again';
+            }
+            this.cd.markForCheck();
+          }
         );
     }
-
-    console.log('joining game: ' + this.gameId + 'with username: ' + this.playerName);
   }
 }

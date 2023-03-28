@@ -219,4 +219,44 @@ class GameControllerTest {
                 .andExpect(status().isTooEarly());
         verify(gameService).getRound(GAME_ID, PLAYER_ID);
     }
+    
+    @Test
+    void enterRound_200() throws Exception {
+        when(gameService.enterRound(any(), any())).then(o -> new Round(ROUND_ID, PROMPT, 4, 2));
+        mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isOk());
+        verify(gameService).enterRound(GAME_ID, PLAYER_ID);
+        
+    }
+    
+    @Test
+    void enterRound_404_game() throws Exception {
+        when(gameService.enterRound(any(), any())).thenThrow(new GameError.NotFoundException(GAME_ID));
+        mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isNotFound());
+        verify(gameService).enterRound(GAME_ID, PLAYER_ID);
+        
+    }
+    
+    @Test
+    void enterRound_404_player() throws Exception {
+        when(gameService.enterRound(any(), any())).thenThrow(new PlayerError.NotFoundException(GAME_ID));
+        mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isNotFound());
+        verify(gameService).enterRound(GAME_ID, PLAYER_ID);
+        
+    }
+    
+    @Test
+    void enterRound_409() throws Exception {
+        when(gameService.enterRound(any(), any())).thenThrow(new GameError.FullCapacityException());
+        mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isConflict());
+        verify(gameService).enterRound(GAME_ID, PLAYER_ID);
+        
+    }
 }

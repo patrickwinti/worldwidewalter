@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Model class with all the current state of a game.
@@ -85,6 +86,27 @@ public class Game {
     public Prompt consumePrompt() {
         //return prompts.remove(0) ;
         return prompts.get(0);
+    }
+    
+    /**
+     * Returns stream of all active and waiting room players
+     *
+     * @return stream with all valid games
+     */
+    public Stream<Player> getAllPlayers() {
+        List<Player> players = new ArrayList<>(waitingRoom.values());
+        players.addAll(activePlayers.values());
+        return players.stream();
+    }
+    
+    /**
+     * Moves players in the waiting room into the active list
+     *
+     * @param player player that will be marked as active
+     */
+    public void markPlayerAsActive(Player player) {
+        waitingRoom.remove(player.getId());
+        activePlayers.put(player.getId(), player);
     }
     
     public enum State {

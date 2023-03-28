@@ -1,11 +1,10 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Round;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,11 +26,11 @@ class GameServiceIntegrationTest {
         assertNull(gameService.getGame(gameId).getCurrentRound());
         assertEquals(0, gameService.getGame(gameId).getRounds().size());
         
-        int numberOfThreads = Runtime.getRuntime().availableProcessors() * 2;
-        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
-        
-        var callables = IntStream.range(0, numberOfThreads)
-                .mapToObj(operand -> (Callable<Player>) () -> gameService.enterGame(gameId, "Enrique-" + UUID.randomUUID()))
+        int nrOfPlayers = Runtime.getRuntime().availableProcessors() * 2;
+        ExecutorService service = Executors.newFixedThreadPool(nrOfPlayers);
+        var callables = IntStream.range(0, nrOfPlayers)
+                .mapToObj(value -> gameService.enterGame(gameId, "Sara" + value))
+                .map(player -> (Callable<Round>) () -> gameService.enterRound(gameId, player.getId()))
                 .toList();
         
         service.invokeAll(callables);

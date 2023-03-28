@@ -4,10 +4,12 @@ import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -34,18 +36,30 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        var player = new Player(playerName);
-        gameEntityService.editGame(gameId, game -> {
-            startNewRound(game);
-            game.getWaitingRoom().put(player.getId(), player);
-            return game;
-        });
-        return player;
+        return new Player(playerName);
     }
     
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
     
+    }
+    
+    @Override
+    public Round enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+        gameEntityService.editGame(gameId, game -> {
+            if (game.getState() == Game.State.NO_VALID_ROUND) {
+                game.addRound(new Round(generateId(),
+                        game.consumePrompt(),
+                        gameProperties.getPropositionSubmissionDuration().getSeconds(),
+                        gameProperties.getRoundEnterLimitDuration().getSeconds()));
+            }
+            Player player = game.getAllPlayers()
+                    .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
+                    .orElseThrow(() -> new PlayerError.NotFoundException(playerId));
+            game.markPlayerAsActive(player);
+            return game;
+        });
+        return gameEntityService.getGame(gameId).getCurrentRound();
     }
     
     @Override
@@ -66,15 +80,6 @@ class GameServiceImpl implements GameService {
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
-    }
-    
-    private void startNewRound(@NotNull Game game) {
-        if (game.getState() == Game.State.NO_VALID_ROUND) {
-            game.addRound(new Round(generateId(),
-                    game.consumePrompt(),
-                    gameProperties.getPropositionSubmissionDuration().getSeconds(),
-                    gameProperties.getRoundEnterLimitDuration().getSeconds()));
-        }
     }
     
     private String generateId() {

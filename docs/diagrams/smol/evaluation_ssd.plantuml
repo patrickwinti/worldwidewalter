@@ -1,4 +1,7 @@
 @startuml
+skinparam componentStyle rectangle
+skinparam linestyle ortho
+
 participant ":GameController" as gc
 participant ":GameService" as gs
 participant ":EvalService" as ev
@@ -7,6 +10,7 @@ participant ":GameRepository" as gr
 participant "game:Game" as game
 participant "round:Round" as round
 
+autonumber
 gc -> gs: evalRound(gameId, playerId)
 gs -> ges: evalRound(gameId)
 ges -> gr : findGame(gameId)

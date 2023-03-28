@@ -18,9 +18,9 @@ playerN -> system: enterGame(gameId, playerName)
 system --> playerN: added to game, playerId
 
 loop until players end the game
-    player1 -> system: startNextRound(gameId)
-    player2 -> system: startNextRound(gameId)
-    playerN -> system: startNextRound(gameId)
+    player1 -> system: enterRound(gameId, playerId)
+    player2 -> system: enterRound(gameId, playerId)
+    playerN -> system: enterRound(gameId, playerId)
 
     system --> player1: announce sphinx, playerId
     system --> player2: announce sphinx, playerId

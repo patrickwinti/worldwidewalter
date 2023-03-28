@@ -1,0 +1,62 @@
+@startuml
+package backend{
+    left to right direction
+
+    hide empty members
+   class GameController {
+        -gameService: GameService
+        +createGame(): GameDto
+        +getGame(gameId: String) : GameDto
+        +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+        +leaveGame(gameId: String, playerId: String) : void
+        +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto) : void
+        +selectProposition(roundId: String, propositionId: String, playerId: String) : void
+        +getRound(gameId: String, playerId: String) : RoundDto
+        +enterRound(gameId: String, playerId: String) : RoundDto
+    }
+
+    class Game {
+        id: String
+        getState(): Game.State
+    }
+
+    class GameEntityService {
+        getGame():Game
+        editGame(): void
+        saveNewGame(): void
+    }
+
+
+    interface GameRepository
+
+   interface GameService{
+       createGame(): Game
+       leaveGame(gameId: String, playerId: String): void
+       submitProposition(roundId: String, playerId: String, gaps: List<String>): void
+       selectProposition(roundId: String, playerId: String, propositionId: String): void
+       getGame(gameId: String) : Game
+       enterGame(gameId: String, playerName: String) : Player
+       enterRound(gameId: String, playerId: String) : Round
+       getRound(gameId: String, playerId: String) : Round
+    }
+    interface GameRepository
+
+    class Round {
+        -id: String
+        -prompt: Prompt
+        -propositions: Map<Proposition>
+        -selections: Map<Selection>
+        +getState(): Round.State
+    }
+
+    GameController..>GameService
+
+
+    GameService ..> Game
+    GameService ..> Round
+    GameService --> GameRepository
+    GameService ..> GameEntityService
+
+
+}
+@enduml

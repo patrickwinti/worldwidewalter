@@ -89,10 +89,14 @@ class GameServiceImpl implements GameService {
             selectSphinx(gameId,round);
         }
         int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
+
         if(findGame(gameId).getPreviousSphinx().containsKey(index)){
             selectSphinx(gameId,round);
         }
         round.setSphinx(findGame(gameId).getWaitingRoom().get(index));
+
+        Player newSphinx = findGame(gameId).getWaitingRoom().get(index);
+        findGame(gameId).getPreviousSphinx().put(newSphinx.getId(), newSphinx);
 
     }
 

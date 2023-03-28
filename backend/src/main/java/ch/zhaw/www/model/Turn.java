@@ -16,5 +16,6 @@ public class Turn {
     Player sphinx;
     List<Player> players;
     Round[] rounds = new Round[MAX_ROUNDS];
+    final String id;
 
 }

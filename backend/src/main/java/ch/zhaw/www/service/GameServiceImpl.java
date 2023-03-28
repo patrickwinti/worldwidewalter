@@ -4,10 +4,12 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.model.Turn;
 import ch.zhaw.www.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -78,4 +80,12 @@ class GameServiceImpl implements GameService {
     private void saveGame(Game game) {
         gameRepository.save(game);
     }
+    public void selectSphinx(String gameId,Turn turn) throws GameError.NotFoundException
+
+    {
+        int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
+        Player newSphinx = findGame(gameId).getWaitingRoom().get(index);
+        turn.setSphinx(newSphinx);
+    }
+
 }

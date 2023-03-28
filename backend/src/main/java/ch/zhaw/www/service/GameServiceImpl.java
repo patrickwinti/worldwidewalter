@@ -47,7 +47,8 @@ class GameServiceImpl implements GameService {
         if (findGame(gameId) != null) {
             if (findGame(gameId).getWaitingRoom().containsKey(playerId)) {
                 findGame(gameId).getWaitingRoom().remove(playerId);
-            } else if (findGame(gameId).getActivePlayers().containsKey(playerId)) {
+            }
+            if (findGame(gameId).getActivePlayers().containsKey(playerId)) {
                 findGame(gameId).getActivePlayers().remove(playerId);
             }
         }

@@ -82,8 +82,9 @@ class GameServiceImpl implements GameService {
     }
     public void selectSphinx(String gameId,Turn turn) throws GameError.NotFoundException
 
-    {
-        int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
+    {   int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
+        if(findGame(gameId).getPreviousSphinx().containsKey(findGame(gameId).getWaitingRoom().get(index)));
+        {selectSphinx(gameId,turn);}
         Player newSphinx = findGame(gameId).getWaitingRoom().get(index);
         turn.setSphinx(newSphinx);
     }

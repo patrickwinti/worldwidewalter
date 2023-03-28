@@ -1,7 +1,9 @@
 package ch.zhaw.www.model;
 import lombok.Data;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represents a Turn, which consists of a set of propositions and a set of selections
@@ -17,5 +19,6 @@ public class Turn {
     List<Player> players;
     Round[] rounds = new Round[MAX_ROUNDS];
     final String id;
+
 
 }

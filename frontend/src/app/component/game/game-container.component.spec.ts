@@ -30,7 +30,7 @@ describe('GameContainerComponent', () => {
       component.ngOnInit();
 
       // assert
-      expect(component.gameState).toBe(GameState.START);
+      expect(component.gameState).toBe(GameState.WAITING_FOR_PLAYERS);
     });
   })
 

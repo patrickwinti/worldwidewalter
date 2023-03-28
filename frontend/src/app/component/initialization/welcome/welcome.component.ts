@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 import { GameService } from "../../../service/game.service";
-import { GameDto } from "../../../dto/game-dto";
 import { InitializationState } from "../../../model/initialization-state";
 import { firstValueFrom } from "rxjs";
+import { StateService } from "../../../service/state.service";
 
 @Component({
   selector: 'www-welcome',
@@ -10,10 +10,10 @@ import { firstValueFrom } from "rxjs";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WelcomeComponent {
-  @Output() newGameEmitter = new EventEmitter<GameDto>()
   @Output() initializationStateEmitter = new EventEmitter<InitializationState>()
 
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService,
+              private stateService: StateService) {
   }
 
   /**
@@ -25,7 +25,7 @@ export class WelcomeComponent {
       () => undefined
     );
     if (newGame !== undefined) {
-      this.newGameEmitter.emit(newGame);
+      this.stateService.setGameId(newGame.id);
       this.initializationStateEmitter.emit(InitializationState.JOIN_GAME);
     }
   }

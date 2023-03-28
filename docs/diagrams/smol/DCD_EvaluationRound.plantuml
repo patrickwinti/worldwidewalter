@@ -1,0 +1,60 @@
+@startuml
+class GameService {
+    +createGame(game: Game): Game
+    +getGame(gameId: String): Game
+    +updateGame(game: Game): Game
+    +deleteGame(gameId: String): void
+}
+
+class EvalService {
+    +evaluate(game: Game): Evaluation
+}
+
+class Game {
+    -id: String
+    -status: GameStatus
+    -player1: Player
+    -player2: Player
+    -winner: Player
+    -board: Board
+    +getId(): String
+    +getStatus(): GameStatus
+    +getPlayer1(): Player
+    +getPlayer2(): Player
+    +getWinner(): Player
+    +getBoard(): Board
+    +setId(id: String): void
+    +setStatus(status: GameStatus): void
+    +setPlayer1(player: Player): void
+    +setPlayer2(player: Player): void
+    +setWinner(player: Player): void
+    +setBoard(board: Board): void
+}
+
+class GameController {
+    -gameService: GameService
+    -evalService: EvalService
+    +createGame(game: Game): Game
+    +getGame(gameId: String): Game
+    +updateGame(game: Game): Game
+    +deleteGame(gameId: String): void
+    +evaluateGame(game: Game): Evaluation
+}
+
+class Evaluation {
+    -winner: Player
+    -status: EvaluationStatus
+    +getWinner(): Player
+    +getStatus(): EvaluationStatus
+    +setWinner(winner: Player): void
+    +setStatus(status: EvaluationStatus): void
+}
+
+
+
+GameController -> GameService : uses
+GameService -> EvalService : uses
+Game <- GameService : uses
+
+GameController -> EvalService : uses
+@enduml

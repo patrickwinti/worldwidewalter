@@ -19,6 +19,6 @@ public class Round {
     final String id;
     @NotNull
    final Prompt prompt;
-
+    Player sphinx;
 
 }

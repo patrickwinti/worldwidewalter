@@ -8,6 +8,7 @@ import ch.zhaw.www.model.Turn;
 import ch.zhaw.www.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -80,13 +81,19 @@ class GameServiceImpl implements GameService {
     private void saveGame(Game game) {
         gameRepository.save(game);
     }
-    public void selectSphinx(String gameId,Turn turn) throws GameError.NotFoundException
+    public void selectSphinx(String gameId, Round round) throws GameError.NotFoundException {
 
-    {   int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
-        if(findGame(gameId).getPreviousSphinx().containsKey(findGame(gameId).getWaitingRoom().get(index)));
-        {selectSphinx(gameId,turn);}
-        Player newSphinx = findGame(gameId).getWaitingRoom().get(index);
-        turn.setSphinx(newSphinx);
+        if (findGame(gameId).getWaitingRoom().size() == findGame(gameId).getPreviousSphinx().size()) {
+            // all players have played the Sphinx role, reset the previousSphinx map
+            findGame(gameId).getPreviousSphinx().clear();
+            selectSphinx(gameId,round);
+        }
+        int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
+        if(findGame(gameId).getPreviousSphinx().containsKey(index)){
+            selectSphinx(gameId,round);
+        }
+        round.setSphinx(findGame(gameId).getWaitingRoom().get(index));
+
     }
 
 }

@@ -24,4 +24,5 @@ public class Game {
     private Map<String, Player> waitingRoom = new HashMap<>();
     private Map<String, Player> activePlayers = new HashMap<>();
     private Map<String, Player> previousSphinx = new HashMap<>();
+
 }

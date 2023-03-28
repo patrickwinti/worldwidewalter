@@ -1,0 +1,21 @@
+@startuml
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant ":GameEntityService" as ges
+participant ":GameRepository" as gr
+participant "game:Game" as game
+participant "round:Round" as round
+
+gc -> gs: enterRound(gameId, playerId)
+gs -> ges: editGame(gameId)
+ges -> gr : findGame(gameId)
+gr  --> ges: Game
+ges --> gs: Game
+gs -> :game: getState()
+game -> round: getState()
+round --> game: RoundState
+game --> gs: GameState
+gs -> game :addRound()
+gs -> game : markPlayerActive
+gs -> gc : round
+@enduml

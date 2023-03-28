@@ -1,16 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from "rxjs";
 import { GameState } from "../model/game-state";
-import { RoundDto } from "../dto/round-dto";
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
-  private state = new BehaviorSubject<GameState>(GameState.WAITING_FOR_PLAYERS);
+  private state = new BehaviorSubject<GameState>(GameState.ENTER_PROPOSITION);
   private gameId: string;
   private playerId: string;
-  private round: RoundDto;
 
   getGameId(): string {
     return this.gameId ?? '';
@@ -28,14 +26,6 @@ export class StateService {
     this.playerId = value;
   }
 
-  getRound(): RoundDto {
-    return this.round;
-  }
-
-  setRound(round: RoundDto): void {
-    this.round = round;
-  }
-
   goToNextState() {
     this.state.next(this.getNextState(this.state.getValue()));
   }
@@ -50,12 +40,12 @@ export class StateService {
 
   private getNextState(currentState: GameState): GameState {
     switch (currentState) {
-      case GameState.WAITING_FOR_PLAYERS:
-        return GameState.WAITING_FOR_ALL_PROPOSITIONS;
-      case GameState.WAITING_FOR_ALL_PROPOSITIONS:
-        return GameState.WAITING_FOR_ALL_SELECTIONS;
-      case GameState.WAITING_FOR_ALL_SELECTIONS:
-        return GameState.WAITING_FOR_PLAYERS;
+      case GameState.ENTER_PROPOSITION:
+        return GameState.SELECT_PROPOSITION;
+      case GameState.SELECT_PROPOSITION:
+        return GameState.SHOW_RANKING;
+      case GameState.SHOW_RANKING:
+        return GameState.ENTER_PROPOSITION
     }
   }
 }

@@ -12,7 +12,7 @@ gs -> ges: evalRound(gameId)
 ges -> gr : findGame(gameId)
 gr  --> ges: Game
 ges --> gs: Game
-gs -> :game: getCurrentRound()
+gs -> game: getCurrentRound()
 game -> round: getState()
 round --> game: RoundState
 game --> gs: Round

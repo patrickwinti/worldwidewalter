@@ -11,7 +11,7 @@ gs -> ges: editGame(gameId)
 ges -> gr : findGame(gameId)
 gr  --> ges: Game
 ges --> gs: Game
-gs -> :game: getState()
+gs -> game: getState()
 game -> round: getState()
 round --> game: RoundState
 game --> gs: GameState

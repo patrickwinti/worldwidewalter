@@ -1,3 +1,5 @@
 export enum GameState {
-  START
+  WAITING_FOR_PLAYERS= 'WAITING_FOR_PLAYERS',
+  READY = 'READY',
+  START = 'START'
 }

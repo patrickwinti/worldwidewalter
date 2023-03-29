@@ -17,7 +17,6 @@ package Testing {
     package Jasmine
     package Karma
     package Mockito
-    package Hamcrest
     package Jupiter
 }
 

@@ -1,17 +1,9 @@
 <ng-container [ngSwitch]="state">
   <www-welcome *ngSwitchCase="InitializationState.WELCOME_PAGE"
-               (newGameEmitter)="setGame($event)"
                (initializationStateEmitter)="setState($event)">
   </www-welcome>
 
   <www-join *ngSwitchCase="InitializationState.JOIN_GAME"
-            [presetGameId]="presetGameId"
-            (playerEmitter)="setPlayer($event)"
             (initializationStateEmitter)="setState($event)">
   </www-join>
-
-  <www-waiting-page *ngSwitchCase="InitializationState.WAITING_ROOM"
-                    [game]="game"
-                    (gameStartEmitter)="startGame($event)">
-  </www-waiting-page>
 </ng-container>

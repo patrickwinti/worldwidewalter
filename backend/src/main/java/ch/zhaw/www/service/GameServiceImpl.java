@@ -1,108 +1,88 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.*;
-import ch.zhaw.www.repository.GameRepository;
+import ch.zhaw.www.GameProperties;
+import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Round;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 class GameServiceImpl implements GameService {
-    private final GameRepository gameRepository;
-    private final NamePostfixStack namePostFixStack = new NamePostfixStack();
-
-    GameServiceImpl(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
+    private final GameEntityService gameEntityService;
+    private final GameProperties gameProperties;
+    
+    GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
+        this.gameEntityService = gameEntityService;
+        this.gameProperties = gameProperties;
     }
-
+    
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString());
-        saveGame(game);
+        gameEntityService.saveNewGame(game);
         return game;
     }
-
+    
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
-        return findGame(gameId);
+        return gameEntityService.getGame(gameId);
     }
-
+    
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        if (findGame(gameId).getWaitingRoom().size() >= 12) {
-            throw new GameError.FullCapacityException();
-        }
-        if (doesPlayerNameExistInGame(gameId, playerName)) {
-            playerName = playerName + namePostFixStack.popNamePostFix();
-        }
-        Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
-        findGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
-        return tempPlayer;
+        return new Player(playerName);
     }
-
+    
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-
-            if (findGame(gameId).getWaitingRoom().containsKey(playerId)) {
-                findGame(gameId).getWaitingRoom().remove(playerId);
-            }
-            if (findGame(gameId).getActivePlayers().containsKey(playerId)) {
-                findGame(gameId).getActivePlayers().remove(playerId);
-            }
-
-
-
-
-
+    
     }
-
+    
     @Override
-    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException {
-        return new Round(UUID.randomUUID().toString(), new Prompt("I've always wanted to WALTER", 1));
+    public Round enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+        gameEntityService.editGame(gameId, game -> {
+            if (game.getState() == Game.State.NO_VALID_ROUND) {
+                game.addRound(new Round(generateId(),
+                        game.consumePrompt(),
+                        gameProperties.getPropositionSubmissionDuration().getSeconds(),
+                        gameProperties.getRoundEnterLimitDuration().getSeconds()));
+            }
+            Player player = game.getAllPlayers()
+                    .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
+                    .orElseThrow(() -> new PlayerError.NotFoundException(playerId));
+            game.markPlayerAsActive(player);
+            return game;
+        });
+        return gameEntityService.getGame(gameId).getCurrentRound();
     }
-
+    
+    @Override
+    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        Game game = gameEntityService.getGame(gameId);
+        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
+            throw new RoundError.IllegalStateException();
+        }
+        return game.getCurrentRound();
+    }
+    
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {
-
+        
     }
-
+    
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }
-
-    private Game findGame(String gameId) {
-        return gameRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
+    
+    private String generateId() {
+        return UUID.randomUUID().toString();
     }
-
-    private void saveGame(Game game) {
-        gameRepository.save(game);
-    }
-
-    /**
-     * Support method for enterGame.
-     * Checks if a playerName already exists in a game.
-     *
-     * @param gameId     gameId to find the game and clarify the id in exception
-     * @param playerName playerName to check if it already exists
-     * @return true if the player name already exists in the game
-     */
-    private boolean doesPlayerNameExistInGame(String gameId, String playerName) {
-        for (Player player : findGame(gameId).getWaitingRoom().values()) {
-            if (player.getName().equals(playerName)) {
-                return true;
-            }
-        }
-        for (Player player : findGame(gameId).getActivePlayers().values()) {
-            if (player.getName().equals(playerName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
 }

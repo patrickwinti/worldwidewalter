@@ -24,7 +24,6 @@ export class WelcomeComponent {
     await firstValueFrom(this.gameService.requestNewGame()).then(
       (newGame) => {
         this.stateService.setGameId(newGame.id);
-        this.stateService.goToNextState();
         this.initializationStateEmitter.emit(InitializationState.JOIN_GAME);
       },
       (error: HttpErrorResponse) => console.log('error occurred: ' + error.message)

@@ -31,7 +31,7 @@ public class Game {
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
-    
+    private final ArrayList<Player> SphinxCandidates = new ArrayList<Player>();
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
     
     public void addRound(Round round) {

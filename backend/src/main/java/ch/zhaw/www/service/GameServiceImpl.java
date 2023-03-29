@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
+
+import static java.util.UUID.randomUUID;
 
 @Service
 class GameServiceImpl implements GameService {
@@ -24,7 +27,7 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Game createGame() {
-        var game = new Game(UUID.randomUUID().toString());
+        var game = new Game(randomUUID().toString());
         gameEntityService.saveNewGame(game);
         return game;
     }
@@ -36,7 +39,7 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        return new Player(playerName);
+        return new Player(playerName,randomUUID().toString());
     }
     
     @Override
@@ -83,6 +86,29 @@ class GameServiceImpl implements GameService {
     }
     
     private String generateId() {
-        return UUID.randomUUID().toString();
+        return randomUUID().toString();
     }
+
+    public void selectSphinx(String gameId, Round round) throws GameError.NotFoundException {
+        if (getGame(gameId).getSphinxCandidates().isEmpty()) {
+            getGame(gameId).getSphinxCandidates().addAll(getGame(gameId).getActivePlayers().values());
+        }
+        int index = new Random().nextInt(getGame(gameId).getSphinxCandidates().size());
+        Player newSphinx = getGame(gameId).getSphinxCandidates().get(index);
+        getGame(gameId).getSphinxCandidates().remove(index);
+    }
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+

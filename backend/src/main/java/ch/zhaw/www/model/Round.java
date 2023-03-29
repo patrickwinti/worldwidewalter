@@ -23,7 +23,7 @@ public class Round {
     private final long propositionDuration;
     private final long enterLimit;
     
-    private final Map<String, List<String>> propositions = new ConcurrentHashMap<>();
+    private final Map<String, Proposition> propositions = new ConcurrentHashMap<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     
     @Nullable

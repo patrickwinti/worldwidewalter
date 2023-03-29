@@ -9,6 +9,7 @@ import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.RoundError;
 import ch.zhaw.www.utils.InstantWrapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -134,6 +137,18 @@ class GameServiceTest {
         assertEquals(round, gameService.getRound(GAME_ID, player2.getId()));
         assertEquals(round, gameService.getRound(GAME_ID, player3.getId()));
         assertEquals(round, gameService.getRound(GAME_ID, player4.getId()));
+    }
+
+    @Disabled
+    @Test
+    void testSubmitProposition(){
+        Game game = mockGameInRepository();
+        Round round = getRound();
+        game.addRound(round);
+
+        gameService.submitProposition(round.getId(), UNKNOWN_PLAYER_ID, List.of("hello"));
+
+        assertEquals(1, round.getPropositions().size());
     }
     
     private Player addWaitingRoomPlayer(Game game) {

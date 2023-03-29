@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -73,7 +74,7 @@ class RoundTest {
         tick(fixedClock, PROPOSITION_DURATION - 1);
         
         assertEquals(Round.State.FINISHED, round.getState());
-        round.getPropositions().put("1", List.of("Fish"));
+        round.getPropositions().put("1", new Proposition(UUID.randomUUID().toString(), List.of("Fish ")));
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
@@ -85,18 +86,20 @@ class RoundTest {
     @Test
     void selectionsCanBeSubmitted() {
         Round round = getRound();
-        
+        Proposition proposition1 = new Proposition("1", Arrays.asList("Joseph"));
+        Proposition proposition2 = new Proposition("1", Arrays.asList("Joseph"));
+
         assertEquals(Round.State.CREATED, round.getState());
         
         round.setSphinx(getSphinx());
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        round.getPropositions().put("1", List.of("Joseph"));
+        round.getPropositions().put("1", proposition1);
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
         
-        round.getPropositions().put("2", List.of("Maria"));
+        round.getPropositions().put("2", proposition2);
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }

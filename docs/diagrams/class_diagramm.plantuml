@@ -12,6 +12,7 @@ package backend{
         +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto) : void
         +selectProposition(roundId: String, propositionId: String, playerId: String) : void
         +getRound(gameId: String, playerId: String) : RoundDto
+        +enterRound(gameId: String, playerId: String) : RoundDto
     }
     class GameDto {
         -id: String
@@ -21,6 +22,7 @@ package backend{
         id: String
         waitingRoom: Map<Player>
         activePlayers: Map<Player>
+        getState(): Game.State
     }
     class Prompt{
         -statement: String
@@ -35,7 +37,8 @@ package backend{
        selectProposition(roundId: String, playerId: String, propositionId: String): void
        getGame(gameId: String) : Game
        enterGame(gameId: String, playerName: String) : Player
-       startNextRound(gameId: String) : Round
+       enterRound(gameId: String, playerId: String) : Round
+       getRound(gameId: String, playerId: String) : Round
     }
     interface GameRepository
     class PlayerDto {
@@ -64,6 +67,7 @@ package backend{
         -prompt: Prompt
         -propositions: Map<Proposition>
         -selections: Map<Selection>
+        +getState(): Round.State
     }
     class NamePostfixStack {
         -postFixes: Stack<String>

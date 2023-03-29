@@ -53,10 +53,10 @@ public interface GameService {
      * @param gameId   game requested to enter
      * @param playerId player requesting round
      * @return new or existing round
-     * @throws GameError.NotFoundException         if game is not found
-     * @throws GameError.NotEnoughPlayersException if there are not enough players anymore
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
-    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, GameError.NotEnoughPlayersException;
+    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
     
     /**
      * Player submitted their propositions for the prompt
@@ -79,5 +79,17 @@ public interface GameService {
      * @throws RoundError.NotFoundException  if round is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
-    void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
+    void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
+    
+    /**
+     * Player requested to participate in the current round of the game. If round is currently not available
+     * a new one will be created
+     *
+     * @param gameId   game identifier
+     * @param playerId player identifier
+     * @return current round
+     * @throws GameError.NotFoundException   if game is not found
+     * @throws PlayerError.NotFoundException if player is not found
+     */
+    Round enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
 }

@@ -1,10 +1,18 @@
 <div class="column">
   <div>
+    <div>{{round.prompt}}</div>
+    <br>
+    <br>
     <div class="textbox special-margin2 special-margin3">Dein Vorschlag</div>
     <br>
-    <input class="special-margin2" type="text" placeholder="Bitte vorschlage eingeben">
+
+    <div *ngFor="let proposition of propositionsForGaps; let i = index">
+      {{i}} <input class="special-margin2" type="text" placeholder="Bitte Vorschlag eingeben"
+                   [(ngModel)]="propositionsForGaps[i].text">
+    </div>
+
   </div>
   <br>
-  <button class="special-margin2" (click)="sendProposition()">Senden</button>
+  <button class="special-margin2" (click)="emitProposition()">Senden</button>
   <h2></h2>
 </div>

@@ -107,7 +107,7 @@ public class GameController {
     @Operation(summary = "Player selects proposition")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Proposition choice saved"),
-            @ApiResponse(responseCode = "404", description = "Either game, round, proposition or player has not been found"),
+            @ApiResponse(responseCode = "404", description = "Either round, proposition or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(value = "/rounds/{roundId}/proposition/{propositionId}")
@@ -118,19 +118,33 @@ public class GameController {
     }
     //endregion
     
-    @Operation(summary = "Player requested to start new round")
+    @Operation(summary = "Player requested current round round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
-            @ApiResponse(responseCode = "400", description = "Game is in an invalid state to start new round"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "425", description = "Game has not enough players to continue"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<RoundDto> getRound(@PathVariable String gameId) {
-        Round round = gameService.getRound(gameId);
-        logger.log(Level.INFO, "started next round {0}", round);
+    public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        Round round = gameService.getRound(gameId, playerId);
+        logger.log(Level.INFO, "get current round {0}", round);
+        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
+    }
+    
+    @Operation(summary = "Player requested to enter round")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "New round started"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "409", description = "Game is at capacity"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PutMapping(value = "/games/{gameId}/rounds", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<RoundDto> enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        Round round = gameService.enterRound(gameId, playerId);
+        logger.log(Level.INFO, "participate next round {0}", round);
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
     }
 }

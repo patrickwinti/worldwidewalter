@@ -11,17 +11,7 @@ public abstract class RoundError extends RuntimeException {
     private RoundError(String message) {
         super(message);
     }
-
-    /**
-     * Round is in wrong state to be started
-     */
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public static class OngoingException extends RoundError {
-        public OngoingException() {
-            super("Round is ongoing and cannot start a new one");
-        }
-    }
-
+    
     /**
      * Round ID passed has not been found
      */
@@ -34,6 +24,16 @@ public abstract class RoundError extends RuntimeException {
          */
         public NotFoundException(@NotNull String roundId) {
             super(String.format("Round with ID = %s could not be found", roundId));
+        }
+    }
+    
+    /**
+     * Round has not enough players os is currently running
+     */
+    @ResponseStatus(HttpStatus.TOO_EARLY)
+    public static class IllegalStateException extends RoundError {
+        public IllegalStateException() {
+            super("Round has not enough players or is currently running");
         }
     }
 }

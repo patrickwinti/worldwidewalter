@@ -1,103 +1,88 @@
 package ch.zhaw.www.service;
 
+import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
-import ch.zhaw.www.model.Turn;
-import ch.zhaw.www.repository.GameRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
 class GameServiceImpl implements GameService {
-    private final GameRepository gameRepository;
-
-    GameServiceImpl(GameRepository gameRepository) {
-        this.gameRepository = gameRepository;
+    private final GameEntityService gameEntityService;
+    private final GameProperties gameProperties;
+    
+    GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
+        this.gameEntityService = gameEntityService;
+        this.gameProperties = gameProperties;
     }
-
+    
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString());
-        saveGame(game);
+        gameEntityService.saveNewGame(game);
         return game;
     }
-
+    
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
-        return findGame(gameId);
+        return gameEntityService.getGame(gameId);
     }
-
-
+    
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-
-        if (findGame(gameId).getWaitingRoom().containsKey(playerName)) {
-            playerName = playerName + "+1";
-            enterGame(gameId, playerName);
-        }
-        findGame(gameId).getWaitingRoom().put(playerName, new Player(playerName, UUID.randomUUID().toString()));
-        return findGame(gameId).getWaitingRoom().get(playerName);
+        return new Player(playerName);
     }
-
+    
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-        if (findGame(gameId) != null) {
-            if (findGame(gameId).getWaitingRoom().containsKey(playerId)) {
-                findGame(gameId).getWaitingRoom().remove(playerId);
-            }
-            if (findGame(gameId).getActivePlayers().containsKey(playerId)) {
-                findGame(gameId).getActivePlayers().remove(playerId);
-            }
-        }
+    
     }
-
+    
     @Override
-    public Round startNextRound(String gameId) throws GameError.NotFoundException, RoundError.OngoingException,
-            GameError.NotEnoughPlayersException {
-        return new Round(UUID.randomUUID().toString(), new Prompt("I've always wanted to WALTER"));
+    public Round enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+        gameEntityService.editGame(gameId, game -> {
+            if (game.getState() == Game.State.NO_VALID_ROUND) {
+                game.addRound(new Round(generateId(),
+                        game.consumePrompt(),
+                        gameProperties.getPropositionSubmissionDuration().getSeconds(),
+                        gameProperties.getRoundEnterLimitDuration().getSeconds()));
+            }
+            Player player = game.getAllPlayers()
+                    .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
+                    .orElseThrow(() -> new PlayerError.NotFoundException(playerId));
+            game.markPlayerAsActive(player);
+            return game;
+        });
+        return gameEntityService.getGame(gameId).getCurrentRound();
     }
-
+    
+    @Override
+    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        Game game = gameEntityService.getGame(gameId);
+        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
+            throw new RoundError.IllegalStateException();
+        }
+        return game.getCurrentRound();
+    }
+    
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {
-
+        
     }
-
+    
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }
-
-    private Game findGame(String gameId) {
-        return gameRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
+    
+    private String generateId() {
+        return UUID.randomUUID().toString();
     }
-
-    private void saveGame(Game game) {
-        gameRepository.save(game);
-    }
-    public void selectSphinx(String gameId, Round round) throws GameError.NotFoundException {
-
-        if (findGame(gameId).getWaitingRoom().size() == findGame(gameId).getPreviousSphinx().size()) {
-            // all players have played the Sphinx role, reset the previousSphinx map
-            findGame(gameId).getPreviousSphinx().clear();
-            selectSphinx(gameId,round);
-        }
-        int index = new Random().nextInt(findGame(gameId).getWaitingRoom().size());
-
-        if(findGame(gameId).getPreviousSphinx().containsKey(index)){
-            selectSphinx(gameId,round);
-        }
-        round.setSphinx(findGame(gameId).getWaitingRoom().get(index));
-
-        Player newSphinx = findGame(gameId).getWaitingRoom().get(index);
-        findGame(gameId).getPreviousSphinx().put(newSphinx.getId(), newSphinx);
-
-    }
-
 }

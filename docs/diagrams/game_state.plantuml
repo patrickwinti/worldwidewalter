@@ -1,0 +1,8 @@
+@startuml
+
+(*) --> "Waiting for players"
+"Waiting for players" -->[Enough players joined] "Waiting for all propositions"
+"Waiting for all propositions" -->[Propositions being sent] "Waiting for selections"
+"Waiting for selections"  -->[Showing results and waiting for joining game] "Waiting for players"
+
+@enduml

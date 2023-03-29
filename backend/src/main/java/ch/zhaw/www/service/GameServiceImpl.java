@@ -16,6 +16,7 @@ import java.util.UUID;
 class GameServiceImpl implements GameService {
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
+    private final PostfixGenerator postfixGenerator = new PostfixGenerator();
     
     GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
         this.gameEntityService = gameEntityService;
@@ -36,7 +37,14 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        return new Player(playerName);
+        if (doesPlayerNameExistInGame(gameId, playerName)) {
+            while (doesPlayerNameExistInGame(gameId, playerName)) {
+                playerName = playerName + " " + postfixGenerator.getRandomPostfix();
+            }
+        }
+        Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
+        getGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
+        return tempPlayer;
     }
     
     @Override
@@ -84,5 +92,17 @@ class GameServiceImpl implements GameService {
     
     private String generateId() {
         return UUID.randomUUID().toString();
+    }
+    /**
+     * Support method for enterGame.
+     * Checks if a playerName already exists in a game.
+     *
+     * @param gameId     gameId to find the game and clarify the id in exception
+     * @param playerName playerName to check if it already exists
+     * @return true if the player name already exists in the game
+     */
+    private boolean doesPlayerNameExistInGame(String gameId, String playerName) {
+        return gameEntityService.getGame(gameId).getAllPlayers()
+                .anyMatch(player -> player.getName().equals(playerName));
     }
 }

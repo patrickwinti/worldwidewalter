@@ -1,10 +1,12 @@
 package ch.zhaw.www.model;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
+import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;

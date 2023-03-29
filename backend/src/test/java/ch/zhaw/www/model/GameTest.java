@@ -34,7 +34,7 @@ class GameTest {
     }
     
     private static Player getPlayer() {
-        return new Player(getId());
+        return new Player(getId(),"Zola");
     }
     
     private static String getId() {

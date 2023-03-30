@@ -1,20 +1,20 @@
 /* Set global styles */
 body {
-background-color: #181818; /* Set the background color to a dark gray */
-color: #FFFFFF; /* Set the font color to white */
-font-family: Arial, sans-serif; /* Set the font family to Arial or a sans-serif font */
-font-size: 14px; /* Set the default font size to 14 pixels */
+  background-color: #181818; /* Set the background color to a dark gray */
+  color: #FFFFFF; /* Set the font color to white */
+  font-family: Arial, sans-serif; /* Set the font family to Arial or a sans-serif font */
+  font-size: 14px; /* Set the default font size to 14 pixels */
 }
 
 /* Style box element */
 .textbox {
-font-size: 20px; /* Set the font size to 16 pixels */
-color: black; /* Set the font color to black */
-background-color: #fcc603; /* Set the background color to yellow */
-padding: 1px; /* Add 2 pixels of padding */
-text-align: center; /* Center the text */
-width: 140px; /* Set the width to 150 pixels */
-margin: 1px 0 2px 10px; /* Set the margin */
+  font-size: 20px; /* Set the font size to 16 pixels */
+  color: black; /* Set the font color to black */
+  background-color: #fcc603; /* Set the background color to yellow */
+  padding: 1px; /* Add 2 pixels of padding */
+  text-align: center; /* Center the text */
+  width: 140px; /* Set the width to 150 pixels */
+  margin: 1px 0 2px 10px; /* Set the margin */
 }
 .special-margin1 {
   margin-left: 60px;
@@ -27,28 +27,28 @@ margin: 1px 0 2px 10px; /* Set the margin */
 }
 /* Style button element */
 button {
-top:50%; /* Position the button in the middle of the page */
-background-color: #fcc603; /* Set the background color to gold */
-color: black; /* Set the font color to a dark gray */
-border: none; /* Remove the border */
-padding: 2px 2px; /* Add 2 pixels of padding */
-font-size: 20px; /* Set the font size to 16 pixels */
-cursor: pointer; /* Add a cursor on hover */
-/*margin: 10px 10px 10px 5px; /* Set the margin */
-box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
-width: 150px; /* Set the width to 150 pixels */
+  top:50%; /* Position the button in the middle of the page */
+  background-color: #fcc603; /* Set the background color to gold */
+  color: black; /* Set the font color to a dark gray */
+  border: none; /* Remove the border */
+  padding: 2px 2px; /* Add 2 pixels of padding */
+  font-size: 20px; /* Set the font size to 16 pixels */
+  cursor: pointer; /* Add a cursor on hover */
+  /*margin: 10px 10px 10px 5px; /* Set the margin */
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
+  width: 150px; /* Set the width to 150 pixels */
 }
 
 /* Set width for input element */
 .input[type="text"] {
-width: 70%; /* Set the width to 70% */
-height: 30px; /* Set the height to 30 pixels */
-margin-left: 10px; /* Set the left margin to 10 pixels */
-padding: 5px; /* Add 5 pixels of padding */
-font-size: 16px; /* Set the font size to 16 pixels */
-border-radius: 5px; /* Add a border radius */
-border: none; /* Remove the border */
-box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
+  width: 70%; /* Set the width to 70% */
+  height: 30px; /* Set the height to 30 pixels */
+  margin-left: 10px; /* Set the left margin to 10 pixels */
+  padding: 5px; /* Add 5 pixels of padding */
+  font-size: 16px; /* Set the font size to 16 pixels */
+  border-radius: 5px; /* Add a border radius */
+  border: none; /* Remove the border */
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
 }
 
 /* Set box-sizing for all elements */
@@ -63,24 +63,24 @@ body {
 
 /* Style the header */
 .header {
-background-color: #333333; /* Set the background color to a dark gray */
-padding: 10px; /* Add 5 pixels of padding */
-text-align: center; /* Center the text */
+  background-color: #333333; /* Set the background color to a dark gray */
+  padding: 10px; /* Add 5 pixels of padding */
+  text-align: center; /* Center the text */
 
 }
 
 /* Style the top navigation bar */
 .topnav {
-overflow: hidden; /* Hide any overflow */
-background-color: #333333; /* Set the background color to a dark gray */
+  overflow: hidden; /* Hide any overflow */
+  background-color: #333333; /* Set the background color to a dark gray */
 }
 
 /* Style the topnav links */
 .topnav a {
-float: left; /* Float the links to the left */
-display: block; /* Set the display to block */
-color: #FFFFFF; /*Set the font color to white */
-text-align: center;}
+  float: left; /* Float the links to the left */
+  display: block; /* Set the display to block */
+  color: #FFFFFF; /*Set the font color to white */
+  text-align: center;}
 /* Create three equal columns that floats next to each other */
 
 .column {
@@ -168,4 +168,13 @@ text-align: center;}
   font-weight: bold;
   font-size: 36px;
   color: #ff6347;
+}
+
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
 }

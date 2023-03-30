@@ -16,7 +16,7 @@ export class HttpPollingInterceptor implements HttpInterceptor {
   private readonly RETRIES = 100;
 
   constructor(private stateService: StateService,
-              private loadingService: LoadingService) { 
+              private loadingService: LoadingService) {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -24,7 +24,7 @@ export class HttpPollingInterceptor implements HttpInterceptor {
     const requestWithHeader = this.addPlayerIdToHeader(request);
 
     this.loadingService.startLoading();
-    
+
     return next.handle(requestWithHeader)
       .pipe(
         retry({count: this.RETRIES, delay: this.shouldRetry}),

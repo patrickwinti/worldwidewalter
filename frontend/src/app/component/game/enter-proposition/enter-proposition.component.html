@@ -7,8 +7,8 @@
     <br>
 
     <div *ngFor="let proposition of propositionsForGaps; let i = index">
-      {{i}} <input class="special-margin2" type="text" placeholder="Bitte Vorschlag eingeben"
-                   [(ngModel)]="propositionsForGaps[i].text">
+      <input class="special-margin2" type="text" placeholder="{{i+1}}. Walterersatz"
+             [(ngModel)]="propositionsForGaps[i].text">
     </div>
 
   </div>

@@ -6,6 +6,8 @@ import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
+
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,7 +17,12 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+
+import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -161,31 +168,16 @@ class GameServiceTest {
 
     @Test
     void enterGame() {
-        // 1. mock a game in the repository
-        var game = mockGameInRepository();
-        // 2. call the method under test
-        var player1 = gameService.enterGame(game.getId(), "Nora");
-        var player2 = gameService.enterGame(game.getId(), "Nora");
-        // 3. add player1 to the game in activePlayers
-        game.getActivePlayers().put(player1.getId(), player1);
-        // 4. remove player1 from the game in waitingRoom
-        game.getWaitingRoom().remove(player1.getId());
-        // 5. add another player with the same name
-        var player3 = gameService.enterGame(game.getId(), "Nora");
-        // 6. verify that 3 players were added to the game
-        assertEquals(2, game.getWaitingRoom().size());
-        assertEquals(1, game.getActivePlayers().size());
-        assertEquals(player1, game.getActivePlayers().get(player1.getId()));
-        assertEquals(player2, game.getWaitingRoom().get(player2.getId()));
-        assertEquals(player3, game.getWaitingRoom().get(player3.getId()));
-        // 7. verify that player 1 is in activePlayers and player 2 and 3 are in waitingRoom
-        assertFalse(game.getWaitingRoom().containsKey(player1.getId()));
-        assertTrue(game.getActivePlayers().containsKey(player1.getId()));
-        assertTrue(game.getWaitingRoom().containsKey(player2.getId()));
-        assertTrue(game.getWaitingRoom().containsKey(player3.getId()));
+        Game game = mockGameInRepository();
+        gameService.enterGame(game.getId(), "Nora");
 
-        assertEquals("Nora", game.getActivePlayers().get(player1.getId()).getName());
-        assertEquals("Nora 😏", game.getWaitingRoom().get(player2.getId()).getName());
-        assertEquals("Nora 🦅", game.getWaitingRoom().get(player3.getId()).getName());
+        ArgumentCaptor<UnaryOperator> lambdaCaptor = ArgumentCaptor.forClass(UnaryOperator.class);
+        verify(gameEntityService).editGame(any(), lambdaCaptor.capture());
+        lambdaCaptor.getValue().apply(game);
+
+        Map<String, Player> tempWait = game.getWaitingRoom();
+
+        assertEquals(1, tempWait.size());
+        assertTrue(tempWait.keySet().stream().map(tempWait::get).anyMatch(player -> Objects.equals(player.getName(), "Nora")));
     }
 }

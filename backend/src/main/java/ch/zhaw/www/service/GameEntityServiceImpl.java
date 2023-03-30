@@ -33,7 +33,7 @@ class GameEntityServiceImpl implements GameEntityService {
     @Override
     public void saveNewGame(Game game) {
         synchronized (gamesRepository) {
-            if (gamesRepository.findById(game.getId()).isEmpty()) {
+            if (!gamesRepository.existsById(game.getId())) {
                 gamesRepository.save(game);
             } else {
                 throw new RuntimeException("Game already exists");

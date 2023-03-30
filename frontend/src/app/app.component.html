@@ -1,3 +1,8 @@
+<div class="header">
+  <div class="textbox special-margin1">Worldwide</div>
+  <div class="textbox special-margin2">WALTER</div>
+</div>
+
 <ng-container [ngSwitch]="appState">
   <www-initialization-container *ngSwitchCase="AppState.INITIALIZATION"
                                 (startGameEmitter)="startGame()">
@@ -6,3 +11,7 @@
   <www-game-container *ngSwitchCase="AppState.GAME">
   </www-game-container>
 </ng-container>
+
+
+<www-overlay-spinner>
+</www-overlay-spinner>

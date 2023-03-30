@@ -1,0 +1,24 @@
+<table>
+  <thead>
+  <tr>
+    <th>
+      <div class="textbox special-margin2">Spieler:in</div>
+    </th>
+    <th>
+      <div class="textbox special-margin2">Punkte</div>
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <ng-container *ngFor="let rank of sortedRanking.entries()">
+    <tr>
+      <td>{{rank[0]}}</td>
+      <td>{{rank[1]}}</td>
+    </tr>
+  </ng-container>
+  </tbody>
+</table>
+
+<button (click)="continue()">
+  weiter
+</button>

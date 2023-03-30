@@ -1,0 +1,17 @@
+<ng-container [ngSwitch]="stateObservable$ | async">
+
+  <www-enter-proposition *ngSwitchCase="GameState.ENTER_PROPOSITION"
+                         [round]=round
+                         (propositionEmitter)="sendProposition($event)">
+  </www-enter-proposition>
+
+  <ng-container *ngSwitchCase="GameState.SELECT_PROPOSITION">
+    <www-select-proposition *ngIf="allPropositions$ | async as allPropositions"
+                            [round]=round
+                            [propositions]="allPropositions.propositions"
+                            (selectedPropositionEmitter)="submitSelection($event)">
+    </www-select-proposition>
+
+  </ng-container>
+</ng-container>
+

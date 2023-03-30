@@ -135,16 +135,15 @@ public class GameController {
     
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "New round started"),
+            @ApiResponse(responseCode = "204", description = "New round started, added to round or aknowledge as part of game"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game is at capacity"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PutMapping(value = "/games/{gameId}/rounds", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<RoundDto> enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        Round round = gameService.enterRound(gameId, playerId);
-        logger.log(Level.INFO, "participate next round {0}", round);
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        gameService.enterRound(gameId, playerId);
+        logger.log(Level.INFO, "participate next round");
     }
 }

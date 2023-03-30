@@ -24,7 +24,6 @@ import java.util.UUID;
 import java.util.function.UnaryOperator;
 
 
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -181,6 +180,7 @@ class GameServiceTest {
         assertEquals(1, tempWait.size());
         assertTrue(tempWait.keySet().stream().map(tempWait::get).anyMatch(player -> Objects.equals(player.getName(), "Nora")));
     }
+
     @Test
     void enterGameWithExistingPlayerOfSameName() {
         Game game = mockGameInRepository();

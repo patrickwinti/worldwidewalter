@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Model class with all the current states of a game.
+ * Model class with all the current state of a game.
  */
 @Getter
 @EqualsAndHashCode

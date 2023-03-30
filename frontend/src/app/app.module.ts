@@ -14,6 +14,7 @@ import { EnterPropositionComponent } from './component/game/enter-proposition/en
 import { SelectPropositionComponent } from "./component/game/select-proposition/select-proposition.component";
 import { ShowRankingComponent } from "./component/game/show-ranking/show-ranking.component";
 import { RoundComponent } from './component/game/round/round.component';
+import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spinner.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { RoundComponent } from './component/game/round/round.component';
     EnterPropositionComponent,
     SelectPropositionComponent,
     ShowRankingComponent,
-    RoundComponent
+    RoundComponent,
+    OverlaySpinnerComponent
   ],
   imports: [
     BrowserModule,

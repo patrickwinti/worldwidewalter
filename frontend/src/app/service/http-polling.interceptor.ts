@@ -6,24 +6,31 @@ import {
   HttpResponse,
   HttpStatusCode
 } from '@angular/common/http';
-import { Observable, retry, timer } from 'rxjs';
+import { finalize, Observable, retry, timer } from 'rxjs';
 import { StateService } from "./state.service";
 import { Injectable } from "@angular/core";
+import { LoadingService } from "./loading.service";
 
 @Injectable()
 export class HttpPollingInterceptor implements HttpInterceptor {
   private readonly RETRIES = 100;
 
-  constructor(private stateService: StateService) {
+  constructor(private stateService: StateService,
+              private loadingService: LoadingService) { 
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
     const requestWithHeader = this.addPlayerIdToHeader(request);
 
+    this.loadingService.startLoading();
+    
     return next.handle(requestWithHeader)
       .pipe(
-        retry({count: this.RETRIES, delay: this.shouldRetry})
+        retry({count: this.RETRIES, delay: this.shouldRetry}),
+        finalize(() => {
+          this.loadingService.stopLoading();
+        })
       )
   }
 

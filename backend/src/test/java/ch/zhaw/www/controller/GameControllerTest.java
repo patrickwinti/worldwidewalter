@@ -1,6 +1,5 @@
 package ch.zhaw.www.controller;
 
-import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
@@ -21,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
+import static ch.zhaw.www.model.TestHelper.getGame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -45,7 +45,7 @@ class GameControllerTest {
     
     @Test
     void testCreateGame_200() throws Exception {
-        when(gameService.createGame()).then(invocationOnMock -> new Game(GAME_ID));
+        when(gameService.createGame()).then(invocationOnMock -> getGame(GAME_ID));
         mvc.perform(MockMvcRequestBuilders.post("/api/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + GAME_ID + "\",\"state\":\"WAITING_FOR_PLAYERS\"}"));
@@ -53,7 +53,7 @@ class GameControllerTest {
     
     @Test
     void testGetGame_200() throws Exception {
-        when(gameService.getGame(any())).then(invocationOnMock -> new Game(GAME_ID));
+        when(gameService.getGame(any())).then(invocationOnMock -> getGame(GAME_ID));
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}", GAME_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + GAME_ID + "\",\"state\":\"WAITING_FOR_PLAYERS\"}"));
@@ -221,18 +221,18 @@ class GameControllerTest {
     }
     
     @Test
-    void enterRound_200() throws Exception {
-        when(gameService.enterRound(any(), any())).then(o -> new Round(ROUND_ID, PROMPT, 4, 2));
+    void enterRound_204() throws Exception {
+        doNothing().when(gameService).enterRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
         verify(gameService).enterRound(GAME_ID, PLAYER_ID);
         
     }
     
     @Test
     void enterRound_404_game() throws Exception {
-        when(gameService.enterRound(any(), any())).thenThrow(new GameError.NotFoundException(GAME_ID));
+        doThrow(new GameError.NotFoundException(GAME_ID)).when(gameService).enterRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
@@ -242,7 +242,7 @@ class GameControllerTest {
     
     @Test
     void enterRound_404_player() throws Exception {
-        when(gameService.enterRound(any(), any())).thenThrow(new PlayerError.NotFoundException(GAME_ID));
+        doThrow(new PlayerError.NotFoundException(GAME_ID)).when(gameService).enterRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
@@ -252,7 +252,7 @@ class GameControllerTest {
     
     @Test
     void enterRound_409() throws Exception {
-        when(gameService.enterRound(any(), any())).thenThrow(new GameError.FullCapacityException());
+        doThrow(new GameError.FullCapacityException()).when(gameService).enterRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isConflict());

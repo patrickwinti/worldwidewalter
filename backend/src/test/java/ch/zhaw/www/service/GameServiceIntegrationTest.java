@@ -10,8 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class GameServiceIntegrationTest {
@@ -24,19 +23,33 @@ class GameServiceIntegrationTest {
         String gameId = gameService.createGame().getId();
         
         assertNull(gameService.getGame(gameId).getCurrentRound());
-        assertEquals(0, gameService.getGame(gameId).getRounds().size());
+        assertNull(gameService.getGame(gameId).getCurrentRound());
         
         int nrOfPlayers = Runtime.getRuntime().availableProcessors() * 2;
         ExecutorService service = Executors.newFixedThreadPool(nrOfPlayers);
         var callables = IntStream.range(0, nrOfPlayers)
                 .mapToObj(value -> gameService.enterGame(gameId, "Sara" + value))
-                .map(player -> (Callable<Round>) () -> gameService.enterRound(gameId, player.getId()))
+                .map(player -> (Callable<Round>) () -> {
+                    gameService.enterRound(gameId, player.getId());
+                    return gameService.getGame(gameId).getCurrentRound();
+                })
                 .toList();
         
-        service.invokeAll(callables);
+        var futures = service.invokeAll(callables);
         service.shutdown();
         
-        assertEquals(1, gameService.getGame(gameId).getRounds().size());
+        var distinctRounds = futures.stream()
+                .map(roundFuture -> {
+                    try {
+                        return roundFuture.get();
+                    } catch (Throwable e) {
+                        return null;
+                    }
+                })
+                .distinct()
+                .toList();
+        assertEquals(1, distinctRounds.size());
+        assertNotNull(distinctRounds.get(0));
     }
     
 }

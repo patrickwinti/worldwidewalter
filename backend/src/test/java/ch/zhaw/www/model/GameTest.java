@@ -9,37 +9,15 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 
+import static ch.zhaw.www.model.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GameTest {
-    private static final Prompt PROMPT = new Prompt("I am WALTER", 1);
+    
     private static final int DURATION = 4;
-    
-    private static Round getRound(int propositionDuration) {
-        return new Round(getId(), PROMPT, propositionDuration, 1);
-    }
-    
-    private static void addToWaitingRoom(Game game) {
-        Player player = getPlayer();
-        game.getWaitingRoom().put(player.getId(), player);
-    }
-    
-    private static void addToActive(Game game) {
-        Player player = getPlayer();
-        game.getActivePlayers().put(player.getId(), player);
-    }
-    
-    private static Player getPlayer() {
-        return new Player(getId(),"Zola");
-    }
-    
-    private static String getId() {
-        return UUID.randomUUID().toString();
-    }
     
     private static void addRoundOpenForPropositionSubmission(Game game) {
         Round round = getRound(DURATION);
@@ -50,10 +28,10 @@ class GameTest {
     
     @Test
     void testGameState_WaitingForPlayers() {
-        Game game = new Game(getId());
+        Game game = getGame();
         assertEquals(Game.State.NO_VALID_ROUND, game.getState());
         
-        game.addRound(getRound(2));
+        game.addRound(getRound(DURATION));
         
         addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
@@ -67,7 +45,7 @@ class GameTest {
         game.getActivePlayers().putAll(game.getWaitingRoom());
         assertEquals(Game.State.NO_VALID_ROUND, game.getState());
         
-        Round round = getRound(2);
+        Round round = getRound(DURATION);
         game.addRound(round);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
@@ -77,8 +55,8 @@ class GameTest {
     
     @Test
     void testGameState_WaitingForPropositions() {
-        Game game = new Game(getId());
-        game.addRound(getRound(2));
+        Game game = getGame();
+        game.addRound(getRound(DURATION));
         
         addToWaitingRoom(game);
         addToWaitingRoom(game);
@@ -92,7 +70,7 @@ class GameTest {
     
     @Test
     void testGameState_WaitingForSelections() {
-        Game game = new Game(getId());
+        Game game = getGame();
         addToActive(game);
         addToActive(game);
         addToActive(game);
@@ -110,12 +88,11 @@ class GameTest {
         game.getCurrentRound().getPropositions().put(player.getId(), List.of("Walter " + player.getId()));
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, Duration.of(DURATION, ChronoUnit.MINUTES));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
-        
     }
     
     @Test
     void testRunningRound() {
-        Game game = new Game(getId());
+        Game game = getGame();
         assertNull(game.getCurrentRound());
         
         Round round = mock(Round.class);
@@ -135,7 +112,7 @@ class GameTest {
     
     @Test
     void testNewRound() {
-        Game game = new Game(getId());
+        Game game = getGame();
         addToWaitingRoom(game);
         addToWaitingRoom(game);
         addToWaitingRoom(game);
@@ -147,7 +124,7 @@ class GameTest {
         addToActive(game);
         assertEquals(4, game.getActivePlayers().size());
         
-        game.addRound(getRound(2));
+        game.addRound(getRound(DURATION));
         
         assertEquals(8, game.getWaitingRoom().size());
         assertEquals(0, game.getActivePlayers().size());

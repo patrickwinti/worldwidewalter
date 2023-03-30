@@ -6,7 +6,8 @@ import java.util.Random;
  * Class that generates a random postfix for a player name.
  */
 public class PostfixGenerator {
-    Random random = new Random(0);
+    private static final int SEED = 0;
+    Random random = new Random(SEED);
 
     /**
      * Generates a random postfix for a player name in the range of 0 to 1999.

@@ -27,11 +27,9 @@ public class Game {
     @NotNull
     private final String id;
     private final int numberOfRoundsInTurn = 1;
-
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
-
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
 
     public void addRound(Round round) {

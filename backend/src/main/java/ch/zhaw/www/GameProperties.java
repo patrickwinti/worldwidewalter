@@ -16,4 +16,9 @@ public class GameProperties {
     private Duration propositionSubmissionDuration;
     @Value("${round.enter-limit-duration}")
     private Duration roundEnterLimitDuration;
+    @Value("${game.maximum-players}")
+    private int maximumAmountOfActivePlayersPerGame;
+    @Value("${game.minimum-players}")
+    private int minimumAmountOfActivePlayersPerGame;
+    
 }

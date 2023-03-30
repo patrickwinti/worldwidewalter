@@ -87,9 +87,8 @@ public interface GameService {
      *
      * @param gameId   game identifier
      * @param playerId player identifier
-     * @return current round
      * @throws GameError.NotFoundException   if game is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
-    Round enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
+    void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
 }

@@ -11,12 +11,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 class GameServiceImpl implements GameService {
+    private static final Logger LOGGER = Logger.getLogger(GameService.class.getSimpleName());
+    private static final int DEFAULT_NUMBER_OF_ROUNDS = 1;
+    
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
-    private final PostfixGenerator postfixGenerator = new PostfixGenerator();
     
     GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
         this.gameEntityService = gameEntityService;
@@ -25,7 +29,10 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Game createGame() {
-        var game = new Game(UUID.randomUUID().toString());
+        var game = new Game(UUID.randomUUID().toString(),
+                gameProperties.getMinimumAmountOfActivePlayersPerGame(),
+                gameProperties.getMaximumAmountOfActivePlayersPerGame(),
+                DEFAULT_NUMBER_OF_ROUNDS);
         gameEntityService.saveNewGame(game);
         return game;
     }
@@ -37,14 +44,7 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        if (doesPlayerNameExistInGame(gameId, playerName)) {
-            while (doesPlayerNameExistInGame(gameId, playerName)) {
-                playerName = playerName + " " + postfixGenerator.getRandomPostfix();
-            }
-        }
-        Player tempPlayer = new Player(UUID.randomUUID().toString(), playerName);
-        getGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
-        return tempPlayer;
+        return new Player(playerName, "Josehf");
     }
     
     @Override
@@ -53,27 +53,37 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Round enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+    public void enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGame(gameId, game -> {
-            if (game.getState() == Game.State.NO_VALID_ROUND) {
-                game.addRound(new Round(generateId(),
-                        game.consumePrompt(),
-                        gameProperties.getPropositionSubmissionDuration().getSeconds(),
-                        gameProperties.getRoundEnterLimitDuration().getSeconds()));
-            }
             Player player = game.getAllPlayers()
                     .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
                     .orElseThrow(() -> new PlayerError.NotFoundException(playerId));
-            game.markPlayerAsActive(player);
+            Game.State state = game.getState();
+            switch (state) {
+                case NO_VALID_ROUND -> {
+                    game.addRound(new Round(generateId(),
+                            game.consumePrompt(),
+                            gameProperties.getPropositionSubmissionDuration().getSeconds(),
+                            gameProperties.getRoundEnterLimitDuration().getSeconds()));
+                    LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
+                    game.markPlayerAsActive(player);
+                }
+                case WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS -> {
+                    game.markPlayerAsActive(player);
+                    LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
+                }
+                case WAITING_FOR_ALL_SELECTIONS -> {
+                    //Player can't enter round at the moment. Player will stay in waiting room.
+                }
+            }
             return game;
         });
-        return gameEntityService.getGame(gameId).getCurrentRound();
     }
     
     @Override
     public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
-        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.getActivePlayers().containsKey(playerId)) {
+        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.hasActivePlayer(playerId)) {
             throw new RoundError.IllegalStateException();
         }
         return game.getCurrentRound();
@@ -92,17 +102,5 @@ class GameServiceImpl implements GameService {
     
     private String generateId() {
         return UUID.randomUUID().toString();
-    }
-    /**
-     * Support method for enterGame.
-     * Checks if a playerName already exists in a game.
-     *
-     * @param gameId     gameId to find the game and clarify the id in exception
-     * @param playerName playerName to check if it already exists
-     * @return true if the player name already exists in the game
-     */
-    private boolean doesPlayerNameExistInGame(String gameId, String playerName) {
-        return gameEntityService.getGame(gameId).getAllPlayers()
-                .anyMatch(player -> player.getName().equals(playerName));
     }
 }

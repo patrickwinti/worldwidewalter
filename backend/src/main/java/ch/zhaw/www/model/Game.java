@@ -1,12 +1,14 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.GameError;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
-import org.springframework.lang.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,21 +24,25 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @KeySpace("running_games")
 public class Game {
-    private static final int MINIMUM_AMOUNT_OF_PLAYERS = 4;
     @Id
     @NotNull
     private final String id;
-    private final int numberOfRoundsInTurn = 1;
-    
+    @Getter(AccessLevel.NONE)
+    private final int minimumAmountOfPlayers;
+    @Getter(AccessLevel.NONE)
+    private final int maximumAmountOfPlayers;
+    @Getter(AccessLevel.NONE)
+    private final int numberOfRoundsInTurn;
+    @Getter(AccessLevel.PACKAGE)
     private final List<Round> rounds = new ArrayList<>();
+    @Getter(AccessLevel.PACKAGE)
     private final Map<String, Player> waitingRoom = new HashMap<>();
+    @Getter(AccessLevel.PACKAGE)
     private final Map<String, Player> activePlayers = new HashMap<>();
     
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
     
     public void addRound(Round round) {
-        waitingRoom.putAll(activePlayers);
-        activePlayers.clear();
         rounds.add(round);
     }
     
@@ -69,7 +75,7 @@ public class Game {
         var numberOfActivePlayers = activePlayers.size();
         if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (numberOfActivePlayers < MINIMUM_AMOUNT_OF_PLAYERS || round.getState() == Round.State.CREATED) {
+        } else if (numberOfActivePlayers < minimumAmountOfPlayers || round.getState() == Round.State.CREATED) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
                 round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
@@ -100,13 +106,28 @@ public class Game {
     }
     
     /**
-     * Moves players in the waiting room into the active list
+     * Moves players in the waiting room into the active list, if there is space in current round
      *
      * @param player player that will be marked as active
+     * @throws GameError.FullCapacityException if more than maximum players reached
      */
-    public void markPlayerAsActive(Player player) {
-        waitingRoom.remove(player.getId());
-        activePlayers.put(player.getId(), player);
+    public void markPlayerAsActive(Player player) throws GameError.FullCapacityException {
+        if (activePlayers.size() <= maximumAmountOfPlayers && waitingRoom.containsKey(player.getId())) {
+            waitingRoom.remove(player.getId());
+            activePlayers.put(player.getId(), player);
+        } else if (!activePlayers.containsKey(player.getId())) {
+            throw new GameError.FullCapacityException();
+        }
+    }
+    
+    /**
+     * Checks if player ID is currently an active player
+     *
+     * @param playerId player identifier
+     * @return is an active player or false if in waiting room or not existing
+     */
+    public boolean hasActivePlayer(@NotNull String playerId) {
+        return getActivePlayers().containsKey(playerId);
     }
     
     public enum State {

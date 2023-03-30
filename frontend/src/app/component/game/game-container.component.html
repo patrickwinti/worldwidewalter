@@ -1,9 +1,9 @@
-<ng-container [ngSwitch]="gameState">
+<div *ngIf="gameState == GameState.ENTER_PROPOSITION || gameState == GameState.SELECT_PROPOSITION">
+  <www-round *ngIf="round$ | async as round"
+             [round]="round">
+  </www-round>
+</div>
 
-  <www-waiting-for-players *ngSwitchCase="GameState.WAITING_FOR_PLAYERS" >
-  </www-waiting-for-players>
 
-  <www-enter-proposition *ngSwitchCase="GameState.WAITING_FOR_ALL_PROPOSITIONS" >
-  </www-enter-proposition>
-
-</ng-container>
+<www-show-ranking *ngIf="gameState == GameState.SHOW_RANKING">
+</www-show-ranking>

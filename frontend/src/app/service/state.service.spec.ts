@@ -20,10 +20,10 @@ describe('StateService', () => {
     expect(service.getCurrentState()).toBe(GameState.WAITING_FOR_PLAYERS);
 
     service.goToNextState();
-    expect(service.getCurrentState()).toBe(GameState.WAITING_FOR_ALL_PROPOSITIONS);
+    expect(service.getCurrentState()).toBe(GameState.ENTER_PROPOSITION);
 
     service.goToNextState();
-    expect(service.getCurrentState()).toBe(GameState.WAITING_FOR_ALL_SELECTIONS);
+    expect(service.getCurrentState()).toBe(GameState.SELECT_PROPOSITION);
 
     service.goToNextState();
     expect(service.getCurrentState()).toBe(GameState.WAITING_FOR_PLAYERS);

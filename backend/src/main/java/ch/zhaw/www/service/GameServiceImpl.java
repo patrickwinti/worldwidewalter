@@ -36,20 +36,18 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+    public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
         gameEntityService.editGame(gameId, game -> {
-            final StringBuilder b = new StringBuilder();
-            b.append(playerName);
-
-            while (doesPlayerNameExistInGame(gameId, b.toString())) {
-                b.append(postfixGenerator.getRandomPostfix());
+            StringBuilder name = new StringBuilder(playerName);
+            while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
+                name.append(postfixGenerator.getRandomPostfix());
             }
-            Player tempPlayer = new Player(uuid, b.toString());
-            getGame(gameId).getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
-            return getGame(gameId);
+            Player tempPlayer = new Player(uuid, name.toString());
+            game.getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
+            return game;
         });
-        return gameEntityService.getGame(gameId).getWaitingRoom().get(uuid);
+        return uuid;
     }
 
     @Override
@@ -97,18 +95,5 @@ class GameServiceImpl implements GameService {
 
     private String generateId() {
         return UUID.randomUUID().toString();
-    }
-
-    /**
-     * Support method for enterGame.
-     * Checks if a playerName already exists in a game.
-     *
-     * @param gameId     gameId to find the game and clarify the id in exception
-     * @param playerName playerName to check if it already exists
-     * @return true if the player name already exists in the game
-     */
-    private boolean doesPlayerNameExistInGame(String gameId, String playerName) {
-        return gameEntityService.getGame(gameId).getAllPlayers()
-                .anyMatch(player -> player.getName().equals(playerName));
     }
 }

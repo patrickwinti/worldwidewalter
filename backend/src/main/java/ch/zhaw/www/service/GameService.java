@@ -36,7 +36,7 @@ public interface GameService {
      * @throws GameError.NotFoundException     if game is not found
      * @throws GameError.FullCapacityException if game has no available seats
      */
-    Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
+    String enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
     
     /**
      * Request to leave a game

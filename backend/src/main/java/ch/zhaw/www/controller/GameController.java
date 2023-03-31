@@ -42,20 +42,7 @@ public class GameController {
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
         logger.log(Level.INFO, "created game {0}", newGame);
-        return ResponseEntity.ok(new GameDto(newGame.getId(), GameDto.State.WAITING_FOR_PLAYERS));
-    }
-    
-    @Operation(summary = "Reads the status of th game")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Existing game"),
-            @ApiResponse(responseCode = "500", description = "Unknown error")
-    })
-    @GetMapping(value = "/games/{gameId}", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GameDto> getGame(@PathVariable String gameId) {
-        Game existingGame = gameService.getGame(gameId);
-        logger.log(Level.INFO, "game found {0}", existingGame);
-        return ResponseEntity.ok(new GameDto(gameId, GameDto.State.WAITING_FOR_PLAYERS));
+        return ResponseEntity.ok(new GameDto(newGame.getId()));
     }
     
     //region Game-Player endpoints

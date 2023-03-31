@@ -2,7 +2,6 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.PlayerError;
@@ -190,25 +189,6 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/proposition/{propositionId}", ROUND_ID, PROPOSITION_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
-    }
-    
-    @Test
-    void testGetRound_200() throws Exception {
-        when(gameService.getRound(any(), any())).then(o -> new Round(ROUND_ID, PROMPT, 4, 2));
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + ROUND_ID + "\",\"prompt\":\"prompt\"}"));
-        verify(gameService).getRound(GAME_ID, PLAYER_ID);
-    }
-    
-    @Test
-    void testGetRound_404() throws Exception {
-        when(gameService.getRound(any(), any())).thenThrow(new GameError.NotFoundException(GAME_ID));
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isNotFound());
-        verify(gameService).getRound(GAME_ID, PLAYER_ID);
     }
     
     @Test

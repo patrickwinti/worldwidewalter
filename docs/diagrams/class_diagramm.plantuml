@@ -64,8 +64,8 @@ package backend{
         -selections: Map<Selection>
         +getState(): Round.State
     }
-    class NamePostfixStack {
-        -postFixes: Stack<String>
+    class PostfixGenerator {
+        -postFixes: Random
     }
     exception GameError {
         FullCapacityException

@@ -70,9 +70,9 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        String player = gameService.enterGame(gameId, playerDto.getPlayerName());
+        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
         logger.log(Level.INFO, "entered game {0}", player);
-        return ResponseEntity.ok(new PlayerDto(player));
+        return ResponseEntity.ok(new PlayerDto(player.getId()));
     }
     
     @Operation(summary = "Player leaves game gracefully")

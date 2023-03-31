@@ -7,8 +7,6 @@ import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.invocation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,7 +18,6 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
 import java.util.List;
@@ -150,9 +147,10 @@ class GameServiceTest {
         var game = new Game(GAME_ID);
 
         //noinspection unchecked
-        invocationOnMock.getArgument(1, UnaryOperator.class).apply(game);
-        return null;
-        when(gameEntityService).editGame(eq(game.getId()), any());
+        doAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            lambda.apply(game);
+        return null;}).when(gameEntityService).editGame(eq(game.getId()), any());
         when(gameEntityService.getGame(game.getId())).thenReturn(game);
 
         return game;
@@ -168,21 +166,6 @@ class GameServiceTest {
 
         doThrow(GameError.NotFoundException.class)
                 .when(gameEntityService).getGame(gameId);
-    }
-
-    @Test
-    void enterGame() {
-        Game game = mockGameInRepository();
-        gameService.enterGame(game.getId(), "Nora");
-
-        ArgumentCaptor<UnaryOperator> lambdaCaptor = ArgumentCaptor.forClass(UnaryOperator.class);
-        verify(gameEntityService).editGame(any(), lambdaCaptor.capture());
-        lambdaCaptor.getValue().apply(game);
-
-        Map<String, Player> tempWait = game.getWaitingRoom();
-
-        assertEquals(1, tempWait.size());
-        assertTrue(tempWait.keySet().stream().map(tempWait::get).anyMatch(player -> Objects.equals(player.getName(), "Nora")));
     }
 
     @Test

@@ -36,7 +36,7 @@ class GameServiceImpl implements GameService {
     }
 
     @Override
-    public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
         gameEntityService.editGame(gameId, game -> {
             StringBuilder name = new StringBuilder(playerName);
@@ -47,7 +47,7 @@ class GameServiceImpl implements GameService {
             game.getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
             return game;
         });
-        return uuid;
+        return gameEntityService.getGame(gameId).getWaitingRoom().get(uuid);
     }
 
     @Override

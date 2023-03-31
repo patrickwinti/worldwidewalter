@@ -22,24 +22,23 @@ export class CountDownComponent implements OnInit, OnDestroy {
   public secondsToTimeout: number;
   public minutesToTimeout: number;
 
+  private timeDifference: number;
   private subscription: Subscription;
 
   private readonly milliSecondsInASecond = 1000;
   private readonly SecondsInAMinute = 60;
   private readonly minutesInAnHour = 60;
 
-
   constructor(private cd: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
-
     this.subscription = timer(0, 1000)
       .subscribe(() => {
-        let timeDifference = this.getTimeDifference();
-        this.allocateTimeUnits(timeDifference);
+        this.timeDifference = this.getTimeDifference();
+        this.allocateTimeUnits();
         this.cd.markForCheck();
-        if (timeDifference <= 1000) {
+        if (this.timeDifference <= 1000) {
           this.timeoutEmitter.emit();
         }
       });
@@ -53,8 +52,8 @@ export class CountDownComponent implements OnInit, OnDestroy {
     return this.timeout - new Date().getTime();
   }
 
-  private allocateTimeUnits(timeDifference: number): void {
-    this.secondsToTimeout = Math.floor((timeDifference) / (this.milliSecondsInASecond) % this.SecondsInAMinute);
-    this.minutesToTimeout = Math.floor((timeDifference) / (this.milliSecondsInASecond * this.minutesInAnHour) % this.SecondsInAMinute);
+  private allocateTimeUnits(): void {
+    this.secondsToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond) % this.SecondsInAMinute);
+    this.minutesToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond * this.minutesInAnHour) % this.SecondsInAMinute);
   }
 }

@@ -14,7 +14,5 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultsDto {
     @NotNull
-    private final String roundId;
-    @NotNull
     private final Map<String, Integer> results;
 }

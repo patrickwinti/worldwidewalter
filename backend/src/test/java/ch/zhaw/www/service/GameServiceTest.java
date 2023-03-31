@@ -24,7 +24,7 @@ class GameServiceTest {
     
     private static final String GAME_ID = "GAME ID";
     private static final String UNKNOWN_PLAYER_ID = "Unknown Player";
-    private static final int ROUND_DURATION = 4;
+    private static final Duration ROUND_DURATION = Duration.of(4, ChronoUnit.MINUTES);
     
     @Autowired
     private GameService gameService;
@@ -76,7 +76,7 @@ class GameServiceTest {
         markActivePlayer(game, player4);
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         
-        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, Duration.of(ROUND_DURATION, ChronoUnit.MINUTES));
+        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, ROUND_DURATION);
         
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
     }

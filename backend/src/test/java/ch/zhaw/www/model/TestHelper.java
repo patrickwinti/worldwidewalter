@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public class TestHelper {
     private static final Prompt PROMPT = new Prompt("I am WALTER", 1);
+    public static final Duration DEFAULT_DURATION = Duration.of(5, ChronoUnit.MINUTES);
     
     public static Player addToWaitingRoom(Game game) {
         Player player = getPlayer();
@@ -31,11 +32,15 @@ public class TestHelper {
     }
     
     public static Round getRound(int propositionDuration) {
-        return new Round(getId(), PROMPT, Duration.of(propositionDuration, ChronoUnit.MINUTES), Duration.of(1, ChronoUnit.MINUTES));
+        return getRound(Duration.of(propositionDuration, ChronoUnit.MINUTES));
+    }
+    
+    public static Round getRound(Duration duration) {
+        return new Round(getId(), PROMPT, DEFAULT_DURATION, Duration.of(1, ChronoUnit.MINUTES));
     }
     
     public static Round getRound() {
-        return getRound(2);
+        return getRound(DEFAULT_DURATION);
     }
     
     public static Game getGame() {

@@ -74,6 +74,21 @@ public class GameController {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game successfully");
     }
+    
+    @Operation(summary = "Retrieves the points for each player")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
+            @ApiResponse(responseCode = "404", description = "Either game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/games/{gameId}/results")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ResultsDto> fetchResultsForRound(@PathVariable String gameId) {
+        var game = gameService.getGame(gameId);
+        logger.log(Level.INFO, "game results returned {0}", game);
+        //TODO return valid results
+        return ResponseEntity.ok(new ResultsDto(Map.of("Elias", 10, "Jennifer", 1, "Sara", 11)));
+    }
     //endregion
     
     //region Round endpoints
@@ -81,10 +96,10 @@ public class GameController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Proposition submitted to round"),
             @ApiResponse(responseCode = "400", description = "Missing proposition"),
-            @ApiResponse(responseCode = "404", description = "Either game, round or player has not been found"),
+            @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/rounds/{roundId}/proposition", consumes = "application/json")
+    @PostMapping(value = "/rounds/{roundId}/propositions", consumes = "application/json")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void submitProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
         gameService.submitProposition(roundId, playerId, proposition.getGaps());
@@ -106,32 +121,17 @@ public class GameController {
     
     @Operation(summary = "Get all propositions sent by the players in current round")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "propositions"),
+            @ApiResponse(responseCode = "200", description = "Propositions in round to be selected by players"),
             @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @GetMapping(value = "/rounds/{roundId}/proposition")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<PropositionSelectionDto> selectProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+    @GetMapping(value = "/rounds/{roundId}/propositions")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRound(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
         //TODO use correct getter (missing proposition impl)
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, round.getPropositions(), round.getSelectionSubmissionEnd()));
-    }
-    
-    @Operation(summary = "Retrieves the points for each player")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "propositions"),
-            @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
-            @ApiResponse(responseCode = "500", description = "Unknown error")
-    })
-    @GetMapping(value = "/rounds/{roundId}/results")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<ResultsDto> fetchResultsForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var round = gameService.getRound(roundId, playerId);
-        logger.log(Level.INFO, "round results returned {0}", round);
-        //TODO return valid results
-        return ResponseEntity.ok(new ResultsDto(roundId, Map.of("Elias", 10, "Jennifer", 1, "Sara", 11)));
     }
     //endregion
     

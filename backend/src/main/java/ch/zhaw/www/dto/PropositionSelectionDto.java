@@ -21,6 +21,6 @@ public class PropositionSelectionDto {
     @NotNull
     private final Map<String, List<String>> propositions;
     @Nullable
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "UTC")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private final Instant selectionSubmissionEndInUtc;
 }

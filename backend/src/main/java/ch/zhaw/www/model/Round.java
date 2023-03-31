@@ -3,7 +3,10 @@ package ch.zhaw.www.model;
 import ch.zhaw.www.utils.InstantWrapper;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -21,7 +24,9 @@ public class Round {
     @NotNull
     private final Prompt prompt;
     
+    @Getter(AccessLevel.NONE)
     private final Duration propositionDuration;
+    @Getter(AccessLevel.NONE)
     private final Duration enterLimitDuration;
     
     private final Map<String, List<String>> propositions = new ConcurrentHashMap<>();
@@ -29,12 +34,18 @@ public class Round {
     
     @Nullable
     private Player sphinx;
+    @Setter(AccessLevel.NONE)
     @Nullable
     private Instant propositionSubmissionEnd;
+    @Setter(AccessLevel.NONE)
+    @Nullable
+    private Instant selectionSubmissionEnd;
     
     public void setSphinx(Player sphinx) {
         this.sphinx = sphinx;
-        this.propositionSubmissionEnd = InstantWrapper.offsetNowMinutes(enterLimitDuration);
+        this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
+        //TODO: Change for more reasonable time
+        this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(propositionDuration));
     }
     
     State getState() {

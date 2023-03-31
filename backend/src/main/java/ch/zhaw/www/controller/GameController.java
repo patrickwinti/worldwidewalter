@@ -3,7 +3,6 @@ package ch.zhaw.www.controller;
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -103,6 +102,21 @@ public class GameController {
         gameService.selectProposition(roundId, playerId, propositionId);
         logger.log(Level.INFO, "proposition selected successfully");
     }
+    
+    @Operation(summary = "Get all propositions sent by the players in current round")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "propositions"),
+            @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/rounds/{roundId}/proposition")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<PropositionSelectionDto> selectProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        var round = gameService.getRound(roundId, playerId);
+        logger.log(Level.INFO, "round selections returned");
+        //TODO use correct getter (missing proposition impl)
+        return ResponseEntity.ok(new PropositionSelectionDto(round.getPropositions(), round.getSelectionSubmissionEnd()));
+    }
     //endregion
     
     @Operation(summary = "Player requested current round round")
@@ -115,14 +129,14 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        Round round = gameService.getRound(gameId, playerId);
+        var round = gameService.getCurrentRoundInGame(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
+        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPropositionSubmissionEnd()));
     }
     
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "New round started, added to round or aknowledge as part of game"),
+            @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game is at capacity"),
             @ApiResponse(responseCode = "500", description = "Unknown error")

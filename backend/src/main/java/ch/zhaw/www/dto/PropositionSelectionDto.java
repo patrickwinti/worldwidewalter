@@ -3,23 +3,20 @@ package ch.zhaw.www.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Data object representing the new round
- * with its prompt
+ * Response containing all proposition of the players
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RoundDto {
-    @NotNull
-    private final String id;
-    @NotNull
-    private final String prompt;
+public class PropositionSelectionDto {
+    private final Map<String, List<String>> propositions;
     @Nullable
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss", timezone = "UTC")
-    private final Instant endOfSubmissionsInUtc;
+    private final Instant selectionSubmissionEndInUtc;
 }

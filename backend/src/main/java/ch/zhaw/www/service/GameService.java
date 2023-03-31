@@ -56,18 +56,28 @@ public interface GameService {
      * @throws GameError.NotFoundException      if game is not found
      * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
-    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    Round getCurrentRoundInGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    
+    /**
+     * Returns round with
+     *
+     * @param roundId  round identifier
+     * @param playerId player requesting round
+     * @return new or existing round
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
+     */
+    Round getRound(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
     
     /**
      * Player submitted their propositions for the prompt
      *
      * @param roundId  round identifier
      * @param playerId player identifier
-     * @throws GameError.NotFoundException   if game is not found
      * @throws RoundError.NotFoundException  if round is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
-    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException;
+    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException;
     
     /**
      * Player has chosen a proposition id. The given player id is anonymized and only valid for the round
@@ -75,7 +85,6 @@ public interface GameService {
      * @param roundId       round identifier
      * @param playerId      player identifier
      * @param propositionId proposition identifier
-     * @throws GameError.NotFoundException   if game is not found
      * @throws RoundError.NotFoundException  if round is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
@@ -91,4 +100,5 @@ public interface GameService {
      * @throws PlayerError.NotFoundException if player is not found
      */
     void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
+    
 }

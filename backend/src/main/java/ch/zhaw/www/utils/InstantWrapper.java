@@ -21,7 +21,7 @@ public class InstantWrapper {
      * @param duration offset from now
      * @return now with minutes offset
      */
-    public static Instant offsetNowMinutes(@NotNull Duration duration) {
+    public static Instant offsetNow(@NotNull Duration duration) {
         return getNow().plus(duration);
     }
     

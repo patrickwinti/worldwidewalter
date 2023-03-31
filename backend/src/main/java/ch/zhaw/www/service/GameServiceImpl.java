@@ -3,6 +3,7 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -81,7 +82,7 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Round getRound(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+    public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
         if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.hasActivePlayer(playerId)) {
             throw new RoundError.IllegalStateException();
@@ -90,14 +91,21 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
-            RoundError.NotFoundException, PlayerError.NotFoundException {
+    public void submitProposition(String roundId, String playerId, List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException {
         
     }
     
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
-            RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
+    public void selectProposition(String roundId, String playerId, String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
+    }
+    
+    @Override
+    public Round getRound(String roundId, String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException {
+        //TODO return proper round
+        return new Round(roundId,
+                new Prompt("Test", 1),
+                gameProperties.getPropositionSubmissionDuration(),
+                gameProperties.getRoundEnterLimitDuration());
     }
     
     private String generateId() {

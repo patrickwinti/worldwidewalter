@@ -102,10 +102,15 @@ class GameServiceImpl implements GameService {
     @Override
     public Round getRound(String roundId, String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException {
         //TODO return proper round
-        return new Round(roundId,
+        var round = new Round(roundId,
                 new Prompt("Test", 1),
                 gameProperties.getPropositionSubmissionDuration(),
                 gameProperties.getRoundEnterLimitDuration());
+        round.getPropositions().put("1", List.of("Walter 1"));
+        round.getPropositions().put("2", List.of("Walter 2"));
+        round.getPropositions().put("3", List.of("Walter 3"));
+        round.getPropositions().put("4", List.of("Walter 4"));
+        return round;
     }
     
     private String generateId() {

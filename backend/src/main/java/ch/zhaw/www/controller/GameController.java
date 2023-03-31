@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,9 +114,24 @@ public class GameController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<PropositionSelectionDto> selectProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRound(roundId, playerId);
-        logger.log(Level.INFO, "round selections returned");
+        logger.log(Level.INFO, "round selections returned {0}", round);
         //TODO use correct getter (missing proposition impl)
-        return ResponseEntity.ok(new PropositionSelectionDto(round.getPropositions(), round.getSelectionSubmissionEnd()));
+        return ResponseEntity.ok(new PropositionSelectionDto(roundId, round.getPropositions(), round.getSelectionSubmissionEnd()));
+    }
+    
+    @Operation(summary = "Retrieves the points for each player")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "propositions"),
+            @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/rounds/{roundId}/results")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<ResultsDto> fetchResultsForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        var round = gameService.getRound(roundId, playerId);
+        logger.log(Level.INFO, "round results returned {0}", round);
+        //TODO return valid results
+        return ResponseEntity.ok(new ResultsDto(roundId, Map.of("Elias", 10, "Jennifer", 1, "Sara", 11)));
     }
     //endregion
     

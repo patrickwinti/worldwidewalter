@@ -9,8 +9,8 @@ import lombok.Data;
 import java.time.Instant;
 
 /**
- * Data object representing the new round
- * with its prompt
+ * Data object representing the round
+ * with its prompt and proposition submission end date
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)

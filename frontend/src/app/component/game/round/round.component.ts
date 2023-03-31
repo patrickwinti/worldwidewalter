@@ -7,6 +7,7 @@ import { firstValueFrom, Observable } from "rxjs";
 import { AllPropositionsDto } from "../../../dto/all-propositions-dto";
 import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
 import { HttpErrorResponse } from "@angular/common/http";
+import { PlayerDto } from "../../../dto/player-dto";
 
 @Component({
   selector: 'www-round',
@@ -21,13 +22,14 @@ export class RoundComponent implements OnInit {
   allPropositions$: Observable<AllPropositionsDto>;
   stateObservable$: Observable<GameState>;
 
-  constructor(public stateService: StateService,
+  constructor(private stateService: StateService,
               private gameService: GameService) {
   }
 
   ngOnInit(): void {
     this.stateObservable$ = this.stateService.getStateObservable();
     this.allPropositions$ = this.gameService.getAllPropositions(this.round.id);
+    this.round.sphinx = {id: '123', name: 'playerName'} as PlayerDto;
   }
 
   submitSelection(selectedProposition: string) {
@@ -54,5 +56,9 @@ export class RoundComponent implements OnInit {
           console.log('an error occurred: ' + error.status);
         }
       );
+  }
+
+  getCurrentPlayerId(): String {
+    return this.stateService.getPlayerId();
   }
 }

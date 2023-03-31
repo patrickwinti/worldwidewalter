@@ -10,11 +10,12 @@ import { JoinComponent } from './component/initialization/join/join.component';
 import { FormsModule } from "@angular/forms";
 import { GameContainerComponent } from './component/game/game-container.component';
 import { HttpPollingInterceptor } from "./service/http-polling.interceptor";
-import { EnterPropositionComponent } from './component/game/enter-proposition/enter-proposition.component';
-import { SelectPropositionComponent } from "./component/game/select-proposition/select-proposition.component";
+import { EnterPropositionComponent } from './component/game/round/enter-proposition/enter-proposition.component';
+import { SelectPropositionComponent } from "./component/game/round/select-proposition/select-proposition.component";
 import { ShowRankingComponent } from "./component/game/show-ranking/show-ranking.component";
 import { RoundComponent } from './component/game/round/round.component';
 import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spinner.component';
+import { SphinxDisplayComponent } from './component/game/round/sphinx-display/sphinx-display.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spi
     SelectPropositionComponent,
     ShowRankingComponent,
     RoundComponent,
-    OverlaySpinnerComponent
+    OverlaySpinnerComponent,
+    SphinxDisplayComponent
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { PropositionDto } from "../../../dto/proposition-dto";
-import { RoundDto } from "../../../dto/round-dto";
+import { PropositionDto } from "../../../../dto/proposition-dto";
+import { RoundDto } from "../../../../dto/round-dto";
 
 @Component({
   selector: 'www-select-proposition',

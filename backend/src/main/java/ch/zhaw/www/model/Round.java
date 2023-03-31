@@ -5,6 +5,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,8 @@ public class Round {
     @NotNull
     private final Prompt prompt;
     
-    private final long propositionDuration;
-    private final long enterLimit;
+    private final Duration propositionDuration;
+    private final Duration enterLimitDuration;
     
     private final Map<String, List<String>> propositions = new ConcurrentHashMap<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
@@ -33,19 +34,23 @@ public class Round {
     
     public void setSphinx(Player sphinx) {
         this.sphinx = sphinx;
-        this.propositionSubmissionEnd = InstantWrapper.offsetNowMinutes(propositionDuration);
+        this.propositionSubmissionEnd = InstantWrapper.offsetNowMinutes(enterLimitDuration);
     }
     
     State getState() {
         if (sphinx == null) {
             return State.CREATED;
-        } else if (InstantWrapper.isAfterNow(propositionSubmissionEnd, -enterLimit)) {
+        } else if (canEnterRound()) {
             return State.OPEN_FOR_SUBMISSIONS;
         } else if (!propositions.isEmpty()) {
             return State.OPEN_FOR_SELECTIONS;
         } else {
             return State.FINISHED;
         }
+    }
+    
+    private boolean canEnterRound() {
+        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
     }
     
     int getNumberOfSelectionsSubmitted() {

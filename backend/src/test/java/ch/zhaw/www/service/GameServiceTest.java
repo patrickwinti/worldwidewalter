@@ -2,7 +2,6 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
@@ -51,10 +50,6 @@ class GameServiceTest {
         var gameId = "jibberish";
         mockGameNotFoundInRepository(gameId);
         assertThrows(GameError.NotFoundException.class, () -> gameService.getGame(gameId));
-    }
-    
-    private static Round getRound() {
-        return new Round("1", new Prompt("WALTER!", 1), ROUND_DURATION, 1);
     }
     
     @Test

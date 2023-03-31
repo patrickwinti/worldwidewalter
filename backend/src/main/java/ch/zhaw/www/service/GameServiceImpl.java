@@ -63,8 +63,8 @@ class GameServiceImpl implements GameService {
                 case NO_VALID_ROUND -> {
                     game.addRound(new Round(generateId(),
                             game.consumePrompt(),
-                            gameProperties.getPropositionSubmissionDuration().getSeconds(),
-                            gameProperties.getRoundEnterLimitDuration().getSeconds()));
+                            gameProperties.getPropositionSubmissionDuration(),
+                            gameProperties.getRoundEnterLimitDuration()));
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
                     game.markPlayerAsActive(player);
                 }

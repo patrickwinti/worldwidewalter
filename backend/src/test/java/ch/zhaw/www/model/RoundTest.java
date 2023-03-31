@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoundTest {
     private static final String ID = "ROUND_ID";
     private static final Prompt PROMPT = new Prompt("WALTER", 1);
-    private static final int PROPOSITION_DURATION = 40;
-    private static final int PROPOSITION_ENTER_LIMIT = 10;
+    private static final Duration PROPOSITION_DURATION = Duration.ofMinutes(40);
+    private static final Duration PROPOSITION_ENTER_LIMIT = Duration.ofMinutes(10);
     private final Instant instant = Instant.parse("2022-12-22T10:00:00Z");
     private final Clock fixedClock = Clock.fixed(instant, ZoneId.of("UTC"));
     
@@ -48,7 +48,7 @@ class RoundTest {
         round.setSphinx(getSphinx());
         
         assertNotNull(round.getPropositionSubmissionEnd());
-        assertEquals(instant.plus(PROPOSITION_DURATION, ChronoUnit.MINUTES), round.getPropositionSubmissionEnd());
+        assertEquals(instant.plus(PROPOSITION_DURATION), round.getPropositionSubmissionEnd());
     }
     
     @Test
@@ -57,9 +57,9 @@ class RoundTest {
         round.setSphinx(getSphinx());
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION - PROPOSITION_ENTER_LIMIT - 1);
+        tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT).minus(1, ChronoUnit.MINUTES));
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION - PROPOSITION_ENTER_LIMIT);
+        tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT));
         assertEquals(Round.State.FINISHED, round.getState());
     }
     
@@ -70,16 +70,12 @@ class RoundTest {
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        tick(fixedClock, PROPOSITION_DURATION - 1);
+        tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
         assertEquals(Round.State.FINISHED, round.getState());
         round.getPropositions().put("1", List.of("Fish"));
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
-    }
-    
-    private void tick(Clock clock, int minutes) {
-        InstantWrapper.clock = Clock.offset(clock, Duration.of(minutes, ChronoUnit.MINUTES));
     }
     
     @Test
@@ -101,4 +97,7 @@ class RoundTest {
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
     
+    private void tick(Clock clock, Duration offset) {
+        InstantWrapper.clock = Clock.offset(clock, offset);
+    }
 }

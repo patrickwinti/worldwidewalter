@@ -1,5 +1,7 @@
 package ch.zhaw.www.model;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 public class TestHelper {
@@ -29,7 +31,11 @@ public class TestHelper {
     }
     
     public static Round getRound(int propositionDuration) {
-        return new Round(getId(), PROMPT, propositionDuration, 1);
+        return new Round(getId(), PROMPT, Duration.of(propositionDuration, ChronoUnit.MINUTES), Duration.of(1, ChronoUnit.MINUTES));
+    }
+    
+    public static Round getRound() {
+        return getRound(2);
     }
     
     public static Game getGame() {

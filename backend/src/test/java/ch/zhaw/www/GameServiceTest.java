@@ -1,9 +1,7 @@
 package ch.zhaw.www;
 
-import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.model.Round;
+import ch.zhaw.www.model.*;
+import ch.zhaw.www.repository.GameRepository;
 import ch.zhaw.www.service.GameEntityService;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
@@ -15,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -22,7 +21,9 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.UnaryOperator;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -40,6 +41,9 @@ class GameServiceTest {
     private GameService gameService;
     @MockBean
     private GameEntityService gameEntityService;
+    @MockBean
+    private UnaryOperator<Game> mockEditor;
+
 
     @Test
     void testAddGameSavesItToRepository() {
@@ -145,7 +149,7 @@ class GameServiceTest {
     @Test
     void testSubmitProposition() {
         Game game = new Game(GAME_ID);
-        Round round = new Round("randomRound", PROMPT, 3, 3);
+        Round round = getRound();
         game.addRound(round);
 
         gameService.submitProposition(round.getId(), UNKNOWN_PLAYER_ID, List.of("hello"));

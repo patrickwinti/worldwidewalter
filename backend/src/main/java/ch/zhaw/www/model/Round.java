@@ -35,6 +35,10 @@ public class Round {
         this.sphinx = sphinx;
         this.propositionSubmissionEnd = InstantWrapper.offsetNowMinutes(propositionDuration);
     }
+
+    public void addProposition(String playerId, Proposition proposition) {
+        getPropositions().put(playerId, proposition);
+    }
     
     State getState() {
         if (sphinx == null) {
@@ -47,6 +51,7 @@ public class Round {
             return State.FINISHED;
         }
     }
+
     
     int getNumberOfSelectionsSubmitted() {
         return selections.size();

@@ -5,6 +5,7 @@ import ch.zhaw.www.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.function.UnaryOperator;
+import java.util.stream.StreamSupport;
 
 @Service
 class GameEntityServiceImpl implements GameEntityService {
@@ -38,6 +39,18 @@ class GameEntityServiceImpl implements GameEntityService {
             } else {
                 throw new RuntimeException("Game already exists");
             }
+        }
+    }
+    @Override
+    public void editGameForRound(String roundId, UnaryOperator<Game> editor) throws RoundError.NotFoundException {
+        synchronized (gamesRepository) {
+            var game = StreamSupport.stream(gamesRepository.findAll().spliterator(), true)
+                    .filter(g -> {
+                        var round = g.getCurrentRound();
+                        return round != null && round.getId().equals(roundId);
+                    })
+                    .findFirst().orElseThrow(() -> new RoundError.NotFoundException(roundId));
+            gamesRepository.save(editor.apply(game));
         }
     }
 }

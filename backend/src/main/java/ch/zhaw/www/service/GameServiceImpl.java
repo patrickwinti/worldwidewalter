@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.UnaryOperator;
+import java.util.stream.StreamSupport;
 
 @Service
 class GameServiceImpl implements GameService {
@@ -79,15 +80,16 @@ class GameServiceImpl implements GameService {
             RoundError.NotFoundException, PlayerError.NotFoundException {
 
         Proposition temp = new Proposition(UUID.randomUUID().toString(), gaps);
-
-        for (Proposition proposition : getRound(roundId, playerId).getPropositions().values()) {
-            if (checkForDuplicates(proposition.getGaps(), gaps)) {
-                proposition.getDuplicates().add(temp);
-                return;
+        gameEntityService.editGameForRound(roundId, game -> {
+            for (Proposition proposition : game.getCurrentRound().getPropositions().values()) {
+                if (checkForDuplicates(proposition.getGaps(), gaps)) {
+                    proposition.getDuplicates().add(temp);
+                    return game;
+                }
             }
-        }
-
-        getRound(roundId, playerId).getPropositions().put(playerId, temp);
+            game.getCurrentRound().addProposition(playerId, temp);
+            return game;
+        });
 
     }
 
@@ -101,14 +103,9 @@ class GameServiceImpl implements GameService {
         return UUID.randomUUID().toString();
     }
 
-    private boolean checkForDuplicates(List<String> existingProposition, List<String> newProposition) {
-        return existingProposition.size() == newProposition.size() &&
-                existingProposition.stream()
-                        .map(String::toLowerCase)
-                        .toList()
-                        .equals(newProposition.stream()
-                                .map(String::toLowerCase)
-                                .collect(Collectors.toList()));
+    private boolean checkForDuplicates(List<String> existingPropositionGaps, List<String> newPropositionGaps) {
+        return existingPropositionGaps.size() == newPropositionGaps.size() &&
+                String.join("", existingPropositionGaps).equalsIgnoreCase(String.join("", newPropositionGaps));
     }
 
 }

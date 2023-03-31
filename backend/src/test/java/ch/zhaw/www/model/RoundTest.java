@@ -86,8 +86,8 @@ class RoundTest {
     @Test
     void selectionsCanBeSubmitted() {
         Round round = getRound();
-        Proposition proposition1 = new Proposition("1", Arrays.asList("Joseph"));
-        Proposition proposition2 = new Proposition("1", Arrays.asList("Joseph"));
+        Proposition proposition1 = new Proposition("1", List.of("Joseph"));
+        Proposition proposition2 = new Proposition("1", List.of("Joseph"));
 
         assertEquals(Round.State.CREATED, round.getState());
         
@@ -103,5 +103,14 @@ class RoundTest {
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
+
+    @Test
+    void addProposition() {
+        Round round = getRound();
+        Proposition proposition1 = new Proposition("1", List.of("Bruce", "Martha", "Selina"));
+        Proposition proposition2 = new Proposition("2", List.of("Barry", "Wally"));
+
+    }
+
     
 }

@@ -5,6 +5,7 @@ import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,6 +15,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+
+import java.util.function.UnaryOperator;
 
 import static ch.zhaw.www.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,10 +126,27 @@ class GameServiceTest {
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player4.getId()));
     }
     
+    @Test
+    void enterGameWithExistingPlayerOfSameName() {
+        Game game = mockGameInRepository();
+        
+        gameService.enterGame(game.getId(), "Nora");
+        gameService.enterGame(game.getId(), "Nora");
+        
+        Map<String, Player> tempWait = game.getWaitingRoom();
+        assertEquals(2, tempWait.size());
+        List<String> waitingListNames = tempWait.values().stream().map(Player::getName).sorted().toList();
+        assertEquals("Nora", waitingListNames.get(0));
+        assertEquals("Nora1360", waitingListNames.get(1));
+    }
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         
-        doNothing().when(gameEntityService).editGame(eq(game.getId()), any());
+        //noinspection unchecked
+        doAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            lambda.apply(game);
+        return null;}).when(gameEntityService).editGame(eq(game.getId()), any());
         when(gameEntityService.getGame(game.getId())).thenReturn(game);
         
         return game;
@@ -139,4 +159,5 @@ class GameServiceTest {
         doThrow(GameError.NotFoundException.class)
                 .when(gameEntityService).getGame(gameId);
     }
+
 }

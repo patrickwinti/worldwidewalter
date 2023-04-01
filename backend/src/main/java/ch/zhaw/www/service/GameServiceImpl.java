@@ -26,7 +26,7 @@ class GameServiceImpl implements GameService {
         this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
     }
-    
+
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString(),
@@ -36,24 +36,32 @@ class GameServiceImpl implements GameService {
         gameEntityService.saveNewGame(game);
         return game;
     }
-    
+
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         return gameEntityService.getGame(gameId);
     }
-    
+
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        var player = new Player(UUID.randomUUID().toString(), playerName);
-        getGame(gameId).addPlayerToWaitingRoom(player);
-        return player;
+        String uuid = UUID.randomUUID().toString();
+        gameEntityService.editGame(gameId, game -> {
+            StringBuilder name = new StringBuilder(playerName);
+            while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
+                name.append(postfixGenerator.getRandomPostfix());
+            }
+            Player tempPlayer = new Player(uuid, name.toString());
+            game.getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
+            return game;
+        });
+        return gameEntityService.getGame(gameId).getWaitingRoom().get(uuid);
     }
-    
+
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-    
+
     }
-    
+
     @Override
     public void enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGame(gameId, game -> {
@@ -82,7 +90,7 @@ class GameServiceImpl implements GameService {
             return game;
         });
     }
-    
+
     @Override
     public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
@@ -91,12 +99,11 @@ class GameServiceImpl implements GameService {
         }
         return game.getCurrentRound();
     }
-    
+
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException {
-        
     }
-    
+
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }

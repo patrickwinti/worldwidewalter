@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
-import static ch.zhaw.www.model.TestHelper.*;
+import static ch.zhaw.www.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -56,7 +56,7 @@ class GameServiceTest {
     void testGetRound_IllegalState() {
         var game = mockGameInRepository();
         
-        Round round = getRound();
+        Round round = createRound();
         game.addRound(round);
         
         Player player1 = addToWaitingRoom(game);
@@ -70,10 +70,10 @@ class GameServiceTest {
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         round.setSphinx(getRandomPlayer(game));
-        markActivePlayer(game, player1);
-        markActivePlayer(game, player2);
-        markActivePlayer(game, player3);
-        markActivePlayer(game, player4);
+        game.markPlayerAsActive(player1);
+        game.markPlayerAsActive(player2);
+        game.markPlayerAsActive(player3);
+        game.markPlayerAsActive(player4);
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, ROUND_DURATION);
@@ -84,7 +84,7 @@ class GameServiceTest {
     @Test
     void testGetRound_UnknownPlayer() {
         var game = mockGameInRepository();
-        Round round = getRound();
+        Round round = createRound();
         game.addRound(round);
         addToWaitingRoom(game);
         addToWaitingRoom(game);
@@ -105,17 +105,17 @@ class GameServiceTest {
     @Test
     void testGetRound_ValidRound() {
         var game = mockGameInRepository();
-        Round round = getRound();
+        Round round = createRound();
         game.addRound(round);
         Player player1 = addToWaitingRoom(game);
         Player player2 = addToWaitingRoom(game);
         Player player3 = addToWaitingRoom(game);
         Player player4 = addToWaitingRoom(game);
         round.setSphinx(getRandomPlayer(game));
-        markActivePlayer(game, player1);
-        markActivePlayer(game, player2);
-        markActivePlayer(game, player3);
-        markActivePlayer(game, player4);
+        game.markPlayerAsActive(player1);
+        game.markPlayerAsActive(player2);
+        game.markPlayerAsActive(player3);
+        game.markPlayerAsActive(player4);
         
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player2.getId()));
@@ -124,7 +124,7 @@ class GameServiceTest {
     }
     
     private Game mockGameInRepository() {
-        var game = getGame(GAME_ID);
+        var game = createGame(GAME_ID);
         
         doNothing().when(gameEntityService).editGame(eq(game.getId()), any());
         when(gameEntityService.getGame(game.getId())).thenReturn(game);

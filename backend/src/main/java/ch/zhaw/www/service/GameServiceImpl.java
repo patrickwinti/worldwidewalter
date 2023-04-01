@@ -44,7 +44,9 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        return new Player(playerName, "Josehf");
+        var player = new Player(UUID.randomUUID().toString(), playerName);
+        getGame(gameId).addPlayerToWaitingRoom(player);
+        return player;
     }
     
     @Override
@@ -61,7 +63,7 @@ class GameServiceImpl implements GameService {
             Game.State state = game.getState();
             switch (state) {
                 case NO_VALID_ROUND -> {
-                    game.addRound(new Round(generateId(),
+                    game.addRound(new Round(UUID.randomUUID().toString(),
                             game.consumePrompt(),
                             gameProperties.getPropositionSubmissionDuration(),
                             gameProperties.getRoundEnterLimitDuration()));
@@ -106,9 +108,5 @@ class GameServiceImpl implements GameService {
         } else {
             throw new PlayerError.NotFoundException(playerId);
         }
-    }
-    
-    private String generateId() {
-        return UUID.randomUUID().toString();
     }
 }

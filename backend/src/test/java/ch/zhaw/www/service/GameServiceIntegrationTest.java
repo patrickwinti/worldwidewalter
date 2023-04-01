@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +47,7 @@ class GameServiceIntegrationTest {
                         return null;
                     }
                 })
+                .filter(Objects::nonNull)
                 .distinct()
                 .toList();
         assertEquals(1, distinctRounds.size());

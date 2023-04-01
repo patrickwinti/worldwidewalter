@@ -33,11 +33,11 @@ public class Game {
     private final int maximumAmountOfPlayers;
     @Getter(AccessLevel.NONE)
     private final int numberOfRoundsInTurn;
-    @Getter(AccessLevel.PACKAGE)
+    @Getter(AccessLevel.NONE)
     private final List<Round> rounds = new ArrayList<>();
-    @Getter(AccessLevel.PACKAGE)
+    @Getter(AccessLevel.NONE)
     private final Map<String, Player> waitingRoom = new HashMap<>();
-    @Getter(AccessLevel.PACKAGE)
+    @Getter(AccessLevel.NONE)
     private final Map<String, Player> activePlayers = new HashMap<>();
     
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
@@ -70,6 +70,7 @@ public class Game {
      *
      * @return {@link Game.State}
      */
+    @NotNull
     public State getState() {
         var round = getCurrentRound();
         var numberOfActivePlayers = activePlayers.size();
@@ -127,7 +128,18 @@ public class Game {
      * @return is an active player or false if in waiting room or not existing
      */
     public boolean hasActivePlayer(@NotNull String playerId) {
-        return getActivePlayers().containsKey(playerId);
+        return activePlayers.containsKey(playerId);
+    }
+    
+    /**
+     * Adds player to waiting room if not already active
+     *
+     * @param player player that shall be added
+     */
+    public void addPlayerToWaitingRoom(@NotNull Player player) {
+        if (!activePlayers.containsKey(player.getId())) {
+            waitingRoom.put(player.getId(), player);
+        }
     }
     
     public enum State {

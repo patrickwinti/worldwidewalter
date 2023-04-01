@@ -1,7 +1,6 @@
 package ch.zhaw.www.controller;
 
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
@@ -26,7 +25,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static ch.zhaw.www.model.TestHelper.*;
+import static ch.zhaw.www.TestHelper.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -42,7 +41,6 @@ class GameControllerTest {
     private static final String ROUND_ID = "789";
     private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
-    private static final Prompt PROMPT = new Prompt("prompt", 0);
     
     @Autowired
     private MockMvc mvc;
@@ -111,7 +109,7 @@ class GameControllerTest {
     
     @Test
     void testCreateGame_200() throws Exception {
-        when(gameService.createGame()).then(invocationOnMock -> getGame(GAME_ID));
+        when(gameService.createGame()).then(invocationOnMock -> createGame(GAME_ID));
         mvc.perform(MockMvcRequestBuilders.post("/api/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + GAME_ID + "\"}"));
@@ -179,7 +177,7 @@ class GameControllerTest {
     
     @Test
     void testGetRound_200() throws Exception {
-        Round round = getRound();
+        Round round = createRound();
         when(gameService.getCurrentRoundInGame(any(), any())).then(o -> round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
@@ -239,9 +237,9 @@ class GameControllerTest {
     
     @Test
     void testGetRound_200_withDate() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_DURATION);
-        Round round = getRound();
-        round.setSphinx(getPlayer());
+        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
+        Round round = createRound();
+        round.setSphinx(createPlayer());
         when(gameService.getCurrentRoundInGame(any(), any())).then(o -> round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
@@ -252,8 +250,8 @@ class GameControllerTest {
     
     @Test
     void fetchResults_200() throws Exception {
-        var game = getGame();
-        Round round = getRound();
+        var game = createGame();
+        Round round = createRound();
         game.addRound(round);
         when(gameService.getGame(any())).thenReturn(game);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)
@@ -273,11 +271,11 @@ class GameControllerTest {
     
     @Test
     void getAllPropositionForRound_200() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_DURATION.plus(DEFAULT_DURATION));
-        Round round = getRound();
+        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_PROPOSITION_DURATION));
+        Round round = createRound();
         round.getPropositions().put("1", List.of("prop 1"));
         round.getPropositions().put("2", List.of("prop 2", "prop 3"));
-        round.setSphinx(getPlayer());
+        round.setSphinx(createPlayer());
         when(gameService.getRound(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))

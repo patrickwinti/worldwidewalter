@@ -53,7 +53,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
   }
 
   private allocateTimeUnits(): void {
-    this.secondsToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond) % this.SecondsInAMinute);
-    this.minutesToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond * this.minutesInAnHour) % this.SecondsInAMinute);
+    this.secondsToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond) % this.secondsInAMinute);
+    this.minutesToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond * this.minutesInAnHour) % this.secondsInAMinute);
   }
 }

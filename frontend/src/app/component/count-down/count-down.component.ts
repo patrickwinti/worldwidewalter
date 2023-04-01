@@ -26,7 +26,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
 
   private readonly milliSecondsInASecond = 1000;
-  private readonly SecondsInAMinute = 60;
+  private readonly secondsInAMinute = 60;
   private readonly minutesInAnHour = 60;
 
   constructor(private cd: ChangeDetectorRef) {

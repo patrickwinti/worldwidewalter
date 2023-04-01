@@ -57,7 +57,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
         String playerId = gameService.enterGame(gameId, playerDto.getPlayerName());
-        logger.log(Level.INFO, "entered game {0}", playerId);
+        logger.log(Level.INFO, String.format("%s entered game %s", playerId, gameId));
         return ResponseEntity.ok(new PlayerDto(playerId));
     }
     
@@ -77,7 +77,7 @@ public class GameController {
     @Operation(summary = "Retrieves the points for each player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
-            @ApiResponse(responseCode = "404", description = "Either game has not been found"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/games/{gameId}/results")
@@ -134,7 +134,7 @@ public class GameController {
     }
     //endregion
     
-    @Operation(summary = "Player requested current round round")
+    @Operation(summary = "Player requested current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),

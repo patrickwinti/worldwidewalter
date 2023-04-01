@@ -31,7 +31,7 @@ public interface GameEntityService {
      * Fetches the game for given round ID
      *
      * @param roundId round id that needs to be found
-     * @return
+     * @return game for given round
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
     Game getGameForRound(String roundId) throws RoundError.NotFoundException;

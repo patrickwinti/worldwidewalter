@@ -73,10 +73,10 @@ class GameServiceTest {
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         round.setSphinx(getRandomPlayer(game));
-        game.markPlayerAsActive(player1);
-        game.markPlayerAsActive(player2);
-        game.markPlayerAsActive(player3);
-        game.markPlayerAsActive(player4);
+        game.moveToActivePlayers(player1);
+        game.moveToActivePlayers(player2);
+        game.moveToActivePlayers(player3);
+        game.moveToActivePlayers(player4);
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, ROUND_DURATION);
@@ -115,10 +115,10 @@ class GameServiceTest {
         Player player3 = addWaitingRoomPlayer(game);
         Player player4 = addWaitingRoomPlayer(game);
         round.setSphinx(getRandomPlayer(game));
-        game.markPlayerAsActive(player1);
-        game.markPlayerAsActive(player2);
-        game.markPlayerAsActive(player3);
-        game.markPlayerAsActive(player4);
+        game.moveToActivePlayers(player1);
+        game.moveToActivePlayers(player2);
+        game.moveToActivePlayers(player3);
+        game.moveToActivePlayers(player4);
         
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player2.getId()));

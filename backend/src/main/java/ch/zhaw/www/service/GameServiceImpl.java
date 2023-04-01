@@ -78,10 +78,10 @@ class GameServiceImpl implements GameService {
                             gameProperties.getRoundEnterLimitDuration(),
                             gameProperties.getSelectionSubmissionDuration()));
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
-                    game.markPlayerAsActive(player);
+                    game.moveToActivePlayers(player);
                 }
                 case WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS -> {
-                    game.markPlayerAsActive(player);
+                    game.moveToActivePlayers(player);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
                 }
                 case WAITING_FOR_ALL_SELECTIONS -> {
@@ -112,7 +112,7 @@ class GameServiceImpl implements GameService {
     @Override
     public Round getRound(String roundId, String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException {
         var game = gameEntityService.getGameForRound(roundId);
-        if (game.getAllPlayers().anyMatch(player -> player.getId().equals(playerId))) {
+        if (game.hasPlayer(playerId)) {
             return game.getCurrentRound();
         } else {
             throw new PlayerError.NotFoundException(playerId);

@@ -32,10 +32,10 @@ class GameTest {
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         var player4 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        game.markPlayerAsActive(player1);
-        game.markPlayerAsActive(player2);
-        game.markPlayerAsActive(player3);
-        game.markPlayerAsActive(player4);
+        game.moveToActivePlayers(player1);
+        game.moveToActivePlayers(player2);
+        game.moveToActivePlayers(player3);
+        game.moveToActivePlayers(player4);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         Round round = createRound();
@@ -60,7 +60,7 @@ class GameTest {
         addRoundOpenForPropositionSubmission(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
-        game.getAllPlayers().forEach(game::markPlayerAsActive);
+        game.getAllPlayers().forEach(game::moveToActivePlayers);
         assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
     
@@ -120,7 +120,7 @@ class GameTest {
         var game = createGame();
         
         var unknonwPlayer = createPlayer();
-        assertThrows(PlayerError.NotFoundException.class, () -> game.markPlayerAsActive(unknonwPlayer));
+        assertThrows(PlayerError.NotFoundException.class, () -> game.moveToActivePlayers(unknonwPlayer));
         assertFalse(game.hasActivePlayer(unknonwPlayer.getId()));
     }
     
@@ -129,10 +129,10 @@ class GameTest {
         var game = createGame();
         var player = createPlayer();
         game.addPlayerToWaitingRoom(player);
-        game.markPlayerAsActive(player);
+        game.moveToActivePlayers(player);
         
         assertTrue(game.hasActivePlayer(player.getId()));
-        game.markPlayerAsActive(player);
+        game.moveToActivePlayers(player);
         assertTrue(game.hasActivePlayer(player.getId()));
     }
     
@@ -142,12 +142,12 @@ class GameTest {
         for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++) {
             final Player player = createPlayer();
             game.addPlayerToWaitingRoom(player);
-            game.markPlayerAsActive(player);
+            game.moveToActivePlayers(player);
         }
         var onPlayerTooMuch = createPlayer();
         game.addPlayerToWaitingRoom(onPlayerTooMuch);
         
-        assertThrows(GameError.FullCapacityException.class, () -> game.markPlayerAsActive(onPlayerTooMuch));
+        assertThrows(GameError.FullCapacityException.class, () -> game.moveToActivePlayers(onPlayerTooMuch));
         assertFalse(game.hasActivePlayer(onPlayerTooMuch.getId()));
     }
     
@@ -159,7 +159,7 @@ class GameTest {
         game.addPlayerToWaitingRoom(player);
         
         assertFalse(game.hasActivePlayer(player.getId()));
-        game.markPlayerAsActive(player);
+        game.moveToActivePlayers(player);
         assertTrue(game.hasActivePlayer(player.getId()));
     }
     

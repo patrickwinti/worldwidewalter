@@ -40,7 +40,7 @@ public class TestHelper {
     public static void addActivePlayer(Game game) {
         Player player = createPlayer();
         game.addPlayerToWaitingRoom(player);
-        game.markPlayerAsActive(player);
+        game.moveToActivePlayers(player);
     }
     
     public static Round createRound(Duration duration) {

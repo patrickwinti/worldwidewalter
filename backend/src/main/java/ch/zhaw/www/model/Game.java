@@ -108,7 +108,7 @@ public class Game {
      * @param player player that will be marked as active
      * @throws GameError.FullCapacityException if more than maximum players reached
      */
-    public void markPlayerAsActive(Player player) throws GameError.FullCapacityException {
+    public void moveToActivePlayers(Player player) throws GameError.FullCapacityException {
         if (activePlayers.size() < maximumAmountOfPlayers) {
             if (getAllPlayers().noneMatch(p -> p.equals(player))) {
                 throw new PlayerError.NotFoundException(id);
@@ -131,12 +131,22 @@ public class Game {
     }
     
     /**
+     * Checks if player ID is currently a player
+     *
+     * @param playerId player identifier
+     * @return is a player either in waiting room or is active
+     */
+    public boolean hasPlayer(@NotNull String playerId) {
+        return getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
+    }
+    
+    /**
      * Adds player to waiting room if not already active
      *
      * @param player player that shall be added
      */
     public void addPlayerToWaitingRoom(@NotNull Player player) {
-        if (!activePlayers.containsKey(player.getId())) {
+        if (!hasActivePlayer(player.getId())) {
             waitingRoom.put(player.getId(), player);
         }
     }

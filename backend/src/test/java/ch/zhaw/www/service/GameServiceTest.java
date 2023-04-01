@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -55,7 +56,7 @@ class GameServiceTest {
     }
     
     @Test
-    void testGetRound_IllegalState() {
+    void testGetCurrentRound_IllegalState() {
         var game = mockGameInRepository();
         
         Round round = createRound();
@@ -84,7 +85,7 @@ class GameServiceTest {
     }
     
     @Test
-    void testGetRound_UnknownPlayer() {
+    void testGetCurrentRound_UnknownPlayer() {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
@@ -98,14 +99,14 @@ class GameServiceTest {
     }
     
     @Test
-    void testGetRound_GameNotFound() {
+    void testGetCurrentRound_GameNotFound() {
         mockGameNotFoundInRepository(GAME_ID);
         
         assertThrows(GameError.NotFoundException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
-    void testGetRound_ValidRound() {
+    void testGetCurrentRound_ValidRound() {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
@@ -123,6 +124,101 @@ class GameServiceTest {
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player2.getId()));
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player3.getId()));
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player4.getId()));
+    }
+    
+    @Test
+    void testEnterGame_GameNotFound() {
+        mockGameNotFoundInRepository(GAME_ID);
+        
+        assertThrows(GameError.NotFoundException.class, () -> gameService.enterRound(GAME_ID, UNKNOWN_PLAYER_ID));
+    }
+    
+    @Test
+    void testEnterGame_PlayerNotFound() {
+        var game = mockGameInRepository();
+        game.addPlayerToWaitingRoom(createPlayer());
+        game.addPlayerToWaitingRoom(createPlayer());
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.enterRound(GAME_ID, UNKNOWN_PLAYER_ID));
+    }
+    
+    @Test
+    void testEnterGame_NoValidRound() {
+        var game = mockGameInRepository();
+        game.addPlayerToWaitingRoom(createPlayer());
+        final Player playerEnteringRound = createPlayer();
+        game.addPlayerToWaitingRoom(playerEnteringRound);
+        
+        assertFalse(game.hasActivePlayer(playerEnteringRound.getId()));
+        assertNull(game.getCurrentRound());
+        gameService.enterRound(GAME_ID, playerEnteringRound.getId());
+        assertNotNull(game.getCurrentRound());
+        assertTrue(game.hasActivePlayer(playerEnteringRound.getId()));
+    }
+    
+    @Test
+    void testEnterGame_WaitingForPlayers() {
+        var game = mockGameInRepository();
+        final Player player1 = createPlayer();
+        game.addPlayerToWaitingRoom(player1);
+        final Player player2 = createPlayer();
+        game.addPlayerToWaitingRoom(player2);
+        
+        gameService.enterRound(GAME_ID, player1.getId());
+        Objects.requireNonNull(game.getCurrentRound()).setSphinx(player1);
+        
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        
+        assertFalse(game.hasActivePlayer(player2.getId()));
+        gameService.enterRound(GAME_ID, player2.getId());
+        assertTrue(game.hasActivePlayer(player2.getId()));
+    }
+    
+    @Test
+    void testEnterGame_WaitingForPropositions() {
+        var game = mockGameInRepository();
+        Player sphinx = createPlayer();
+        Player player = createPlayer();
+        Player otherPlayer = createPlayer();
+        Player anotherPlayer = createPlayer();
+        Player playerEnteringLater = createPlayer();
+        List.of(sphinx, player, otherPlayer, anotherPlayer).forEach(p -> {
+            game.addPlayerToWaitingRoom(p);
+            gameService.enterRound(GAME_ID, p.getId());
+        });
+        game.addPlayerToWaitingRoom(playerEnteringLater);
+        Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
+        
+        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
+        
+        assertFalse(game.hasActivePlayer(playerEnteringLater.getId()));
+        gameService.enterRound(GAME_ID, playerEnteringLater.getId());
+        assertTrue(game.hasActivePlayer(playerEnteringLater.getId()));
+    }
+    
+    @Test
+    void testEnterGame_WaitingForSelections() {
+        var game = mockGameInRepository();
+        Player sphinx = createPlayer();
+        Player player = createPlayer();
+        Player otherPlayer = createPlayer();
+        Player anotherPlayer = createPlayer();
+        Player cannotEnterCurrentlyPlayer = createPlayer();
+        var playersInCurrentRound = List.of(sphinx, player, otherPlayer, anotherPlayer);
+        playersInCurrentRound.forEach(p -> {
+            game.addPlayerToWaitingRoom(p);
+            gameService.enterRound(GAME_ID, p.getId());
+        });
+        
+        //make round ready for selections
+        Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
+        playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(p.getId(), List.of("Cereal")));
+        
+        assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
+        
+        game.addPlayerToWaitingRoom(cannotEnterCurrentlyPlayer);
+        assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));
+        gameService.enterRound(GAME_ID, cannotEnterCurrentlyPlayer.getId());
+        assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));
     }
     
     @Test

@@ -31,6 +31,7 @@ public class TestHelper {
         return new Player(getId(), "Chris");
     }
     
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static Player getRandomPlayer(Game game) {
         return game.getAllPlayers().findFirst().get();
     }

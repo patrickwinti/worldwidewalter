@@ -2,7 +2,6 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
 import ch.zhaw.www.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -57,9 +56,9 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
-        logger.log(Level.INFO, "entered game {0}", player);
-        return ResponseEntity.ok(new PlayerDto(player.getId()));
+        String playerId = gameService.enterGame(gameId, playerDto.getPlayerName());
+        logger.log(Level.INFO, "entered game {0}", playerId);
+        return ResponseEntity.ok(new PlayerDto(playerId));
     }
     
     @Operation(summary = "Player leaves game gracefully")

@@ -70,13 +70,13 @@ class GameTest {
         addRoundOpenForPropositionSubmission(game);
         var round = game.getCurrentRound();
         assertNotNull(round);
-        game.getAllPlayers().forEach(player -> round.getPropositions().put(player.getId(), List.of("Walter " + player.getId())));
+        game.getAllPlayers().forEach(player -> round.addProposition(player.getId(), List.of("Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
-        game.getCurrentRound().getPropositions().put(player.getId(), List.of("Walter " + player.getId()));
+        game.getCurrentRound().addProposition(player.getId(), List.of("Walter " + player.getId()));
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
     }

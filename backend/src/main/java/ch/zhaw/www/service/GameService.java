@@ -1,7 +1,6 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
 
@@ -32,11 +31,11 @@ public interface GameService {
      *
      * @param gameId     game requested to enter
      * @param playerName desired player name to register to game
-     * @return new player
+     * @return new player identifier
      * @throws GameError.NotFoundException     if game is not found
      * @throws GameError.FullCapacityException if game has no available seats
      */
-    Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
+    String enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
     
     /**
      * Request to leave a game

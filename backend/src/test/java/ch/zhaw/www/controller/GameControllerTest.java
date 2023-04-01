@@ -1,6 +1,5 @@
 package ch.zhaw.www.controller;
 
-import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
@@ -56,7 +55,7 @@ class GameControllerTest {
     
     @Test
     void testEnterGame_200() throws Exception {
-        when(gameService.enterGame(any(), any())).then(m -> new Player(PLAYER_ID, "Ulisses"));
+        when(gameService.enterGame(any(), any())).then(m -> PLAYER_ID);
         
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/players", GAME_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -249,7 +248,7 @@ class GameControllerTest {
     }
     
     @Test
-    void fetchResults_200() throws Exception {
+    void testFetchResults_200() throws Exception {
         var game = createGame();
         Round round = createRound();
         game.addRound(round);
@@ -261,7 +260,7 @@ class GameControllerTest {
     }
     
     @Test
-    void fetchResults_404_game() throws Exception {
+    void testFetchResults_404_game() throws Exception {
         doThrow(new GameError.NotFoundException(ROUND_ID)).when(gameService).getGame(any());
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
@@ -270,7 +269,7 @@ class GameControllerTest {
     }
     
     @Test
-    void getAllPropositionForRound_200() throws Exception {
+    void testGetAllPropositionForRound_200() throws Exception {
         String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
         var round = createRound();
         round.setSphinx(createPlayer());
@@ -285,7 +284,7 @@ class GameControllerTest {
     }
     
     @Test
-    void getAllPropositionForRound_404_round() throws Exception {
+    void testGetAllPropositionForRound_404_round() throws Exception {
         doThrow(new RoundError.NotFoundException(ROUND_ID)).when(gameService).getRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
@@ -294,7 +293,7 @@ class GameControllerTest {
     }
     
     @Test
-    void getAllPropositionForRound_404_player() throws Exception {
+    void testGetAllPropositionForRound_404_player() throws Exception {
         doThrow(new PlayerError.NotFoundException(ROUND_ID)).when(gameService).getRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))

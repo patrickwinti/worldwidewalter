@@ -66,7 +66,7 @@ class RoundTest {
         tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
         assertEquals(Round.State.FINISHED, round.getState());
-        round.getPropositions().put("1", List.of("Fish"));
+        round.addProposition("1", List.of("Fish"));
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
@@ -80,12 +80,12 @@ class RoundTest {
         round.setSphinx(createPlayer());
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        round.getPropositions().put("1", List.of("Joseph"));
+        round.addProposition("1", List.of("Joseph"));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
         
-        round.getPropositions().put("2", List.of("Maria"));
+        round.addProposition("2", List.of("Maria"));
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }

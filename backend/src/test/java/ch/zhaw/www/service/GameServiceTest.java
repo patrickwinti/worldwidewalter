@@ -5,7 +5,6 @@ import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -15,7 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -133,20 +132,22 @@ class GameServiceTest {
         gameService.enterGame(game.getId(), "Nora");
         gameService.enterGame(game.getId(), "Nora");
         
-        Map<String, Player> tempWait = game.getWaitingRoom();
-        assertEquals(2, tempWait.size());
-        List<String> waitingListNames = tempWait.values().stream().map(Player::getName).sorted().toList();
+        var allPlayersInGame = game.getAllPlayers().count();
+        assertEquals(2, allPlayersInGame);
+        List<String> waitingListNames = game.getAllPlayers().map(Player::getName).sorted().toList();
         assertEquals("Nora", waitingListNames.get(0));
         assertEquals("Nora1360", waitingListNames.get(1));
     }
+    
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         
-        //noinspection unchecked
         doAnswer(invocationOnMock -> {
             var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            //noinspection unchecked
             lambda.apply(game);
-        return null;}).when(gameEntityService).editGame(eq(game.getId()), any());
+            return null;
+        }).when(gameEntityService).editGame(eq(game.getId()), any());
         when(gameEntityService.getGame(game.getId())).thenReturn(game);
         
         return game;
@@ -159,5 +160,5 @@ class GameServiceTest {
         doThrow(GameError.NotFoundException.class)
                 .when(gameEntityService).getGame(gameId);
     }
-
+    
 }

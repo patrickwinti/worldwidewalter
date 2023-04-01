@@ -21,12 +21,13 @@ class GameServiceImpl implements GameService {
     
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
+    private final PostfixGenerator postfixGenerator = new PostfixGenerator();
     
     GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
         this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
     }
-
+    
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString(),
@@ -36,14 +37,14 @@ class GameServiceImpl implements GameService {
         gameEntityService.saveNewGame(game);
         return game;
     }
-
+    
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         return gameEntityService.getGame(gameId);
     }
-
+    
     @Override
-    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+    public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
         gameEntityService.editGame(gameId, game -> {
             StringBuilder name = new StringBuilder(playerName);
@@ -51,17 +52,17 @@ class GameServiceImpl implements GameService {
                 name.append(postfixGenerator.getRandomPostfix());
             }
             Player tempPlayer = new Player(uuid, name.toString());
-            game.getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
+            game.addPlayerToWaitingRoom(tempPlayer);
             return game;
         });
-        return gameEntityService.getGame(gameId).getWaitingRoom().get(uuid);
+        return uuid;
     }
-
+    
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-
+    
     }
-
+    
     @Override
     public void enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGame(gameId, game -> {
@@ -90,7 +91,7 @@ class GameServiceImpl implements GameService {
             return game;
         });
     }
-
+    
     @Override
     public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
@@ -99,11 +100,11 @@ class GameServiceImpl implements GameService {
         }
         return game.getCurrentRound();
     }
-
+    
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException {
     }
-
+    
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }

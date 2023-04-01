@@ -14,6 +14,8 @@ public class TestHelper {
     public static final Duration DEFAULT_PROPOSITION_DURATION = Duration.of(5, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_PROPOSITION_END_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
+    public static final int MIN_NUMBER_OF_PLAYERS = 4;
+    public static final int MAX_NUMBER_OF_PLAYERS = 15;
     
     public static Player addWaitingRoomPlayer(Game game) {
         Player player = createPlayer();
@@ -50,11 +52,11 @@ public class TestHelper {
     }
     
     public static Game createGame() {
-        return new Game(getId(), 4, 12, 1);
+        return createGame(UUID.randomUUID().toString());
     }
     
     public static Game createGame(String id) {
-        return new Game(id, 4, 12, 1);
+        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1);
     }
     
     private static String getId() {

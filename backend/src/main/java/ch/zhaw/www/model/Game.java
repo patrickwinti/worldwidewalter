@@ -1,6 +1,7 @@
 package ch.zhaw.www.model;
 
 import ch.zhaw.www.service.GameError;
+import ch.zhaw.www.service.PlayerError;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -86,7 +87,7 @@ public class Game {
     }
     
     public Prompt consumePrompt() {
-        //return prompts.remove(0) ;
+        // uncomment when deck is implemented: return prompts.remove(0) ;
         return prompts.get(0);
     }
     
@@ -108,10 +109,13 @@ public class Game {
      * @throws GameError.FullCapacityException if more than maximum players reached
      */
     public void markPlayerAsActive(Player player) throws GameError.FullCapacityException {
-        if (activePlayers.size() <= maximumAmountOfPlayers && waitingRoom.containsKey(player.getId())) {
+        if (activePlayers.size() < maximumAmountOfPlayers) {
+            if (getAllPlayers().noneMatch(p -> p.equals(player))) {
+                throw new PlayerError.NotFoundException(id);
+            }
             waitingRoom.remove(player.getId());
             activePlayers.put(player.getId(), player);
-        } else if (!activePlayers.containsKey(player.getId())) {
+        } else {
             throw new GameError.FullCapacityException();
         }
     }

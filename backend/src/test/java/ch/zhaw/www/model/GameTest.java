@@ -1,5 +1,7 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.GameError;
+import ch.zhaw.www.service.PlayerError;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +19,7 @@ class GameTest {
     
     @Test
     void testGameState_WaitingForPlayers() {
-        Game game = createGame();
+        var game = createGame();
         assertEquals(Game.State.NO_VALID_ROUND, game.getState());
         
         game.addRound(createRound());
@@ -46,7 +48,7 @@ class GameTest {
     
     @Test
     void testGameState_WaitingForPropositions() {
-        Game game = createGame();
+        var game = createGame();
         game.addRound(createRound());
         
         int numberOfPlayersToAdd = 10;
@@ -64,7 +66,7 @@ class GameTest {
     
     @Test
     void testGameState_WaitingForSelections() {
-        Game game = createGame();
+        var game = createGame();
         int numberOfPlayersToAdd = 10;
         for (int i = 0; i < numberOfPlayersToAdd; i++) {
             addActivePlayer(game);
@@ -87,7 +89,7 @@ class GameTest {
     
     @Test
     void testRunningRound() {
-        Game game = createGame();
+        var game = createGame();
         assertNull(game.getCurrentRound());
         
         Round round = mock(Round.class);
@@ -107,10 +109,58 @@ class GameTest {
     
     @Test
     void testNewRound() {
-        Game game = createGame();
+        var game = createGame();
         assertNull(game.getCurrentRound());
         game.addRound(createRound());
         assertNotNull(game.getCurrentRound());
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_NotFound() {
+        var game = createGame();
+        
+        var unknonwPlayer = createPlayer();
+        assertThrows(PlayerError.NotFoundException.class, () -> game.markPlayerAsActive(unknonwPlayer));
+        assertFalse(game.hasActivePlayer(unknonwPlayer.getId()));
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_AlreadyInActive() {
+        var game = createGame();
+        var player = createPlayer();
+        game.addPlayerToWaitingRoom(player);
+        game.markPlayerAsActive(player);
+        
+        assertTrue(game.hasActivePlayer(player.getId()));
+        game.markPlayerAsActive(player);
+        assertTrue(game.hasActivePlayer(player.getId()));
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_TooMayActivePlayers() {
+        var game = createGame();
+        for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++) {
+            final Player player = createPlayer();
+            game.addPlayerToWaitingRoom(player);
+            game.markPlayerAsActive(player);
+        }
+        var onPlayerTooMuch = createPlayer();
+        game.addPlayerToWaitingRoom(onPlayerTooMuch);
+        
+        assertThrows(GameError.FullCapacityException.class, () -> game.markPlayerAsActive(onPlayerTooMuch));
+        assertFalse(game.hasActivePlayer(onPlayerTooMuch.getId()));
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_InWaitingRoom() {
+        var game = createGame();
+        game.addPlayerToWaitingRoom(createPlayer());
+        var player = createPlayer();
+        game.addPlayerToWaitingRoom(player);
+        
+        assertFalse(game.hasActivePlayer(player.getId()));
+        game.markPlayerAsActive(player);
+        assertTrue(game.hasActivePlayer(player.getId()));
     }
     
 }

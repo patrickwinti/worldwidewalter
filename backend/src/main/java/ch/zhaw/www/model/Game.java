@@ -3,10 +3,10 @@ package ch.zhaw.www.model;
 import ch.zhaw.www.service.GameError;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
@@ -17,27 +17,23 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Model class with all the current states of a game.
+ * Class containing all the information related to a game.
+ * It controls players in game, running rounds and prompts from the deck
  */
-@Getter
+@ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 @KeySpace("running_games")
 public class Game {
     @Id
+    @Getter
     @NotNull
     private final String id;
-    @Getter(AccessLevel.NONE)
     private final int minimumAmountOfPlayers;
-    @Getter(AccessLevel.NONE)
     private final int maximumAmountOfPlayers;
-    @Getter(AccessLevel.NONE)
     private final int numberOfRoundsInTurn;
-    @Getter(AccessLevel.NONE)
     private final List<Round> rounds = new ArrayList<>();
-    @Getter(AccessLevel.NONE)
     private final Map<String, Player> waitingRoom = new HashMap<>();
-    @Getter(AccessLevel.NONE)
     private final Map<String, Player> activePlayers = new HashMap<>();
     
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));

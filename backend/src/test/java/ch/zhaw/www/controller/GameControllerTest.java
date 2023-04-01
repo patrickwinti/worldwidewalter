@@ -271,11 +271,11 @@ class GameControllerTest {
     
     @Test
     void getAllPropositionForRound_200() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_PROPOSITION_DURATION));
-        Round round = createRound();
-        round.getPropositions().put("1", List.of("prop 1"));
-        round.getPropositions().put("2", List.of("prop 2", "prop 3"));
+        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
+        var round = createRound();
         round.setSphinx(createPlayer());
+        round.addProposition("1", List.of("prop 1"));
+        round.addProposition("2", List.of("prop 2", "prop 3"));
         when(gameService.getRound(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))

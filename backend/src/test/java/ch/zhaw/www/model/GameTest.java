@@ -22,16 +22,18 @@ class GameTest {
         
         game.addRound(createRound());
         
-        addToWaitingRoom(game);
+        var player1 = addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        addToWaitingRoom(game);
+        var player2 = addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        addToWaitingRoom(game);
+        var player3 = addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        addToWaitingRoom(game);
+        var player4 = addToWaitingRoom(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        
-        game.getActivePlayers().putAll(game.getWaitingRoom());
+        game.markPlayerAsActive(player1);
+        game.markPlayerAsActive(player2);
+        game.markPlayerAsActive(player3);
+        game.markPlayerAsActive(player4);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         Round round = createRound();
@@ -68,12 +70,12 @@ class GameTest {
         addRoundOpenForPropositionSubmission(game);
         var round = game.getCurrentRound();
         assertNotNull(round);
-        game.getActivePlayers().forEach((s, player) -> round.getPropositions().put(s, List.of("Walter " + player.getId())));
+        game.getAllPlayers().forEach(player -> round.getPropositions().put(player.getId(), List.of("Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
-        var player = game.getActivePlayers().values().stream().findAny().get();
+        var player = getRandomPlayer(game);
         game.getCurrentRound().getPropositions().put(player.getId(), List.of("Walter " + player.getId()));
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
@@ -102,9 +104,9 @@ class GameTest {
     @Test
     void testNewRound() {
         Game game = createGame();
-        assertEquals(0, game.getRounds().size());
+        assertNull(game.getCurrentRound());
         game.addRound(createRound());
-        assertEquals(1, game.getRounds().size());
+        assertNotNull(game.getCurrentRound());
     }
     
 }

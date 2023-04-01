@@ -66,7 +66,8 @@ class GameServiceImpl implements GameService {
                     game.addRound(new Round(UUID.randomUUID().toString(),
                             game.consumePrompt(),
                             gameProperties.getPropositionSubmissionDuration(),
-                            gameProperties.getRoundEnterLimitDuration()));
+                            gameProperties.getRoundEnterLimitDuration(),
+                            gameProperties.getSelectionSubmissionDuration()));
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
                     game.markPlayerAsActive(player);
                 }

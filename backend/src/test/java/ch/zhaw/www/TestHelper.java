@@ -13,6 +13,7 @@ public class TestHelper {
     private static final Prompt PROMPT = new Prompt("I am WALTER", 1);
     public static final Duration DEFAULT_PROPOSITION_DURATION = Duration.of(5, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_PROPOSITION_END_DURATION = Duration.of(1, ChronoUnit.MINUTES);
+    public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     
     public static Player addToWaitingRoom(Game game) {
         Player player = createPlayer();
@@ -41,7 +42,7 @@ public class TestHelper {
     }
     
     public static Round createRound(Duration duration) {
-        return new Round(getId(), PROMPT, duration, DEFAULT_PROPOSITION_END_DURATION);
+        return new Round(getId(), PROMPT, duration, DEFAULT_PROPOSITION_END_DURATION, DEFAULT_SUBMISSION_DURATION);
     }
     
     public static Round createRound() {

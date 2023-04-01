@@ -1,12 +1,10 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.RoundError;
 import ch.zhaw.www.utils.InstantWrapper;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,7 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Model class with round information
  */
-@Data
+@Getter
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
 public class Round {
     @NotNull
     private final String id;
@@ -28,24 +29,50 @@ public class Round {
     private final Duration propositionDuration;
     @Getter(AccessLevel.NONE)
     private final Duration enterLimitDuration;
+    @Getter(AccessLevel.NONE)
+    private final Duration selectionDuration;
     
     private final Map<String, List<String>> propositions = new ConcurrentHashMap<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     
     @Nullable
     private Player sphinx;
-    @Setter(AccessLevel.NONE)
     @Nullable
     private Instant propositionSubmissionEnd;
-    @Setter(AccessLevel.NONE)
     @Nullable
     private Instant selectionSubmissionEnd;
     
     public void setSphinx(Player sphinx) {
         this.sphinx = sphinx;
         this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
-        //TODO: Change for more reasonable time
-        this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(propositionDuration));
+    }
+    
+    /**
+     * Adds player selection for proposition
+     *
+     * @param playerId      player selecting a proposition. cannot be the sphinx
+     * @param propositionId proposition being selected
+     */
+    public void addSelection(String playerId, String propositionId) {
+        if (sphinx != null && !sphinx.getId().equals(playerId)) {
+            selections.put(playerId, propositionId);
+        }
+    }
+    
+    /**
+     * Adds player proposition for prompt
+     *
+     * @param playerId    player adding their proposition
+     * @param proposition as many propositions as gaps in the prompt
+     */
+    public void addProposition(String playerId, List<String> proposition) {
+        if (sphinx == null) {
+            throw new RoundError.IllegalStateException();
+        }
+        propositions.put(playerId, proposition);
+        if (selectionSubmissionEnd == null && propositionSubmissionEnd != null) {
+            this.selectionSubmissionEnd = propositionSubmissionEnd.plus(selectionDuration);
+        }
     }
     
     State getState() {
@@ -53,7 +80,7 @@ public class Round {
             return State.CREATED;
         } else if (canEnterRound()) {
             return State.OPEN_FOR_SUBMISSIONS;
-        } else if (!propositions.isEmpty()) {
+        } else if (canSendSelections()) {
             return State.OPEN_FOR_SELECTIONS;
         } else {
             return State.FINISHED;
@@ -62,6 +89,10 @@ public class Round {
     
     private boolean canEnterRound() {
         return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+    }
+    
+    private boolean canSendSelections() {
+        return selectionSubmissionEnd != null && InstantWrapper.isAfterNow(selectionSubmissionEnd);
     }
     
     int getNumberOfSelectionsSubmitted() {

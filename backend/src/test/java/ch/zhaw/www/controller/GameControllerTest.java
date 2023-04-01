@@ -55,7 +55,7 @@ class GameControllerTest {
     
     @Test
     void testEnterGame_200() throws Exception {
-        when(gameService.enterGame(any(), any())).then(m -> PLAYER_ID);
+        when(gameService.enterGame(any(), any())).thenReturn(PLAYER_ID);
         
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/players", GAME_ID)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +108,7 @@ class GameControllerTest {
     
     @Test
     void testCreateGame_200() throws Exception {
-        when(gameService.createGame()).then(invocationOnMock -> createGame(GAME_ID));
+        when(gameService.createGame()).thenReturn(createGame(GAME_ID));
         mvc.perform(MockMvcRequestBuilders.post("/api/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + GAME_ID + "\"}"));
@@ -177,7 +177,7 @@ class GameControllerTest {
     @Test
     void testGetRound_200() throws Exception {
         Round round = createRound();
-        when(gameService.getCurrentRoundInGame(any(), any())).then(o -> round);
+        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
@@ -239,7 +239,7 @@ class GameControllerTest {
         String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
         Round round = createRound();
         round.setSphinx(createPlayer());
-        when(gameService.getCurrentRoundInGame(any(), any())).then(o -> round);
+        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())

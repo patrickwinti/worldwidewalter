@@ -63,8 +63,8 @@ class GameEntityServiceImpl implements GameEntityService {
     
     private Game findGameForRound(String roundId) {
         return StreamSupport.stream(gamesRepository.findAll().spliterator(), true)
-                .filter(g -> {
-                    var round = g.getCurrentRound();
+                .filter(game -> {
+                    var round = game.getCurrentRound();
                     return round != null && round.getId().equals(roundId);
                 })
                 .findFirst().orElseThrow(() -> new RoundError.NotFoundException(roundId));

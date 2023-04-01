@@ -12,5 +12,6 @@ import lombok.Data;
 @Data
 public class Player {
     @NotNull
-    String id;
+    private String id;
+    private String name;
 }

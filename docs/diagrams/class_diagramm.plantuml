@@ -16,9 +16,12 @@ package backend{
     }
     class GameDto {
         -id: String
+        -state: State
     }
     class Game {
         id: String
+        waitingRoom: Map<Player>
+        activePlayers: Map<Player>
         getState(): Game.State
     }
     class Prompt{
@@ -60,6 +63,9 @@ package backend{
         -propositions: Map<Proposition>
         -selections: Map<Selection>
         +getState(): Round.State
+    }
+    class PostfixGenerator {
+        -postFixes: Random
     }
     exception GameError {
         FullCapacityException

@@ -28,6 +28,24 @@ public interface GameEntityService {
     void editGame(@NotNull String gameId, UnaryOperator<Game> editor) throws GameError.NotFoundException;
     
     /**
+     * Fetches the game for given round ID
+     *
+     * @param roundId round id that needs to be found
+     * @return
+     * @throws RoundError.NotFoundException if no round is found matching the ID
+     */
+    Game getGameForRound(String roundId) throws RoundError.NotFoundException;
+    
+    /**
+     * Fetches the game for given round ID
+     *
+     * @param roundId round id that needs to be found
+     * @param editor  for changes in game
+     * @throws RoundError.NotFoundException if no round is found matching the ID
+     */
+    void editGameForRound(String roundId, UnaryOperator<Game> editor) throws RoundError.NotFoundException;
+    
+    /**
      * Saves a new game. If game is already saved it will throw an exception.
      *
      * @param game to be saved

@@ -3,7 +3,6 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -101,16 +100,12 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Round getRound(String roundId, String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException {
-        //TODO return proper round
-        var round = new Round(roundId,
-                new Prompt("Test", 1),
-                gameProperties.getPropositionSubmissionDuration(),
-                gameProperties.getRoundEnterLimitDuration());
-        round.getPropositions().put("1", List.of("Walter 1"));
-        round.getPropositions().put("2", List.of("Walter 2"));
-        round.getPropositions().put("3", List.of("Walter 3"));
-        round.getPropositions().put("4", List.of("Walter 4"));
-        return round;
+        var game = gameEntityService.getGameForRound(roundId);
+        if (game.getAllPlayers().anyMatch(player -> player.getId().equals(playerId))) {
+            return game.getCurrentRound();
+        } else {
+            throw new PlayerError.NotFoundException(playerId);
+        }
     }
     
     private String generateId() {

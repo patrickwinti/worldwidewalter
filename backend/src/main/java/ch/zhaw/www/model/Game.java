@@ -75,6 +75,7 @@ public class Game {
         } else if (numberOfActivePlayers < minimumAmountOfPlayers || round.getState() == Round.State.CREATED) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
+                round.canEnterRound() &&
                 round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
         } else if ((round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||

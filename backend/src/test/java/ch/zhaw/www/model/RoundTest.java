@@ -52,8 +52,10 @@ class RoundTest {
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT).minus(1, ChronoUnit.MINUTES));
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.canEnterRound());
         tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT));
-        assertEquals(Round.State.FINISHED, round.getState());
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertFalse(round.canEnterRound());
     }
     
     @Test
@@ -65,9 +67,11 @@ class RoundTest {
         
         tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
-        assertEquals(Round.State.FINISHED, round.getState());
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         round.addProposition("1", List.of("Fish"));
         
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        tick(fixedClock, PROPOSITION_DURATION);
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
     

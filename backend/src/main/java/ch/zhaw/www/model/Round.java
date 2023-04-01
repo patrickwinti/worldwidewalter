@@ -43,8 +43,11 @@ public class Round {
     private Instant selectionSubmissionEnd;
     
     public void setSphinx(Player sphinx) {
-        this.sphinx = sphinx;
-        this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
+        if (this.sphinx == null) {
+            this.sphinx = sphinx;
+            this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
+            this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(selectionDuration));
+        }
     }
     
     /**
@@ -70,15 +73,16 @@ public class Round {
             throw new RoundError.IllegalStateException();
         }
         propositions.put(playerId, proposition);
-        if (selectionSubmissionEnd == null && propositionSubmissionEnd != null) {
-            this.selectionSubmissionEnd = propositionSubmissionEnd.plus(selectionDuration);
-        }
+    }
+    
+    public boolean canEnterRound() {
+        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
     }
     
     State getState() {
         if (sphinx == null) {
             return State.CREATED;
-        } else if (canEnterRound()) {
+        } else if (canSendPropositions()) {
             return State.OPEN_FOR_SUBMISSIONS;
         } else if (canSendSelections()) {
             return State.OPEN_FOR_SELECTIONS;
@@ -87,8 +91,8 @@ public class Round {
         }
     }
     
-    private boolean canEnterRound() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+    private boolean canSendPropositions() {
+        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd);
     }
     
     private boolean canSendSelections() {

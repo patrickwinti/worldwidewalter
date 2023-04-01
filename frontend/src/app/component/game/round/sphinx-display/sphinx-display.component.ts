@@ -12,9 +12,9 @@ export class SphinxDisplayComponent {
 
   getDisplayText(): String {
     if (this.sphinx.id === this.currentPlayerId) {
-      return 'you are Sphinx!';
+      return 'Du bist die Sphinx!';
     } else {
-      return 'Sphinx is: ' + this.sphinx.name;
+      return 'Die Sphinx ist: ' + this.sphinx.name;
     }
   }
 }

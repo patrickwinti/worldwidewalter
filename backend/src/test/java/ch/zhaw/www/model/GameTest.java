@@ -22,13 +22,13 @@ class GameTest {
         
         game.addRound(createRound());
         
-        var player1 = addToWaitingRoom(game);
+        var player1 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        var player2 = addToWaitingRoom(game);
+        var player2 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        var player3 = addToWaitingRoom(game);
+        var player3 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        var player4 = addToWaitingRoom(game);
+        var player4 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         game.markPlayerAsActive(player1);
         game.markPlayerAsActive(player2);
@@ -41,7 +41,7 @@ class GameTest {
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         round.setSphinx(getRandomPlayer(game));
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
     
     @Test
@@ -49,27 +49,31 @@ class GameTest {
         Game game = createGame();
         game.addRound(createRound());
         
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
+        int numberOfPlayersToAdd = 10;
+        for (int i = 0; i < numberOfPlayersToAdd; i++) {
+            addWaitingRoomPlayer(game);
+        }
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         addRoundOpenForPropositionSubmission(game);
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        
+        game.getAllPlayers().forEach(game::markPlayerAsActive);
         assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
     
     @Test
     void testGameState_WaitingForSelections() {
         Game game = createGame();
-        addToActive(game);
-        addToActive(game);
-        addToActive(game);
-        addToActive(game);
+        int numberOfPlayersToAdd = 10;
+        for (int i = 0; i < numberOfPlayersToAdd; i++) {
+            addActivePlayer(game);
+        }
         
         addRoundOpenForPropositionSubmission(game);
         var round = game.getCurrentRound();
         assertNotNull(round);
+        
         game.getAllPlayers().forEach(player -> round.addProposition(player.getId(), List.of("Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         

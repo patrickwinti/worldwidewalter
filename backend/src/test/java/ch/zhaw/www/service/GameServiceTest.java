@@ -62,13 +62,13 @@ class GameServiceTest {
         Round round = createRound();
         game.addRound(round);
         
-        Player player1 = addToWaitingRoom(game);
+        Player player1 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        Player player2 = addToWaitingRoom(game);
+        Player player2 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        Player player3 = addToWaitingRoom(game);
+        Player player3 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        Player player4 = addToWaitingRoom(game);
+        Player player4 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
@@ -89,10 +89,10 @@ class GameServiceTest {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
+        addWaitingRoomPlayer(game);
+        addWaitingRoomPlayer(game);
+        addWaitingRoomPlayer(game);
+        addWaitingRoomPlayer(game);
         round.setSphinx(getRandomPlayer(game));
         
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
@@ -110,10 +110,10 @@ class GameServiceTest {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        Player player1 = addToWaitingRoom(game);
-        Player player2 = addToWaitingRoom(game);
-        Player player3 = addToWaitingRoom(game);
-        Player player4 = addToWaitingRoom(game);
+        Player player1 = addWaitingRoomPlayer(game);
+        Player player2 = addWaitingRoomPlayer(game);
+        Player player3 = addWaitingRoomPlayer(game);
+        Player player4 = addWaitingRoomPlayer(game);
         round.setSphinx(getRandomPlayer(game));
         game.markPlayerAsActive(player1);
         game.markPlayerAsActive(player2);

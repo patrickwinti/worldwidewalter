@@ -15,7 +15,7 @@ public class TestHelper {
     public static final Duration DEFAULT_PROPOSITION_END_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     
-    public static Player addToWaitingRoom(Game game) {
+    public static Player addWaitingRoomPlayer(Game game) {
         Player player = createPlayer();
         game.addPlayerToWaitingRoom(player);
         return player;
@@ -31,12 +31,11 @@ public class TestHelper {
         return new Player(getId(), "Chris");
     }
     
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     public static Player getRandomPlayer(Game game) {
-        return game.getAllPlayers().findFirst().get();
+        return game.getAllPlayers().findAny().orElseThrow();
     }
     
-    public static void addToActive(Game game) {
+    public static void addActivePlayer(Game game) {
         Player player = createPlayer();
         game.addPlayerToWaitingRoom(player);
         game.markPlayerAsActive(player);

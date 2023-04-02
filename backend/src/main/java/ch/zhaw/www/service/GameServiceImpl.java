@@ -60,7 +60,14 @@ class GameServiceImpl implements GameService {
     
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-    
+
+        if (getGame(gameId).hasActivePlayer(playerId)) {
+            getGame(gameId).removePlayerFromActivePlayer(playerId);
+        }
+        if (getGame(gameId).hasPlayer(playerId)) {
+            getGame(gameId).removePlayerFromWaitingRoom(playerId);
+        }
+
     }
     
     @Override

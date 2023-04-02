@@ -18,16 +18,16 @@ import java.util.logging.Logger;
 class GameServiceImpl implements GameService {
     private static final Logger LOGGER = Logger.getLogger(GameService.class.getSimpleName());
     private static final int DEFAULT_NUMBER_OF_ROUNDS = 1;
-    
+
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
     private final PostfixGenerator postfixGenerator = new PostfixGenerator();
-    
+
     GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
         this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
     }
-    
+
     @Override
     public Game createGame() {
         var game = new Game(UUID.randomUUID().toString(),
@@ -37,12 +37,12 @@ class GameServiceImpl implements GameService {
         gameEntityService.saveNewGame(game);
         return game;
     }
-    
+
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         return gameEntityService.getGame(gameId);
     }
-    
+
     @Override
     public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
@@ -57,19 +57,20 @@ class GameServiceImpl implements GameService {
         });
         return uuid;
     }
-    
+
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-
-        if (getGame(gameId).hasActivePlayer(playerId)) {
-            getGame(gameId).removePlayerFromActivePlayer(playerId);
-        }
-        if (getGame(gameId).hasPlayer(playerId)) {
-            getGame(gameId).removePlayerFromWaitingRoom(playerId);
-        }
-
+        gameEntityService.editGame(gameId, game -> {
+            if (game.hasActivePlayer(playerId)) {
+                game.removePlayerFromActivePlayer(playerId);
+            }
+            if (game.hasPlayer(playerId)) {
+                game.removePlayerFromWaitingRoom(playerId);
+            }
+            return game;
+        });
     }
-    
+
     @Override
     public void enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGame(gameId, game -> {
@@ -98,7 +99,7 @@ class GameServiceImpl implements GameService {
             return game;
         });
     }
-    
+
     @Override
     public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
@@ -107,15 +108,15 @@ class GameServiceImpl implements GameService {
         }
         return game.getCurrentRound();
     }
-    
+
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException {
     }
-    
+
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
     }
-    
+
     @Override
     public Round getRound(String roundId, String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException {
         var game = gameEntityService.getGameForRound(roundId);

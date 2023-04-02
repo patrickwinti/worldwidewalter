@@ -234,7 +234,41 @@ class GameServiceTest {
         assertEquals("Nora", waitingListNames.get(0));
         assertEquals("Nora1360", waitingListNames.get(1));
     }
-    
+    @Test
+    void testLeaveGame_RemovesPlayerFromWaitingRoom() throws GameError.NotFoundException {
+        // Arrange
+        var gameId = "test-game-id";
+        var playerId = "test-player-id";
+        var game = createGame(gameId);
+        game.addPlayerToWaitingRoom(createPlayer(playerId));
+        when(gameEntityService.getGame(gameId)).thenReturn(game);
+
+        // Act
+        gameService.leaveGame(gameId, playerId);
+
+        // Assert
+        assertFalse(game.hasPlayer(playerId));
+        verify(gameEntityService).editGame(eq(gameId), any());
+    }
+    @Test
+    void testLeaveGame_RemovesPlayerFromActivePlayers() throws GameError.NotFoundException {
+        // Arrange
+        var gameId = "test-game-id";
+        var playerId = "test-player-id";
+        var game = createGame(gameId);
+        var player = createPlayer(playerId);
+        game.addPlayerToWaitingRoom(player);
+        game.moveToActivePlayers(player);
+        when(gameEntityService.getGame(gameId)).thenReturn(game);
+
+        // Act
+        gameService.leaveGame(gameId, playerId);
+
+        // Assert
+        assertFalse(game.hasActivePlayer(playerId));
+        verify(gameEntityService).editGame(eq(gameId), any());
+    }
+
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         

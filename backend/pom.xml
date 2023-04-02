@@ -82,6 +82,9 @@
                     <mainClass>
                         ch.zhaw.www.DomainApplication
                     </mainClass>
+                    <outputDirectory>
+                        ../deployment
+                    </outputDirectory>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

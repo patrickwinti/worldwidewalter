@@ -1,9 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   selector: 'www-ranking-display',
   templateUrl: './ranking-display.component.html',
-  styleUrls: ['./ranking-display.component.css']
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RankingDisplayComponent {
   @Input() sortedResults: Map<string, number>;

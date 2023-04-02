@@ -1,5 +1,7 @@
+import { PropositionDto } from "./proposition-dto";
+
 export interface PropositionSelectionDto {
   roundId: string;
-  propositions: Map<string, Array<string>>;
+  propositions: PropositionDto[];
   selectionSubmissionEndInUtc: string;
 }

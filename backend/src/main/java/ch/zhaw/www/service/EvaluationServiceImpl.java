@@ -3,25 +3,33 @@ package ch.zhaw.www.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 public class EvaluationServiceImpl {
     Map<String, List<String>> selections = new HashMap<>();
+
     public void submitSelections() {
         // the ID is the key of the map and represents the proposition
         // the list of playerIDs is the value of the map and represents the players who selected the proposition
-        selections.put("ID-0001",List.of("PlayerID A","PlayerID B","PlayerID C"));
-        selections.put("ID-0002",List.of("PlayerID D","PlayerID E"));
+        selections.put("ID-0001", List.of("PlayerID A", "PlayerID B", "PlayerID C"));
+        selections.put("ID-0002", List.of("PlayerID D", "PlayerID E"));
     }
 
     public Map<String, Integer> evaluateRound() throws RoundError.IllegalStateException {
         Map<String, Integer> evaluationMap = new HashMap<>();
+
+        // iterate over the entries in the selections map
         for (Map.Entry<String, List<String>> entry : selections.entrySet()) {
+            // get the proposition ID and the list of player IDs
             String propositionId = entry.getKey();
             List<String> playerIds = entry.getValue();
+            // compute the number of players who selected the proposition
             int numPlayers = playerIds.size();
+            // add the proposition and the number of players to the evaluation map
             evaluationMap.put(propositionId, numPlayers);
         }
         return evaluationMap;
     }
+
     // print the evaluation map
     public void printEvaluationMap(Map<String, Integer> evaluationMap) {
         for (Map.Entry<String, Integer> entry : evaluationMap.entrySet()) {

@@ -1,60 +1,40 @@
 @startuml
-class GameService {
-    +createGame(game: Game): Game
-    +getGame(gameId: String): Game
-    +updateGame(game: Game): Game
-    +deleteGame(gameId: String): void
+Interface GameService {
+    +evaluateRound(gameId: String)
+}
+
+class GameEntityService {
+    +evalRound(gameId: String)
 }
 
 class EvalService {
-    +evaluate(game: Game): Evaluation
+    +eval(round: Round): Evaluation
 }
 
 class Game {
-    -id: String
-    -status: GameStatus
-    -player1: Player
-    -player2: Player
-    -winner: Player
-    -board: Board
-    +getId(): String
-    +getStatus(): GameStatus
-    +getPlayer1(): Player
-    +getPlayer2(): Player
-    +getWinner(): Player
-    +getBoard(): Board
-    +setId(id: String): void
-    +setStatus(status: GameStatus): void
-    +setPlayer1(player: Player): void
-    +setPlayer2(player: Player): void
-    +setWinner(player: Player): void
-    +setBoard(board: Board): void
+    +getCurrentRound()
+    +updateResults(result: Result)
+}
+
+class Round {
+    +getState()
+}
+
+class GameRepository {
+    +findGame(gameId: String)
 }
 
 class GameController {
-    -gameService: GameService
-    -evalService: EvalService
-    +createGame(game: Game): Game
-    +getGame(gameId: String): Game
-    +updateGame(game: Game): Game
-    +deleteGame(gameId: String): void
-    +evaluateGame(game: Game): Evaluation
-}
-
-class Evaluation {
-    -winner: Player
-    -status: EvaluationStatus
-    +getWinner(): Player
-    +getStatus(): EvaluationStatus
-    +setWinner(winner: Player): void
-    +setStatus(status: EvaluationStatus): void
+    +evalRound(game: Game): Evaluation
 }
 
 
+GameController ..> GameService
+GameService ..> GameEntityService
+GameService ..> EvalService
+GameService ..> Game
+GameEntityService ..> GameRepository
+Game..> Round
 
-GameController -> GameService : uses
-GameService -> EvalService : uses
-Game <- GameService : uses
 
-GameController -> EvalService : uses
 @enduml

@@ -36,7 +36,7 @@ class RoundTest {
     }
     
     private static Player getSphinx() {
-        return new Player(UUID.randomUUID().toString());
+        return new Player(UUID.randomUUID().toString(), "Yasmine");
     }
     
     @Test

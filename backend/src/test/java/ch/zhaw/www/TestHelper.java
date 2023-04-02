@@ -33,6 +33,10 @@ public class TestHelper {
         return new Player(getId(), "Chris");
     }
     
+    public static Player createPlayer(String playerName) {
+        return new Player(getId(), playerName);
+    }
+    
     public static Player getRandomPlayer(Game game) {
         return game.getAllPlayers().findAny().orElseThrow();
     }

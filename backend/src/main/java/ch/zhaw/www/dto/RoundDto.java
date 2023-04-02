@@ -20,6 +20,8 @@ public class RoundDto {
     @NotNull
     private final String prompt;
     @Nullable
+    private final PlayerDto sphinx;
+    @Nullable
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private final Instant endOfSubmissionsInUtc;
 }

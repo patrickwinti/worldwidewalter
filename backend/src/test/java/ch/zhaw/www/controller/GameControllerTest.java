@@ -1,6 +1,5 @@
 package ch.zhaw.www.controller;
 
-import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.PlayerError;
@@ -175,13 +174,52 @@ class GameControllerTest {
     }
     
     @Test
-    void testGetRound_200() throws Exception {
-        Round round = createRound();
+    void testGetRound_200_noSphinx() throws Exception {
+        var round = createRound();
         when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\"}"));
+        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
+    }
+    
+    @Test
+    void testGetRound_200_withSphinx_sphinxPlayer() throws Exception {
+        var round = createRound();
+        var sphinx = createPlayer("Sphinx");
+        round.setSphinx(sphinx);
+        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, sphinx.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"sphinx\":{\"id\":\"" + sphinx.getId() + "\",\"playerName\":\"Sphinx\"}}"));
+        verify(gameService).getCurrentRoundInGame(GAME_ID, sphinx.getId());
+    }
+    
+    @Test
+    void testGetRound_200_withSphinx_otherPlayer() throws Exception {
+        var round = createRound();
+        var sphinx = createPlayer("Sphinx");
+        round.setSphinx(sphinx);
+        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"sphinx\":{\"id\":\"\",\"playerName\":\"Sphinx\"}}"));
+        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
+    }
+    
+    @Test
+    void testGetRound_200_withDate() throws Exception {
+        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
+        var round = createRound();
+        round.setSphinx(createPlayer("Sphinx"));
+        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"endOfSubmissionsInUtc\":\"" + expectedDate + "\"}"));
         verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
     }
     
@@ -235,22 +273,9 @@ class GameControllerTest {
     }
     
     @Test
-    void testGetRound_200_withDate() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
-        Round round = createRound();
-        round.setSphinx(createPlayer());
-        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
-        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"endOfSubmissionsInUtc\":\"" + expectedDate + "\"}"));
-        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
-    }
-    
-    @Test
     void testFetchResults_200() throws Exception {
         var game = createGame();
-        Round round = createRound();
+        var round = createRound();
         game.addRound(round);
         when(gameService.getGame(any())).thenReturn(game);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)

@@ -234,6 +234,7 @@ class GameServiceTest {
         assertEquals("Nora", waitingListNames.get(0));
         assertEquals("Nora1360", waitingListNames.get(1));
     }
+
     @Test
     void testLeaveGame_RemovesPlayerFromWaitingRoom() throws GameError.NotFoundException {
         // Arrange
@@ -242,10 +243,8 @@ class GameServiceTest {
         var game = createGame(gameId);
         game.addPlayerToWaitingRoom(createPlayer(playerId));
         when(gameEntityService.getGame(gameId)).thenReturn(game);
-
         // Act
         gameService.leaveGame(gameId, playerId);
-
         // Assert
         assertFalse(game.hasPlayer(playerId));
         verify(gameEntityService).editGame(eq(gameId), any());
@@ -260,10 +259,8 @@ class GameServiceTest {
         game.addPlayerToWaitingRoom(player);
         game.moveToActivePlayers(player);
         when(gameEntityService.getGame(gameId)).thenReturn(game);
-
         // Act
         gameService.leaveGame(gameId, playerId);
-
         // Assert
         assertFalse(game.hasActivePlayer(playerId));
         verify(gameEntityService).editGame(eq(gameId), any());

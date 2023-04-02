@@ -4,4 +4,4 @@ COPY backend-0.0.1-SNAPSHOT.jar /www.jar
 
 ENTRYPOINT ["java","-jar","/www.jar"]
 
-EXPOSE 8080
+EXPOSE 232323

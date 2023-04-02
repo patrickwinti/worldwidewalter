@@ -15,6 +15,7 @@ import { SelectPropositionComponent } from "./component/game/select-proposition/
 import { ShowRankingComponent } from "./component/game/show-ranking/show-ranking.component";
 import { RoundComponent } from './component/game/round/round.component';
 import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spinner.component';
+import { CountDownComponent } from './component/count-down/count-down.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spi
     SelectPropositionComponent,
     ShowRankingComponent,
     RoundComponent,
-    OverlaySpinnerComponent
+    OverlaySpinnerComponent,
+    CountDownComponent
   ],
   imports: [
     BrowserModule,

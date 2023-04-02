@@ -299,12 +299,12 @@ class GameControllerTest {
         var round = createRound();
         round.setSphinx(createPlayer());
         round.addProposition("1", List.of("prop 1"));
-        round.addProposition("2", List.of("prop 2", "prop 3"));
+        round.addProposition(PLAYER_ID, List.of("prop 2", "prop 3"));
         when(gameService.getRound(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":[{\"id\":\"456\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"456\",\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":false}],\"selectionSubmissionEndInUtc\":\"%s\"}", ROUND_ID, expectedDate)));
+                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":[{\"id\":\"456\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"456\",\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}],\"selectionSubmissionEndInUtc\":\"%s\"}", ROUND_ID, expectedDate)));
         verify(gameService).getRound(ROUND_ID, PLAYER_ID);
     }
     

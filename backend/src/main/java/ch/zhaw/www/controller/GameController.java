@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -129,8 +131,13 @@ public class GameController {
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRound(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
-        //TODO use correct getter (missing proposition impl)
-        return ResponseEntity.ok(new PropositionSelectionDto(roundId, round.getPropositions(), round.getSelectionSubmissionEnd()));
+        List<PropositionSelectionDto.Proposition> proposition = new ArrayList<>();
+        var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
+        round.getPropositions().forEach((player, strings) -> {
+            //TODO use correct values
+            proposition.add(new PropositionSelectionDto.Proposition(playerId, strings, playerId.equals(player) || isSphinx));
+        });
+        return ResponseEntity.ok(new PropositionSelectionDto(roundId, proposition, round.getSelectionSubmissionEnd()));
     }
     //endregion
     

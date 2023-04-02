@@ -304,7 +304,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":{\"1\":[\"prop 1\"],\"2\":[\"prop 2\",\"prop 3\"]},\"selectionSubmissionEndInUtc\":\"%s\"}", ROUND_ID, expectedDate)));
+                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":[{\"id\":\"456\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"456\",\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":false}],\"selectionSubmissionEndInUtc\":\"%s\"}", ROUND_ID, expectedDate)));
         verify(gameService).getRound(ROUND_ID, PLAYER_ID);
     }
     

@@ -161,6 +161,7 @@ public class Game {
             waitingRoom.remove(playerId);
         }
 
+
     }
     /**
      *Removes the specified player from the list of active players if they are currently in it.
@@ -171,6 +172,8 @@ public class Game {
     public void removePlayerFromActivePlayer(@NotNull String playerId) {
         if (hasActivePlayer(playerId)) {
             activePlayers.remove(playerId);
+
+
         }
     }
 

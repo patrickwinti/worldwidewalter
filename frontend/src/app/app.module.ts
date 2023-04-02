@@ -16,6 +16,7 @@ import { ShowRankingComponent } from "./component/game/show-ranking/show-ranking
 import { RoundComponent } from './component/game/round/round.component';
 import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spinner.component';
 import { SphinxDisplayComponent } from './component/game/round/sphinx-display/sphinx-display.component';
+import { CountDownComponent } from './component/count-down/count-down.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { SphinxDisplayComponent } from './component/game/round/sphinx-display/sp
     ShowRankingComponent,
     RoundComponent,
     OverlaySpinnerComponent,
-    SphinxDisplayComponent
+    SphinxDisplayComponent,
+    CountDownComponent
   ],
   imports: [
     BrowserModule,

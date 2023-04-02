@@ -27,19 +27,17 @@ public class Game {
     @NotNull
     private final String id;
     private final int numberOfRoundsInTurn = 1;
-    
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
-    
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
-    
+
     public void addRound(Round round) {
         waitingRoom.putAll(activePlayers);
         activePlayers.clear();
         rounds.add(round);
     }
-    
+
     /**
      * Gets current round,
      * when the Sphinx has been selected
@@ -55,7 +53,7 @@ public class Game {
             return round.getState() != Round.State.FINISHED ? round : null;
         }
     }
-    
+
     /**
      * Returns state of the current game:
      * - Waiting for player: Not enough players active or no valid round
@@ -69,7 +67,7 @@ public class Game {
         var numberOfActivePlayers = activePlayers.size();
         if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (numberOfActivePlayers < MINIMUM_AMOUNT_OF_PLAYERS) {
+        } else if (numberOfActivePlayers < MINIMUM_AMOUNT_OF_PLAYERS || round.getState() == Round.State.CREATED) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
                 round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
@@ -82,12 +80,12 @@ public class Game {
             return State.NO_VALID_ROUND;
         }
     }
-    
+
     public Prompt consumePrompt() {
         //return prompts.remove(0) ;
         return prompts.get(0);
     }
-    
+
     /**
      * Returns stream of all active and waiting room players
      *
@@ -98,7 +96,7 @@ public class Game {
         players.addAll(activePlayers.values());
         return players.stream();
     }
-    
+
     /**
      * Moves players in the waiting room into the active list
      *
@@ -108,7 +106,7 @@ public class Game {
         waitingRoom.remove(player.getId());
         activePlayers.put(player.getId(), player);
     }
-    
+
     public enum State {
         NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
     }

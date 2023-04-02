@@ -13,8 +13,11 @@ export class SelectPropositionComponent {
   @Input() propositions: PropositionDto[];
   @Output() selectedPropositionEmitter = new EventEmitter<string>();
 
-  selectProposition(i: number) {
-    this.selectedPropositionEmitter.emit(this.propositions[i].id);
-    console.log('prop ' + this.propositions[i].gaps + ' selected');
+  selectProposition(i: number | undefined): void {
+    if (i !== undefined) {
+      this.selectedPropositionEmitter.emit(this.propositions[i].id);
+    } else {
+      this.selectedPropositionEmitter.emit('no selection');
+    }
   }
 }

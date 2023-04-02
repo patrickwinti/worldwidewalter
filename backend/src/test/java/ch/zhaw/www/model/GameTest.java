@@ -1,121 +1,95 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.GameError;
+import ch.zhaw.www.service.PlayerError;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.UUID;
 
+import static ch.zhaw.www.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GameTest {
-    private static final Prompt PROMPT = new Prompt("I am WALTER", 1);
-    private static final int DURATION = 4;
-    
-    private static Round getRound(int propositionDuration) {
-        return new Round(getId(), PROMPT, propositionDuration, 1);
-    }
-    
-    private static void addToWaitingRoom(Game game) {
-        Player player = getPlayer();
-        game.getWaitingRoom().put(player.getId(), player);
-    }
-    
-    private static void addToActive(Game game) {
-        Player player = getPlayer();
-        game.getActivePlayers().put(player.getId(), player);
-    }
-    
-    private static Player getPlayer() {
-        return new Player(getId());
-    }
-    
-    private static String getId() {
-        return UUID.randomUUID().toString();
-    }
-    
-    private static void addRoundOpenForPropositionSubmission(Game game) {
-        Round round = getRound(DURATION);
-        game.addRound(round);
-        game.getActivePlayers().putAll(game.getWaitingRoom());
-        round.setSphinx(game.getActivePlayers().values().iterator().next());
-    }
     
     @Test
     void testGameState_WaitingForPlayers() {
-        Game game = new Game(getId());
+        var game = createGame();
         assertEquals(Game.State.NO_VALID_ROUND, game.getState());
         
-        game.addRound(getRound(2));
+        game.addRound(createRound());
         
-        addToWaitingRoom(game);
+        var player1 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        addToWaitingRoom(game);
+        var player2 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        addToWaitingRoom(game);
+        var player3 = addWaitingRoomPlayer(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-        addToWaitingRoom(game);
+        var player4 = addWaitingRoomPlayer(game);
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        game.moveToActivePlayers(player1);
+        game.moveToActivePlayers(player2);
+        game.moveToActivePlayers(player3);
+        game.moveToActivePlayers(player4);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
-        game.getActivePlayers().putAll(game.getWaitingRoom());
-        assertEquals(Game.State.NO_VALID_ROUND, game.getState());
-        
-        Round round = getRound(2);
+        Round round = createRound();
         game.addRound(round);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
-        round.setSphinx(game.getWaitingRoom().values().iterator().next());
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        round.setSphinx(getRandomPlayer(game));
+        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
     
     @Test
     void testGameState_WaitingForPropositions() {
-        Game game = new Game(getId());
-        game.addRound(getRound(2));
+        var game = createGame();
+        game.addRound(createRound());
         
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
+        int numberOfPlayersToAdd = 10;
+        for (int i = 0; i < numberOfPlayersToAdd; i++) {
+            addWaitingRoomPlayer(game);
+        }
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         addRoundOpenForPropositionSubmission(game);
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        
+        game.getAllPlayers().forEach(game::moveToActivePlayers);
         assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
     
     @Test
     void testGameState_WaitingForSelections() {
-        Game game = new Game(getId());
-        addToActive(game);
-        addToActive(game);
-        addToActive(game);
-        addToActive(game);
+        var game = createGame();
+        int numberOfPlayersToAdd = 10;
+        for (int i = 0; i < numberOfPlayersToAdd; i++) {
+            addActivePlayer(game);
+        }
         
         addRoundOpenForPropositionSubmission(game);
         var round = game.getCurrentRound();
         assertNotNull(round);
-        game.getActivePlayers().forEach((s, player) -> round.getPropositions().put(s, List.of("Walter " + player.getId())));
+        
+        game.getAllPlayers().forEach(player -> round.addProposition(player.getId(), List.of("Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
-        var player = game.getActivePlayers().values().stream().findAny().get();
-        game.getCurrentRound().getPropositions().put(player.getId(), List.of("Walter " + player.getId()));
-        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, Duration.of(DURATION, ChronoUnit.MINUTES));
+        var player = getRandomPlayer(game);
+        game.getCurrentRound().addProposition(player.getId(), List.of("Walter " + player.getId()));
+        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
-        
     }
     
     @Test
     void testRunningRound() {
-        Game game = new Game(getId());
+        var game = createGame();
         assertNull(game.getCurrentRound());
         
         Round round = mock(Round.class);
@@ -124,7 +98,7 @@ class GameTest {
         assertSame(round, game.getCurrentRound());
         
         when(round.getState()).thenReturn(Round.State.OPEN_FOR_SUBMISSIONS);
-        Player sphinx = getPlayer();
+        Player sphinx = createPlayer();
         round.setSphinx(sphinx);
         assertSame(round, game.getCurrentRound());
         
@@ -135,21 +109,58 @@ class GameTest {
     
     @Test
     void testNewRound() {
-        Game game = new Game(getId());
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        addToWaitingRoom(game);
-        assertEquals(4, game.getWaitingRoom().size());
-        addToActive(game);
-        addToActive(game);
-        addToActive(game);
-        addToActive(game);
-        assertEquals(4, game.getActivePlayers().size());
-        
-        game.addRound(getRound(2));
-        
-        assertEquals(8, game.getWaitingRoom().size());
-        assertEquals(0, game.getActivePlayers().size());
+        var game = createGame();
+        assertNull(game.getCurrentRound());
+        game.addRound(createRound());
+        assertNotNull(game.getCurrentRound());
     }
+    
+    @Test
+    void testMarkPlayerAsActive_NotFound() {
+        var game = createGame();
+        
+        var unknonwPlayer = createPlayer();
+        assertThrows(PlayerError.NotFoundException.class, () -> game.moveToActivePlayers(unknonwPlayer));
+        assertFalse(game.hasActivePlayer(unknonwPlayer.getId()));
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_AlreadyInActive() {
+        var game = createGame();
+        var player = createPlayer();
+        game.addPlayerToWaitingRoom(player);
+        game.moveToActivePlayers(player);
+        
+        assertTrue(game.hasActivePlayer(player.getId()));
+        game.moveToActivePlayers(player);
+        assertTrue(game.hasActivePlayer(player.getId()));
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_TooMayActivePlayers() {
+        var game = createGame();
+        for (int i = 0; i < MAX_NUMBER_OF_PLAYERS; i++) {
+            final Player player = createPlayer();
+            game.addPlayerToWaitingRoom(player);
+            game.moveToActivePlayers(player);
+        }
+        var onPlayerTooMuch = createPlayer();
+        game.addPlayerToWaitingRoom(onPlayerTooMuch);
+        
+        assertThrows(GameError.FullCapacityException.class, () -> game.moveToActivePlayers(onPlayerTooMuch));
+        assertFalse(game.hasActivePlayer(onPlayerTooMuch.getId()));
+    }
+    
+    @Test
+    void testMarkPlayerAsActive_InWaitingRoom() {
+        var game = createGame();
+        game.addPlayerToWaitingRoom(createPlayer());
+        var player = createPlayer();
+        game.addPlayerToWaitingRoom(player);
+        
+        assertFalse(game.hasActivePlayer(player.getId()));
+        game.moveToActivePlayers(player);
+        assertTrue(game.hasActivePlayer(player.getId()));
+    }
+    
 }

@@ -34,7 +34,7 @@ class GameTest {
     }
 
     private static Player getPlayer() {
-        return new Player(getId());
+        return new Player(getId(), "Zola");
     }
 
     private static String getId() {
@@ -65,8 +65,8 @@ class GameTest {
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
 
         game.getActivePlayers().putAll(game.getWaitingRoom());
-        assertEquals(Game.State.NO_VALID_ROUND, game.getState());
-
+        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        
         Round round = getRound(2);
         game.addRound(round);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());

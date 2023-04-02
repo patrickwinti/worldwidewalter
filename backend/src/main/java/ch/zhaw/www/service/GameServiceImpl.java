@@ -19,6 +19,7 @@ import java.util.stream.StreamSupport;
 class GameServiceImpl implements GameService {
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
+    private final PostfixGenerator postfixGenerator = new PostfixGenerator();
 
     GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
         this.gameEntityService = gameEntityService;
@@ -39,7 +40,17 @@ class GameServiceImpl implements GameService {
 
     @Override
     public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        return new Player(playerName);
+        String uuid = UUID.randomUUID().toString();
+        gameEntityService.editGame(gameId, game -> {
+            StringBuilder name = new StringBuilder(playerName);
+            while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
+                name.append(postfixGenerator.getRandomPostfix());
+            }
+            Player tempPlayer = new Player(uuid, name.toString());
+            game.getWaitingRoom().put(tempPlayer.getId(), tempPlayer);
+            return game;
+        });
+        return gameEntityService.getGame(gameId).getWaitingRoom().get(uuid);
     }
 
     @Override
@@ -73,8 +84,7 @@ class GameServiceImpl implements GameService {
         }
         return game.getCurrentRound();
     }
-
-
+    
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {

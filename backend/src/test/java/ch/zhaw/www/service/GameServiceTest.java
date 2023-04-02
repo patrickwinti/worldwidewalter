@@ -1,14 +1,22 @@
-package ch.zhaw.www;
+package ch.zhaw.www.service;
 
+<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
 import ch.zhaw.www.model.*;
 import ch.zhaw.www.repository.GameRepository;
 import ch.zhaw.www.service.GameEntityService;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.RoundError;
+=======
+import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Prompt;
+import ch.zhaw.www.model.Round;
+>>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -19,11 +27,19 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.UnaryOperator;
+=======
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.UnaryOperator;
+import java.util.List;
+>>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -35,15 +51,21 @@ class GameServiceTest {
     private static final String UNKNOWN_PLAYER_ID = "Unknown Player";
     private static final int ROUND_DURATION = 4;
 
+<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
     private static final Prompt PROMPT = new Prompt("Hello my name is WALTER", 1);
 
+=======
+>>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
     @Autowired
     private GameService gameService;
     @MockBean
     private GameEntityService gameEntityService;
+<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
     @MockBean
     private UnaryOperator<Game> mockEditor;
 
+=======
+>>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
 
     @Test
     void testAddGameSavesItToRepository() {
@@ -145,6 +167,7 @@ class GameServiceTest {
         assertEquals(round, gameService.getRound(GAME_ID, player4.getId()));
     }
 
+<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
     @Disabled
     @Test
     void testSubmitProposition() {
@@ -157,8 +180,10 @@ class GameServiceTest {
         assertEquals(1, round.getPropositions().size());
     }
 
+=======
+>>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
     private Player addWaitingRoomPlayer(Game game) {
-        Player player = new Player(UUID.randomUUID().toString());
+        Player player = new Player(UUID.randomUUID().toString(), "Luna");
         game.getWaitingRoom().put(player.getId(), player);
         return player;
     }
@@ -166,7 +191,15 @@ class GameServiceTest {
     private Game mockGameInRepository() {
         var game = new Game(GAME_ID);
 
+<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
         doNothing().when(gameEntityService).editGame(eq(game.getId()), any());
+=======
+        //noinspection unchecked
+        doAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            lambda.apply(game);
+        return null;}).when(gameEntityService).editGame(eq(game.getId()), any());
+>>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
         when(gameEntityService.getGame(game.getId())).thenReturn(game);
 
         return game;
@@ -182,5 +215,19 @@ class GameServiceTest {
 
         doThrow(GameError.NotFoundException.class)
                 .when(gameEntityService).getGame(gameId);
+    }
+
+    @Test
+    void enterGameWithExistingPlayerOfSameName() {
+        Game game = mockGameInRepository();
+
+        gameService.enterGame(game.getId(), "Nora");
+        gameService.enterGame(game.getId(), "Nora");
+
+        Map<String, Player> tempWait = game.getWaitingRoom();
+        assertEquals(2, tempWait.size());
+        List<String> waitingListNames = tempWait.values().stream().map(Player::getName).sorted().toList();
+        assertEquals("Nora", waitingListNames.get(0));
+        assertEquals("Nora1360", waitingListNames.get(1));
     }
 }

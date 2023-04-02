@@ -1,9 +1,8 @@
-game Id: <input type="text" name="gameId" placeholder="Insert the gameId"
+Spiel Id: <input type="text" name="gameId" placeholder="Spiel Id"
                 [readOnly]="gameIdIsReadOnly"
                 [(ngModel)]="joinGameId"/>
-your name: <input type="text" name="playerName" placeholder="Insert Name" [(ngModel)]="playerName"/>
-<button (click)="joinGame()" formtarget="_blank">join</button>
-
+Name: <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
+<button (click)="joinGame()" formtarget="_blank">beitreten</button>
 
 <ng-container *ngIf="error">
   <div>

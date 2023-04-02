@@ -1,17 +1,29 @@
 @startuml
-Interface GameService {
-    +evaluateRound(gameId: String)
+skinparam class {
+    BackgroundColor white
+    BorderColor Black
+    FontColor Black
+    ArrowColor Firebrick
+}
+skinparam roundcorner 0
+hide empty members
+
+
+interface GameService {
+    +selectProposition(roundId:String,  playerId:String,  propositionId:String)
 }
 
-class GameEntityService {
-    +evalRound(gameId: String)
+interface GameEntityService {
+    +editGameForRound(roundId: String, UnaryOperator<Game>)
 }
 
-class EvalService {
+interface EvaluationService {
     +eval(round: Round): Evaluation
 }
 
 class Game {
+    -rounds: List<Round>
+    +getState()
     +getCurrentRound()
     +updateResults(result: Result)
 }
@@ -21,7 +33,7 @@ class Round {
 }
 
 class GameRepository {
-    +findGame(gameId: String)
+    +findAll(): List<Game>
 }
 
 class GameController {

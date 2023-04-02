@@ -1,4 +1,13 @@
 @startuml
+skinparam class {
+    BackgroundColor white
+    BorderColor Black
+    FontColor Black
+    ArrowColor Firebrick
+}
+skinparam roundcorner 0
+hide empty members
+
 package backend{
     left to right direction
 

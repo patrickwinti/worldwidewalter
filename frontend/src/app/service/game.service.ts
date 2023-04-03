@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Observable, of } from "rxjs";
+import { Observable } from "rxjs";
 import { AppConfigService } from "./app-config.service";
 import { GameDto } from "../dto/game-dto";
 import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
 import { PlayerDto } from "../dto/player-dto";
 import { RoundDto } from "../dto/round-dto";
 import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
-import { PropositionDto } from "../dto/proposition-dto";
-import { AllPropositionsDto } from "../dto/all-propositions-dto";
+import { PropositionSelectionDto } from "../dto/proposition-selection-dto";
+import { ResultsDto } from "../dto/results-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class GameService {
   }
 
   requestNewGame(): Observable<GameDto> {
-    return this.http.post<GameDto>(this.appConfigService.getBaseUrl() + '/api/games', {});
+    return this.http.post<GameDto>(this.appConfigService.getBaseUrl() + '/api/games', null);
   }
 
   joinGame(playerJoinRequestDto: PlayerJoinRequestDto, gameId: string,): Observable<PlayerDto> {
@@ -29,6 +29,10 @@ export class GameService {
 
   getGame(gameId: string): Observable<GameDto> {
     return this.http.get<GameDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId);
+  }
+
+  enterRound(gameId: string): Observable<void> {
+    return this.http.put<void>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/rounds', null);
   }
 
   getRound(gameId: string): Observable<RoundDto> {
@@ -40,21 +44,16 @@ export class GameService {
       proposition);
   }
 
-  getAllPropositions(roundId: string): Observable<AllPropositionsDto> {
-    // return this.http.get<Array<PropositionDto>>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/rounds');
-    return of(
-      {
-        propositions: [
-          {gaps: ['b', 'bb'], id: '1abce3212a'} as PropositionDto,
-          {gaps: ['a', 'aa'], id: '2va3werfva'} as PropositionDto,
-          {gaps: ['g', 'gg'], id: '3asdv3av30'} as PropositionDto
-        ]
-      } as AllPropositionsDto)
+  getAllPropositions(roundId: string): Observable<PropositionSelectionDto> {
+    return this.http.get<PropositionSelectionDto>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/propositions');
   }
 
-  submitSelection(id: string): Observable<void> {
-    return new Observable<void>((res) => {
-      res.next()
-    });
+  submitPropositionSelection(roundId: string, id: string): Observable<void> {
+    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/proposition/' + id, null);
   }
+
+  getResults(gameId: string): Observable<ResultsDto> {
+    return this.http.get<ResultsDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/results/');
+  }
+
 }

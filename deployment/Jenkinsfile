@@ -9,7 +9,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'java -version'
-                // Get some code from a GitHub repository
+                // Get code from a GitHub repository
                 git branch: 'feature/WWW-88-set-up-deployment',
                     credentialsId: 'zhaw',
                     url: 'https://github.zhaw.ch/PM3-FS23-IT21ta-ZH-Team4/PM3_FS23_IT21ta-ZH-Team4'
@@ -24,10 +24,12 @@ pipeline {
                 // failed, record the test results and archive the jar file.
                 success {
                     archiveArtifacts 'backend/target/*.jar'
-                    sshagent(credentials : ['hostCredentials']) {
-                      sh "echo pwd"
-                      sh 'ssh -t -t patrick@192.168.1.51 -o StrictHostKeyChecking=no "echo pwd && /home/patrick/www/run-www.sh"'
-                    }
+
+                    // call script on host to stop old jar and copy & run new artifact
+//                     sshagent(credentials : ['hostCredentials']) {
+//                       sh "echo pwd"
+//                       sh 'ssh -t -t patrick@192.168.1.51 -o StrictHostKeyChecking=no "echo pwd && /home/patrick/www/run-www.sh"'
+//                     }
                 }
 
             }

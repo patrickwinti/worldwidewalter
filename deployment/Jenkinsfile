@@ -10,7 +10,7 @@ pipeline {
             steps {
                 sh 'java -version'
                 // Get some code from a GitHub repository
-                git branch: 'main',
+                git branch: 'feature/WWW-88-set-up-deployment',
                     credentialsId: 'zhaw',
                     url: 'https://github.zhaw.ch/PM3-FS23-IT21ta-ZH-Team4/PM3_FS23_IT21ta-ZH-Team4'
 

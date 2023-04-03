@@ -23,9 +23,13 @@ pipeline {
                 // If Maven was able to run the tests, even if some of the test
                 // failed, record the test results and archive the jar file.
                 success {
-                    junit '**/target/surefire-reports/TEST-*.xml'
                     archiveArtifacts 'backend/target/*.jar'
+                    sshagent(credentials : ['hostCredentials']) {
+                      sh "echo pwd"
+                      sh 'ssh -t -t patrick@192.168.1.51 -o StrictHostKeyChecking=no "echo pwd && /home/patrick/www/run-www.sh"'
+                    }
                 }
+
             }
         }
     }

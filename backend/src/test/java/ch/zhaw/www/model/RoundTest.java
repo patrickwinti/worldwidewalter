@@ -13,8 +13,8 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
+import static ch.zhaw.www.TestHelper.createPlayer;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -22,22 +22,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class RoundTest {
     private static final String ID = "ROUND_ID";
     private static final Prompt PROMPT = new Prompt("WALTER", 1);
-    private static final int PROPOSITION_DURATION = 40;
-    private static final int PROPOSITION_ENTER_LIMIT = 10;
+    private static final Duration PROPOSITION_DURATION = Duration.ofMinutes(40);
+    private static final Duration PROPOSITION_ENTER_LIMIT = Duration.ofMinutes(10);
+    private static final Duration SUBMISSION_DURATION = Duration.ofMinutes(10);
     private final Instant instant = Instant.parse("2022-12-22T10:00:00Z");
     private final Clock fixedClock = Clock.fixed(instant, ZoneId.of("UTC"));
-    
-    private static Round getRound() {
-        return new Round(ID, PROMPT, PROPOSITION_DURATION, PROPOSITION_ENTER_LIMIT);
-    }
     
     @BeforeEach
     void setUp() {
         InstantWrapper.clock = fixedClock;
-    }
-    
-    private static Player getSphinx() {
-        return new Player(UUID.randomUUID().toString(), "Yasmine");
     }
     
     @Test
@@ -46,41 +39,41 @@ class RoundTest {
         
         assertNull(round.getPropositionSubmissionEnd());
         
-        round.setSphinx(getSphinx());
+        round.setSphinx(createPlayer());
         
         assertNotNull(round.getPropositionSubmissionEnd());
-        assertEquals(instant.plus(PROPOSITION_DURATION, ChronoUnit.MINUTES), round.getPropositionSubmissionEnd());
+        assertEquals(instant.plus(PROPOSITION_DURATION), round.getPropositionSubmissionEnd());
     }
     
     @Test
     void roundCanNotBeEnteredIfAMinuteBeforePropositionSubmissionEnd() {
         Round round = getRound();
-        round.setSphinx(getSphinx());
+        round.setSphinx(createPlayer());
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION - PROPOSITION_ENTER_LIMIT - 1);
+        tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT).minus(1, ChronoUnit.MINUTES));
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION - PROPOSITION_ENTER_LIMIT);
-        assertEquals(Round.State.FINISHED, round.getState());
+        assertTrue(round.canEnterRound());
+        tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT));
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertFalse(round.canEnterRound());
     }
     
     @Test
     void propositionsCanBeSubmittedIf_PropositionEndTimePassed() {
         Round round = getRound();
-        round.setSphinx(getSphinx());
+        round.setSphinx(createPlayer());
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        tick(fixedClock, PROPOSITION_DURATION - 1);
+        tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
         assertEquals(Round.State.FINISHED, round.getState());
         round.getPropositions().put("1", new Proposition(UUID.randomUUID().toString(), List.of("Fish ")));
         
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        tick(fixedClock, PROPOSITION_DURATION);
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
-    }
-    
-    private void tick(Clock clock, int minutes) {
-        InstantWrapper.clock = Clock.offset(clock, Duration.of(minutes, ChronoUnit.MINUTES));
     }
     
     @Test
@@ -91,7 +84,7 @@ class RoundTest {
 
         assertEquals(Round.State.CREATED, round.getState());
         
-        round.setSphinx(getSphinx());
+        round.setSphinx(createPlayer());
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
         round.getPropositions().put("1", proposition1);
@@ -113,4 +106,11 @@ class RoundTest {
     }
 
     
+    private void tick(Clock clock, Duration offset) {
+        InstantWrapper.clock = Clock.offset(clock, offset);
+    }
+    
+    private static Round getRound() {
+        return new Round(ID, PROMPT, PROPOSITION_DURATION, PROPOSITION_ENTER_LIMIT, SUBMISSION_DURATION);
+    }
 }

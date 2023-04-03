@@ -12,10 +12,11 @@ import { GameContainerComponent } from './component/game/game-container.componen
 import { HttpPollingInterceptor } from "./service/http-polling.interceptor";
 import { EnterPropositionComponent } from './component/game/enter-proposition/enter-proposition.component';
 import { SelectPropositionComponent } from "./component/game/select-proposition/select-proposition.component";
-import { ShowRankingComponent } from "./component/game/show-ranking/show-ranking.component";
+import { RankingContainerComponent } from "./component/game/show-ranking/ranking-container.component";
 import { RoundComponent } from './component/game/round/round.component';
 import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spinner.component';
 import { CountDownComponent } from './component/count-down/count-down.component';
+import { RankingDisplayComponent } from './component/game/show-ranking/ranking-display/ranking-display.component';
 
 @NgModule({
   declarations: [
@@ -26,10 +27,12 @@ import { CountDownComponent } from './component/count-down/count-down.component'
     GameContainerComponent,
     EnterPropositionComponent,
     SelectPropositionComponent,
-    ShowRankingComponent,
+    RankingContainerComponent,
     RoundComponent,
     OverlaySpinnerComponent,
-    CountDownComponent
+    SelectPropositionComponent,
+    CountDownComponent,
+    RankingDisplayComponent
   ],
   imports: [
     BrowserModule,

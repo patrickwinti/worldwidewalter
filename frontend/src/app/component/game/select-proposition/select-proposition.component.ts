@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { PropositionDto } from "../../../dto/proposition-dto";
 import { RoundDto } from "../../../dto/round-dto";
+import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
 
 @Component({
   selector: 'www-select-proposition',
@@ -10,12 +10,12 @@ import { RoundDto } from "../../../dto/round-dto";
 export class SelectPropositionComponent {
 
   @Input() round: RoundDto;
-  @Input() propositions: PropositionDto[];
+  @Input() propositionSelectionDto: PropositionSelectionDto;
   @Output() selectedPropositionEmitter = new EventEmitter<string>();
 
-  selectProposition(i: number | undefined): void {
-    if (i !== undefined) {
-      this.selectedPropositionEmitter.emit(this.propositions[i].id);
+  selectProposition(id: string | undefined): void {
+    if (id !== undefined) {
+      this.selectedPropositionEmitter.emit(id);
     } else {
       this.selectedPropositionEmitter.emit('no selection');
     }

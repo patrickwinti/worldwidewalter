@@ -1,20 +1,18 @@
 package ch.zhaw.www.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.Map;
+
 /**
- * Response object for API call
- * POST /games. Contains id and
- * relative path for a newly created
- * game.
+ * Data object representing the results for round
+ * The results contains the player name and their current points
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GameDto {
-    @Valid
+public class ResultsDto {
     @NotNull
-    private final String id;
+    private final Map<String, Integer> results;
 }

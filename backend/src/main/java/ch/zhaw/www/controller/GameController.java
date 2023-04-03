@@ -2,8 +2,6 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,6 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,20 +43,7 @@ public class GameController {
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
         logger.log(Level.INFO, "created game {0}", newGame);
-        return ResponseEntity.ok(new GameDto(newGame.getId(), GameDto.State.WAITING_FOR_PLAYERS));
-    }
-    
-    @Operation(summary = "Reads the status of th game")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Existing game"),
-            @ApiResponse(responseCode = "500", description = "Unknown error")
-    })
-    @GetMapping(value = "/games/{gameId}", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GameDto> getGame(@PathVariable String gameId) {
-        Game existingGame = gameService.getGame(gameId);
-        logger.log(Level.INFO, "game found {0}", existingGame);
-        return ResponseEntity.ok(new GameDto(gameId, GameDto.State.WAITING_FOR_PLAYERS));
+        return ResponseEntity.ok(new GameDto(newGame.getId()));
     }
     
     //region Game-Player endpoints
@@ -70,9 +58,9 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
-        logger.log(Level.INFO, "entered game {0}", player);
-        return ResponseEntity.ok(new PlayerDto(player.getId()));
+        String playerId = gameService.enterGame(gameId, playerDto.getPlayerName());
+        logger.log(Level.INFO, () -> String.format("%s entered game %s", playerId, gameId));
+        return ResponseEntity.ok(new PlayerDto(playerId));
     }
     
     @Operation(summary = "Player leaves game gracefully")
@@ -87,6 +75,21 @@ public class GameController {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game successfully");
     }
+    
+    @Operation(summary = "Retrieves the points for each player")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ResultsDto> fetchResultsForRound(@PathVariable String gameId) {
+        var game = gameService.getGame(gameId);
+        logger.log(Level.INFO, "game results returned {0}", game);
+        //TODO return valid results
+        return ResponseEntity.ok(new ResultsDto(Map.of("Elias", 10, "Jennifer", 1, "Sara", 11)));
+    }
     //endregion
     
     //region Round endpoints
@@ -94,10 +97,10 @@ public class GameController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Proposition submitted to round"),
             @ApiResponse(responseCode = "400", description = "Missing proposition"),
-            @ApiResponse(responseCode = "404", description = "Either game, round or player has not been found"),
+            @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/rounds/{roundId}/proposition", consumes = "application/json")
+    @PostMapping(value = "/rounds/{roundId}/propositions", consumes = "application/json")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void submitProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
         gameService.submitProposition(roundId, playerId, proposition.getGaps());
@@ -116,9 +119,29 @@ public class GameController {
         gameService.selectProposition(roundId, playerId, propositionId);
         logger.log(Level.INFO, "proposition selected successfully");
     }
+    
+    @Operation(summary = "Get all propositions sent by the players in current round")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Propositions in round to be selected by players"),
+            @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/rounds/{roundId}/propositions", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        var round = gameService.getRound(roundId, playerId);
+        logger.log(Level.INFO, "round selections returned {0}", round);
+        List<PropositionSelectionDto.Proposition> proposition = new ArrayList<>();
+        var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
+        round.getPropositions().forEach((player, strings) -> {
+            //TODO use correct values
+            proposition.add(new PropositionSelectionDto.Proposition(playerId, strings, playerId.equals(player) || isSphinx));
+        });
+        return ResponseEntity.ok(new PropositionSelectionDto(roundId, proposition, round.getSelectionSubmissionEnd()));
+    }
     //endregion
     
-    @Operation(summary = "Player requested current round round")
+    @Operation(summary = "Player requested current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
@@ -128,23 +151,35 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        Round round = gameService.getRound(gameId, playerId);
+        var round = gameService.getCurrentRoundInGame(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
+        
+        PlayerDto sphinx = null;
+        if (round.getSphinx() != null) {
+            if (round.getSphinx().getId().equals(playerId)) {
+                logger.log(Level.INFO, "current sphinx requesting round {0}", playerId);
+                sphinx = new PlayerDto(round.getSphinx().getId());
+            } else {
+                // for security reasons only pass the sphinx id to the actual Sphinx
+                sphinx = new PlayerDto("");
+            }
+            sphinx.setPlayerName(round.getSphinx().getName());
+        }
+        
+        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), sphinx, round.getPropositionSubmissionEnd()));
     }
     
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "New round started"),
+            @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game is at capacity"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PutMapping(value = "/games/{gameId}/rounds", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<RoundDto> enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        Round round = gameService.enterRound(gameId, playerId);
-        logger.log(Level.INFO, "participate next round {0}", round);
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement()));
+    @PutMapping(value = "/games/{gameId}/rounds")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        gameService.enterRound(gameId, playerId);
+        logger.log(Level.INFO, "participate next round");
     }
 }

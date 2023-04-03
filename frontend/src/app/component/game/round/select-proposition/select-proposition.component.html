@@ -1,9 +1,9 @@
 <div class="column">
   <div>Bitte einen Vorschlag aussuchen:</div>
 
-  <div *ngFor="let proposition of propositions; let i = index">
+  <div *ngFor="let proposition of propositionSelectionDto.propositions">
     <p>
-      <button (click)="selectProposition(i)">
+      <button [disabled]="proposition.readonly" (click)="selectProposition(proposition.id)">
         {{proposition.gaps}}
       </button>
     </p>

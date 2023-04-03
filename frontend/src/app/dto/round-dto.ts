@@ -5,4 +5,5 @@ export interface RoundDto {
   prompt: string;
   numberOfGaps: number;
   sphinx: PlayerDto;
+  endOfSubmissionsInUtc: string;
 }

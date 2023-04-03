@@ -4,7 +4,7 @@ import { GameService } from "../../../service/game.service";
 import { RoundDto } from "../../../dto/round-dto";
 import { GameState } from "../../../model/game-state";
 import { firstValueFrom, Observable } from "rxjs";
-import { AllPropositionsDto } from "../../../dto/all-propositions-dto";
+import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
 import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
 import { HttpErrorResponse } from "@angular/common/http";
 import { PlayerDto } from "../../../dto/player-dto";
@@ -19,7 +19,7 @@ export class RoundComponent implements OnInit {
   @Input() round: RoundDto;
   GameState = GameState;
 
-  allPropositions$: Observable<AllPropositionsDto>;
+  propositionSelectionDto$: Observable<PropositionSelectionDto>;
   stateObservable$: Observable<GameState>;
 
   constructor(private stateService: StateService,
@@ -28,12 +28,11 @@ export class RoundComponent implements OnInit {
 
   ngOnInit(): void {
     this.stateObservable$ = this.stateService.getStateObservable();
-    this.allPropositions$ = this.gameService.getAllPropositions(this.round.id);
-    this.round.sphinx = {id: '123', name: 'playerName'} as PlayerDto;
+    this.propositionSelectionDto$ = this.gameService.getAllPropositions(this.round.id);
   }
 
-  submitSelection(selectedProposition: string) {
-    firstValueFrom(this.gameService.submitSelection(selectedProposition)).then(
+  submitSelection(selectedPropositionId: string): void {
+    firstValueFrom(this.gameService.submitPropositionSelection(selectedPropositionId, this.round.id)).then(
       () => {
         console.log('selection submission successful');
         this.stateService.goToNextState();

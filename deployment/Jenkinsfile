@@ -14,12 +14,9 @@ pipeline {
                     credentialsId: 'zhaw',
                     url: 'https://github.zhaw.ch/PM3-FS23-IT21ta-ZH-Team4/PM3_FS23_IT21ta-ZH-Team4'
 
-
                 // Run Maven on a Unix agent.
                 sh "mvn -Dmaven.test.failure.ignore=true clean package"
 
-                // To run Maven on a Windows agent, use
-                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
             }
 
             post {

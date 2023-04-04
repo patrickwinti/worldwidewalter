@@ -17,5 +17,6 @@
   <h2></h2>
 </div>
 
-<www-count-down (timeoutEmitter)="emitProposition()">
+<www-count-down [timeoutString]="round.endOfSubmissionsInUtc"
+                (timeoutEmitter)="emitProposition()">
 </www-count-down>

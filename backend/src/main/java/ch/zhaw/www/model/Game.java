@@ -151,37 +151,19 @@ public class Game {
             waitingRoom.put(player.getId(), player);
         }
     }
-    /**
-     * Removes the specified player from the waiting room if they are currently in it.
-     * @param playerId the ID of the player to be removed from the waiting room.
-     * @throws NullPointerException if playerId is null.
+/**
+     * Removes player from waiting room or active players
+     *
+     * @param playerId player identifier
+     * @throws PlayerError.NotFoundException if player is not in waiting room or active players
      */
-    public void removePlayerFromWaitingRoom(@NotNull String playerId) {
-        if (hasPlayer(playerId)) {
-            waitingRoom.remove(playerId);
+    public void removePlayer(@NotNull String playerId) throws PlayerError.NotFoundException{
+        if (!hasPlayer(playerId)) {
+            throw new PlayerError.NotFoundException(id);
         }
-
-
+        waitingRoom.remove(playerId);
+        activePlayers.remove(playerId);
     }
-    /**
-     *Removes the specified player from the list of active players if they are currently in it.
-     * @param playerId the ID of the player to be removed from the list of active players.
-     *@throws NullPointerException if playerId is null.
-     */
-
-    public void removePlayerFromActivePlayer(@NotNull String playerId) {
-        if (hasActivePlayer(playerId)) {
-            activePlayers.remove(playerId);
-
-
-        }
-    }
-
-
-
-
-
-
 
     
     public enum State {

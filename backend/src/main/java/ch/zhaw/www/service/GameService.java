@@ -1,7 +1,6 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
 
@@ -32,11 +31,11 @@ public interface GameService {
      *
      * @param gameId     game requested to enter
      * @param playerName desired player name to register to game
-     * @return new player
+     * @return new player identifier
      * @throws GameError.NotFoundException     if game is not found
      * @throws GameError.FullCapacityException if game has no available seats
      */
-    Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
+    String enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
     
     /**
      * Request to leave a game
@@ -56,18 +55,28 @@ public interface GameService {
      * @throws GameError.NotFoundException      if game is not found
      * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
-    Round getRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    Round getCurrentRoundInGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    
+    /**
+     * Returns round with
+     *
+     * @param roundId  round identifier
+     * @param playerId player requesting round
+     * @return new or existing round
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
+     */
+    Round getRound(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
     
     /**
      * Player submitted their propositions for the prompt
      *
      * @param roundId  round identifier
      * @param playerId player identifier
-     * @throws GameError.NotFoundException   if game is not found
      * @throws RoundError.NotFoundException  if round is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
-    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws GameError.NotFoundException, RoundError.NotFoundException, PlayerError.NotFoundException;
+    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException;
     
     /**
      * Player has chosen a proposition id. The given player id is anonymized and only valid for the round
@@ -75,7 +84,6 @@ public interface GameService {
      * @param roundId       round identifier
      * @param playerId      player identifier
      * @param propositionId proposition identifier
-     * @throws GameError.NotFoundException   if game is not found
      * @throws RoundError.NotFoundException  if round is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
@@ -87,9 +95,9 @@ public interface GameService {
      *
      * @param gameId   game identifier
      * @param playerId player identifier
-     * @return current round
      * @throws GameError.NotFoundException   if game is not found
      * @throws PlayerError.NotFoundException if player is not found
      */
-    Round enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
+    void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
+    
 }

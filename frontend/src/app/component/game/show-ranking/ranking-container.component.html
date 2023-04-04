@@ -1,0 +1,8 @@
+<www-ranking-display *ngIf="ranking$ | async as ranking"
+                     [sortedResults]="sortRanking(ranking.results)">
+</www-ranking-display>
+
+
+<button (click)="continue()">
+  weiter
+</button>

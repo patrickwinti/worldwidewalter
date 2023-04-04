@@ -1,10 +1,13 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.GameError;
+import ch.zhaw.www.service.PlayerError;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
@@ -15,29 +18,30 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Model class with all the current state of a game.
+ * Class containing all the information related to a game.
+ * It controls players in game, running rounds and prompts from the deck
  */
-@Getter
+@ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
 @KeySpace("running_games")
 public class Game {
-    private static final int MINIMUM_AMOUNT_OF_PLAYERS = 4;
     @Id
+    @Getter
     @NotNull
     private final String id;
-    private final int numberOfRoundsInTurn = 1;
+    private final int minimumAmountOfPlayers;
+    private final int maximumAmountOfPlayers;
+    private final int numberOfRoundsInTurn;
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
-
+    
     public void addRound(Round round) {
-        waitingRoom.putAll(activePlayers);
-        activePlayers.clear();
         rounds.add(round);
     }
-
+    
     /**
      * Gets current round,
      * when the Sphinx has been selected
@@ -53,7 +57,7 @@ public class Game {
             return round.getState() != Round.State.FINISHED ? round : null;
         }
     }
-
+    
     /**
      * Returns state of the current game:
      * - Waiting for player: Not enough players active or no valid round
@@ -62,14 +66,16 @@ public class Game {
      *
      * @return {@link Game.State}
      */
+    @NotNull
     public State getState() {
         var round = getCurrentRound();
         var numberOfActivePlayers = activePlayers.size();
         if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (numberOfActivePlayers < MINIMUM_AMOUNT_OF_PLAYERS || round.getState() == Round.State.CREATED) {
+        } else if (numberOfActivePlayers < minimumAmountOfPlayers || round.getState() == Round.State.CREATED) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
+                round.canEnterRound() &&
                 round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
         } else if ((round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
@@ -80,12 +86,12 @@ public class Game {
             return State.NO_VALID_ROUND;
         }
     }
-
+    
     public Prompt consumePrompt() {
-        //return prompts.remove(0) ;
+        // uncomment when deck is implemented: return prompts.remove(0) ;
         return prompts.get(0);
     }
-
+    
     /**
      * Returns stream of all active and waiting room players
      *
@@ -96,17 +102,56 @@ public class Game {
         players.addAll(activePlayers.values());
         return players.stream();
     }
-
+    
     /**
-     * Moves players in the waiting room into the active list
+     * Moves players in the waiting room into the active list, if there is space in current round
      *
      * @param player player that will be marked as active
+     * @throws GameError.FullCapacityException if more than maximum players reached
      */
-    public void markPlayerAsActive(Player player) {
-        waitingRoom.remove(player.getId());
-        activePlayers.put(player.getId(), player);
+    public void moveToActivePlayers(Player player) throws GameError.FullCapacityException {
+        if (activePlayers.size() < maximumAmountOfPlayers) {
+            if (getAllPlayers().noneMatch(p -> p.equals(player))) {
+                throw new PlayerError.NotFoundException(id);
+            }
+            waitingRoom.remove(player.getId());
+            activePlayers.put(player.getId(), player);
+        } else {
+            throw new GameError.FullCapacityException();
+        }
     }
-
+    
+    /**
+     * Checks if player ID is currently an active player
+     *
+     * @param playerId player identifier
+     * @return is an active player or false if in waiting room or not existing
+     */
+    public boolean hasActivePlayer(@NotNull String playerId) {
+        return activePlayers.containsKey(playerId);
+    }
+    
+    /**
+     * Checks if player ID is currently a player
+     *
+     * @param playerId player identifier
+     * @return is a player either in waiting room or is active
+     */
+    public boolean hasPlayer(@NotNull String playerId) {
+        return getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
+    }
+    
+    /**
+     * Adds player to waiting room if not already active
+     *
+     * @param player player that shall be added
+     */
+    public void addPlayerToWaitingRoom(@NotNull Player player) {
+        if (!hasActivePlayer(player.getId())) {
+            waitingRoom.put(player.getId(), player);
+        }
+    }
+    
     public enum State {
         NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
     }

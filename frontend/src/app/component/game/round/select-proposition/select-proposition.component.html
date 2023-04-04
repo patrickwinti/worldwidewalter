@@ -1,0 +1,14 @@
+<div class="column">
+  <div>Bitte einen Vorschlag aussuchen:</div>
+
+  <div *ngFor="let proposition of propositionSelectionDto.propositions">
+    <p>
+      <button [disabled]="proposition.readonly" (click)="selectProposition(proposition.id)">
+        {{proposition.gaps}}
+      </button>
+    </p>
+  </div>
+</div>
+
+<www-count-down (timeoutEmitter)="selectProposition(undefined)">
+</www-count-down>

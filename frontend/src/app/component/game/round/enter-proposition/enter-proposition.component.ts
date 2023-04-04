@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { RoundDto } from "../../../dto/round-dto";
-import { Proposition } from "../../../model/proposition";
+import { RoundDto } from "../../../../dto/round-dto";
+import { Proposition } from "../../../../model/proposition";
 
 @Component({
   selector: 'www-enter-proposition',

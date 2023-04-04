@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EnterPropositionComponent } from './enter-proposition.component';
-import { StateService } from "../../../service/state.service";
-import { getGameServiceMock, getStateServiceMock } from "../../../testing/mock-services";
-import { RoundDto } from "../../../dto/round-dto";
-import { GameService } from "../../../service/game.service";
-import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
+import { StateService } from "../../../../service/state.service";
+import { getGameServiceMock, getStateServiceMock } from "../../../../testing/mock-services";
+import { RoundDto } from "../../../../dto/round-dto";
+import { GameService } from "../../../../service/game.service";
+import { PropositionSubmissionDto } from "../../../../dto/proposition-submission-dto";
 
 describe('EnterPropositionComponent', () => {
   let component: EnterPropositionComponent;

@@ -1,21 +1,27 @@
 package ch.zhaw.www.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.Valid;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.Instant;
+
 /**
- * Data object representing the new round
- * with its prompt
+ * Data object representing the round
+ * with its prompt and proposition submission end date
  */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoundDto {
-    @Valid
     @NotNull
     private final String id;
-    @Valid
     @NotNull
     private final String prompt;
+    @Nullable
+    private final PlayerDto sphinx;
+    @Nullable
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
+    private final Instant endOfSubmissionsInUtc;
 }

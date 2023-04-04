@@ -4,6 +4,8 @@ import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.utils.GameIdGenerator;
+import ch.zhaw.www.utils.PostfixGenerator;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Game createGame() {
-        var game = new Game(UUID.randomUUID().toString(),
+        var game = new Game(GameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
                 DEFAULT_NUMBER_OF_ROUNDS);
@@ -83,6 +85,10 @@ class GameServiceImpl implements GameService {
                 case WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS -> {
                     game.moveToActivePlayers(player);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
+                    var round = game.getCurrentRound();
+                    if (round != null && round.getSphinx() == null) {
+                        round.setSphinx(game.selectSphinx());
+                    }
                 }
                 case WAITING_FOR_ALL_SELECTIONS -> {
                     //Player can't enter round at the moment. Player will stay in waiting room.

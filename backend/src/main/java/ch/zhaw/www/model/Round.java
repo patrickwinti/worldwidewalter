@@ -43,7 +43,7 @@ public class Round {
     private Instant selectionSubmissionEnd;
     
     public void setSphinx(Player sphinx) {
-        if (this.sphinx == null) {
+        if (this.sphinx == null && sphinx != null) {
             this.sphinx = sphinx;
             this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
             this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(selectionDuration));

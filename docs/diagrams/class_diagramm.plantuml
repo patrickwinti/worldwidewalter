@@ -92,7 +92,7 @@ package backend{
     class SphinxElector {
         -rounds: List<Round>
         -activePlayers: Map<String, Player>
-        -sphinxCandidates: List<Player>
+        -candidates: List<Player>
         selectCandidate(numberOfRounds: Int)
         addCandidate(player: Player)
     }

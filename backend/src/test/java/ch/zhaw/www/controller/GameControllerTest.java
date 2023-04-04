@@ -22,7 +22,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -303,7 +302,7 @@ class GameControllerTest {
         
         addProposition("1", round, "prop 1");
         addProposition(PLAYER_ID, round, "prop 2", "prop 3");
-        List<Proposition> propositions = new ArrayList<>(round.getPropositions().values());
+        List<Proposition> propositions = round.getPropositions();
         when(gameService.getRound(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))

@@ -106,14 +106,15 @@ class GameServiceImpl implements GameService {
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGameForRound(roundId, game -> {
-            Proposition temp = new Proposition(UUID.randomUUID().toString(), gaps);
-            for (Proposition proposition : Objects.requireNonNull(game.getCurrentRound()).getPropositions().values()) {
-                if (checkForDuplicates(proposition.getGaps(), gaps)) {
+            Proposition temp = new Proposition(UUID.randomUUID().toString(), playerId, gaps);
+            final Round round = Objects.requireNonNull(game.getCurrentRound());
+            for (Proposition proposition : round.getPropositions()) {
+                if (proposition.hasSameGaps(temp)) {
                     proposition.getDuplicates().add(temp);
                     return game;
                 }
             }
-            game.getCurrentRound().addProposition(playerId, temp);
+            round.addProposition(temp);
             return game;
         });
         
@@ -133,11 +134,6 @@ class GameServiceImpl implements GameService {
         } else {
             throw new PlayerError.NotFoundException(playerId);
         }
-    }
-    
-    private boolean checkForDuplicates(List<String> existingPropositionGaps, List<String> newPropositionGaps) {
-        return existingPropositionGaps.size() == newPropositionGaps.size() &&
-                String.join("", existingPropositionGaps).equalsIgnoreCase(String.join("", newPropositionGaps));
     }
     
 }

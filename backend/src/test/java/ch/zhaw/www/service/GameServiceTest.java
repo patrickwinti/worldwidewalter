@@ -235,6 +235,45 @@ class GameServiceTest {
         assertEquals("Nora1360", waitingListNames.get(1));
     }
     
+    /**
+     * Proposition temp = new Proposition(UUID.randomUUID().toString(), gaps);
+     * final Round round = Objects.requireNonNull(game.getCurrentRound());
+     * for (Proposition proposition : round.getPropositions().values()) {
+     * if (checkForDuplicates(proposition.getGaps(), gaps)) {
+     * proposition.getDuplicates().add(temp);
+     * return game;
+     * }
+     * }
+     * round.addProposition(playerId, temp);
+     * return game;
+     */
+    @Test
+    void addPropositionThatAlreadyExists() {
+        Round round = mockRoundInRepository();
+        addProposition("1", round, "Wasser", "Gummi");
+        addProposition("2", round, "Wasser", "gummi");
+        addProposition("3", round, "Wasser ", "gummi");
+        assertEquals(1, round.getPropositions().size());
+        assertEquals(2, round.getPropositions().get(0).getDuplicates().size());
+        assertEquals("2", round.getPropositions().get(0).getDuplicates().get(0).getPlayerId());
+        assertEquals("3", round.getPropositions().get(0).getDuplicates().get(1).getPlayerId());
+    }
+    
+    private Round mockRoundInRepository() {
+        var game = createGame(GAME_ID);
+        var round = createRound();
+        game.addRound(round);
+        doAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            //noinspection unchecked
+            lambda.apply(game);
+            return null;
+        }).when(gameEntityService).editGameForRound(eq(round.getId()), any());
+        when(gameEntityService.getGameForRound(round.getId())).thenReturn(game);
+        return round;
+        
+    }
+    
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         

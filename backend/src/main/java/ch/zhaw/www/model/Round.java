@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +33,7 @@ public class Round {
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
     
-    private final Map<String, Proposition> propositions = new ConcurrentHashMap<>();
+    private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     
     @Nullable
@@ -68,14 +70,13 @@ public class Round {
     /**
      * Adds player proposition for prompt
      *
-     * @param playerId    player adding their proposition
      * @param proposition as many propositions as gaps in the prompt
      */
-    public void addProposition(String playerId, Proposition proposition) {
+    public void addProposition(Proposition proposition) {
         if (sphinx == null) {
             throw new RoundError.IllegalStateException();
         }
-        propositions.put(playerId, proposition);
+        propositions.add(proposition);
     }
     
     State getState() {

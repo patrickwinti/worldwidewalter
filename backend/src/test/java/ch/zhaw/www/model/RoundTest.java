@@ -1,6 +1,7 @@
 package ch.zhaw.www.model;
 
 import ch.zhaw.www.TestHelper;
+import ch.zhaw.www.service.RoundError;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 import static ch.zhaw.www.TestHelper.createPlayer;
 import static org.junit.jupiter.api.Assertions.*;
@@ -98,9 +100,12 @@ class RoundTest {
     @Test
     void addProposition() {
         Round round = getRound();
-        Proposition proposition1 = new Proposition("1", List.of("Bruce", "Martha", "Selina"));
-        Proposition proposition2 = new Proposition("2", List.of("Barry", "Wally"));
-        
+        Proposition proposition1 = new Proposition(UUID.randomUUID().toString(), "1", List.of("Bruce", "Martha", "Selina"));
+        assertThrows(RoundError.IllegalStateException.class, () -> round.addProposition(proposition1));
+        Proposition proposition2 = new Proposition(UUID.randomUUID().toString(), "2", List.of("Barry", "Wally"));
+        round.setSphinx(createPlayer());
+        round.addProposition(proposition2);
+        assertEquals(1, round.getPropositions().size());
     }
     
     private void tick(Clock clock, Duration offset) {

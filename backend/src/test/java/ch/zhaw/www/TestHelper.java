@@ -46,7 +46,7 @@ public class TestHelper {
     }
     
     public static void addProposition(String playerId, Round round, String... gaps) {
-        round.addProposition(playerId, new Proposition(UUID.randomUUID().toString(), Arrays.asList(gaps)));
+        round.addProposition(new Proposition(UUID.randomUUID().toString(), playerId, Arrays.asList(gaps)));
     }
     
     public static void addProposition(String playerId, Game game, String... gaps) {

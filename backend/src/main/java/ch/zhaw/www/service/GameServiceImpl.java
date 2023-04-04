@@ -31,7 +31,7 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Game createGame() {
+    public Game createGame() throws GameError.ExistAlready {
         var game = new Game(GameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),

@@ -36,6 +36,7 @@ public class GameController {
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
+            @ApiResponse(responseCode = "409", description = "Game exists with that ID"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(value = "/games", produces = "application/json")

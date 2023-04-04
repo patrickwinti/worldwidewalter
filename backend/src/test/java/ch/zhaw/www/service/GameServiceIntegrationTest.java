@@ -24,7 +24,6 @@ class GameServiceIntegrationTest {
         String gameId = gameService.createGame().getId();
         
         assertNull(gameService.getGame(gameId).getCurrentRound());
-        assertNull(gameService.getGame(gameId).getCurrentRound());
         
         int nrOfPlayers = Runtime.getRuntime().availableProcessors() * 2;
         ExecutorService service = Executors.newFixedThreadPool(nrOfPlayers);

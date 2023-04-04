@@ -89,7 +89,7 @@ package backend{
     }
 
     class TextFileReader
-    class SphinxSelector {
+    class SphinxElector {
         -rounds: List<Round>
         -activePlayers: Map<String, Player>
         -sphinxCandidates: List<Player>

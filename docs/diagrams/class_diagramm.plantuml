@@ -70,7 +70,7 @@ package backend{
     }
     exception GameError {
         FullCapacityException
-        NotEnoughPlayersException
+        AlreadyExists
         NotFoundException
     }
     exception RoundError {
@@ -121,5 +121,5 @@ package backend{
     FileReader<|-TextFileReader
 
     Game -> Round
-    Game -> SphinxSelector
+    Game -> SphinxElector
 @enduml

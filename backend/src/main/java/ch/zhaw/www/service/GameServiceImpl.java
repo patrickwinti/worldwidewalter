@@ -60,13 +60,8 @@ class GameServiceImpl implements GameService {
 
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-        gameEntityService.editGame(gameId, game -> {
-            if (game.hasActivePlayer(playerId)) {
-                game.removePlayerFromActivePlayer(playerId);
-            }
-            if (game.hasPlayer(playerId)) {
-                game.removePlayerFromWaitingRoom(playerId);
-            }
+gameEntityService.editGame(gameId, game -> {
+            game.removePlayer(playerId);
             return game;
         });
     }

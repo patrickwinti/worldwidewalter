@@ -1,6 +1,7 @@
 @startuml
 package backend{
     left to right direction
+    skinparam linetype ortho
 
     hide empty members
     class GameController {
@@ -88,6 +89,13 @@ package backend{
     }
 
     class TextFileReader
+    class SphinxSelector {
+        -rounds: List<Round>
+        -activePlayers: Map<String, Player>
+        -sphinxCandidates: List<Player>
+        selectCandidate(numberOfRounds: Int)
+        addCandidate(player: Player)
+    }
 
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
@@ -96,16 +104,19 @@ package backend{
     GameController ..> GameDto
 
     GameService ..> Game
-    GameService ..> Round
     GameService ..> Player
     GameService ..> GameError
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
-    GameService --> GameRepository
+    GameService --> GameEntityService
+    GameService --> PostfixGenerator
+
+    GameEntityService --> GameRepository
 
     TextFileReader ..> Prompt
-}
-
     FileReader<|-TextFileReader
+
+    Game -> Round
+    Game -> SphinxSelector
 @enduml

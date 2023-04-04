@@ -106,6 +106,9 @@ class GameServiceImpl implements GameService {
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGameForRound(roundId, game -> {
+            if (!game.hasActivePlayer(playerId)) {
+                throw new PlayerError.NotFoundException(playerId);
+            }
             Proposition temp = new Proposition(UUID.randomUUID().toString(), playerId, gaps);
             final Round round = Objects.requireNonNull(game.getCurrentRound());
             for (Proposition proposition : round.getPropositions()) {

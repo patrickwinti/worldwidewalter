@@ -4,7 +4,7 @@ import ch.zhaw.www.model.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class TestHelper {
@@ -45,12 +45,12 @@ public class TestHelper {
         game.moveToActivePlayers(player);
     }
     
-    public static void addProposition(String playerId, Round round, String... gaps) {
-        round.addProposition(new Proposition(UUID.randomUUID().toString(), playerId, Arrays.asList(gaps)));
+    public static Proposition createProposition(String playerId, String gap) {
+        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap));
     }
     
-    public static void addProposition(String playerId, Game game, String... gaps) {
-        addProposition(playerId, game.getCurrentRound(), gaps);
+    public static Proposition createProposition(String playerId, String gap1, String gap2) {
+        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap1, gap2));
     }
     
     public static Round createRound(Duration duration) {

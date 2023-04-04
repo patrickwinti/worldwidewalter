@@ -1,6 +1,5 @@
 package ch.zhaw.www.model;
 
-import ch.zhaw.www.TestHelper;
 import ch.zhaw.www.service.RoundError;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static ch.zhaw.www.TestHelper.createPlayer;
+import static ch.zhaw.www.TestHelper.createProposition;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -71,7 +71,7 @@ class RoundTest {
         tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        TestHelper.addProposition("1", round, "Fish ");
+        round.addProposition(createProposition("1", "Fish "));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
@@ -87,12 +87,12 @@ class RoundTest {
         round.setSphinx(createPlayer());
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        TestHelper.addProposition("1", round, "Joseph");
+        round.addProposition(createProposition("1", "Joseph"));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
         
-        TestHelper.addProposition("2", round, "Joseph");
+        round.addProposition(createProposition("2", "Joseph"));
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }

@@ -75,13 +75,13 @@ class GameTest {
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> addProposition(player.getId(), round, "Walter " + player.getId()));
+        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
-        addProposition(player.getId(), game, "Walter " + player.getId());
+        game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
     }

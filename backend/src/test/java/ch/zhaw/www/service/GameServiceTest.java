@@ -211,7 +211,7 @@ class GameServiceTest {
         
         //make round ready for selections
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
-        playersInCurrentRound.forEach(p -> addProposition(p.getId(), game, "Cereal"));
+        playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(createProposition(p.getId(), "Cereal")));
         
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
@@ -235,33 +235,28 @@ class GameServiceTest {
         assertEquals("Nora1360", waitingListNames.get(1));
     }
     
-    /**
-     * Proposition temp = new Proposition(UUID.randomUUID().toString(), gaps);
-     * final Round round = Objects.requireNonNull(game.getCurrentRound());
-     * for (Proposition proposition : round.getPropositions().values()) {
-     * if (checkForDuplicates(proposition.getGaps(), gaps)) {
-     * proposition.getDuplicates().add(temp);
-     * return game;
-     * }
-     * }
-     * round.addProposition(playerId, temp);
-     * return game;
-     */
     @Test
     void addPropositionThatAlreadyExists() {
-        Round round = mockRoundInRepository();
-        addProposition("1", round, "Wasser", "Gummi");
-        addProposition("2", round, "Wasser", "gummi");
-        addProposition("3", round, "Wasser ", "gummi");
+        var game = mockRoundInRepository();
+        var players = List.of(createPlayer(), createPlayer(), createPlayer());
+        players.forEach(player -> {
+            game.addPlayerToWaitingRoom(player);
+            game.moveToActivePlayers(player);
+        });
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        gameService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
+        gameService.submitProposition(round.getId(), players.get(1).getId(), List.of("WASSER", "gummi"));
+        gameService.submitProposition(round.getId(), players.get(2).getId(), List.of("Wasser ", "  gummi"));
         assertEquals(1, round.getPropositions().size());
         assertEquals(2, round.getPropositions().get(0).getDuplicates().size());
-        assertEquals("2", round.getPropositions().get(0).getDuplicates().get(0).getPlayerId());
-        assertEquals("3", round.getPropositions().get(0).getDuplicates().get(1).getPlayerId());
+        assertEquals(players.get(1).getId(), round.getPropositions().get(0).getDuplicates().get(0).getPlayerId());
+        assertEquals(players.get(2).getId(), round.getPropositions().get(0).getDuplicates().get(1).getPlayerId());
     }
     
-    private Round mockRoundInRepository() {
+    private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);
         var round = createRound();
+        round.setSphinx(createPlayer());
         game.addRound(round);
         doAnswer(invocationOnMock -> {
             var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
@@ -270,7 +265,7 @@ class GameServiceTest {
             return null;
         }).when(gameEntityService).editGameForRound(eq(round.getId()), any());
         when(gameEntityService.getGameForRound(round.getId())).thenReturn(game);
-        return round;
+        return game;
         
     }
     

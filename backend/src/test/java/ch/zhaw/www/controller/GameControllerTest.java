@@ -300,8 +300,8 @@ class GameControllerTest {
         var round = createRound();
         round.setSphinx(createPlayer());
         
-        addProposition("1", round, "prop 1");
-        addProposition(PLAYER_ID, round, "prop 2", "prop 3");
+        round.addProposition(createProposition("1", "prop 1"));
+        round.addProposition(createProposition(PLAYER_ID, "prop 2", "prop 3"));
         List<Proposition> propositions = round.getPropositions();
         when(gameService.getRound(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)

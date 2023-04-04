@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.List;
 
 import static ch.zhaw.www.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,7 +44,7 @@ class GameTest {
         round.setSphinx(getRandomPlayer(game));
         assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
-
+    
     @Test
     void testGameState_WaitingForPropositions() {
         var game = createGame();
@@ -56,14 +55,14 @@ class GameTest {
             addWaitingRoomPlayer(game);
         }
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
-
+        
         addRoundOpenForPropositionSubmission(game);
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         game.getAllPlayers().forEach(game::moveToActivePlayers);
         assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
     }
-
+    
     @Test
     void testGameState_WaitingForSelections() {
         var game = createGame();
@@ -76,37 +75,37 @@ class GameTest {
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> round.addProposition(player.getId(), List.of("Walter " + player.getId())));
+        game.getAllPlayers().forEach(player -> addProposition(player.getId(), round, "Walter " + player.getId()));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
-
+        
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
-        game.getCurrentRound().addProposition(player.getId(), List.of("Walter " + player.getId()));
+        addProposition(player.getId(), game, "Walter " + player.getId());
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
     }
-
+    
     @Test
     void testRunningRound() {
         var game = createGame();
         assertNull(game.getCurrentRound());
-
+        
         Round round = mock(Round.class);
         when(round.getState()).thenReturn(Round.State.CREATED);
         game.addRound(round);
         assertSame(round, game.getCurrentRound());
-
+        
         when(round.getState()).thenReturn(Round.State.OPEN_FOR_SUBMISSIONS);
         Player sphinx = createPlayer();
         round.setSphinx(sphinx);
         assertSame(round, game.getCurrentRound());
-
+        
         when(round.getState()).thenReturn(Round.State.FINISHED);
         assertNull(game.getCurrentRound());
-
+        
     }
-
+    
     @Test
     void testNewRound() {
         var game = createGame();

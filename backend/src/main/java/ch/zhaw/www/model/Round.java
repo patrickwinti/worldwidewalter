@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -62,25 +61,21 @@ public class Round {
         }
     }
     
+    public boolean canEnterRound() {
+        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+    }
+    
     /**
      * Adds player proposition for prompt
      *
      * @param playerId    player adding their proposition
      * @param proposition as many propositions as gaps in the prompt
      */
-    public void addProposition(String playerId, List<String> proposition) {
+    public void addProposition(String playerId, Proposition proposition) {
         if (sphinx == null) {
             throw new RoundError.IllegalStateException();
         }
         propositions.put(playerId, proposition);
-    }
-    
-    public boolean canEnterRound() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
-    }
-
-    public void addProposition(String playerId, Proposition proposition) {
-        getPropositions().put(playerId, proposition);
     }
     
     State getState() {
@@ -94,7 +89,6 @@ public class Round {
             return State.FINISHED;
         }
     }
-
     
     private boolean canSendPropositions() {
         return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd);

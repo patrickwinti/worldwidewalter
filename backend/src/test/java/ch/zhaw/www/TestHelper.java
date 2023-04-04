@@ -1,12 +1,10 @@
 package ch.zhaw.www;
 
-import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.model.Round;
+import ch.zhaw.www.model.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class TestHelper {
@@ -45,6 +43,14 @@ public class TestHelper {
         Player player = createPlayer();
         game.addPlayerToWaitingRoom(player);
         game.moveToActivePlayers(player);
+    }
+    
+    public static void addProposition(String playerId, Round round, String... gaps) {
+        round.addProposition(playerId, new Proposition(UUID.randomUUID().toString(), Arrays.asList(gaps)));
+    }
+    
+    public static void addProposition(String playerId, Game game, String... gaps) {
+        addProposition(playerId, game.getCurrentRound(), gaps);
     }
     
     public static Round createRound(Duration duration) {

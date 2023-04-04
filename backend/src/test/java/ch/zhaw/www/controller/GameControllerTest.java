@@ -1,5 +1,6 @@
 package ch.zhaw.www.controller;
 
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.PlayerError;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -298,13 +300,19 @@ class GameControllerTest {
         String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
         var round = createRound();
         round.setSphinx(createPlayer());
-        round.addProposition("1", List.of("prop 1"));
-        round.addProposition(PLAYER_ID, List.of("prop 2", "prop 3"));
+        
+        addProposition("1", round, "prop 1");
+        addProposition(PLAYER_ID, round, "prop 2", "prop 3");
+        List<Proposition> propositions = new ArrayList<>(round.getPropositions().values());
         when(gameService.getRound(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":[{\"id\":\"456\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"456\",\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}],\"selectionSubmissionEndInUtc\":\"%s\"}", ROUND_ID, expectedDate)));
+                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":" +
+                                "[{\"id\":\"%s\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"%s\"," +
+                                "\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}]," +
+                                "\"selectionSubmissionEndInUtc\":\"%s\"}",
+                        ROUND_ID, propositions.get(0).getId(), propositions.get(1).getId(), expectedDate)));
         verify(gameService).getRound(ROUND_ID, PLAYER_ID);
     }
     

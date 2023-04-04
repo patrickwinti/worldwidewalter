@@ -1,5 +1,6 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.TestHelper;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.List;
 
 import static ch.zhaw.www.TestHelper.createPlayer;
@@ -68,8 +68,8 @@ class RoundTest {
         
         tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
-        assertEquals(Round.State.FINISHED, round.getState());
-        round.getPropositions().put("1", new Proposition(UUID.randomUUID().toString(), List.of("Fish ")));
+        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        TestHelper.addProposition("1", round, "Fish ");
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
@@ -79,32 +79,29 @@ class RoundTest {
     @Test
     void selectionsCanBeSubmitted() {
         Round round = getRound();
-        Proposition proposition1 = new Proposition("1", List.of("Joseph"));
-        Proposition proposition2 = new Proposition("1", List.of("Joseph"));
-
+        
         assertEquals(Round.State.CREATED, round.getState());
         
         round.setSphinx(createPlayer());
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        round.getPropositions().put("1", proposition1);
+        TestHelper.addProposition("1", round, "Joseph");
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
         
-        round.getPropositions().put("2", proposition2);
+        TestHelper.addProposition("2", round, "Joseph");
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
-
+    
     @Test
     void addProposition() {
         Round round = getRound();
         Proposition proposition1 = new Proposition("1", List.of("Bruce", "Martha", "Selina"));
         Proposition proposition2 = new Proposition("2", List.of("Barry", "Wally"));
-
+        
     }
-
     
     private void tick(Clock clock, Duration offset) {
         InstantWrapper.clock = Clock.offset(clock, offset);

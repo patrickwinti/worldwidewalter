@@ -1,25 +1,14 @@
 package ch.zhaw.www.service;
 
-<<<<<<< HEAD:backend/src/test/java/ch/zhaw/www/GameServiceTest.java
-import ch.zhaw.www.model.*;
-import ch.zhaw.www.repository.GameRepository;
-import ch.zhaw.www.service.GameEntityService;
-import ch.zhaw.www.service.GameError;
-import ch.zhaw.www.service.GameService;
-import ch.zhaw.www.service.RoundError;
-=======
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
->>>>>>> main:backend/src/test/java/ch/zhaw/www/service/GameServiceTest.java
 import ch.zhaw.www.utils.InstantWrapper;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.io.IOException;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -222,7 +211,7 @@ class GameServiceTest {
         
         //make round ready for selections
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
-        playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(p.getId(), List.of("Cereal")));
+        playersInCurrentRound.forEach(p -> addProposition(p.getId(), game, "Cereal"));
         
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         

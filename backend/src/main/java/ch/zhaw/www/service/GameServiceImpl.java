@@ -105,10 +105,9 @@ class GameServiceImpl implements GameService {
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {
-
-        Proposition temp = new Proposition(UUID.randomUUID().toString(), gaps);
         gameEntityService.editGameForRound(roundId, game -> {
-            for (Proposition proposition : game.getCurrentRound().getPropositions().values()) {
+            Proposition temp = new Proposition(UUID.randomUUID().toString(), gaps);
+            for (Proposition proposition : Objects.requireNonNull(game.getCurrentRound()).getPropositions().values()) {
                 if (checkForDuplicates(proposition.getGaps(), gaps)) {
                     proposition.getDuplicates().add(temp);
                     return game;
@@ -117,13 +116,13 @@ class GameServiceImpl implements GameService {
             game.getCurrentRound().addProposition(playerId, temp);
             return game;
         });
-
+        
     }
     
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
-
+        
     }
     
     @Override
@@ -135,10 +134,10 @@ class GameServiceImpl implements GameService {
             throw new PlayerError.NotFoundException(playerId);
         }
     }
-
+    
     private boolean checkForDuplicates(List<String> existingPropositionGaps, List<String> newPropositionGaps) {
         return existingPropositionGaps.size() == newPropositionGaps.size() &&
                 String.join("", existingPropositionGaps).equalsIgnoreCase(String.join("", newPropositionGaps));
     }
-
+    
 }

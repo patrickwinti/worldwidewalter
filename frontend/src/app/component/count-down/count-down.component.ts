@@ -16,7 +16,7 @@ import { Subscription, timer } from "rxjs";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CountDownComponent implements OnInit, OnDestroy {
-  @Input() timeout = new Date().getTime() + 15000;
+  @Input() timeoutString: string;
   @Output() timeoutEmitter = new EventEmitter<void>();
 
   public secondsToTimeout: number;
@@ -24,6 +24,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
 
   private timeDifference: number;
   private subscription: Subscription;
+  private timeout: number;
 
   private readonly milliSecondsInASecond = 1000;
   private readonly secondsInAMinute = 60;
@@ -42,6 +43,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
           this.timeoutEmitter.emit();
         }
       });
+    this.timeout = this.getUTCMilliseconds(this.timeoutString);
   }
 
   ngOnDestroy(): void {
@@ -55,5 +57,14 @@ export class CountDownComponent implements OnInit, OnDestroy {
   private allocateTimeUnits(): void {
     this.secondsToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond) % this.secondsInAMinute);
     this.minutesToTimeout = Math.floor((this.timeDifference) / (this.milliSecondsInASecond * this.minutesInAnHour) % this.secondsInAMinute);
+  }
+
+  private getUTCMilliseconds(dateString: string): number {
+    // dateString format will be "YYY-MM-DD HH:mm:ss"
+    var [date, time] = dateString.split(" ");
+    var [year, month, day] = date.split("-");
+    var [hours, minutes, seconds] = time.split(":");
+    // month is 0 indexed in Date operations, subtract 1 when converting string to Date object
+    return Date.UTC(Number.parseInt(year), Number.parseInt(month) - 1, Number.parseInt(day), Number.parseInt(hours), Number.parseInt(minutes), Number.parseInt(seconds));
   }
 }

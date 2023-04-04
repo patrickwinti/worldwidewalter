@@ -96,7 +96,9 @@ package backend{
         selectCandidate(numberOfRounds: Int)
         addCandidate(player: Player)
     }
-
+    class GameIdGenerator{
+        +generateId():String{static}
+    }
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
@@ -111,6 +113,7 @@ package backend{
     GameService ..> PropositionError
     GameService --> GameEntityService
     GameService --> PostfixGenerator
+    GameService --> GameIdGenerator
 
     GameEntityService --> GameRepository
 

@@ -10,5 +10,6 @@
   </div>
 </div>
 
-<www-count-down (timeoutEmitter)="selectProposition(undefined)">
+<www-count-down [timeoutString]="propositionSelectionDto.selectionSubmissionEndInUtc"
+                (timeoutEmitter)="selectProposition(undefined)">
 </www-count-down>

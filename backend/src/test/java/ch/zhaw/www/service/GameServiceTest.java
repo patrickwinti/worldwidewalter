@@ -234,7 +234,20 @@ class GameServiceTest {
         assertEquals("Nora", waitingListNames.get(0));
         assertEquals("Nora1360", waitingListNames.get(1));
     }
-    
+    @Test
+    void leaveGame() {
+        Game game = mockGameInRepository();
+        addActivePlayer(game);
+        addWaitingRoomPlayer(game);
+        List<String> playerIDs = game.getAllPlayers().map(Player::getId).toList();
+
+        gameService.leaveGame(game.getId(), playerIDs.get(0));
+        assertEquals(1, game.getAllPlayers().count());
+        gameService.leaveGame(game.getId(), playerIDs.get(1));
+        assertEquals(0, game.getAllPlayers().count());
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(0)));
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(1)));
+    }    
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         

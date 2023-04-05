@@ -153,6 +153,20 @@ public class Game {
             sphinxElector.addCandidate(player);
         }
     }
+/**
+     * Removes player from waiting room or active players
+     *
+     * @param playerId player identifier
+     * @throws PlayerError.NotFoundException if player is not in waiting room or active players
+     */
+    public void removePlayer(@NotNull String playerId) throws PlayerError.NotFoundException{
+        if (!hasPlayer(playerId)) {
+            throw new PlayerError.NotFoundException(id);
+        }
+        waitingRoom.remove(playerId);
+        activePlayers.remove(playerId);
+    }
+
     
     public Player selectSphinx() {
         return activePlayers.size() >= minimumAmountOfPlayers ? sphinxElector.selectCandidate(numberOfRoundsInTurn) : null;

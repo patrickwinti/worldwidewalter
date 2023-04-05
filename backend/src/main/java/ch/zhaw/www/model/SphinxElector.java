@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Handles the Sphinx management. Saves candidates and selects the next possible.
+ */
 @AllArgsConstructor
 class SphinxElector {
     private static final int MINIMUM_ROUNDS_POSSIBLE = 1;
@@ -17,6 +20,14 @@ class SphinxElector {
     private final List<Player> candidates = new ArrayList<>();
     private final Random random = new Random();
     
+    /**
+     * Selects candidates depending on in which round the game is in
+     * If game the game is in the first round of turn, it fetches it from candidates
+     * Otherwise, it fetches it from the last round
+     *
+     * @param numberOfRoundsInTurn number of rounds per turn
+     * @return a sphinx if it could be found or null
+     */
     @Nullable
     public Player selectCandidate(final int numberOfRoundsInTurn) {
         if (activePlayers.isEmpty() || numberOfRoundsInTurn < MINIMUM_ROUNDS_POSSIBLE) {

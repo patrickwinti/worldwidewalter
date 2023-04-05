@@ -23,6 +23,16 @@ public abstract class GameError extends RuntimeException {
     }
     
     /**
+     * Game with given ID already exists
+     */
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class ExistAlready extends GameError {
+        public ExistAlready() {
+            super("Game already exists");
+        }
+    }
+    
+    /**
      * Exception for cases where there is no game for the given ID
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)

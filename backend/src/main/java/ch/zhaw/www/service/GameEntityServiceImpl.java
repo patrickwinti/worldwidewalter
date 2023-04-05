@@ -52,7 +52,7 @@ class GameEntityServiceImpl implements GameEntityService {
             if (!gamesRepository.existsById(game.getId())) {
                 gamesRepository.save(game);
             } else {
-                throw new RuntimeException("Game already exists");
+                throw new GameError.ExistAlready();
             }
         }
     }
@@ -60,6 +60,8 @@ class GameEntityServiceImpl implements GameEntityService {
     private Game findGame(String gameId) {
         return gamesRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
     }
+
+
     
     private Game findGameForRound(String roundId) {
         return StreamSupport.stream(gamesRepository.findAll().spliterator(), true)

@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 @RestController
 @Validated
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin("*")
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
@@ -36,6 +36,7 @@ public class GameController {
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
+            @ApiResponse(responseCode = "409", description = "Game exists with that ID"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(value = "/games", produces = "application/json")
@@ -181,6 +182,6 @@ public class GameController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         gameService.enterRound(gameId, playerId);
-        logger.log(Level.INFO, "participate next round");
+        logger.log(Level.INFO, "{0} will participate next round", playerId);
     }
 }

@@ -50,5 +50,10 @@ public interface GameEntityService {
      *
      * @param game to be saved
      */
+<<<<<<< HEAD
     void saveNewGame(Game game);
 }
+=======
+    void saveNewGame(Game game) throws GameError.ExistAlready;
+}
+>>>>>>> main

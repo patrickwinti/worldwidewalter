@@ -111,6 +111,15 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/games"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + GAME_ID + "\"}"));
+        verify(gameService).createGame();
+    }
+    
+    @Test
+    void testCreateGame_409() throws Exception {
+        doThrow(new GameError.ExistAlready()).when(gameService).createGame();
+        mvc.perform(MockMvcRequestBuilders.post("/api/games"))
+                .andExpect(status().isConflict());
+        verify(gameService).createGame();
     }
     
     @Test

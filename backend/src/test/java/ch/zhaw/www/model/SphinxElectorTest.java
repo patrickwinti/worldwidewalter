@@ -60,17 +60,20 @@ class SphinxElectorTest {
     
     @Test
     void testNewRound_SelectNewSphinx() {
-        var currentSphinx = createPlayer("Player3");
-        var round1 = createRound();
-        var round2 = createRound();
-        var round3 = createRound();
-        round1.setSphinx(currentSphinx);
-        round2.setSphinx(currentSphinx);
-        List<Round> rounds = List.of(round1, round2, round3);
-        Map<String, Player> activePlayers = Map.of("1", createPlayer("Player1"), "2", createPlayer("Player2"), "3", currentSphinx);
-        
+        List<Round> rounds = new ArrayList<>();
+        Map<String, Player> activePlayers = Map.of("1", createPlayer("Player1"), "2", createPlayer("Player2"), "3", createPlayer("Player3"));
         SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
-        assertNotSame(currentSphinx, sphinxElector.selectCandidate(2));
+        final int numberOfRoundsInTurn = 2;
+        var round1 = createRound();
+        rounds.add(round1);
+        var sphinx = sphinxElector.selectCandidate(numberOfRoundsInTurn);
+        round1.setSphinx(sphinx);
+        var round2 = createRound();
+        rounds.add(round2);
+        assertSame(sphinx, sphinxElector.selectCandidate(numberOfRoundsInTurn));
+        round2.setSphinx(sphinx);
+        rounds.add(createRound());
+        assertNotSame(sphinx, sphinxElector.selectCandidate(numberOfRoundsInTurn));
     }
     
 }

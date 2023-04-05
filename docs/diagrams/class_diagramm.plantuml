@@ -1,6 +1,7 @@
 @startuml
 package backend{
     left to right direction
+    skinparam linetype ortho
 
     hide empty members
     class GameController {
@@ -69,7 +70,7 @@ package backend{
     }
     exception GameError {
         FullCapacityException
-        NotEnoughPlayersException
+        AlreadyExists
         NotFoundException
     }
     exception RoundError {
@@ -88,7 +89,16 @@ package backend{
     }
 
     class TextFileReader
-
+    class SphinxElector {
+        -rounds: List<Round>
+        -activePlayers: Map<String, Player>
+        -candidates: List<Player>
+        selectCandidate(numberOfRounds: Int)
+        addCandidate(player: Player)
+    }
+    class GameIdGenerator{
+        +generateId():String{static}
+    }
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
@@ -96,16 +106,20 @@ package backend{
     GameController ..> GameDto
 
     GameService ..> Game
-    GameService ..> Round
     GameService ..> Player
     GameService ..> GameError
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
-    GameService --> GameRepository
+    GameService --> GameEntityService
+    GameService --> PostfixGenerator
+    GameService --> GameIdGenerator
+
+    GameEntityService --> GameRepository
 
     TextFileReader ..> Prompt
-}
-
     FileReader<|-TextFileReader
+
+    Game -> Round
+    Game -> SphinxElector
 @enduml

@@ -15,7 +15,7 @@ public interface GameService {
      *
      * @return new game
      */
-    Game createGame();
+    Game createGame() throws GameError.ExistAlready;
     
     /**
      * Fetches the current state of the game for given game ID

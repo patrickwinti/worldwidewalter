@@ -1,4 +1,4 @@
-package ch.zhaw.www.service;
+package ch.zhaw.www.utils;
 
 import java.util.Random;
 
@@ -8,7 +8,7 @@ import java.util.Random;
 public class PostfixGenerator {
     private static final int SEED = 0;
     private final Random random = new Random(SEED);
-
+    
     /**
      * Generates a random postfix for a player name in the range of 0 to 1999.
      *

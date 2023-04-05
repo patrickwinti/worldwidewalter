@@ -10,6 +10,24 @@
     <name>www</name>
     <description>WorldWideWalter App</description>
 
+    <profiles>
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <id>dev</id>
+            <properties>
+                <npm-build-command>run build-dev</npm-build-command>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <npm-build-command>run build</npm-build-command>
+            </properties>
+        </profile>
+    </profiles>
+
     <packaging>pom</packaging>
 
     <parent>

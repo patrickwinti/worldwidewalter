@@ -36,6 +36,7 @@ public class Game {
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
+    private final SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
     
     public void addRound(Round round) {
@@ -44,7 +45,7 @@ public class Game {
     
     /**
      * Gets current round,
-     * when the Sphinx has been selected
+     * when the SphinxElector has been selected
      *
      * @return {@link Round} or null
      */
@@ -149,7 +150,26 @@ public class Game {
     public void addPlayerToWaitingRoom(@NotNull Player player) {
         if (!hasActivePlayer(player.getId())) {
             waitingRoom.put(player.getId(), player);
+            sphinxElector.addCandidate(player);
         }
+    }
+/**
+     * Removes player from waiting room or active players
+     *
+     * @param playerId player identifier
+     * @throws PlayerError.NotFoundException if player is not in waiting room or active players
+     */
+    public void removePlayer(@NotNull String playerId) throws PlayerError.NotFoundException{
+        if (!hasPlayer(playerId)) {
+            throw new PlayerError.NotFoundException(id);
+        }
+        waitingRoom.remove(playerId);
+        activePlayers.remove(playerId);
+    }
+
+    
+    public Player selectSphinx() {
+        return activePlayers.size() >= minimumAmountOfPlayers ? sphinxElector.selectCandidate(numberOfRoundsInTurn) : null;
     }
     
     public enum State {

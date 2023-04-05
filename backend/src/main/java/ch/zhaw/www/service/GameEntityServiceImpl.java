@@ -60,6 +60,8 @@ class GameEntityServiceImpl implements GameEntityService {
     private Game findGame(String gameId) {
         return gamesRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
     }
+
+
     
     private Game findGameForRound(String roundId) {
         return StreamSupport.stream(gamesRepository.findAll().spliterator(), true)

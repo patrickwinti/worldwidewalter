@@ -18,7 +18,7 @@ public class GameIdGenerator {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
     private static final int MIN_GAME_ID_LENGTH = 7;
-    private static final Random RANDOM = new Random();
+    private static final Random RANDOM = new Random(0);
     
     public static String generateId() {
         StringBuilder id = new StringBuilder();

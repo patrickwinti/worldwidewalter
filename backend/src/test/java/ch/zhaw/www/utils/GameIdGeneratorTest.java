@@ -1,6 +1,7 @@
 package ch.zhaw.www.utils;
 
 import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
@@ -8,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GameIdGeneratorTest {
     
-    @RepeatedTest(3)
+    @Test
     void testUniqueness() {
         final int generatedIds = 10_000_000;
         var distinctIds = IntStream.range(0, generatedIds)

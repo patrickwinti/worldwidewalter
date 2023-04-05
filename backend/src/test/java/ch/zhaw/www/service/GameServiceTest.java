@@ -211,7 +211,7 @@ class GameServiceTest {
         
         //make round ready for selections
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
-        playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(p.getId(), List.of("Cereal")));
+        playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(createProposition(p.getId(), "Cereal")));
         
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
@@ -234,6 +234,41 @@ class GameServiceTest {
         assertEquals("Nora", waitingListNames.get(0));
         assertEquals("Nora1360", waitingListNames.get(1));
     }
+    
+    @Test
+    void addPropositionThatAlreadyExists() {
+        var game = mockRoundInRepository();
+        var players = List.of(createPlayer(), createPlayer(), createPlayer());
+        players.forEach(player -> {
+            game.addPlayerToWaitingRoom(player);
+            game.moveToActivePlayers(player);
+        });
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        gameService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
+        gameService.submitProposition(round.getId(), players.get(1).getId(), List.of("WASSER", "gummi"));
+        gameService.submitProposition(round.getId(), players.get(2).getId(), List.of("Wasser ", "  gummi"));
+        assertEquals(1, round.getPropositions().size());
+        assertEquals(2, round.getPropositions().get(0).getDuplicates().size());
+        assertEquals(players.get(1).getId(), round.getPropositions().get(0).getDuplicates().get(0).getPlayerId());
+        assertEquals(players.get(2).getId(), round.getPropositions().get(0).getDuplicates().get(1).getPlayerId());
+    }
+    
+    private Game mockRoundInRepository() {
+        var game = createGame(GAME_ID);
+        var round = createRound();
+        round.setSphinx(createPlayer());
+        game.addRound(round);
+        doAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            //noinspection unchecked
+            lambda.apply(game);
+            return null;
+        }).when(gameEntityService).editGameForRound(eq(round.getId()), any());
+        when(gameEntityService.getGameForRound(round.getId())).thenReturn(game);
+        return game;
+        
+    }
+    
     @Test
     void leaveGame() {
         Game game = mockGameInRepository();

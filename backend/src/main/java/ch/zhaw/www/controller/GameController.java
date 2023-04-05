@@ -132,13 +132,14 @@ public class GameController {
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRound(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
-        List<PropositionSelectionDto.Proposition> proposition = new ArrayList<>();
+        List<PropositionSelectionDto.Proposition> propositions = new ArrayList<>();
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
-        round.getPropositions().forEach((player, strings) -> {
-            //TODO use correct values
-            proposition.add(new PropositionSelectionDto.Proposition(playerId, strings, playerId.equals(player) || isSphinx));
+        round.getPropositions().forEach(proposition -> {
+            propositions.add(new PropositionSelectionDto.Proposition(proposition.getId(),
+                    proposition.getGaps(),
+                    playerId.equals(proposition.getPlayerId()) || isSphinx));
         });
-        return ResponseEntity.ok(new PropositionSelectionDto(roundId, proposition, round.getSelectionSubmissionEnd()));
+        return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
     //endregion
     

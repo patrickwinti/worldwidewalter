@@ -31,6 +31,14 @@ package backend{
         -hasBeenUsed: boolean
     }
 
+    class Proposition{
+          -id: String
+          -playerId: String
+          -gaps: List<String>
+          -duplicates: List<Proposition>
+          +hasSameGaps(proposition: Proposition): Boolean
+    }
+
     interface GameService{
        createGame(): Game
        leaveGame(gameId: String, playerId: String): void
@@ -112,6 +120,7 @@ package backend{
     GameService ..> PlayerError
     GameService ..> PropositionError
     GameService --> GameEntityService
+    GameService ..> Proposition
     GameService --> PostfixGenerator
     GameService --> GameIdGenerator
 

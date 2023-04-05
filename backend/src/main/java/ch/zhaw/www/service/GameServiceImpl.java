@@ -3,6 +3,7 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.GameIdGenerator;
 import ch.zhaw.www.utils.PostfixGenerator;
@@ -111,11 +112,30 @@ gameEntityService.editGame(gameId, game -> {
     }
 
     @Override
-    public void submitProposition(String roundId, String playerId, List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException {
+    public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
+            RoundError.NotFoundException, PlayerError.NotFoundException {
+        gameEntityService.editGameForRound(roundId, game -> {
+            if (!game.hasActivePlayer(playerId)) {
+                throw new PlayerError.NotFoundException(playerId);
+            }
+            Proposition temp = new Proposition(UUID.randomUUID().toString(), playerId, gaps);
+            final Round round = Objects.requireNonNull(game.getCurrentRound());
+            for (Proposition proposition : round.getPropositions()) {
+                if (proposition.hasSameGaps(temp)) {
+                    proposition.getDuplicates().add(temp);
+                    return game;
+                }
+            }
+            round.addProposition(temp);
+            return game;
+        });
+        
     }
 
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
+    public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
+            RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
+        
     }
 
     @Override
@@ -127,4 +147,5 @@ gameEntityService.editGame(gameId, game -> {
             throw new PlayerError.NotFoundException(playerId);
         }
     }
+    
 }

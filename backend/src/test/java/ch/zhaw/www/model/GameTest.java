@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.List;
 
 import static ch.zhaw.www.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,13 +75,13 @@ class GameTest {
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> round.addProposition(player.getId(), List.of("Walter " + player.getId())));
+        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
         InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
-        game.getCurrentRound().addProposition(player.getId(), List.of("Walter " + player.getId()));
+        game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
         InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
     }

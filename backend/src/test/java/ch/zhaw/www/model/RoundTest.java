@@ -1,5 +1,6 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.RoundError;
 import ch.zhaw.www.utils.InstantWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,10 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 import static ch.zhaw.www.TestHelper.createPlayer;
+import static ch.zhaw.www.TestHelper.createProposition;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -68,7 +71,7 @@ class RoundTest {
         tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        round.addProposition("1", List.of("Fish"));
+        round.addProposition(createProposition("1", "Fish "));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
@@ -84,14 +87,25 @@ class RoundTest {
         round.setSphinx(createPlayer());
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        round.addProposition("1", List.of("Joseph"));
+        round.addProposition(createProposition("1", "Joseph"));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         tick(fixedClock, PROPOSITION_DURATION);
         
-        round.addProposition("2", List.of("Maria"));
+        round.addProposition(createProposition("2", "Joseph"));
         
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
+    }
+    
+    @Test
+    void addProposition() {
+        Round round = getRound();
+        Proposition proposition1 = new Proposition(UUID.randomUUID().toString(), "1", List.of("Bruce", "Martha", "Selina"));
+        assertThrows(RoundError.IllegalStateException.class, () -> round.addProposition(proposition1));
+        Proposition proposition2 = new Proposition(UUID.randomUUID().toString(), "2", List.of("Barry", "Wally"));
+        round.setSphinx(createPlayer());
+        round.addProposition(proposition2);
+        assertEquals(1, round.getPropositions().size());
     }
     
     private void tick(Clock clock, Duration offset) {

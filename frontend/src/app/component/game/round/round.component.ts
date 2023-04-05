@@ -7,7 +7,6 @@ import { firstValueFrom, Observable } from "rxjs";
 import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
 import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
 import { HttpErrorResponse } from "@angular/common/http";
-import { PlayerDto } from "../../../dto/player-dto";
 
 @Component({
   selector: 'www-round',

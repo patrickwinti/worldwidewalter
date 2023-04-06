@@ -1,14 +1,14 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {AppConfigService} from "./app-config.service";
-import {GameDto} from "../dto/game-dto";
-import {PlayerJoinRequestDto} from "../dto/player-join-request-dto";
-import {PlayerDto} from "../dto/player-dto";
-import {RoundDto} from "../dto/round-dto";
-import {PropositionSubmissionDto} from "../dto/proposition-submission-dto";
-import {PropositionSelectionDto} from "../dto/proposition-selection-dto";
-import {ResultsDto} from "../dto/results-dto";
+import { Injectable } from '@angular/core';
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { AppConfigService } from "./app-config.service";
+import { GameDto } from "../dto/game-dto";
+import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
+import { PlayerDto } from "../dto/player-dto";
+import { RoundDto } from "../dto/round-dto";
+import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
+import { PropositionSelectionDto } from "../dto/proposition-selection-dto";
+import { ResultsDto } from "../dto/results-dto";
 
 @Injectable({
   providedIn: 'root'

@@ -148,7 +148,7 @@ class GameControllerTest {
     @Test
     void testSelectProposition_204() throws Exception {
         doNothing().when(gameService).selectProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/proposition/{propositionId}", ROUND_ID, PROPOSITION_ID)
+        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions/{propositionId}", ROUND_ID, PROPOSITION_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNoContent());
         
@@ -158,7 +158,7 @@ class GameControllerTest {
     @Test
     void testSelectProposition_404_round() throws Exception {
         doThrow(new RoundError.NotFoundException(ROUND_ID)).when(gameService).selectProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/proposition/{propositionId}", ROUND_ID, PROPOSITION_ID)
+        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions/{propositionId}", ROUND_ID, PROPOSITION_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
         verify(gameService).selectProposition(ROUND_ID, PLAYER_ID, PROPOSITION_ID);
@@ -167,7 +167,7 @@ class GameControllerTest {
     @Test
     void testSelectProposition_404_player() throws Exception {
         doThrow(new GameError.NotFoundException(GAME_ID)).when(gameService).selectProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/proposition/{propositionId}", ROUND_ID, PROPOSITION_ID)
+        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions/{propositionId}", ROUND_ID, PROPOSITION_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
     }

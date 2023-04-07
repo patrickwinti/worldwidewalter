@@ -7,7 +7,6 @@ import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.GameIdGenerator;
 import ch.zhaw.www.utils.PostfixGenerator;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +20,11 @@ import java.util.logging.Logger;
 class GameServiceImpl implements GameService {
     private static final Logger LOGGER = Logger.getLogger(GameService.class.getSimpleName());
     private static final int DEFAULT_NUMBER_OF_ROUNDS = 1;
-
+    
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
     private final PostfixGenerator postfixGenerator = new PostfixGenerator();
-
+    
     GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
         this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
@@ -68,9 +67,9 @@ gameEntityService.editGame(gameId, game -> {
             return game;
         });
     }
-
+    
     @Override
-    public void enterRound(String gameId, @Valid String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+    public void enterRound(String gameId, String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         gameEntityService.editGame(gameId, game -> {
             Player player = game.getAllPlayers()
                     .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
@@ -98,6 +97,7 @@ gameEntityService.editGame(gameId, game -> {
                     //Player can't enter round at the moment. Player will stay in waiting room.
                 }
             }
+            LOGGER.log(Level.INFO, () -> String.format("Game %s moved to state: %s", gameId, game.getState()));
             return game;
         });
     }
@@ -131,13 +131,13 @@ gameEntityService.editGame(gameId, game -> {
         });
         
     }
-
+    
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
         
     }
-
+    
     @Override
     public Round getRound(String roundId, String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException {
         var game = gameEntityService.getGameForRound(roundId);

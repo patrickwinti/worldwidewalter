@@ -3,22 +3,20 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
-import ch.zhaw.www.utils.InstantWrapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import static ch.zhaw.www.TestHelper.*;
+import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,6 +31,11 @@ class GameServiceTest {
     private GameService gameService;
     @MockBean
     private GameEntityService gameEntityService;
+    
+    @AfterEach
+    void tearDown() {
+        disableFixedClocked();
+    }
     
     @Test
     void testAddGameSavesItToRepository() {
@@ -71,7 +74,7 @@ class GameServiceTest {
         Player player4 = addWaitingRoomPlayer(game);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         
-        InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        enableFixedClocked();
         round.setSphinx(getRandomPlayer(game));
         game.moveToActivePlayers(player1);
         game.moveToActivePlayers(player2);
@@ -79,7 +82,7 @@ class GameServiceTest {
         game.moveToActivePlayers(player4);
         assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
         
-        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, ROUND_DURATION);
+        offsetFixedClockBy(ROUND_DURATION);
         
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
     }
@@ -160,13 +163,13 @@ class GameServiceTest {
         var game = mockGameInRepository();
         final Player player1 = createPlayer();
         game.addPlayerToWaitingRoom(player1);
-        final Player player2 = createPlayer();
-        game.addPlayerToWaitingRoom(player2);
         
         gameService.enterRound(GAME_ID, player1.getId());
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(player1);
         
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        final Player player2 = createPlayer();
+        game.addPlayerToWaitingRoom(player2);
         
         assertFalse(game.hasActivePlayer(player2.getId()));
         gameService.enterRound(GAME_ID, player2.getId());
@@ -275,14 +278,15 @@ class GameServiceTest {
         addActivePlayer(game);
         addWaitingRoomPlayer(game);
         List<String> playerIDs = game.getAllPlayers().map(Player::getId).toList();
-
+        
         gameService.leaveGame(game.getId(), playerIDs.get(0));
         assertEquals(1, game.getAllPlayers().count());
         gameService.leaveGame(game.getId(), playerIDs.get(1));
         assertEquals(0, game.getAllPlayers().count());
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(0)));
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(1)));
-    }    
+    }
+    
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         

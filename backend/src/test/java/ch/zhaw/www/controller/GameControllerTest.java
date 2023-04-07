@@ -5,7 +5,7 @@ import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.PlayerError;
 import ch.zhaw.www.service.RoundError;
-import ch.zhaw.www.utils.InstantWrapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,14 +17,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static ch.zhaw.www.TestHelper.*;
+import static ch.zhaw.www.TimeHelper.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,10 +46,14 @@ class GameControllerTest {
     private GameService gameService;
     
     private static String getExpectedDateInTheFuture(Duration duration) {
-        Instant i = Instant.now();
-        InstantWrapper.clock = Clock.fixed(i, ZoneId.systemDefault());
+        enableFixedClocked();
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.of("UTC")).format(i.plus(duration));
+                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(duration));
+    }
+    
+    @AfterEach
+    void tearDown() {
+        disableFixedClocked();
     }
     
     @Test

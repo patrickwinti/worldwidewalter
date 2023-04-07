@@ -2,19 +2,22 @@ package ch.zhaw.www.model;
 
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.PlayerError;
-import ch.zhaw.www.utils.InstantWrapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
+import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GameTest {
+    @AfterEach
+    void tearDown() {
+        disableFixedClocked();
+    }
     
     @Test
     void testGameState_WaitingForPlayers() {
@@ -57,7 +60,7 @@ class GameTest {
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         addRoundOpenForPropositionSubmission(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
         
         game.getAllPlayers().forEach(game::moveToActivePlayers);
         assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
@@ -78,11 +81,11 @@ class GameTest {
         game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
-        InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        enableFixedClocked();
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
         game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
-        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
+        offsetFixedClockBy(DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
     }
     

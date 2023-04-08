@@ -113,8 +113,20 @@ class GameTest {
     void testNewRound() {
         var game = createGame();
         assertNull(game.getCurrentRound());
-        game.addRound(createRound());
+        
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS).forEach(i -> game.addPlayerToWaitingRoom(createPlayer()));
+        final Round round1 = createRound();
+        game.addRound(round1);
         assertNotNull(game.getCurrentRound());
+        
+        var doesNotFitPlayer = createPlayer();
+        game.addPlayerToWaitingRoom(doesNotFitPlayer);
+        
+        final Round round2 = createRound();
+        game.addRound(round2);
+        assertNotEquals(round1, game.getCurrentRound());
+        assertEquals(round2, game.getCurrentRound());
+        assertFalse(game.hasActivePlayer(doesNotFitPlayer.getId()));
     }
     
     @Test

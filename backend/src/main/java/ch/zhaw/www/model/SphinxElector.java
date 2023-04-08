@@ -1,5 +1,6 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.service.PlayerError;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 
@@ -27,9 +28,10 @@ class SphinxElector {
      *
      * @param numberOfRoundsInTurn number of rounds per turn
      * @return a sphinx if it could be found or null
+     * @throws PlayerError.NotFoundException when sphinx is no longer an active player
      */
     @Nullable
-    public Player selectCandidate(final int numberOfRoundsInTurn) {
+    public Player selectCandidate(final int numberOfRoundsInTurn) throws PlayerError.NotFoundException {
         if (activePlayers.isEmpty() || numberOfRoundsInTurn < MINIMUM_ROUNDS_POSSIBLE) {
             return null;
         }
@@ -48,16 +50,27 @@ class SphinxElector {
     
     @Nullable
     private Player getSphinxFromLastRound() {
+        Player lastSphinx = null;
         for (int i = rounds.size() - 1; i >= 0; i--) {
             var lastRound = rounds.get(i);
             if (lastRound.getSphinx() != null) {
-                return lastRound.getSphinx();
+                lastSphinx = lastRound.getSphinx();
+                break;
             }
         }
-        return null;
+        if (lastSphinx != null && !activePlayers.containsKey(lastSphinx.getId())) {
+            //Player is no longer part of the round and can't be sphinx anymore
+            throw new PlayerError.NotFoundException(lastSphinx.getId());
+        }
+        return lastSphinx;
     }
     
     public void addCandidate(final Player player) {
         candidates.add(player);
+    }
+    
+    public void removeCandidate(final String playerId) {
+        candidates.stream().filter(player -> player.getId().equals(playerId))
+                .findFirst().ifPresent(candidates::remove);
     }
 }

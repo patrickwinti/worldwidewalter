@@ -11,10 +11,7 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -41,6 +38,13 @@ public class Game {
     
     public void addRound(Round round) {
         rounds.add(round);
+        final Iterator<Player> iterator = waitingRoom.values().iterator();
+        iterator.forEachRemaining(player -> {
+            if (activePlayers.size() < maximumAmountOfPlayers) {
+                iterator.remove();
+                activePlayers.put(player.getId(), player);
+            }
+        });
     }
     
     /**
@@ -153,20 +157,20 @@ public class Game {
             sphinxElector.addCandidate(player);
         }
     }
-/**
+    
+    /**
      * Removes player from waiting room or active players
      *
      * @param playerId player identifier
      * @throws PlayerError.NotFoundException if player is not in waiting room or active players
      */
-    public void removePlayer(@NotNull String playerId) throws PlayerError.NotFoundException{
+    public void removePlayer(@NotNull String playerId) throws PlayerError.NotFoundException {
         if (!hasPlayer(playerId)) {
             throw new PlayerError.NotFoundException(id);
         }
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
     }
-
     
     public Player selectSphinx() {
         return activePlayers.size() >= minimumAmountOfPlayers ? sphinxElector.selectCandidate(numberOfRoundsInTurn) : null;

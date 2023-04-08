@@ -29,6 +29,7 @@ public class Game {
     private final String id;
     private final int minimumAmountOfPlayers;
     private final int maximumAmountOfPlayers;
+    @Getter
     private final int numberOfRoundsInTurn;
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
@@ -74,22 +75,39 @@ public class Game {
     @NotNull
     public State getState() {
         var round = getCurrentRound();
-        var numberOfActivePlayers = activePlayers.size();
         if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (numberOfActivePlayers < minimumAmountOfPlayers || round.getState() == Round.State.CREATED) {
+        } else if (!hasEnoughPlayers() || canRoundStart(round)) {
             return State.WAITING_FOR_PLAYERS;
-        } else if (round.getState() == Round.State.OPEN_FOR_SUBMISSIONS &&
-                round.canEnterRound() &&
-                round.getNumberOfPropositionsSubmitted() < numberOfActivePlayers) {
+        } else if (round.canEnterRound() && canAcceptPropositions(round)) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else if ((round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
-                round.getState() == Round.State.OPEN_FOR_SELECTIONS) &&
-                round.getNumberOfSelectionsSubmitted() < numberOfActivePlayers) {
+        } else if (canAcceptSelections(round) && haveAllPlayersSubmittedASelection(round)) {
             return State.WAITING_FOR_ALL_SELECTIONS;
         } else {
             return State.NO_VALID_ROUND;
         }
+    }
+    
+    private boolean haveAllPlayersSubmittedASelection(final Round round) {
+        return round.getNumberOfSelectionsSubmitted() == activePlayers.size() - 1;
+    }
+    
+    private boolean canAcceptSelections(final Round round) {
+        return round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
+                round.getState() == Round.State.OPEN_FOR_SELECTIONS;
+    }
+    
+    private boolean hasEnoughPlayers() {
+        return activePlayers.size() >= minimumAmountOfPlayers;
+    }
+    
+    private boolean canAcceptPropositions(final Round round) {
+        return round.getNumberOfPropositionsSubmitted() < activePlayers.size() &&
+                round.getState() == Round.State.OPEN_FOR_SUBMISSIONS;
+    }
+    
+    private boolean canRoundStart(final Round round) {
+        return round.getState() == Round.State.CREATED;
     }
     
     public Prompt consumePrompt() {
@@ -170,10 +188,17 @@ public class Game {
         }
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
+        sphinxElector.removeCandidate(playerId);
     }
     
-    public Player selectSphinx() {
-        return activePlayers.size() >= minimumAmountOfPlayers ? sphinxElector.selectCandidate(numberOfRoundsInTurn) : null;
+    /**
+     * Selects a sphinx based on in which round the players are in the turn
+     *
+     * @return sphinx or null
+     * @throws PlayerError.NotFoundException if the sphinx is no longer an active player
+     */
+    public Player selectSphinx() throws PlayerError.NotFoundException {
+        return sphinxElector.selectCandidate(numberOfRoundsInTurn);
     }
     
     public enum State {

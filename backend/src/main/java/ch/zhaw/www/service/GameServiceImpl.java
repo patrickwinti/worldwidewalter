@@ -1,10 +1,7 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.GameProperties;
-import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Proposition;
-import ch.zhaw.www.model.Round;
+import ch.zhaw.www.model.*;
 import ch.zhaw.www.utils.GameIdGenerator;
 import ch.zhaw.www.utils.PostfixGenerator;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +26,7 @@ class GameServiceImpl implements GameService {
         this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
     }
-
+    
     @Override
     public Game createGame() throws GameError.ExistAlready {
         var game = new Game(GameIdGenerator.generateId(),
@@ -39,12 +36,12 @@ class GameServiceImpl implements GameService {
         gameEntityService.saveNewGame(game);
         return game;
     }
-
+    
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         return gameEntityService.getGame(gameId);
     }
-
+    
     @Override
     public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
@@ -59,10 +56,10 @@ class GameServiceImpl implements GameService {
         });
         return uuid;
     }
-
+    
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
-gameEntityService.editGame(gameId, game -> {
+        gameEntityService.editGame(gameId, game -> {
             game.removePlayer(playerId);
             return game;
         });
@@ -77,21 +74,18 @@ gameEntityService.editGame(gameId, game -> {
             Game.State state = game.getState();
             switch (state) {
                 case NO_VALID_ROUND -> {
-                    game.addRound(new Round(UUID.randomUUID().toString(),
-                            game.consumePrompt(),
-                            gameProperties.getPropositionSubmissionDuration(),
-                            gameProperties.getRoundEnterLimitDuration(),
-                            gameProperties.getSelectionSubmissionDuration()));
-                    LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
+                    createNewRound(game, game.consumePrompt());
+                    LOGGER.log(Level.INFO, "Creating a new round for game {0}", game);
                     game.moveToActivePlayers(player);
                 }
-                case WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS -> {
+                case WAITING_FOR_PLAYERS -> {
                     game.moveToActivePlayers(player);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
-                    var round = Objects.requireNonNull(game.getCurrentRound());
-                    if (round.getSphinx() == null) {
-                        round.setSphinx(game.selectSphinx());
-                    }
+                }
+                case WAITING_FOR_ALL_PROPOSITIONS -> {
+                    game.moveToActivePlayers(player);
+                    LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
+                    chooseSphinx(game);
                 }
                 case WAITING_FOR_ALL_SELECTIONS -> {
                     //Player can't enter round at the moment. Player will stay in waiting room.
@@ -101,7 +95,7 @@ gameEntityService.editGame(gameId, game -> {
             return game;
         });
     }
-
+    
     @Override
     public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = gameEntityService.getGame(gameId);
@@ -110,7 +104,7 @@ gameEntityService.editGame(gameId, game -> {
         }
         return game.getCurrentRound();
     }
-
+    
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException {
@@ -148,4 +142,18 @@ gameEntityService.editGame(gameId, game -> {
         }
     }
     
+    private void createNewRound(final Game game, Prompt prompt) {
+        game.addRound(new Round(UUID.randomUUID().toString(),
+                prompt,
+                gameProperties.getPropositionSubmissionDuration(),
+                gameProperties.getRoundEnterLimitDuration(),
+                gameProperties.getSelectionSubmissionDuration()));
+    }
+    
+    private void chooseSphinx(final Game game) {
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        if (round.getSphinx() == null) {
+            round.setSphinx(game.selectSphinx());
+        }
+    }
 }

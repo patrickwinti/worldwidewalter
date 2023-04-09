@@ -1,17 +1,13 @@
 package ch.zhaw.www.model;
 
-import ch.zhaw.www.service.GameError;
-import ch.zhaw.www.service.PlayerError;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -29,24 +25,13 @@ public class Game {
     private final String id;
     private final int minimumAmountOfPlayers;
     private final int maximumAmountOfPlayers;
-    @Getter
     private final int numberOfRoundsInTurn;
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
-    private final SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
+    @Setter
+    private Set<Map.Entry<Player, Integer>> sphinxCandidates;
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
-    
-    public void addRound(Round round) {
-        rounds.add(round);
-        final Iterator<Player> iterator = waitingRoom.values().iterator();
-        iterator.forEachRemaining(player -> {
-            if (activePlayers.size() < maximumAmountOfPlayers) {
-                iterator.remove();
-                activePlayers.put(player.getId(), player);
-            }
-        });
-    }
     
     /**
      * Gets current round,
@@ -77,7 +62,7 @@ public class Game {
         var round = getCurrentRound();
         if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (!hasEnoughPlayers() || canRoundStart(round)) {
+        } else if (doesNotHaveEnoughPlayers() || hasRoundNotStartedYet(round)) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.canEnterRound() && canAcceptPropositions(round)) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
@@ -97,8 +82,8 @@ public class Game {
                 round.getState() == Round.State.OPEN_FOR_SELECTIONS;
     }
     
-    private boolean hasEnoughPlayers() {
-        return activePlayers.size() >= minimumAmountOfPlayers;
+    private boolean doesNotHaveEnoughPlayers() {
+        return activePlayers.size() < minimumAmountOfPlayers;
     }
     
     private boolean canAcceptPropositions(final Round round) {
@@ -106,13 +91,22 @@ public class Game {
                 round.getState() == Round.State.OPEN_FOR_SUBMISSIONS;
     }
     
-    private boolean canRoundStart(final Round round) {
+    private boolean hasRoundNotStartedYet(final Round round) {
         return round.getState() == Round.State.CREATED;
     }
     
     public Prompt consumePrompt() {
-        // uncomment when deck is implemented: return prompts.remove(0) ;
+        // TODO correct code
         return prompts.get(0);
+    }
+    
+    /**
+     * Adds new round to game
+     *
+     * @param round new round
+     */
+    public void addRound(Round round) {
+        rounds.add(round);
     }
     
     /**
@@ -130,17 +124,16 @@ public class Game {
      * Moves players in the waiting room into the active list, if there is space in current round
      *
      * @param player player that will be marked as active
-     * @throws GameError.FullCapacityException if more than maximum players reached
      */
-    public void moveToActivePlayers(Player player) throws GameError.FullCapacityException {
-        if (activePlayers.size() < maximumAmountOfPlayers) {
-            if (getAllPlayers().noneMatch(p -> p.equals(player))) {
-                throw new PlayerError.NotFoundException(id);
-            }
-            waitingRoom.remove(player.getId());
-            activePlayers.put(player.getId(), player);
-        } else {
-            throw new GameError.FullCapacityException();
+    public void moveToActivePlayers(Player player) {
+        waitingRoom.remove(player.getId());
+        activePlayers.put(player.getId(), player);
+        if (sphinxCandidates != null) {
+            sphinxCandidates.stream()
+                    .filter(entry -> entry.getKey().equals(player))
+                    .findFirst()
+                    .ifPresentOrElse(entry -> {
+                    }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
         }
     }
     
@@ -170,35 +163,45 @@ public class Game {
      * @param player player that shall be added
      */
     public void addPlayerToWaitingRoom(@NotNull Player player) {
-        if (!hasActivePlayer(player.getId())) {
-            waitingRoom.put(player.getId(), player);
-            sphinxElector.addCandidate(player);
-        }
+        waitingRoom.put(player.getId(), player);
     }
     
     /**
      * Removes player from waiting room or active players
      *
      * @param playerId player identifier
-     * @throws PlayerError.NotFoundException if player is not in waiting room or active players
      */
-    public void removePlayer(@NotNull String playerId) throws PlayerError.NotFoundException {
-        if (!hasPlayer(playerId)) {
-            throw new PlayerError.NotFoundException(id);
-        }
+    public void removePlayer(@NotNull String playerId) {
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
-        sphinxElector.removeCandidate(playerId);
+        if (sphinxCandidates != null) {
+            sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
+                    .findFirst().ifPresent(sphinxCandidates::remove);
+        }
     }
     
     /**
-     * Selects a sphinx based on in which round the players are in the turn
+     * There is room for more active player in this or next round
      *
-     * @return sphinx or null
-     * @throws PlayerError.NotFoundException if the sphinx is no longer an active player
+     * @return true if there is space otherwise false
      */
-    public Player selectSphinx() throws PlayerError.NotFoundException {
-        return sphinxElector.selectCandidate(numberOfRoundsInTurn);
+    public boolean hasCapacityForNewActivePlayer() {
+        return activePlayers.size() < maximumAmountOfPlayers;
+    }
+    
+    /**
+     * Fetches sphinx candidates. If there are no candidates, then it returns
+     * a set of entries.
+     *
+     * @return set of every map entry
+     */
+    public Set<Map.Entry<Player, Integer>> getSphinxCandidates() {
+        if (sphinxCandidates == null || sphinxCandidates.isEmpty()) {
+            sphinxCandidates = activePlayers.values().stream()
+                    .map(player -> Map.entry(player, numberOfRoundsInTurn))
+                    .collect(Collectors.toSet());
+        }
+        return sphinxCandidates;
     }
     
     public enum State {

@@ -20,11 +20,13 @@ class GameServiceImpl implements GameService {
     
     private final GameEntityService gameEntityService;
     private final GameProperties gameProperties;
+    private final RoundService roundService;
     private final PostfixGenerator postfixGenerator = new PostfixGenerator();
     
-    GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties) {
+    GameServiceImpl(GameEntityService gameEntityService, GameProperties gameProperties, RoundService roundService) {
         this.gameEntityService = gameEntityService;
         this.gameProperties = gameProperties;
+        this.roundService = roundService;
     }
     
     @Override
@@ -60,6 +62,9 @@ class GameServiceImpl implements GameService {
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
         gameEntityService.editGame(gameId, game -> {
+            if (!game.hasPlayer(playerId)) {
+                throw new PlayerError.NotFoundException(playerId);
+            }
             game.removePlayer(playerId);
             return game;
         });
@@ -76,16 +81,16 @@ class GameServiceImpl implements GameService {
                 case NO_VALID_ROUND -> {
                     createNewRound(game, game.consumePrompt());
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", game);
-                    game.moveToActivePlayers(player);
+                    movePlayerToActive(game, player);
                 }
                 case WAITING_FOR_PLAYERS -> {
-                    game.moveToActivePlayers(player);
+                    movePlayerToActive(game, player);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
                 }
                 case WAITING_FOR_ALL_PROPOSITIONS -> {
-                    game.moveToActivePlayers(player);
+                    movePlayerToActive(game, player);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
-                    chooseSphinx(game);
+                    selectSphinxIfNeeded(game);
                 }
                 case WAITING_FOR_ALL_SELECTIONS -> {
                     //Player can't enter round at the moment. Player will stay in waiting room.
@@ -129,7 +134,7 @@ class GameServiceImpl implements GameService {
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) throws GameError.NotFoundException,
             RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException {
-        
+        //TODO add code
     }
     
     @Override
@@ -148,12 +153,28 @@ class GameServiceImpl implements GameService {
                 gameProperties.getPropositionSubmissionDuration(),
                 gameProperties.getRoundEnterLimitDuration(),
                 gameProperties.getSelectionSubmissionDuration()));
+        game.getAllPlayers()
+                .filter(player -> game.hasActivePlayer(player.getId()))
+                .takeWhile(player -> game.hasCapacityForNewActivePlayer())
+                .forEach(game::moveToActivePlayers);
     }
     
-    private void chooseSphinx(final Game game) {
+    private void selectSphinxIfNeeded(final Game game) {
         var round = Objects.requireNonNull(game.getCurrentRound());
         if (round.getSphinx() == null) {
-            round.setSphinx(game.selectSphinx());
+            round.setSphinx(roundService.selectSphinx(game));
         }
     }
+    
+    private static void movePlayerToActive(final Game game, final Player player) {
+        if (Boolean.TRUE.equals(game.hasCapacityForNewActivePlayer())) {
+            if (!game.hasPlayer(player.getId())) {
+                throw new PlayerError.NotFoundException(player.getId());
+            }
+            game.moveToActivePlayers(player);
+        } else {
+            throw new GameError.FullCapacityException();
+        }
+    }
+    
 }

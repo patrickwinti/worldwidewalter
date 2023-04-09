@@ -5,6 +5,7 @@ import ch.zhaw.www.repository.TextFileReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,6 +21,9 @@ public class PromptServiceImpl implements PromptService {
         TextFileReader textFileReader = new TextFileReader();
         File file = new File("backend/src/main/resources/firstDeck.txt");
 
-        return textFileReader.readFile(file);
+        List<Prompt> prompts = new ArrayList<>(textFileReader.readFile(file));
+        shufflePrompts(prompts);
+
+        return prompts;
     }
 }

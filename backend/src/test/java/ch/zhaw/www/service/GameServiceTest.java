@@ -30,7 +30,7 @@ class GameServiceTest {
     @Autowired
     private GameService gameService;
     @MockBean
-    private GameEntityService gameEntityService;
+    private EntityService entityService;
     
     @AfterEach
     void tearDown() {
@@ -40,7 +40,7 @@ class GameServiceTest {
     @Test
     void testAddGameSavesItToRepository() {
         var game = gameService.createGame();
-        verify(gameEntityService).saveNewGame(game);
+        verify(entityService).saveNewGame(game);
         assertNotNull(game.getId());
     }
     
@@ -266,8 +266,8 @@ class GameServiceTest {
             //noinspection unchecked
             lambda.apply(game);
             return null;
-        }).when(gameEntityService).editGameForRound(eq(round.getId()), any());
-        when(gameEntityService.getGameForRound(round.getId())).thenReturn(game);
+        }).when(entityService).editRound(eq(round.getId()), any());
+        when(entityService.getRound(round.getId())).thenReturn(game);
         return game;
         
     }
@@ -295,18 +295,18 @@ class GameServiceTest {
             //noinspection unchecked
             lambda.apply(game);
             return null;
-        }).when(gameEntityService).editGame(eq(game.getId()), any());
-        when(gameEntityService.getGame(game.getId())).thenReturn(game);
+        }).when(entityService).editGame(eq(game.getId()), any());
+        when(entityService.getGame(game.getId())).thenReturn(game);
         
         return game;
     }
     
     private void mockGameNotFoundInRepository(String gameId) {
         doThrow(GameError.NotFoundException.class)
-                .when(gameEntityService).editGame(eq(gameId), any());
+                .when(entityService).editGame(eq(gameId), any());
         
         doThrow(GameError.NotFoundException.class)
-                .when(gameEntityService).getGame(gameId);
+                .when(entityService).getGame(gameId);
     }
     
 }

@@ -2,7 +2,11 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Round;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 /**
  * Handles the Sphinx management. Based on the current state of the game
@@ -21,4 +25,37 @@ public interface RoundService {
     @Nullable
     Player selectSphinx(Game game);
     
+    void createNewRound(Game game);
+    
+    /**
+     * Returns round with given identifier
+     *
+     * @param roundId  round identifier
+     * @param playerId player requesting round
+     * @return new or existing round
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
+     */
+    Round getRound(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    
+    /**
+     * Player submitted their propositions for the prompt
+     *
+     * @param roundId  round identifier
+     * @param playerId player identifier
+     * @throws RoundError.NotFoundException  if round is not found
+     * @throws PlayerError.NotFoundException if player is not found
+     */
+    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException;
+    
+    /**
+     * Player has chosen a proposition id. The given player id is anonymized and only valid for the round
+     *
+     * @param roundId       round identifier
+     * @param playerId      player identifier
+     * @param propositionId proposition identifier
+     * @throws RoundError.NotFoundException  if round is not found
+     * @throws PlayerError.NotFoundException if player is not found
+     */
+    void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
 }

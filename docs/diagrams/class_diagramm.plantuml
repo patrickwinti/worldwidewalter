@@ -119,12 +119,12 @@ package backend{
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
-    GameService --> GameEntityService
+    GameService --> EntityService
     GameService ..> Proposition
     GameService --> PostfixGenerator
     GameService --> GameIdGenerator
 
-    GameEntityService --> GameRepository
+    EntityService --> GameRepository
 
     TextFileReader ..> Prompt
     FileReader<|-TextFileReader

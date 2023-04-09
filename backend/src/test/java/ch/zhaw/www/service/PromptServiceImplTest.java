@@ -8,11 +8,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PromptServiceTest {
+class PromptServiceImplTest {
 
 
     @Test
     void shufflePrompts() {
+        PromptServiceImpl promptServiceImpl = new PromptServiceImpl();
         List<Prompt> prompts1 = new ArrayList<>();
         prompts1.add(new Prompt("Wenn du Raubkatzen fürchtest, so nähere dich nie einer Frau WALTER.\n", 1));
         prompts1.add(new Prompt("Wenn meine Geliebte traurige Geschichten hören möchte, so erzähle ich ihr von der Zeit, als ich WALTERTE.", 1));
@@ -22,7 +23,7 @@ class PromptServiceTest {
 
         List<Prompt> prompts2 = List.copyOf(prompts1);
 
-        PromptService.shufflePrompts(prompts1);
+        promptServiceImpl.shufflePrompts(prompts1);
 
         assertNotEquals(prompts2, prompts1);
     }

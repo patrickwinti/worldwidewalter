@@ -28,12 +28,18 @@ class RoundServiceImpl implements RoundService {
         var entries = game.getSphinxCandidates();
         if (entries.isEmpty()) return null;
         var player = Collections.min(entries, Comparator.comparingInt(Map.Entry::getValue));
+        
         entries.remove(player);
-        if (player.getValue() > ONE_ROUND_LEFT) {
-            entries.add(Map.entry(player.getKey(), player.getValue() - 1));
+        
+        if (game.hasActivePlayer(player.getKey().getId())) {
+            if (player.getValue() > ONE_ROUND_LEFT) {
+                entries.add(Map.entry(player.getKey(), player.getValue() - 1));
+            }
+            game.setSphinxCandidates(entries);
+            return player.getKey();
+        } else {
+            return selectSphinx(game);
         }
-        game.setSphinxCandidates(entries);
-        return player.getKey();
     }
     
     @Override

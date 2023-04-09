@@ -25,6 +25,11 @@ public interface RoundService {
     @Nullable
     Player selectSphinx(Game game);
     
+    /**
+     * Creates new round in game
+     *
+     * @param game game to have a new round
+     */
     void createNewRound(Game game);
     
     /**

@@ -34,6 +34,7 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
+    //todo: initiate List with PromptServiceImpl
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
     
     public void addRound(Round round) {
@@ -91,7 +92,9 @@ public class Game {
             return State.NO_VALID_ROUND;
         }
     }
-    
+
+    //todo: integrate proper prompts, ensure consumed prompt is removed from list.
+    //todo: handle case when deck is full
     public Prompt consumePrompt() {
         // uncomment when deck is implemented: return prompts.remove(0) ;
         return prompts.get(0);

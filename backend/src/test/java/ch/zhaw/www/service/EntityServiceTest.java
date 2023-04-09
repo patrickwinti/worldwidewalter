@@ -1,6 +1,6 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,9 @@ class EntityServiceTest {
         game3.addRound(roundToBeFound);
         when(gameRepository.findAll()).thenReturn(List.of(game1, game2, game3));
         
-        final Game gameForRound = entityService.getRound(roundToBeFound.getId());
+        final Round gameForRound = entityService.getRound(roundToBeFound.getId());
         assertNotNull(gameForRound);
-        assertSame(game3, gameForRound);
+        assertSame(roundToBeFound, gameForRound);
     }
     
     @Test

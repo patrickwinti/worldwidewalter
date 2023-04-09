@@ -55,7 +55,6 @@ class GameServiceImpl implements GameService {
             }
             Player tempPlayer = new Player(uuid, name.toString());
             game.addPlayerToWaitingRoom(tempPlayer);
-            return game;
         });
         return uuid;
     }
@@ -67,7 +66,6 @@ class GameServiceImpl implements GameService {
                 throw new PlayerError.NotFoundException(playerId);
             }
             game.removePlayer(playerId);
-            return game;
         });
     }
     
@@ -98,7 +96,6 @@ class GameServiceImpl implements GameService {
                 }
             }
             LOGGER.log(Level.INFO, () -> String.format("Game %s moved to state: %s", gameId, game.getState()));
-            return game;
         });
     }
     

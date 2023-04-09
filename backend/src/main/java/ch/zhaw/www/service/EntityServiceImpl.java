@@ -28,7 +28,8 @@ class EntityServiceImpl implements EntityService {
     public void editGame(String gameId, Consumer<Game> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
-            gamesRepository.save(editor.apply(game));
+            editor.accept(game);
+            gamesRepository.save(game);
         }
     }
     
@@ -49,8 +50,8 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public boolean isPlayerActiveInRound(final String roundId) throws RoundError.NotFoundException {
-        return false;
+    public boolean isPlayerActiveInRound(final String roundId, final String playerId) throws RoundError.NotFoundException {
+        return findGameForRound(roundId).hasActivePlayer(playerId);
     }
     
     @Override

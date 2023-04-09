@@ -53,7 +53,7 @@ class RoundServiceImpl implements RoundService {
                 gameProperties.getRoundEnterLimitDuration(),
                 gameProperties.getSelectionSubmissionDuration()));
         game.getAllPlayers()
-                .filter(player -> game.hasActivePlayer(player.getId()))
+                .filter(player -> !game.hasActivePlayer(player.getId()))
                 .takeWhile(player -> game.hasCapacityForNewActivePlayer())
                 .forEach(game::moveToActivePlayers);
     }

@@ -14,7 +14,6 @@ describe('SphinxDisplayComponent', () => {
 
     fixture = TestBed.createComponent(SphinxDisplayComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

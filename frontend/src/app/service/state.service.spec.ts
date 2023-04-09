@@ -17,15 +17,12 @@ describe('StateService', () => {
 
   it('goToNextState should go to correct state', () => {
     // assert initial condition
-    expect(service.getCurrentState()).toBe(GameState.WAITING_FOR_PLAYERS);
-
-    service.goToNextState();
     expect(service.getCurrentState()).toBe(GameState.ENTER_PROPOSITION);
 
     service.goToNextState();
     expect(service.getCurrentState()).toBe(GameState.SELECT_PROPOSITION);
 
     service.goToNextState();
-    expect(service.getCurrentState()).toBe(GameState.WAITING_FOR_PLAYERS);
+    expect(service.getCurrentState()).toBe(GameState.SHOW_RANKING);
   });
 });

@@ -6,9 +6,9 @@
     <div class="textbox special-margin2 special-margin3">Dein Vorschlag</div>
     <br>
 
-    <div *ngFor="let proposition of propositionsForGaps; let i = index">
+    <div *ngFor="let walter of proposition; let i = index">
       <input class="special-margin2" type="text" placeholder="{{i+1}}. Walterersatz"
-             [(ngModel)]="propositionsForGaps[i].text">
+             [(ngModel)]="walter.text">
     </div>
 
   </div>

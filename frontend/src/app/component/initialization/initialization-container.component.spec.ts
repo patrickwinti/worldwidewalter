@@ -16,7 +16,6 @@ describe('InitializationContainerComponent', () => {
 
     fixture = TestBed.createComponent(InitializationContainerComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

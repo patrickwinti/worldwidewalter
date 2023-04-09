@@ -5,7 +5,6 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
-import jakarta.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,23 +21,27 @@ class RoundServiceImpl implements RoundService {
         this.entityService = entityService;
     }
     
-    @Nullable
     @Override
-    public Player selectSphinx(Game game) {
-        var entries = game.getSphinxCandidates();
-        if (entries.isEmpty()) return null;
-        var player = Collections.min(entries, Comparator.comparingInt(Map.Entry::getValue));
-        
-        entries.remove(player);
-        
-        if (game.hasActivePlayer(player.getKey().getId())) {
-            if (player.getValue() > ONE_ROUND_LEFT) {
-                entries.add(Map.entry(player.getKey(), player.getValue() - 1));
+    public void selectSphinx(Game game) {
+        var round = game.getCurrentRound();
+        if (round != null && round.getSphinx() == null) {
+            var entries = game.getSphinxCandidates();
+            if (entries.isEmpty()) return;
+            var player = Collections.min(entries, Comparator.comparingInt(Map.Entry::getValue));
+            
+            entries.remove(player);
+            
+            Player sphinx = null;
+            if (game.hasActivePlayer(player.getKey().getId())) {
+                if (player.getValue() > ONE_ROUND_LEFT) {
+                    entries.add(Map.entry(player.getKey(), player.getValue() - 1));
+                }
+                game.setSphinxCandidates(entries);
+                sphinx = player.getKey();
+            } else {
+                selectSphinx(game);
             }
-            game.setSphinxCandidates(entries);
-            return player.getKey();
-        } else {
-            return selectSphinx(game);
+            round.setSphinx(sphinx);
         }
     }
     
@@ -60,12 +63,17 @@ class RoundServiceImpl implements RoundService {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
             Proposition temp = new Proposition(UUID.randomUUID().toString(), playerId, gaps);
+            boolean isDuplicate = false;
             for (Proposition proposition : round.getPropositions()) {
                 if (proposition.hasSameGaps(temp)) {
                     proposition.getDuplicates().add(temp);
+                    isDuplicate = true;
+                    break;
                 }
             }
-            round.addProposition(temp);
+            if (!isDuplicate) {
+                round.addProposition(temp);
+            }
         });
     }
     

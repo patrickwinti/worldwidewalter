@@ -1,9 +1,7 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -20,10 +18,8 @@ public interface RoundService {
      * Otherwise, it fetches it from the last round
      *
      * @param game in which the sphinx is to be selected
-     * @return a sphinx if it could be found or null
      */
-    @Nullable
-    Player selectSphinx(Game game);
+    void selectSphinx(Game game);
     
     /**
      * Creates new round in game

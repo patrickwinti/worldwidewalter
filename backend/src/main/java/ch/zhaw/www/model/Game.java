@@ -30,7 +30,7 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     @Setter
-    private Set<Map.Entry<Player, Integer>> sphinxCandidates;
+    private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
     
     /**
@@ -66,7 +66,7 @@ public class Game {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.canEnterRound() && canAcceptPropositions(round)) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else if (canAcceptSelections(round) && haveAllPlayersSubmittedASelection(round)) {
+        } else if (canAcceptSelections(round) && !haveAllPlayersSubmittedASelection(round)) {
             return State.WAITING_FOR_ALL_SELECTIONS;
         } else {
             return State.NO_VALID_ROUND;
@@ -128,13 +128,11 @@ public class Game {
     public void moveToActivePlayers(Player player) {
         waitingRoom.remove(player.getId());
         activePlayers.put(player.getId(), player);
-        if (sphinxCandidates != null) {
-            sphinxCandidates.stream()
-                    .filter(entry -> entry.getKey().equals(player))
-                    .findFirst()
-                    .ifPresentOrElse(entry -> {
-                    }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
-        }
+        sphinxCandidates.stream()
+                .filter(entry -> entry.getKey().equals(player))
+                .findFirst()
+                .ifPresentOrElse(entry -> {
+                }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
     }
     
     /**
@@ -174,10 +172,8 @@ public class Game {
     public void removePlayer(@NotNull String playerId) {
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
-        if (sphinxCandidates != null) {
-            sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
-                    .findFirst().ifPresent(sphinxCandidates::remove);
-        }
+        sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
+                .findFirst().ifPresent(sphinxCandidates::remove);
     }
     
     /**
@@ -196,7 +192,7 @@ public class Game {
      * @return set of every map entry
      */
     public Set<Map.Entry<Player, Integer>> getSphinxCandidates() {
-        if (sphinxCandidates == null || sphinxCandidates.isEmpty()) {
+        if (sphinxCandidates.isEmpty()) {
             sphinxCandidates = activePlayers.values().stream()
                     .map(player -> Map.entry(player, numberOfRoundsInTurn))
                     .collect(Collectors.toSet());

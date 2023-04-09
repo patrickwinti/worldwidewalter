@@ -82,14 +82,10 @@ class GameServiceImpl implements GameService {
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", game);
                     movePlayerToActive(game, player);
                 }
-                case WAITING_FOR_PLAYERS -> {
+                case WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS -> {
                     movePlayerToActive(game, player);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
-                }
-                case WAITING_FOR_ALL_PROPOSITIONS -> {
-                    movePlayerToActive(game, player);
-                    LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
-                    selectSphinxIfNeeded(game);
+                    roundService.selectSphinx(game);
                 }
                 case WAITING_FOR_ALL_SELECTIONS -> {
                     //Player can't enter round at the moment. Player will stay in waiting room.
@@ -106,13 +102,6 @@ class GameServiceImpl implements GameService {
             throw new RoundError.IllegalStateException();
         }
         return game.getCurrentRound();
-    }
-    
-    private void selectSphinxIfNeeded(final Game game) {
-        var round = Objects.requireNonNull(game.getCurrentRound());
-        if (round.getSphinx() == null) {
-            round.setSphinx(roundService.selectSphinx(game));
-        }
     }
     
     private static void movePlayerToActive(final Game game, final Player player) {

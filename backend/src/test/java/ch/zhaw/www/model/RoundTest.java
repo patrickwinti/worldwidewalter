@@ -1,22 +1,20 @@
 package ch.zhaw.www.model;
 
 import ch.zhaw.www.service.RoundError;
-import ch.zhaw.www.utils.InstantWrapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
 import static ch.zhaw.www.TestHelper.createPlayer;
 import static ch.zhaw.www.TestHelper.createProposition;
+import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -27,12 +25,15 @@ class RoundTest {
     private static final Duration PROPOSITION_DURATION = Duration.ofMinutes(40);
     private static final Duration PROPOSITION_ENTER_LIMIT = Duration.ofMinutes(10);
     private static final Duration SUBMISSION_DURATION = Duration.ofMinutes(10);
-    private final Instant instant = Instant.parse("2022-12-22T10:00:00Z");
-    private final Clock fixedClock = Clock.fixed(instant, ZoneId.of("UTC"));
     
     @BeforeEach
     void setUp() {
-        InstantWrapper.clock = fixedClock;
+        enableFixedClocked();
+    }
+    
+    @AfterEach
+    void tearDown() {
+        disableFixedClocked();
     }
     
     @Test
@@ -44,7 +45,7 @@ class RoundTest {
         round.setSphinx(createPlayer());
         
         assertNotNull(round.getPropositionSubmissionEnd());
-        assertEquals(instant.plus(PROPOSITION_DURATION), round.getPropositionSubmissionEnd());
+        assertEquals(getFixedClockInstant().plus(PROPOSITION_DURATION), round.getPropositionSubmissionEnd());
     }
     
     @Test
@@ -53,10 +54,10 @@ class RoundTest {
         round.setSphinx(createPlayer());
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT).minus(1, ChronoUnit.MINUTES));
+        offsetFixedClockBy(PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT).minus(1, ChronoUnit.MINUTES));
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         assertTrue(round.canEnterRound());
-        tick(fixedClock, PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT));
+        offsetFixedClockBy(PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT));
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         assertFalse(round.canEnterRound());
     }
@@ -68,13 +69,13 @@ class RoundTest {
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         
-        tick(fixedClock, PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
+        offsetFixedClockBy(PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
         round.addProposition(createProposition("1", "Fish "));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION);
+        offsetFixedClockBy(PROPOSITION_DURATION);
         assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
     }
     
@@ -90,7 +91,7 @@ class RoundTest {
         round.addProposition(createProposition("1", "Joseph"));
         
         assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
-        tick(fixedClock, PROPOSITION_DURATION);
+        offsetFixedClockBy(PROPOSITION_DURATION);
         
         round.addProposition(createProposition("2", "Joseph"));
         
@@ -106,10 +107,6 @@ class RoundTest {
         round.setSphinx(createPlayer());
         round.addProposition(proposition2);
         assertEquals(1, round.getPropositions().size());
-    }
-    
-    private void tick(Clock clock, Duration offset) {
-        InstantWrapper.clock = Clock.offset(clock, offset);
     }
     
     private static Round getRound() {

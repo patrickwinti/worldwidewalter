@@ -114,7 +114,7 @@ public class GameController {
             @ApiResponse(responseCode = "404", description = "Either round, proposition or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/rounds/{roundId}/proposition/{propositionId}")
+    @PostMapping(value = "/rounds/{roundId}/propositions/{propositionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void selectProposition(@PathVariable String roundId, @PathVariable String propositionId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         gameService.selectProposition(roundId, playerId, propositionId);

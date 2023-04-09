@@ -40,7 +40,7 @@ export class GameService {
   }
 
   submitProposition(roundId: string, proposition: PropositionSubmissionDto): Observable<void> {
-    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/proposition',
+    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/propositions',
       proposition);
   }
 
@@ -49,11 +49,11 @@ export class GameService {
   }
 
   submitPropositionSelection(roundId: string, id: string): Observable<void> {
-    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/proposition/' + id, null);
+    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/propositions/' + id, null);
   }
 
   getResults(gameId: string): Observable<ResultsDto> {
-    return this.http.get<ResultsDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/results/');
+    return this.http.get<ResultsDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/results');
   }
 
 }

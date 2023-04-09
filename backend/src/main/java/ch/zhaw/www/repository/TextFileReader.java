@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * Public class to read Files of TXT type.
  * Class implements readFile method from the FileReader interface.
  */
-class TextFileReader implements FileReader {
+public class TextFileReader implements FileReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
     private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
     

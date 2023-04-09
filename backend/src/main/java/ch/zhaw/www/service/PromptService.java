@@ -2,6 +2,7 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Prompt;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -14,4 +15,10 @@ public interface PromptService {
      * @param prompts: list of prompts to be shuffled
      */
     void shufflePrompts(List<Prompt> prompts);
+
+    /**
+     * Method to create a prompt deck with WALTER prompts.
+     *
+     */
+    List<Prompt> createPromptDeck() throws IOException;
 }

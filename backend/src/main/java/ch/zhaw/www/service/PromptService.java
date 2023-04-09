@@ -5,6 +5,7 @@ import ch.zhaw.www.model.Prompt;
 import java.util.Collections;
 import java.util.List;
 
+
 /**
  * Prompt Service class to integrate prompts into the game.
  */

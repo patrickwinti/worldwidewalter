@@ -3,6 +3,8 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Prompt;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,5 +28,14 @@ class PromptServiceImplTest {
         promptServiceImpl.shufflePrompts(prompts1);
 
         assertNotEquals(prompts2, prompts1);
+    }
+
+    @Test
+    void createPromptDeck() throws IOException {
+        File file = new File("src/test/resources/testDeck.txt");
+        PromptServiceImpl promptServiceImpl = new PromptServiceImpl();
+        List<Prompt> prompts = promptServiceImpl.createPromptDeck(file);
+
+        assertEquals(4, prompts.size());
     }
 }

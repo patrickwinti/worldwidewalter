@@ -42,7 +42,7 @@ public class TextFileReader implements FileReader {
         }
     }
     
-    /*
+    /**
      * Method to count the total number of WALTER words (or variations) that appear in one statement.
      *
      * @param input: sentence to be analysed.

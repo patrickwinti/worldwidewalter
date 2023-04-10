@@ -2,6 +2,7 @@ package ch.zhaw.www.model;
 
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.PlayerError;
+import ch.zhaw.www.service.PromptServiceImpl;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -11,6 +12,8 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -34,9 +37,8 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
-    //todo: initiate List with PromptServiceImpl
-    private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
-    
+    private final List<Prompt> prompts = initiatePrompts();
+
     public void addRound(Round round) {
         rounds.add(round);
         final Iterator<Player> iterator = waitingRoom.values().iterator();
@@ -47,7 +49,7 @@ public class Game {
             }
         });
     }
-    
+
     /**
      * Gets current round,
      * when the SphinxElector has been selected
@@ -63,7 +65,7 @@ public class Game {
             return round.getState() != Round.State.FINISHED ? round : null;
         }
     }
-    
+
     /**
      * Returns state of the current game:
      * - Waiting for player: Not enough players active or no valid round
@@ -93,13 +95,10 @@ public class Game {
         }
     }
 
-    //todo: integrate proper prompts, ensure consumed prompt is removed from list.
-    //todo: handle case when deck is full
     public Prompt consumePrompt() {
-        // uncomment when deck is implemented: return prompts.remove(0) ;
-        return prompts.get(0);
+        return prompts.remove(0);
     }
-    
+
     /**
      * Returns stream of all active and waiting room players
      *
@@ -110,7 +109,7 @@ public class Game {
         players.addAll(activePlayers.values());
         return players.stream();
     }
-    
+
     /**
      * Moves players in the waiting room into the active list, if there is space in current round
      *
@@ -128,7 +127,7 @@ public class Game {
             throw new GameError.FullCapacityException();
         }
     }
-    
+
     /**
      * Checks if player ID is currently an active player
      *
@@ -138,7 +137,7 @@ public class Game {
     public boolean hasActivePlayer(@NotNull String playerId) {
         return activePlayers.containsKey(playerId);
     }
-    
+
     /**
      * Checks if player ID is currently a player
      *
@@ -148,7 +147,7 @@ public class Game {
     public boolean hasPlayer(@NotNull String playerId) {
         return getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
     }
-    
+
     /**
      * Adds player to waiting room if not already active
      *
@@ -160,7 +159,7 @@ public class Game {
             sphinxElector.addCandidate(player);
         }
     }
-    
+
     /**
      * Removes player from waiting room or active players
      *
@@ -174,12 +173,23 @@ public class Game {
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
     }
-    
+
     public Player selectSphinx() {
         return activePlayers.size() >= minimumAmountOfPlayers ? sphinxElector.selectCandidate(numberOfRoundsInTurn) : null;
     }
-    
+
     public enum State {
         NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
+    }
+
+    private List<Prompt> initiatePrompts() {
+        File file = new File("src/main/resources/firstDeck.txt");
+        PromptServiceImpl promptService = new PromptServiceImpl();
+
+        try {
+            return promptService.createPromptDeck(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

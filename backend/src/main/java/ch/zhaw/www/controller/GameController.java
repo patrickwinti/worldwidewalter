@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 @RestController
 @Validated
-@CrossOrigin("*")
+@CrossOrigin({"http://localhost:4200", "http://worldwidewalter.ch", "http://myfilebox.synology.me"})
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;

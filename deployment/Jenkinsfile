@@ -14,7 +14,7 @@ pipeline {
             steps {
                 sh 'java -version'
                 // Get code from a GitHub repository
-                git branch: ${params.BRANCH},
+                git branch: "${params.BRANCH}",
                     credentialsId: 'zhaw',
                     url: 'https://github.zhaw.ch/PM3-FS23-IT21ta-ZH-Team4/PM3_FS23_IT21ta-ZH-Team4'
 

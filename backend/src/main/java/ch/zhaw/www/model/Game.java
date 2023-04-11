@@ -172,6 +172,8 @@ public class Game {
     public void removePlayer(@NotNull String playerId) {
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
+        sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
+                .findFirst().ifPresent(sphinxCandidates::remove);
     }
     
     /**

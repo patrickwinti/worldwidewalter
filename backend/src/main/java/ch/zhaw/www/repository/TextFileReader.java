@@ -1,6 +1,7 @@
 package ch.zhaw.www.repository;
 
 import ch.zhaw.www.model.Prompt;
+import org.springframework.stereotype.Repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +18,8 @@ import java.util.stream.Stream;
  * Public class to read Files of TXT type.
  * Class implements readFile method from the FileReader interface.
  */
-public class TextFileReader implements FileReader {
+@Repository
+class TextFileReader implements FileReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
     private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
     

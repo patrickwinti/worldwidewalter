@@ -1,7 +1,8 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.repository.TextFileReader;
+import ch.zhaw.www.repository.FileReader;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,22 +10,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PromptServiceImpl implements PromptService {
+@Service
+class PromptServiceImpl implements PromptService {
 
+    private final FileReader fileReader;
 
-    @Override
-    public List<Prompt> shufflePrompts(List<Prompt> prompts) {
-        Collections.shuffle(prompts);
-        return prompts;
+    PromptServiceImpl(FileReader fileReader) {
+        this.fileReader = fileReader;
     }
 
     @Override
-    public List<Prompt> createPromptDeck(File file) throws IOException {
-        TextFileReader textFileReader = new TextFileReader();
+    public List<Prompt> getPrompts() {
+        File file = new File("src/main/resources/firstDeck.txt");
 
-        List<Prompt> prompts = new ArrayList<>(textFileReader.readFile(file));
-        shufflePrompts(prompts);
-
-        return prompts;
+        try {
+            List<Prompt> prompts = new ArrayList<>(fileReader.readFile(file));
+            Collections.shuffle(prompts);
+            return prompts;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+
 }

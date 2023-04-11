@@ -2,7 +2,6 @@ package ch.zhaw.www.model;
 
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.PlayerError;
-import ch.zhaw.www.service.PromptServiceImpl;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
@@ -37,7 +36,7 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
-    private final List<Prompt> prompts = initiatePrompts();
+    private final List<Prompt> prompts;
 
     public void addRound(Round round) {
         rounds.add(round);
@@ -182,14 +181,4 @@ public class Game {
         NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
     }
 
-    private List<Prompt> initiatePrompts() {
-        File file = new File("src/main/resources/firstDeck.txt");
-        PromptServiceImpl promptService = new PromptServiceImpl();
-
-        try {
-            return promptService.shufflePrompts(promptService.createPromptDeck(file));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

@@ -10,16 +10,11 @@ import java.util.List;
  * Prompt Service class to integrate prompts into the game.
  */
 public interface PromptService {
-    /**
-     * Method to shuffle a list.
-     *
-     * @param prompts: list of prompts to be shuffled
-     */
-    List<Prompt> shufflePrompts(List<Prompt> prompts);
 
     /**
-     * Method to create a prompt deck with WALTER prompts.
-     *
+     * Method to read text file with WALTER prompts
+     * @return List with read WALTER prompts
      */
-    List<Prompt> createPromptDeck(File file) throws IOException;
-}
+    public List<Prompt> getPrompts();
+
+    }

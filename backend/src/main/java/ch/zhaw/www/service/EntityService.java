@@ -1,14 +1,15 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.function.UnaryOperator;
+import java.util.function.Consumer;
 
 /**
  * Game repository with protected access to game instances
  */
-public interface GameEntityService {
+public interface EntityService {
     /**
      * Gets a read only instance of the game. This game can not be read and is subject to dirty reads.
      *
@@ -25,31 +26,40 @@ public interface GameEntityService {
      * @param editor the changes on the game
      * @throws GameError.NotFoundException if game does not exist
      */
-    void editGame(@NotNull String gameId, UnaryOperator<Game> editor) throws GameError.NotFoundException;
+    void editGame(@NotNull String gameId, Consumer<Game> editor) throws GameError.NotFoundException;
     
     /**
-     * Fetches the game for given round ID
+     * Fetches the round for given round ID
      *
      * @param roundId round id that needs to be found
-     * @return game for given round
+     * @return round for given identifier
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
-    Game getGameForRound(String roundId) throws RoundError.NotFoundException;
+    Round getRound(@NotNull String roundId) throws RoundError.NotFoundException;
     
     /**
-     * Fetches the game for given round ID
+     * Checks if player is active for given round id
      *
      * @param roundId round id that needs to be found
-     * @param editor  for changes in game
+     * @return if player is active otherwise false
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
-    void editGameForRound(String roundId, UnaryOperator<Game> editor) throws RoundError.NotFoundException;
+    boolean isPlayerActiveInRound(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException;
+    
+    /**
+     * Edits round with given round ID
+     *
+     * @param roundId round id that needs to be found
+     * @param editor  for changes in round
+     * @throws RoundError.NotFoundException if no round is found matching the ID
+     */
+    void editRound(@NotNull String roundId, Consumer<Round> editor) throws RoundError.NotFoundException;
     
     /**
      * Saves a new game. If game is already saved it will throw an exception.
      *
      * @param game to be saved
      */
-
-    void saveNewGame(Game game) throws GameError.ExistAlready;
+    
+    void saveNewGame(@NotNull Game game) throws GameError.ExistAlready;
 }

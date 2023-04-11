@@ -1,20 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { GameService } from './game.service';
 import { of } from "rxjs";
-import { getHttpClientMock } from "../testing/mock-services";
+import { getAppConfigServiceMock, getHttpClientMock } from "../testing/mock-services";
 import { HttpClient } from "@angular/common/http";
+import { AppConfigService } from "./app-config.service";
 
 describe('GameService', () => {
   let service: GameService;
   let httpMock = getHttpClientMock();
+  let appConfigService = getAppConfigServiceMock();
+  let baseUrl = 'baseUrl';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        {provide: HttpClient, useValue: httpMock}
+        {provide: HttpClient, useValue: httpMock},
+        {provide: AppConfigService, useValue: appConfigService}
       ]
     }).compileComponents();
 
+    appConfigService.getBaseUrl.and.returnValue(baseUrl);
     service = TestBed.inject(GameService);
   });
 
@@ -26,10 +31,11 @@ describe('GameService', () => {
     // arrange
     httpMock.post.and.returnValue(of(undefined));
 
+
     // act
     service.requestNewGame();
 
     // assert
-    expect(httpMock.post).toHaveBeenCalledWith('http://localhost:8080/api/games', {})
+    expect(httpMock.post).toHaveBeenCalledWith(baseUrl + '/games', null)
   });
 });

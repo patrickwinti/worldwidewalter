@@ -24,6 +24,8 @@ class GameServiceIntegrationTest {
     @Autowired
     private GameService gameService;
     @Autowired
+    private RoundService roundService;
+    @Autowired
     private GameProperties gameProperties;
     
     @AfterEach
@@ -102,16 +104,16 @@ class GameServiceIntegrationTest {
         gameService.enterRound(gameId, shulamitPlayerId);
         
         var round1 = gameService.getCurrentRoundInGame(gameId, shulamitPlayerId);
-        gameService.submitProposition(round1.getId(), caelanPlayerId, List.of(" Perikles"));
-        gameService.submitProposition(round1.getId(), cardeaPlayerId, List.of("Eleonore"));
+        roundService.submitProposition(round1.getId(), caelanPlayerId, List.of(" Perikles"));
+        roundService.submitProposition(round1.getId(), cardeaPlayerId, List.of("Eleonore"));
         
         // can't participate in round anymore
         offsetFixedClockBy(gameProperties.getPropositionSubmissionDuration().minus(gameProperties.getRoundEnterLimitDuration()).plus(1, ChronoUnit.SECONDS));
         gameService.enterRound(gameId, neusPlayerId);
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(gameId, neusPlayerId));
         
-        gameService.submitProposition(round1.getId(), grifudPlayerId, List.of("Lysistrata"));
-        gameService.submitProposition(round1.getId(), shulamitPlayerId, List.of("Yedidia"));
+        roundService.submitProposition(round1.getId(), grifudPlayerId, List.of("Lysistrata"));
+        roundService.submitProposition(round1.getId(), shulamitPlayerId, List.of("Yedidia"));
         
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(gameId, neusPlayerId));
         

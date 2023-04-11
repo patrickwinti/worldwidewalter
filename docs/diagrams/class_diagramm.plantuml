@@ -42,12 +42,16 @@ package backend{
     interface GameService{
        createGame(): Game
        leaveGame(gameId: String, playerId: String): void
-       submitProposition(roundId: String, playerId: String, gaps: List<String>): void
-       selectProposition(roundId: String, playerId: String, propositionId: String): void
        getGame(gameId: String) : Game
        enterGame(gameId: String, playerName: String) : Player
        enterRound(gameId: String, playerId: String) : Round
-       getRound(gameId: String, playerId: String) : Round
+    }
+    interface RoundService{
+        selectSphinx(game: Game);
+        createNewRound(game: Game);
+        getRound(roundId: String, playerId: String):Round
+        submitProposition(roundId: String, playerId: String, gaps: List<String>)
+        selectProposition(roundId: String, playerId: String, propositionId: String)
     }
     interface GameRepository
     class PlayerDto {
@@ -97,21 +101,17 @@ package backend{
     }
 
     class TextFileReader
-    class SphinxElector {
-        -rounds: List<Round>
-        -activePlayers: Map<String, Player>
-        -candidates: List<Player>
-        selectCandidate(numberOfRounds: Int)
-        addCandidate(player: Player)
-    }
     class GameIdGenerator{
         +generateId():String{static}
     }
+
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
     GameController..>RoundDto
     GameController ..> GameDto
+    GameController --> RoundService
+    GameController --> GameService
 
     GameService ..> Game
     GameService ..> Player
@@ -119,16 +119,18 @@ package backend{
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
-    GameService --> GameEntityService
+    GameService --> EntityService
     GameService ..> Proposition
     GameService --> PostfixGenerator
     GameService --> GameIdGenerator
+    GameService --> RoundService
 
-    GameEntityService --> GameRepository
+    EntityService --> GameRepository
+
+    RoundService --> EntityService
 
     TextFileReader ..> Prompt
     FileReader<|-TextFileReader
 
     Game -> Round
-    Game -> SphinxElector
 @enduml

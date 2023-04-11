@@ -60,7 +60,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
   }
 
   private getUTCMilliseconds(dateString: string): number {
-    // dateString format will be "YYY-MM-DD HH:mm:ss"
+    // dateString format will be "YYYY-MM-DD HH:mm:ss"
     var [date, time] = dateString.split(" ");
     var [year, month, day] = date.split("-");
     var [hours, minutes, seconds] = time.split(":");

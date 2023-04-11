@@ -14,10 +14,11 @@ describe('CountDownComponent', () => {
 
     fixture = TestBed.createComponent(CountDownComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    component.timeoutString = '2023-03-29 22:13:08'
   });
 
   it('should create', () => {
+    component.ngOnInit();
     expect(component).toBeTruthy();
   });
 });

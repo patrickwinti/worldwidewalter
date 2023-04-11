@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { RoundDto } from "../../../../dto/round-dto";
-import { Proposition } from "../../../../model/proposition";
+import { WalterReplacement } from "../../../../model/walterReplacement";
 
 @Component({
   selector: 'www-enter-proposition',
@@ -11,23 +11,22 @@ export class EnterPropositionComponent implements OnInit {
   @Input() round: RoundDto;
   @Output() propositionEmitter = new EventEmitter<string[]>();
 
-  propositionsForGaps: Array<Proposition>;
+  proposition: Array<WalterReplacement>;
 
   get numberOfGaps(): number {
-    // return this.round.numberOfGaps
-    return 4;
+    return this.round.numberOfGaps;
   }
 
   ngOnInit(): void {
-    this.propositionsForGaps = new Array<Proposition>();
+    this.proposition = new Array<WalterReplacement>();
     for (let i = 0; i < this.numberOfGaps; i++) {
-      this.propositionsForGaps.push({text: ''} as Proposition);
+      this.proposition.push({text: ''} as WalterReplacement);
     }
   }
 
   emitProposition() {
     this.propositionEmitter.emit(
-      this.propositionsForGaps.map(value => value.text)
+      this.proposition.map(value => value.text)
     )
   }
 }

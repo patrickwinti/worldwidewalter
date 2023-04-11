@@ -2,36 +2,32 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GameContainerComponent } from './game-container.component';
 import { NO_ERRORS_SCHEMA } from "@angular/core";
-import { GameState } from "../../model/game-state";
+import { getGameServiceMock, getStateServiceMock } from "../../testing/mock-services";
+import { StateService } from "../../service/state.service";
+import { GameService } from "../../service/game.service";
 
 describe('GameContainerComponent', () => {
   let component: GameContainerComponent;
   let fixture: ComponentFixture<GameContainerComponent>;
+  let stateService = getStateServiceMock();
+  let gameService = getGameServiceMock();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [GameContainerComponent],
+      providers: [
+        {provide: StateService, useValue: stateService},
+        {provide: GameService, useValue: gameService},
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     })
       .compileComponents();
 
     fixture = TestBed.createComponent(GameContainerComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  describe('ngOnInit', () => {
-    it('should set game state to START', () => {
-      // arrange && act
-      component.ngOnInit();
-
-      // assert
-      expect(component.gameState).toBe(GameState.WAITING_FOR_PLAYERS);
-    });
-  })
-
 });

@@ -14,7 +14,6 @@ describe('RankingDisplayComponent', () => {
 
     fixture = TestBed.createComponent(RankingDisplayComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

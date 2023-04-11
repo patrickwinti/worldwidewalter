@@ -4,8 +4,6 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
-
 /**
  * Service to handle changes to state and lifecycle of a game.
  */
@@ -56,38 +54,6 @@ public interface GameService {
      * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
     Round getCurrentRoundInGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
-    
-    /**
-     * Returns round with
-     *
-     * @param roundId  round identifier
-     * @param playerId player requesting round
-     * @return new or existing round
-     * @throws GameError.NotFoundException      if game is not found
-     * @throws RoundError.IllegalStateException if there are not enough players anymore
-     */
-    Round getRound(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
-    
-    /**
-     * Player submitted their propositions for the prompt
-     *
-     * @param roundId  round identifier
-     * @param playerId player identifier
-     * @throws RoundError.NotFoundException  if round is not found
-     * @throws PlayerError.NotFoundException if player is not found
-     */
-    void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException;
-    
-    /**
-     * Player has chosen a proposition id. The given player id is anonymized and only valid for the round
-     *
-     * @param roundId       round identifier
-     * @param playerId      player identifier
-     * @param propositionId proposition identifier
-     * @throws RoundError.NotFoundException  if round is not found
-     * @throws PlayerError.NotFoundException if player is not found
-     */
-    void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
     
     /**
      * Player requested to participate in the current round of the game. If round is currently not available

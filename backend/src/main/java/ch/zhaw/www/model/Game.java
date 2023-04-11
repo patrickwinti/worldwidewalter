@@ -11,8 +11,6 @@ import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -36,7 +34,7 @@ public class Game {
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final SphinxElector sphinxElector = new SphinxElector(rounds, activePlayers);
-    private final List<Prompt> prompts;
+    private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
 
     public void addRound(Round round) {
         rounds.add(round);
@@ -95,7 +93,7 @@ public class Game {
     }
 
     public Prompt consumePrompt() {
-        return prompts.remove(0);
+        return prompts.get(0);
     }
 
     /**

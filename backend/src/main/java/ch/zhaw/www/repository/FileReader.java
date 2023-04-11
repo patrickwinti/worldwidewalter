@@ -12,9 +12,9 @@ import java.util.List;
 public interface FileReader {
 
     /**
-     * Method to read file and return a list of Prompts from a JSON file
+     * Method to read file and return a list of Prompts from a file
      *
-     * @param file TXT file input
+     * @param file input file to be read
      * @return List with parsed prompts
      */
     List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatException, IOException;

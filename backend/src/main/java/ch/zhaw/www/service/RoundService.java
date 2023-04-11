@@ -13,9 +13,9 @@ import java.util.List;
 public interface RoundService {
     
     /**
-     * Selects candidates depending on in which round the game is in
-     * If game the game is in the first round of turn, it fetches it from candidates
-     * Otherwise, it fetches it from the last round
+     * Selects candidates depending on in which round the game is in.
+     * Sphinx can be repeated if the turn has multiple rounds.
+     * Players leaving the game will not be considered for Sphinx selection
      *
      * @param game in which the sphinx is to be selected
      */
@@ -40,7 +40,7 @@ public interface RoundService {
     Round getRound(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
     
     /**
-     * Player submitted their propositions for the prompt
+     * Player submits their propositions for the prompt
      *
      * @param roundId  round identifier
      * @param playerId player identifier
@@ -50,7 +50,7 @@ public interface RoundService {
     void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) throws RoundError.NotFoundException, PlayerError.NotFoundException;
     
     /**
-     * Player has chosen a proposition id. The given player id is anonymized and only valid for the round
+     * Player selects a proposition in given round.
      *
      * @param roundId       round identifier
      * @param playerId      player identifier

@@ -62,7 +62,7 @@ public class Game {
         var round = getCurrentRound();
         if (round == null) {
             return State.NO_VALID_ROUND;
-        } else if (doesNotHaveEnoughPlayers() || hasRoundNotStartedYet(round)) {
+        } else if (!hasEnoughPlayers() || hasRoundNotStartedYet(round)) {
             return State.WAITING_FOR_PLAYERS;
         } else if (round.canEnterRound() && canAcceptPropositions(round)) {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
@@ -82,8 +82,8 @@ public class Game {
                 round.getState() == Round.State.OPEN_FOR_SELECTIONS;
     }
     
-    private boolean doesNotHaveEnoughPlayers() {
-        return activePlayers.size() < minimumAmountOfPlayers;
+    private boolean hasEnoughPlayers() {
+        return activePlayers.size() >= minimumAmountOfPlayers;
     }
     
     private boolean canAcceptPropositions(final Round round) {
@@ -172,8 +172,6 @@ public class Game {
     public void removePlayer(@NotNull String playerId) {
         waitingRoom.remove(playerId);
         activePlayers.remove(playerId);
-        sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
-                .findFirst().ifPresent(sphinxCandidates::remove);
     }
     
     /**

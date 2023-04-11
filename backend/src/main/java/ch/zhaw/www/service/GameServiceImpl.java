@@ -105,7 +105,7 @@ class GameServiceImpl implements GameService {
     }
     
     private static void movePlayerToActive(final Game game, final Player player) {
-        if (Boolean.TRUE.equals(game.hasCapacityForNewActivePlayer())) {
+        if (game.hasCapacityForNewActivePlayer()) {
             if (!game.hasPlayer(player.getId())) {
                 throw new PlayerError.NotFoundException(player.getId());
             }

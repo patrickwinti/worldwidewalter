@@ -1,11 +1,11 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.GameProperties;
+import ch.zhaw.www.bean.PostfixGenerator;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.GameIdGenerator;
-import ch.zhaw.www.utils.PostfixGenerator;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +22,13 @@ class GameServiceImpl implements GameService {
     private final EntityService entityService;
     private final GameProperties gameProperties;
     private final RoundService roundService;
-    private final PostfixGenerator postfixGenerator = new PostfixGenerator();
+    private final PostfixGenerator postfixGenerator;
     
-    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService) {
+    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, final PostfixGenerator postfixGenerator) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
+        this.postfixGenerator = postfixGenerator;
     }
     
     @Override

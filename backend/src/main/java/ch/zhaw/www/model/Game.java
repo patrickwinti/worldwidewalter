@@ -187,7 +187,7 @@ public class Game {
         PromptServiceImpl promptService = new PromptServiceImpl();
 
         try {
-            return promptService.createPromptDeck(file);
+            return promptService.shufflePrompts(promptService.createPromptDeck(file));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

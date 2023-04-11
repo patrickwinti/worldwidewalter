@@ -38,4 +38,12 @@ class PromptServiceImplTest {
 
         assertEquals(4, prompts.size());
     }
+
+    @Test
+    void createPromptDeck_noFile() throws IOException {
+        File file = new File("src/test/resources/asdasdasdsad.txt");
+        PromptServiceImpl promptServiceImpl = new PromptServiceImpl();
+
+        assertThrows(IOException.class, () -> promptServiceImpl.createPromptDeck(file));
+    }
 }

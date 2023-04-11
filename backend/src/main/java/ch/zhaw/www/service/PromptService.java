@@ -15,7 +15,7 @@ public interface PromptService {
      *
      * @param prompts: list of prompts to be shuffled
      */
-    void shufflePrompts(List<Prompt> prompts);
+    List<Prompt> shufflePrompts(List<Prompt> prompts);
 
     /**
      * Method to create a prompt deck with WALTER prompts.

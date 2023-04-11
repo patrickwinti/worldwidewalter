@@ -13,8 +13,9 @@ public class PromptServiceImpl implements PromptService {
 
 
     @Override
-    public void shufflePrompts(List<Prompt> prompts) {
+    public List<Prompt> shufflePrompts(List<Prompt> prompts) {
         Collections.shuffle(prompts);
+        return prompts;
     }
 
     @Override

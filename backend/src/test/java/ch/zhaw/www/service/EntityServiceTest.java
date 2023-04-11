@@ -1,6 +1,6 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class GameEntityServiceTest {
+class EntityServiceTest {
     
     @MockBean
     private GameRepository gameRepository;
     @Autowired
-    private GameEntityService gameEntityService;
+    private EntityService entityService;
     
     @Test
     void findGameByRoundIfExits() {
@@ -32,9 +32,9 @@ class GameEntityServiceTest {
         game3.addRound(roundToBeFound);
         when(gameRepository.findAll()).thenReturn(List.of(game1, game2, game3));
         
-        final Game gameForRound = gameEntityService.getGameForRound(roundToBeFound.getId());
+        final Round gameForRound = entityService.getRound(roundToBeFound.getId());
         assertNotNull(gameForRound);
-        assertSame(game3, gameForRound);
+        assertSame(roundToBeFound, gameForRound);
     }
     
     @Test
@@ -47,6 +47,6 @@ class GameEntityServiceTest {
         when(gameRepository.findAll()).thenReturn(List.of(game1, game2, game3));
         
         final String roundToBeFound = "round does not exist";
-        assertThrows(RoundError.NotFoundException.class, () -> gameEntityService.getGameForRound(roundToBeFound));
+        assertThrows(RoundError.NotFoundException.class, () -> entityService.getRound(roundToBeFound));
     }
 }

@@ -69,6 +69,10 @@ public class TestHelper {
         return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1);
     }
     
+    public static Game createGame(int roundsPerTurn) {
+        return new Game(UUID.randomUUID().toString(), MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, roundsPerTurn);
+    }
+    
     private static String getId() {
         return UUID.randomUUID().toString();
     }

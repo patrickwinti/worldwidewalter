@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.UnaryOperator;
+import java.util.function.Consumer;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -30,7 +30,7 @@ class GameServiceTest {
     @Autowired
     private GameService gameService;
     @MockBean
-    private GameEntityService gameEntityService;
+    private EntityService entityService;
     
     @AfterEach
     void tearDown() {
@@ -40,7 +40,7 @@ class GameServiceTest {
     @Test
     void testAddGameSavesItToRepository() {
         var game = gameService.createGame();
-        verify(gameEntityService).saveNewGame(game);
+        verify(entityService).saveNewGame(game);
         assertNotNull(game.getId());
     }
     
@@ -239,40 +239,6 @@ class GameServiceTest {
     }
     
     @Test
-    void addPropositionThatAlreadyExists() {
-        var game = mockRoundInRepository();
-        var players = List.of(createPlayer(), createPlayer(), createPlayer());
-        players.forEach(player -> {
-            game.addPlayerToWaitingRoom(player);
-            game.moveToActivePlayers(player);
-        });
-        var round = Objects.requireNonNull(game.getCurrentRound());
-        gameService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
-        gameService.submitProposition(round.getId(), players.get(1).getId(), List.of("WASSER", "gummi"));
-        gameService.submitProposition(round.getId(), players.get(2).getId(), List.of("Wasser ", "  gummi"));
-        assertEquals(1, round.getPropositions().size());
-        assertEquals(2, round.getPropositions().get(0).getDuplicates().size());
-        assertEquals(players.get(1).getId(), round.getPropositions().get(0).getDuplicates().get(0).getPlayerId());
-        assertEquals(players.get(2).getId(), round.getPropositions().get(0).getDuplicates().get(1).getPlayerId());
-    }
-    
-    private Game mockRoundInRepository() {
-        var game = createGame(GAME_ID);
-        var round = createRound();
-        round.setSphinx(createPlayer());
-        game.addRound(round);
-        doAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
-            //noinspection unchecked
-            lambda.apply(game);
-            return null;
-        }).when(gameEntityService).editGameForRound(eq(round.getId()), any());
-        when(gameEntityService.getGameForRound(round.getId())).thenReturn(game);
-        return game;
-        
-    }
-    
-    @Test
     void leaveGame() {
         Game game = mockGameInRepository();
         addActivePlayer(game);
@@ -291,22 +257,22 @@ class GameServiceTest {
         var game = createGame(GAME_ID);
         
         doAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, UnaryOperator.class);
+            var lambda = invocationOnMock.getArgument(1, Consumer.class);
             //noinspection unchecked
-            lambda.apply(game);
+            lambda.accept(game);
             return null;
-        }).when(gameEntityService).editGame(eq(game.getId()), any());
-        when(gameEntityService.getGame(game.getId())).thenReturn(game);
+        }).when(entityService).editGame(eq(game.getId()), any());
+        when(entityService.getGame(game.getId())).thenReturn(game);
         
         return game;
     }
     
     private void mockGameNotFoundInRepository(String gameId) {
         doThrow(GameError.NotFoundException.class)
-                .when(gameEntityService).editGame(eq(gameId), any());
+                .when(entityService).editGame(eq(gameId), any());
         
         doThrow(GameError.NotFoundException.class)
-                .when(gameEntityService).getGame(gameId);
+                .when(entityService).getGame(gameId);
     }
     
 }

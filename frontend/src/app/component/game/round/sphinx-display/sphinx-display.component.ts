@@ -14,7 +14,7 @@ export class SphinxDisplayComponent {
     if (this.sphinx.id === this.currentPlayerId) {
       return 'Du bist die Sphinx!';
     } else {
-      return 'Die Sphinx ist: ' + this.sphinx.name;
+      return 'Die Sphinx ist: ' + this.sphinx.playerName;
     }
   }
 }

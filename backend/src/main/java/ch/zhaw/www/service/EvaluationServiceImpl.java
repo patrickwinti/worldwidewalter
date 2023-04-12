@@ -20,7 +20,7 @@ public class EvaluationServiceImpl implements EvaluationService {
     }
 
     @Override
-    public void evaluateRound(String gameId) {
+    public void evaluateRound(String gameId) throws GameError.NotFoundException, RoundError.NotFoundException {
         AtomicInteger tempSphinxPoints = new AtomicInteger();
         Game game = gameService.getGame(gameId);
         String sphinxId = game.getCurrentRound().getSphinx().getId();
@@ -45,13 +45,13 @@ public class EvaluationServiceImpl implements EvaluationService {
     }
 
 
-    private void addPoint(String playerId, String gameId) {
+    private void addPoint(String playerId, String gameId) throws GameError.NotFoundException {
         entityService.editGame(gameId, game -> {
             game.getPoints().put(playerId, SINGLE_POINT);
         });
     }
 
-    private void addTempPointsToSphinx(String gameId, int points) {
+    private void addTempPointsToSphinx(String gameId, int points) throws GameError.NotFoundException{
         entityService.editGame(gameId, game -> {
             game.getPoints().put(game.getCurrentRound().getSphinx().getId(), points);
         });

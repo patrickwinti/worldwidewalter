@@ -1,60 +1,62 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from "@angular/common/http";
-import { Observable, of } from "rxjs";
+import { Observable } from "rxjs";
 import { AppConfigService } from "./app-config.service";
 import { GameDto } from "../dto/game-dto";
 import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
 import { PlayerDto } from "../dto/player-dto";
 import { RoundDto } from "../dto/round-dto";
 import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
-import { PropositionDto } from "../dto/proposition-dto";
-import { AllPropositionsDto } from "../dto/all-propositions-dto";
+import { PropositionSelectionDto } from "../dto/proposition-selection-dto";
+import { ResultsDto } from "../dto/results-dto";
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
 
+  private readonly BASE_URL = this.appConfigService.getBaseUrl();
+
   constructor(private http: HttpClient,
               private appConfigService: AppConfigService) {
   }
 
   requestNewGame(): Observable<GameDto> {
-    return this.http.post<GameDto>(this.appConfigService.getBaseUrl() + '/api/games', {});
+    return this.http.post<GameDto>(this.BASE_URL + '/games', null);
   }
 
   joinGame(playerJoinRequestDto: PlayerJoinRequestDto, gameId: string,): Observable<PlayerDto> {
-    return this.http.post<PlayerDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/players', playerJoinRequestDto);
+    return this.http.post<PlayerDto>(this.BASE_URL + '/games/' + gameId + '/players', playerJoinRequestDto);
   }
 
+
   getGame(gameId: string): Observable<GameDto> {
-    return this.http.get<GameDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId);
+    return this.http.get<GameDto>(this.BASE_URL + '/games/' + gameId);
+  }
+
+  enterRound(gameId: string): Observable<void> {
+    return this.http.put<void>(this.BASE_URL + '/games/' + gameId + '/rounds', null);
   }
 
   getRound(gameId: string): Observable<RoundDto> {
-    return this.http.get<RoundDto>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/rounds');
+    return this.http.get<RoundDto>(this.BASE_URL + '/games/' + gameId + '/rounds');
   }
 
   submitProposition(roundId: string, proposition: PropositionSubmissionDto): Observable<void> {
-    return this.http.post<void>(this.appConfigService.getBaseUrl() + '/api/rounds/' + roundId + '/proposition',
+    return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions',
       proposition);
   }
 
-  getAllPropositions(roundId: string): Observable<AllPropositionsDto> {
-    // return this.http.get<Array<PropositionDto>>(this.appConfigService.getBaseUrl() + '/api/games/' + gameId + '/rounds');
-    return of(
-      {
-        propositions: [
-          {gaps: ['b', 'bb'], id: '1abce3212a'} as PropositionDto,
-          {gaps: ['a', 'aa'], id: '2va3werfva'} as PropositionDto,
-          {gaps: ['g', 'gg'], id: '3asdv3av30'} as PropositionDto
-        ]
-      } as AllPropositionsDto)
+  getAllPropositions(roundId: string): Observable<PropositionSelectionDto> {
+    return this.http.get<PropositionSelectionDto>(this.BASE_URL + '/rounds/' + roundId + '/propositions');
   }
 
-  submitSelection(id: string): Observable<void> {
-    return new Observable<void>((res) => {
-      res.next()
-    });
+  submitPropositionSelection(roundId: string, id: string): Observable<void> {
+    return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions/' + id, null);
   }
+
+  getResults(gameId: string): Observable<ResultsDto> {
+    return this.http.get<ResultsDto>(this.BASE_URL + '/games/' + gameId + '/results');
+  }
+
 }

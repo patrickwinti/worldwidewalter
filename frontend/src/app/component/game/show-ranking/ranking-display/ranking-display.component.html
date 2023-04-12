@@ -10,7 +10,7 @@
   </tr>
   </thead>
   <tbody>
-  <ng-container *ngFor="let rank of sortedRanking.entries()">
+  <ng-container *ngFor="let rank of sortedResults.entries()">
     <tr>
       <td>{{rank[0]}}</td>
       <td>{{rank[1]}}</td>
@@ -18,7 +18,3 @@
   </ng-container>
   </tbody>
 </table>
-
-<button (click)="continue()">
-  weiter
-</button>

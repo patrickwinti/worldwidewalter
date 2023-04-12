@@ -14,7 +14,6 @@ describe('OverlaySpinnerComponent', () => {
 
     fixture = TestBed.createComponent(OverlaySpinnerComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
   it('should create', () => {

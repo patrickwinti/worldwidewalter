@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +33,7 @@ public class Round {
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
     
-    private final Map<String, List<String>> propositions = new ConcurrentHashMap<>();
+    private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     
     @Nullable
@@ -43,7 +44,7 @@ public class Round {
     private Instant selectionSubmissionEnd;
     
     public void setSphinx(Player sphinx) {
-        if (this.sphinx == null) {
+        if (this.sphinx == null && sphinx != null) {
             this.sphinx = sphinx;
             this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
             this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(selectionDuration));
@@ -62,21 +63,20 @@ public class Round {
         }
     }
     
+    public boolean canEnterRound() {
+        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+    }
+    
     /**
      * Adds player proposition for prompt
      *
-     * @param playerId    player adding their proposition
      * @param proposition as many propositions as gaps in the prompt
      */
-    public void addProposition(String playerId, List<String> proposition) {
+    public void addProposition(Proposition proposition) {
         if (sphinx == null) {
             throw new RoundError.IllegalStateException();
         }
-        propositions.put(playerId, proposition);
-    }
-    
-    public boolean canEnterRound() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+        propositions.add(proposition);
     }
     
     State getState() {

@@ -1,21 +1,21 @@
 package ch.zhaw.www.model;
 
-import ch.zhaw.www.service.GameError;
-import ch.zhaw.www.service.PlayerError;
-import ch.zhaw.www.utils.InstantWrapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.List;
+import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
+import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class GameTest {
+    @AfterEach
+    void tearDown() {
+        disableFixedClocked();
+    }
     
     @Test
     void testGameState_WaitingForPlayers() {
@@ -52,12 +52,10 @@ class GameTest {
         game.addRound(createRound());
         
         int numberOfPlayersToAdd = 10;
-        for (int i = 0; i < numberOfPlayersToAdd; i++) {
-            addWaitingRoomPlayer(game);
-        }
+        IntStream.range(0, numberOfPlayersToAdd).forEach(value -> addWaitingRoomPlayer(game));
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
-        addRoundOpenForPropositionSubmission(game);
+        addRoundOpenForPropositionSubmission(game); //Round with Sphinx but not enough active players
         assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
         
         game.getAllPlayers().forEach(game::moveToActivePlayers);
@@ -76,14 +74,14 @@ class GameTest {
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> round.addProposition(player.getId(), List.of("Walter " + player.getId())));
+        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
-        InstantWrapper.clock = Clock.fixed(Instant.now(), ZoneId.systemDefault());
+        enableFixedClocked();
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
-        game.getCurrentRound().addProposition(player.getId(), List.of("Walter " + player.getId()));
-        InstantWrapper.clock = Clock.offset(InstantWrapper.clock, DEFAULT_PROPOSITION_DURATION);
+        game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
+        offsetFixedClockBy(DEFAULT_PROPOSITION_DURATION);
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
     }
     
@@ -111,8 +109,20 @@ class GameTest {
     void testNewRound() {
         var game = createGame();
         assertNull(game.getCurrentRound());
-        game.addRound(createRound());
+        
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS).forEach(i -> game.addPlayerToWaitingRoom(createPlayer()));
+        final Round round1 = createRound();
+        game.addRound(round1);
         assertNotNull(game.getCurrentRound());
+        
+        var doesNotFitPlayer = createPlayer();
+        game.addPlayerToWaitingRoom(doesNotFitPlayer);
+        
+        final Round round2 = createRound();
+        game.addRound(round2);
+        assertNotEquals(round1, game.getCurrentRound());
+        assertEquals(round2, game.getCurrentRound());
+        assertFalse(game.hasActivePlayer(doesNotFitPlayer.getId()));
     }
     
     @Test
@@ -120,7 +130,6 @@ class GameTest {
         var game = createGame();
         
         var unknonwPlayer = createPlayer();
-        assertThrows(PlayerError.NotFoundException.class, () -> game.moveToActivePlayers(unknonwPlayer));
         assertFalse(game.hasActivePlayer(unknonwPlayer.getId()));
     }
     
@@ -147,7 +156,6 @@ class GameTest {
         var onPlayerTooMuch = createPlayer();
         game.addPlayerToWaitingRoom(onPlayerTooMuch);
         
-        assertThrows(GameError.FullCapacityException.class, () -> game.moveToActivePlayers(onPlayerTooMuch));
         assertFalse(game.hasActivePlayer(onPlayerTooMuch.getId()));
     }
     

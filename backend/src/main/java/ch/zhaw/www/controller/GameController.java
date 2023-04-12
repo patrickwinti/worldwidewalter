@@ -3,6 +3,7 @@ package ch.zhaw.www.controller;
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.service.GameService;
+import ch.zhaw.www.service.RoundService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -24,18 +25,21 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 @RestController
 @Validated
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin("*")
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
+    private final RoundService roundService;
     
-    GameController(GameService gameService) {
+    GameController(GameService gameService, RoundService roundService) {
         this.gameService = gameService;
+        this.roundService = roundService;
     }
     
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
+            @ApiResponse(responseCode = "409", description = "Game exists with that ID"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(value = "/games", produces = "application/json")
@@ -103,7 +107,7 @@ public class GameController {
     @PostMapping(value = "/rounds/{roundId}/propositions", consumes = "application/json")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void submitProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
-        gameService.submitProposition(roundId, playerId, proposition.getGaps());
+        roundService.submitProposition(roundId, playerId, proposition.getGaps());
         logger.log(Level.INFO, "proposition submitted successfully");
     }
     
@@ -113,10 +117,10 @@ public class GameController {
             @ApiResponse(responseCode = "404", description = "Either round, proposition or player has not been found"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/rounds/{roundId}/proposition/{propositionId}")
+    @PostMapping(value = "/rounds/{roundId}/propositions/{propositionId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void selectProposition(@PathVariable String roundId, @PathVariable String propositionId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        gameService.selectProposition(roundId, playerId, propositionId);
+        roundService.selectProposition(roundId, playerId, propositionId);
         logger.log(Level.INFO, "proposition selected successfully");
     }
     
@@ -129,15 +133,14 @@ public class GameController {
     @GetMapping(value = "/rounds/{roundId}/propositions", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var round = gameService.getRound(roundId, playerId);
+        var round = roundService.getRound(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
-        List<PropositionSelectionDto.Proposition> proposition = new ArrayList<>();
+        List<PropositionSelectionDto.Proposition> propositions = new ArrayList<>();
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
-        round.getPropositions().forEach((player, strings) -> {
-            //TODO use correct values
-            proposition.add(new PropositionSelectionDto.Proposition(playerId, strings, playerId.equals(player) || isSphinx));
-        });
-        return ResponseEntity.ok(new PropositionSelectionDto(roundId, proposition, round.getSelectionSubmissionEnd()));
+        round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(proposition.getId(),
+                proposition.getGaps(),
+                playerId.equals(proposition.getPlayerId()) || isSphinx)));
+        return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
     //endregion
     
@@ -180,6 +183,6 @@ public class GameController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         gameService.enterRound(gameId, playerId);
-        logger.log(Level.INFO, "participate next round");
+        logger.log(Level.INFO, "{0} will participate next round", playerId);
     }
 }

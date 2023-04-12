@@ -1,12 +1,10 @@
 package ch.zhaw.www;
 
-import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.model.Round;
+import ch.zhaw.www.model.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 public class TestHelper {
@@ -47,6 +45,14 @@ public class TestHelper {
         game.moveToActivePlayers(player);
     }
     
+    public static Proposition createProposition(String playerId, String gap) {
+        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap));
+    }
+    
+    public static Proposition createProposition(String playerId, String gap1, String gap2) {
+        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap1, gap2));
+    }
+    
     public static Round createRound(Duration duration) {
         return new Round(getId(), PROMPT, duration, DEFAULT_PROPOSITION_END_DURATION, DEFAULT_SUBMISSION_DURATION);
     }
@@ -61,6 +67,10 @@ public class TestHelper {
     
     public static Game createGame(String id) {
         return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1);
+    }
+    
+    public static Game createGame(int roundsPerTurn) {
+        return new Game(UUID.randomUUID().toString(), MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, roundsPerTurn);
     }
     
     private static String getId() {

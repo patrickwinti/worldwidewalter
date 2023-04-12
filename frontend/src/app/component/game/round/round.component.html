@@ -6,12 +6,14 @@
   </www-enter-proposition>
 
   <ng-container *ngSwitchCase="GameState.SELECT_PROPOSITION">
-    <www-select-proposition *ngIf="allPropositions$ | async as allPropositions"
+    <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto"
                             [round]=round
-                            [propositions]="allPropositions.propositions"
+                            [propositionSelectionDto]="propositionSelectionDto"
                             (selectedPropositionEmitter)="submitSelection($event)">
     </www-select-proposition>
 
   </ng-container>
+  <www-sphinx-display [sphinx]="round.sphinx"
+                      [currentPlayerId]="getCurrentPlayerId()">
+  </www-sphinx-display>
 </ng-container>
-

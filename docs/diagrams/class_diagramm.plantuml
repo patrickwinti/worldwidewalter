@@ -1,6 +1,7 @@
 @startuml
 package backend{
     left to right direction
+    skinparam linetype ortho
 
     hide empty members
     class GameController {
@@ -30,15 +31,27 @@ package backend{
         -hasBeenUsed: boolean
     }
 
+    class Proposition{
+          -id: String
+          -playerId: String
+          -gaps: List<String>
+          -duplicates: List<Proposition>
+          +hasSameGaps(proposition: Proposition): Boolean
+    }
+
     interface GameService{
        createGame(): Game
        leaveGame(gameId: String, playerId: String): void
-       submitProposition(roundId: String, playerId: String, gaps: List<String>): void
-       selectProposition(roundId: String, playerId: String, propositionId: String): void
        getGame(gameId: String) : Game
        enterGame(gameId: String, playerName: String) : Player
        enterRound(gameId: String, playerId: String) : Round
-       getRound(gameId: String, playerId: String) : Round
+    }
+    interface RoundService{
+        selectSphinx(game: Game);
+        createNewRound(game: Game);
+        getRound(roundId: String, playerId: String):Round
+        submitProposition(roundId: String, playerId: String, gaps: List<String>)
+        selectProposition(roundId: String, playerId: String, propositionId: String)
     }
     interface GameRepository
     class PlayerDto {
@@ -69,7 +82,7 @@ package backend{
     }
     exception GameError {
         FullCapacityException
-        NotEnoughPlayersException
+        AlreadyExists
         NotFoundException
     }
     exception RoundError {
@@ -88,24 +101,36 @@ package backend{
     }
 
     class TextFileReader
+    class GameIdGenerator{
+        +generateId():String{static}
+    }
 
     GameController..>PlayerDto
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
     GameController..>RoundDto
     GameController ..> GameDto
+    GameController --> RoundService
+    GameController --> GameService
 
     GameService ..> Game
-    GameService ..> Round
     GameService ..> Player
     GameService ..> GameError
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError
-    GameService --> GameRepository
+    GameService --> EntityService
+    GameService ..> Proposition
+    GameService --> PostfixGenerator
+    GameService --> GameIdGenerator
+    GameService --> RoundService
+
+    EntityService --> GameRepository
+
+    RoundService --> EntityService
 
     TextFileReader ..> Prompt
-}
-
     FileReader<|-TextFileReader
+
+    Game -> Round
 @enduml

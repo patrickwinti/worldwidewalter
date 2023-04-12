@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
-public class EvaluationServiceImpl {
+public class EvaluationServiceImpl implements EvaluationService {
     public static final AtomicBoolean AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED = new AtomicBoolean(false);
     public static final int NONE = 0;
     private static final int SINGLE_POINT = 1;
@@ -19,6 +19,7 @@ public class EvaluationServiceImpl {
         this.gameService = gameService;
     }
 
+    @Override
     public void evaluateRound(String gameId) {
         AtomicInteger tempSphinxPoints = new AtomicInteger();
         Game game = gameService.getGame(gameId);
@@ -36,7 +37,7 @@ public class EvaluationServiceImpl {
                     addPoint(proposition.getPlayerId(), gameId);
                     addPoint(sphinxId, gameId);
 
-                }else if (value.equals(proposition.getId()) && key.equals(sphinxId) && AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.get()) {
+                } else if (value.equals(proposition.getId()) && key.equals(sphinxId) && AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.get()) {
                     tempSphinxPoints.getAndIncrement();
                 }
             });

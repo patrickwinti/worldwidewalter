@@ -1,3 +1,4 @@
-export interface ResultsDto {
-  results: Map<string, number>;
+export interface ResultDto {
+  playerName: string;
+  points: number;
 }

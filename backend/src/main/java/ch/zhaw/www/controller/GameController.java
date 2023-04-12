@@ -14,8 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -88,11 +88,11 @@ public class GameController {
     })
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ResultsDto> fetchResultsForRound(@PathVariable String gameId) {
+    public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId) {
         var game = gameService.getGame(gameId);
         logger.log(Level.INFO, "game results returned {0}", game);
         //TODO return valid results
-        return ResponseEntity.ok(new ResultsDto(Map.of("Elias", 10, "Jennifer", 1, "Sara", 11)));
+        return ResponseEntity.ok(Arrays.asList(new ResultDto("Elias", 10), new ResultDto("Jenny", 1), new ResultDto("Sara", 12)));
     }
     //endregion
     

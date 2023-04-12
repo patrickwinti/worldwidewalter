@@ -8,7 +8,7 @@ import { PlayerDto } from "../dto/player-dto";
 import { RoundDto } from "../dto/round-dto";
 import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
 import { PropositionSelectionDto } from "../dto/proposition-selection-dto";
-import { ResultsDto } from "../dto/results-dto";
+import { ResultDto } from "../dto/results-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -55,8 +55,8 @@ export class GameService {
     return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions/' + id, null);
   }
 
-  getResults(gameId: string): Observable<ResultsDto> {
-    return this.http.get<ResultsDto>(this.BASE_URL + '/games/' + gameId + '/results');
+  getResults(gameId: string): Observable<ResultDto[]> {
+    return this.http.get<ResultDto[]>(this.BASE_URL + '/games/' + gameId + '/results')
   }
 
 }

@@ -23,12 +23,16 @@ class GameServiceImpl implements GameService {
     private final GameProperties gameProperties;
     private final RoundService roundService;
     private final PostfixGenerator postfixGenerator;
+
+    private final PromptService promptService;
+
     
-    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, final PostfixGenerator postfixGenerator) {
+    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, final PostfixGenerator postfixGenerator, PromptService promptService) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
         this.postfixGenerator = postfixGenerator;
+        this.promptService = promptService;
     }
     
     @Override
@@ -36,7 +40,7 @@ class GameServiceImpl implements GameService {
         var game = new Game(GameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
-                DEFAULT_NUMBER_OF_ROUNDS);
+                DEFAULT_NUMBER_OF_ROUNDS, promptService.getPrompts());
         entityService.saveNewGame(game);
         return game;
     }

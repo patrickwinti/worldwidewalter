@@ -1,32 +1,33 @@
 package ch.zhaw.www.repository;
 
 import ch.zhaw.www.model.Prompt;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Stream;
 
 /**
  * Public class to read Files of TXT type.
- * Class implements readFile method from the FileReader interface.
+ * Class implements readFile method from the ResourceReader interface.
  */
 @Repository
-class TextFileReader implements FileReader {
+class TextResourceReader implements ResourceReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
-    private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
-    
+    private static final Logger LOGGER = Logger.getLogger(TextResourceReader.class.getSimpleName());
+
     @Override
-    public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatException, IOException {
-        try (Stream<String> stream = Files.lines(file.toPath())) {
-            return stream
+    public List<Prompt> readResource(Resource resource) throws ResourceReaderError.WrongResourceFormatException, IOException {
+        try (var inputStreamReader = new InputStreamReader(resource.getInputStream());
+             var bufferedReader = new BufferedReader(inputStreamReader)) {
+            return bufferedReader.lines()
                     .filter(Objects::nonNull)
                     .filter(s -> !s.isEmpty())
                     .map(sentence -> {
@@ -39,11 +40,11 @@ class TextFileReader implements FileReader {
                     })
                     .filter(Objects::nonNull)
                     .toList();
-        } catch (FileReaderError e) {
-            throw new FileReaderError.WrongFileFormatException();
+        } catch (ResourceReaderError e) {
+            throw new ResourceReaderError.WrongResourceFormatException();
         }
     }
-    
+
     /**
      * Method to count the total number of WALTER words (or variations) that appear in one statement.
      *
@@ -52,9 +53,9 @@ class TextFileReader implements FileReader {
      */
     protected long countPlaceholders(String input) {
         Matcher matcher = PATTERN.matcher(input);
-        
+
         long count = matcher.results().count();
-        
+
         if (count == 0) {
             LOGGER.log(Level.WARNING, "No placeholder match found");
         }

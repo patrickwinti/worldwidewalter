@@ -31,7 +31,7 @@ public class Game {
     private final Map<String, Player> activePlayers = new HashMap<>();
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
-    private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
+    private final List<Prompt> prompts;
     
     /**
      * Gets current round,

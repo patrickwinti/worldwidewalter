@@ -1,10 +1,11 @@
 package ch.zhaw.www.service;
 
+import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.repository.FileReader;
+import ch.zhaw.www.repository.ResourceReader;
+import ch.zhaw.www.repository.ResourceReaderError;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,23 +14,21 @@ import java.util.List;
 @Service
 class PromptServiceImpl implements PromptService {
 
-    private final FileReader fileReader;
+    private final List<Prompt> defaultDeck;
 
-    PromptServiceImpl(FileReader fileReader) {
-        this.fileReader = fileReader;
+    PromptServiceImpl(ResourceReader resourceReader, GameProperties gameProperties) {
+        try {
+            defaultDeck = resourceReader.readResource(gameProperties.getDefaultDeck());
+        } catch (IOException e) {
+            throw new ResourceReaderError.InvalidResource();
+        }
     }
 
     @Override
     public List<Prompt> getPrompts() {
-        File file = new File("src/main/resources/firstDeck.txt");
-
-        try {
-            List<Prompt> prompts = new ArrayList<>(fileReader.readFile(file));
-            Collections.shuffle(prompts);
-            return prompts;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        List<Prompt> prompts = new ArrayList<>(defaultDeck);
+        Collections.shuffle(prompts);
+        return prompts;
     }
 
 

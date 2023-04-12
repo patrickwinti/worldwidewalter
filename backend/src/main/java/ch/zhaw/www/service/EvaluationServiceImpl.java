@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class EvaluationServiceImpl {
     public static final AtomicBoolean AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED = new AtomicBoolean(false);
+    public static final int NONE = 0;
     private static final int SINGLE_POINT = 1;
     private final EntityService entityService;
     private final GameService gameService;
@@ -29,7 +30,7 @@ public class EvaluationServiceImpl {
                     addPoint(proposition.getPlayerId(), gameId);
                     AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.set(true);
                     addTempPointsToSphinx(gameId, tempSphinxPoints.get());
-                    tempSphinxPoints.set(0);
+                    tempSphinxPoints.set(NONE);
                 }
                 if (value.equals(proposition.getId()) && key.equals(sphinxId) && AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.get()) {
                     addPoint(proposition.getPlayerId(), gameId);
@@ -43,13 +44,13 @@ public class EvaluationServiceImpl {
     }
 
 
-    public void addPoint(String playerId, String gameId) {
+    private void addPoint(String playerId, String gameId) {
         entityService.editGame(gameId, game -> {
             game.getPoints().put(playerId, SINGLE_POINT);
         });
     }
 
-    public void addTempPointsToSphinx(String gameId, int points) {
+    private void addTempPointsToSphinx(String gameId, int points) {
         entityService.editGame(gameId, game -> {
             game.getPoints().put(game.getCurrentRound().getSphinx().getId(), points);
         });

@@ -29,6 +29,7 @@ public class Game {
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
+    private final Map<String, Integer> points = new HashMap<>();
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
@@ -98,6 +99,10 @@ public class Game {
     public Prompt consumePrompt() {
         // TODO correct code
         return prompts.get(0);
+    }
+
+    public Map<String, Integer> getPoints() {
+        return points;
     }
     
     /**
@@ -199,7 +204,7 @@ public class Game {
         }
         return sphinxCandidates;
     }
-    
+
     public enum State {
         NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
     }

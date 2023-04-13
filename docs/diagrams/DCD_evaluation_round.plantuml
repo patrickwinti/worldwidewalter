@@ -13,11 +13,11 @@ interface GameService {
 }
 
 interface EntityService {
-    +editGameForRound(roundId: String, UnaryOperator<Game>)
+    +editRound(roundId: String, editor: Consumer)
 }
 
-interface EvaluationService {
-    +eval(round: Round): Evaluation
+interface RoundEvaluator {
+    +eval(round: Round, propositionId: String): Evaluation
 }
 
 class Game {
@@ -31,21 +31,19 @@ class Round {
     +getState()
 }
 
-class GameRepository {
-    +findAll(): List<Game>
-}
+interface GameRepository
 
 class GameController {
-    +evalRound(game: Game): Evaluation
+    +evalRound(game: Game, playerId: String, propositionId: String): Evaluation
 }
 
 
-GameController ..> GameService
-GameService ..> EntityService
-GameService ..> EvalService
+GameController --> GameService
+GameService --> EntityService
+GameService --> RoundEvaluator
 GameService ..> Game
-EntityService ..> GameRepository
-Game..> Round
+EntityService --> GameRepository
+Game --> Round
 
 
 @enduml

@@ -18,7 +18,10 @@ package backend{
    }
    class Game {
       -id: String
-      getState(): Game.State
+      +getState(): Game.State
+      +addRound(round:Round)
+      +hasCapacityForNewActivePlayer(): boolean
+      +hasPlayer(playerId: String): boolean
    }
    class Round {
       +getState(): Round.State

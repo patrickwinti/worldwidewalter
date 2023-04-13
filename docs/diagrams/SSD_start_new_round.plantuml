@@ -4,6 +4,7 @@ skinparam sequence {
     BorderColor Black
     ArrowColor Firebrick
     BorderThickness 2
+    LifeLineBackgroundColor #FFD966
 }
 skinparam Note{
     BorderColor #FFD966
@@ -35,9 +36,9 @@ game -> round: getState()
 round --> game: Round state
 game --> gs: Game state
 gs -> game: hasCapacityForNewActivePlayer()
-game --> gs: true or false depending of nr of players
+game --> gs: true or false depending on nr of players
 game -> gs: hasPlayer(playerId)
-gs -> rs :createNewRound()
+gs -> rs :createNewRound(game)
 rs -> game :addRound(round)
 game --> rs
 rs -->gs
@@ -45,4 +46,7 @@ gs -> game : moveToActivePlayers
 game --> gs
 gs-->ges
 ges -> gr : save(game)
+gr --> ges
+ges --> gs
+gs --> gc
 @enduml

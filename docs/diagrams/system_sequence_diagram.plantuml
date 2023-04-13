@@ -1,4 +1,16 @@
 @startuml
+skinparam sequence {
+    BackgroundColor white
+    BorderColor Black
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam responseMessageBelowArrow true
+skinparam style strictuml
 
 actor       player1
 actor       player2

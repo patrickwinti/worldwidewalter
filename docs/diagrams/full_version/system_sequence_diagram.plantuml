@@ -23,7 +23,7 @@ system --> player1: new game created, gameId
 player2 -> system: enterGame(gameId, playerName)
 system --> player2: added to game, playerId
 
-playerN -> system: join session (sessionID, username)
+playerN -> system: join (sessionID, username)
 system --> playerN: confirm
 
 playerN -> system: enterGame(gameId, playerName)

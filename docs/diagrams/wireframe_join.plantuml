@@ -1,0 +1,64 @@
+@startuml
+skinparam ArrowColor Firebrick
+skinparam ActivityBackgroundColor White
+skinparam dpi 200
+
+(*) --> "
+{{
+salt
+{
+    <b> Worldwide walter
+    .
+    Bonding through WALTER
+    sentences since 2022.
+    Minimum 4 player needed
+    to play game
+    .
+    [Create game]
+    [Join game]
+}
+}}
+" as start_page
+
+start_page -down->[clicks on Create game] "
+{{
+salt
+{
+    <b>Game created
+    .
+    ID: >gB2-59l
+    .
+    <&person> Player name| "           "
+    .
+    [Join game]
+}
+}}
+" as game_created
+
+start_page -down->[clicks on Join game] "
+{{
+salt
+{
+    <b>Join Game
+    .
+    ID: | "Game ID    "
+    <&person> Player name| "           "
+    .
+    [Join game]
+}
+}}
+" as join
+
+join -down> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to join
+    The game will start as soon as four players have joined (2/4)
+}
+}}
+" as waiting_room_inactive
+game_created -> join
+
+
+@enduml

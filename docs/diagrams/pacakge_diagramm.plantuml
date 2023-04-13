@@ -1,6 +1,17 @@
 @startuml
-skinparam linetype ortho
 top to bottom direction
+skinparam linetype ortho
+skinparam ArrowColor Firebrick
+skinparam packageStyle rectangle
+skinparam package {
+    BackgroundColor white
+    BorderThickness 2
+}
+skinparam rectangle {
+    BackgroundColor white
+    BorderThickness 2
+}
+skinparam ranksep  20
 
 package "Technical Service" {
     package Angular
@@ -25,10 +36,16 @@ package Controllers {
 }
 
 package Domain {
-    package DTO
-    package Model
-    package Service
-    package Repository
+    together {
+       package Service
+       package Repository
+       package Bean
+    }
+    together {
+        package Model
+        package DTO
+        package Utils
+    }
 }
 
 package UI {
@@ -36,28 +53,18 @@ package UI {
 }
 
 UI ..> Controllers
-Controllers ..> Domain
-Domain ..> "Technical Service"
-
-UI ..> Testing
-Controllers ..> Testing
-Domain ..> Testing
-
-DTO ..> Jackson
-DTO ..> Lombok
-DTO ..> Jakarta
-
-Model ..> Jackson
-Model ..> Lombok
-Model ..> Jakarta
-
-Service ..>"Spring Boot"
-Repository ..>"Spring Boot"
+UI .d.....> Testing
+Controllers .d.> Domain
+Controllers .d.....> Testing
+Domain .d.....> "Technical Service"
+Domain .l.....> Testing
 
 Web ..> Angular
-
 Controller ..> Swagger
-
+Service ..> "Spring Boot"
+Repository .r.> "Spring Boot"
+Bean ..> "Spring Boot"
 Angular -[hidden]- "Spring Boot"
 Jakarta -[hidden]- Swagger
+Service -[hidden]- Model
 @enduml

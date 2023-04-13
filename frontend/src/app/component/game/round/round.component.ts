@@ -31,7 +31,7 @@ export class RoundComponent implements OnInit {
   }
 
   submitSelection(selectedPropositionId: string): void {
-    firstValueFrom(this.gameService.submitPropositionSelection(selectedPropositionId, this.round.id)).then(
+    firstValueFrom(this.gameService.submitPropositionSelection(this.round.id, selectedPropositionId)).then(
       () => {
         console.log('selection submission successful');
         this.stateService.goToNextState();

@@ -169,7 +169,7 @@ public class GameController {
             sphinx.setPlayerName(round.getSphinx().getName());
         }
         
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), sphinx, round.getPropositionSubmissionEnd()));
+        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));
     }
     
     @Operation(summary = "Player requested to enter round")

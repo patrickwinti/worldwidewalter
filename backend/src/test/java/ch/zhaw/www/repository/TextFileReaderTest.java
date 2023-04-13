@@ -31,7 +31,7 @@ class TextFileReaderTest {
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
         assertEquals("WALTER WALTERN WALTER", prompts.get(3).getStatement());
-        assertEquals(3, prompts.get(3).getTotalPlaceholders());
+        assertEquals(3, prompts.get(3).getNumberOfPlaceholders());
     }
     
     private static Stream<Arguments> provideWalterStatements() {
@@ -72,7 +72,7 @@ class TextFileReaderTest {
         List<Prompt> prompts = txtFileReader.readFile(file.toFile());
         
         assertEquals(1, prompts.size());
-        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getTotalPlaceholders());
+        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getNumberOfPlaceholders());
     }
     
     @Test

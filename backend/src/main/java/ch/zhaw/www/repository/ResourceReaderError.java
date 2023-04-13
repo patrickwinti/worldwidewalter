@@ -13,14 +13,5 @@ public abstract class ResourceReaderError extends RuntimeException {
             super("The given file does not have the proper format, please check the format and try again");
         }
     }
-
-    /**
-     * Exception for when the loaded file does not have the expected format
-     */
-    public static class InvalidResource extends ResourceReaderError {
-        public InvalidResource() {
-            super("The given resource does not have the proper format, please check the format and try again");
-        }
-    }
 }
 

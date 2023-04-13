@@ -6,8 +6,11 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.core.io.Resource;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,22 +19,50 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-class TextFileReaderTest {
+class TextResourceReaderTest {
     @TempDir
     private Path tempDir;
     
     @Test
-    void readFile() throws IOException {
+    void readResource() throws IOException {
         File testFile = new File("src/test/resources/testDeck.txt");
-        TextFileReader txtFileReader = new TextFileReader();
-        
-        List<Prompt> prompts = new ArrayList<>(txtFileReader.readFile(testFile));
+        TextResourceReader txtFileReader = new TextResourceReader();
+        List<Prompt> prompts = new ArrayList<>(txtFileReader.readResource(getResourceFromFile(testFile)));
         
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
         assertEquals("WALTER WALTERN WALTER", prompts.get(3).getStatement());
         assertEquals(3, prompts.get(3).getTotalPlaceholders());
+    }
+    
+    @Test
+    void testBadInputs() throws IOException {
+        Path file = tempDir.resolve("deck_2.txt");
+        Files.write(file, List.of("no placeholder", "Walter", "                    ", ""));
+        
+        TextResourceReader txtFileReader = new TextResourceReader();
+        Resource resourceFromFile = getResourceFromFile(file.toFile());
+        List<Prompt> prompts = txtFileReader.readResource(resourceFromFile);
+        
+        assertEquals(0, prompts.size());
+    }
+    
+    /**
+     * Checks that the correct amount of placeholders has been set.
+     */
+    @ParameterizedTest
+    @MethodSource("provideWalterStatements")
+    void testPlaceholderCounting(String input, int expectedNumberOfPlaceholders) throws IOException {
+        Path file = tempDir.resolve("deck.txt");
+        Files.write(file, List.of(input));
+        
+        TextResourceReader txtFileReader = new TextResourceReader();
+        List<Prompt> prompts = txtFileReader.readResource(getResourceFromFile(file.toFile()));
+        
+        assertEquals(1, prompts.size());
+        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getTotalPlaceholders());
     }
     
     private static Stream<Arguments> provideWalterStatements() {
@@ -49,37 +80,18 @@ class TextFileReaderTest {
     }
     
     @Test
-    void testBadInputs() throws IOException {
-        Path file = tempDir.resolve("deck.txt");
-        Files.write(file, List.of("no placeholder", "Walter", "                    ", ""));
+    void testReadFileIOExceptionThrowing() throws IOException {
+        Resource resource = mock(Resource.class);
+        doThrow(FileNotFoundException.class).when(resource).getInputStream();
         
-        TextFileReader txtFileReader = new TextFileReader();
-        List<Prompt> prompts = txtFileReader.readFile(file.toFile());
-        
-        assertEquals(0, prompts.size());
+        TextResourceReader txtFileReader = new TextResourceReader();
+        assertThrows(ResourceReaderError.WrongResourceFormatException.class, () -> txtFileReader.readResource(resource));
     }
     
-    /**
-     * Checks that the correct amount of placeholders has been set.
-     */
-    @ParameterizedTest
-    @MethodSource("provideWalterStatements")
-    void testPlaceholderCounting(String input, int expectedNumberOfPlaceholders) throws IOException {
-        Path file = tempDir.resolve("deck.txt");
-        Files.write(file, List.of(input));
-        
-        TextFileReader txtFileReader = new TextFileReader();
-        List<Prompt> prompts = txtFileReader.readFile(file.toFile());
-        
-        assertEquals(1, prompts.size());
-        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getTotalPlaceholders());
-    }
-    
-    @Test
-    void testReadFileIOExceptionThrowing() {
-        File nonExistingFile = new File("nonExistingFile.txt");
-        TextFileReader txtFileReader = new TextFileReader();
-        assertThrows(IOException.class, () -> txtFileReader.readFile(nonExistingFile));
+    private static Resource getResourceFromFile(File file) throws IOException {
+        Resource resource = mock(Resource.class);
+        when(resource.getInputStream()).thenReturn(new FileInputStream(file));
+        return resource;
     }
     
 }

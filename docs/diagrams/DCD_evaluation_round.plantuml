@@ -1,19 +1,18 @@
 @startuml
 skinparam class {
     BackgroundColor white
-    BorderColor Black
-    FontColor Black
     ArrowColor Firebrick
+    BorderThickness 2
 }
 skinparam roundcorner 0
+skinparam packagestyle Frame
 hide empty members
-
 
 interface GameService {
     +selectProposition(roundId:String,  playerId:String,  propositionId:String)
 }
 
-interface GameEntityService {
+interface EntityService {
     +editGameForRound(roundId: String, UnaryOperator<Game>)
 }
 
@@ -42,10 +41,10 @@ class GameController {
 
 
 GameController ..> GameService
-GameService ..> GameEntityService
+GameService ..> EntityService
 GameService ..> EvalService
 GameService ..> Game
-GameEntityService ..> GameRepository
+EntityService ..> GameRepository
 Game..> Round
 
 

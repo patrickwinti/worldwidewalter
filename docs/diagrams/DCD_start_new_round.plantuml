@@ -1,0 +1,48 @@
+@startuml
+skinparam class {
+    BackgroundColor white
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam roundcorner 0
+skinparam packagestyle Frame
+hide empty members
+
+package backend{
+   class GameController {
+      +enterRound(gameId: String, playerId: String) : RoundDto
+   }
+   class Game {
+      -id: String
+      getState(): Game.State
+   }
+   class Round {
+      +getState(): Round.State
+   }
+   interface EntityService {
+      editGame(gameId: String, editor: Consumer)
+   }
+   interface RoundService{
+      -gameProperties: GameProperties
+      createNewRound(game: Game);
+   }
+   interface GameService{
+      enterRound(gameId: String,playerId: String)
+   }
+   interface GameRepository
+}
+note left of Game: Information Expert
+note top of EntityService: Protected variation
+GameController-->GameService
+GameService ..> Game
+Game --> Round
+RoundService ..> Round
+RoundService ..> Game
+GameService --> EntityService
+GameService --> RoundService
+EntityService --> GameRepository
+@enduml

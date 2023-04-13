@@ -1,0 +1,42 @@
+@startuml
+skinparam sequence {
+    BackgroundColor white
+    BorderColor Black
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam participant {
+    BackgroundColor white
+    BorderThickness 2
+}
+skinparam responseMessageBelowArrow true
+skinparam style strictuml
+
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant ":RoundEvaluator" as ev
+participant "game:Game" as game
+participant "round:Round" as round
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> gs: evalRound(gameId, playerId)
+gs -> ges: editGame(gameId)
+activate ges
+ges -> gr : findGame(gameId)
+gr  --> ges: Game
+gs -> game: getCurrentRound()
+game -> round: getState()
+round --> game: Round state
+game --> gs: Round
+gs -> ev :eval(round, proposition)
+ev --> gs : Result
+gs -> game : updateResults(result: Result)
+ges -> gr : save(game)
+
+
+@enduml

@@ -9,6 +9,10 @@ skinparam Note{
     BorderColor #FFD966
     BackgroundColor #FFD966
 }
+skinparam participant {
+    BackgroundColor white
+    BorderThickness 2
+}
 skinparam responseMessageBelowArrow true
 skinparam style strictuml
 

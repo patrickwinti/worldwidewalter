@@ -24,7 +24,7 @@ class TextResourceReader implements ResourceReader {
     private static final Logger LOGGER = Logger.getLogger(TextResourceReader.class.getSimpleName());
 
     @Override
-    public List<Prompt> readResource(Resource resource) throws ResourceReaderError.WrongResourceFormatException, IOException {
+    public List<Prompt> readResource(Resource resource) throws ResourceReaderError.WrongResourceFormatException {
         try (var inputStreamReader = new InputStreamReader(resource.getInputStream());
              var bufferedReader = new BufferedReader(inputStreamReader)) {
             return bufferedReader.lines()
@@ -40,7 +40,7 @@ class TextResourceReader implements ResourceReader {
                     })
                     .filter(Objects::nonNull)
                     .toList();
-        } catch (ResourceReaderError e) {
+        } catch (ResourceReaderError | IOException e) {
             throw new ResourceReaderError.WrongResourceFormatException();
         }
     }

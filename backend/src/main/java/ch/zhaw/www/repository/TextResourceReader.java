@@ -5,7 +5,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +21,7 @@ import java.util.regex.Pattern;
 class TextResourceReader implements ResourceReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
     private static final Logger LOGGER = Logger.getLogger(TextResourceReader.class.getSimpleName());
-
+    
     @Override
     public List<Prompt> readResource(Resource resource) throws ResourceReaderError.WrongResourceFormatException {
         try (var inputStreamReader = new InputStreamReader(resource.getInputStream());
@@ -44,7 +43,7 @@ class TextResourceReader implements ResourceReader {
             throw new ResourceReaderError.WrongResourceFormatException();
         }
     }
-
+    
     /**
      * Method to count the total number of WALTER words (or variations) that appear in one statement.
      *
@@ -53,9 +52,9 @@ class TextResourceReader implements ResourceReader {
      */
     protected long countPlaceholders(String input) {
         Matcher matcher = PATTERN.matcher(input);
-
+        
         long count = matcher.results().count();
-
+        
         if (count == 0) {
             LOGGER.log(Level.WARNING, "No placeholder match found");
         }

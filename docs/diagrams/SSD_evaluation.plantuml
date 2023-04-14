@@ -26,10 +26,10 @@ participant "round:Round" as round
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-gc -> gs: evalRound(gameId, playerId)
+gc -> gs: selectProposition(roundId,playerId,propositionId)
 gs -> ges: editGame(gameId)
 activate ges
-ges -> gr : findGame(gameId)
+ges -> gr : findById(gameId)
 gr  --> ges: Game
 ges --> gs
 gs -> game: getCurrentRound()
@@ -43,7 +43,7 @@ game --> gs
 ges -> gr : save(game)
 gr --> ges
 ges --> gs
-gs --> gc: ranking of game
+gs --> gc
 
 
 @enduml

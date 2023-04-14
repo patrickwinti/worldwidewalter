@@ -31,7 +31,10 @@ class Round {
     +getState()
 }
 
-interface GameRepository
+interface GameRepository{
+ +findById(id:String)
+ +save(game:Game)
+}
 
 class GameController {
     +evalRound(game: Game, playerId: String, propositionId: String): Evaluation

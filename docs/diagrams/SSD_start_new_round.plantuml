@@ -28,13 +28,13 @@ participant ":GameRepository" as gr
 gc -> gs: enterRound(gameId, playerId)
 gs -> ges: editGame(gameId)
 activate ges
-ges -> gr : findGame(gameId)
+ges -> gr : findById(gameId)
 gr  --> ges: Game
 ges --> gs
 gs -> game: getState()
 game -> round: getState()
-round --> game: Round state
-game --> gs: Game state
+round --> game: Round state FINISHED
+game --> gs: Game state NO_VALID_ROUND
 gs -> game: hasCapacityForNewActivePlayer()
 game --> gs: true or false depending on nr of players
 game -> gs: hasPlayer(playerId)
@@ -42,7 +42,7 @@ gs -> rs :createNewRound(game)
 rs -> game :addRound(round)
 game --> rs
 rs -->gs
-gs -> game : moveToActivePlayers
+gs -> game : moveToActivePlayers(playerId)
 game --> gs
 gs-->ges
 ges -> gr : save(game)

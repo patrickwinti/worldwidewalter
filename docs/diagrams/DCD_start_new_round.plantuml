@@ -22,6 +22,7 @@ package backend{
       +addRound(round:Round)
       +hasCapacityForNewActivePlayer(): boolean
       +hasPlayer(playerId: String): boolean
+      +moveToActivePlayers(playerId: String)
    }
    class Round {
       +getState(): Round.State
@@ -36,7 +37,10 @@ package backend{
    interface GameService{
       enterRound(gameId: String,playerId: String)
    }
-   interface GameRepository
+   interface GameRepository {
+      save(game: Game)
+      findById(id: String)
+   }
 }
 note left of Game: Information Expert
 note top of EntityService: Protected variation

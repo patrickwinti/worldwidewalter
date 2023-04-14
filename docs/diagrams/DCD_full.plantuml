@@ -4,130 +4,128 @@ skinparam class {
     ArrowColor Firebrick
     BorderThickness 2
 }
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
 skinparam roundcorner 0
 skinparam packagestyle Frame
 hide empty members
+'left to right direction
+skinparam linetype ortho
 
 package backend{
-    left to right direction
-    skinparam linetype ortho
-
-    hide empty members
-    class GameController {
-        -gameService: GameService
-        +createGame(): GameDto
-        +getGame(gameId: String) : GameDto
-        +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
-        +leaveGame(gameId: String, playerId: String) : void
-        +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto) : void
-        +selectProposition(roundId: String, propositionId: String, playerId: String) : void
-        +getRound(gameId: String, playerId: String) : RoundDto
-        +enterRound(gameId: String, playerId: String) : RoundDto
+    package controller {
+        class GameController {
+            -gameService: GameService
+            +createGame(): GameDto
+            +getGame(gameId: String) : GameDto
+            +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+            +leaveGame(gameId: String, playerId: String)
+            +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+            +selectProposition(roundId: String, propositionId: String, playerId: String)
+            +getRound(gameId: String, playerId: String) : RoundDto
+            +enterRound(gameId: String, playerId: String) : RoundDto
+        }
     }
-    class GameDto {
-        -id: String
-        -state: State
+    package dto {
+        class GameDto {
+           -id: String
+        }
+        class PlayerDto {
+           -id: String
+        }
+        class PlayerJoinRequestDto {
+            -playerName:String
+        }
+        class PropositionSubmissionDto {
+            -gaps: List<String>
+        }
+        class RoundDto {
+            -id: String
+            -prompt: String
+        }
     }
-    class Game {
-        id: String
-        waitingRoom: Map<Player>
-        activePlayers: Map<Player>
-        getState(): Game.State
+    package model {
+        class Game {
+            id: String
+            waitingRoom: Map<Player>
+            activePlayers: Map<Player>
+            getState(): Game.State
+        }
+        class Prompt{
+            -statement: String
+            -totalPlaceholders: int
+            -hasBeenUsed: boolean
+        }
+        class Proposition{
+            -id: String
+            -playerId: String
+            -gaps: List<String>
+            -duplicates: List<Proposition>
+            +hasSameGaps(proposition: Proposition): Boolean
+        }
+        class Player {
+              -id: String
+              -name: String
+        }
+        class Round {
+             -id: String
+             -prompt: Prompt
+             -propositions: Map<Proposition>
+             -selections: Map<Selection>
+             +getState(): Round.State
+        }
     }
-    class Prompt{
-        -statement: String
-        -totalPlaceholders: int
-        -hasBeenUsed: boolean
+    package service {
+        interface GameService{
+           createGame(): Game
+           leaveGame(gameId: String, playerId: String)
+           getGame(gameId: String) : Game
+           enterGame(gameId: String, playerName: String) : Player
+           enterRound(gameId: String, playerId: String) : Round
+        }
+        interface RoundService{
+            selectSphinx(game: Game);
+            createNewRound(game: Game);
+            getRound(roundId: String, playerId: String):Round
+            submitProposition(roundId: String, playerId: String, gaps: List<String>)
+            selectProposition(roundId: String, playerId: String, propositionId: String)
+        }
+        interface EntityService{
+            getGame(gameId: String): Game
+            editGame(gameId: String, editor: Consumer<Game>)
+            getRound(roundId: String): Round
+            isPlayerActiveInRound(roundId: String, playerId: String): boolean
+            editRound(roundId: String, editor: Consumer<Round>)
+            saveNewGame(game: Game)
+        }
     }
-
-    class Proposition{
-          -id: String
-          -playerId: String
-          -gaps: List<String>
-          -duplicates: List<Proposition>
-          +hasSameGaps(proposition: Proposition): Boolean
-    }
-
-    interface GameService{
-       createGame(): Game
-       leaveGame(gameId: String, playerId: String): void
-       getGame(gameId: String) : Game
-       enterGame(gameId: String, playerName: String) : Player
-       enterRound(gameId: String, playerId: String) : Round
-    }
-    interface RoundService{
-        selectSphinx(game: Game);
-        createNewRound(game: Game);
-        getRound(roundId: String, playerId: String):Round
-        submitProposition(roundId: String, playerId: String, gaps: List<String>)
-        selectProposition(roundId: String, playerId: String, propositionId: String)
-    }
-    interface GameRepository
-    class PlayerDto {
-        -id: String
-    }
-    class PlayerJoinRequestDto {
-        -playerName:String
-    }
-    class PropositionSubmissionDto {
-        -gaps: List<String>
-    }
-    class RoundDto {
-        -id: String
-        -prompt: String
-    }
-    class Player {
-        -id: String
-    }
-    class Round {
-        -id: String
-        -prompt: Prompt
-        -propositions: Map<Proposition>
-        -selections: Map<Selection>
-        +getState(): Round.State
-    }
-    class PostfixGenerator {
-        -postFixes: Random
-    }
-    exception GameError {
-        FullCapacityException
-        AlreadyExists
-        NotFoundException
-    }
-    exception RoundError {
-        OngoingException
-        NotFoundException
-    }
-    exception PropositionError {
-        NotFoundException
-    }
-    exception PlayerError {
-        NotFoundException
+    package repository {
+        interface GameRepository
+         interface FileReader{
+                readFile(file: File): List<Prompt>
+         }
     }
 
-    interface FileReader{
-        readFile(file: File): List<Prompt>
-    }
+    package utils{
+        class PostfixGenerator {
+            -postFixes: Random
+            +getRandomPostfix(): Integer
+        }
 
-    class TextFileReader
-    class GameIdGenerator{
-        +generateId():String{static}
+        class GameIdGenerator {
+            +generateId():String{static}
+        }
     }
+}
 
-    GameController..>PlayerDto
-    GameController..>PlayerJoinRequestDto
-    GameController..>PropositionSubmissionDto
-    GameController..>RoundDto
-    GameController ..> GameDto
-    GameController --> RoundService
+    controller ->dto
+    GameController -> RoundService
     GameController --> GameService
 
     GameService ..> Game
     GameService ..> Player
-    GameService ..> GameError
-    GameService ..> RoundError
-    GameService ..> PlayerError
-    GameService ..> PropositionError
     GameService --> EntityService
     GameService ..> Proposition
     GameService --> PostfixGenerator
@@ -138,8 +136,7 @@ package backend{
 
     RoundService --> EntityService
 
-    TextFileReader ..> Prompt
-    FileReader<|-TextFileReader
+    FileReader -> Prompt
 
     Game -> Round
 @enduml

@@ -16,20 +16,24 @@ skinparam participant {
 skinparam responseMessageBelowArrow true
 skinparam style strictuml
 
-actor       player1
-actor       player2
-actor       playerN
+footer Page %page% of %lastpage%
 
+actor     player1
+actor     player2
+actor     playerN
 
  player1 -> system: enterRound(gameId, playerId)
  player2 -> system: enterRound(gameId, playerId)
  playerN -> system: enterRound(gameId, playerId)
+ system --> player1
+ system --> player2
+ system --> playerN
 
- loop wait for round start conditions met
-     player1 -> system : getRound(roundId, gameId)
-     player2 -> system : getRound(roundId, gameId)
-     playerN -> system : getRound(roundId, gameId)
- end
+loop wait for round start conditions met
+    player1 -> system : getRound(roundId, gameId)
+    player2 -> system : getRound(roundId, gameId)
+    playerN -> system : getRound(roundId, gameId)
+end
 
  system --> player1: new round
  system --> player2: new round, sphinx
@@ -39,11 +43,16 @@ actor       playerN
  player2 -> system: submitProposition(roundId, playerId, proposition)
  playerN -> system: submitProposition(roundId, playerId, proposition)
 
- loop wait all player to send proposition or timeout
-     player1 -> system : getAllPropositionForRound(roundId, gameId)
-     player2 -> system : getAllPropositionForRound(roundId, gameId)
-     playerN -> system : getAllPropositionForRound(roundId, gameId)
- end
+system --> player1
+system --> player2
+system --> playerN
+newpage
+
+loop wait all player to send proposition or timeout
+    player1 -> system : getAllPropositionForRound(roundId, gameId)
+    player2 -> system : getAllPropositionForRound(roundId, gameId)
+    playerN -> system : getAllPropositionForRound(roundId, gameId)
+end
 
  system --> player1: list of propositions
  system --> player2: list of propositions
@@ -55,12 +64,13 @@ actor       playerN
    Player 2 is the sphinx.
    A sphinx cannot send selections
  end note
-
- loop wait all player to select proposition or timeout
-     player1 -> system : fetchResultsForRound(gameId, playerId)
-     player2 -> system : fetchResultsForRound(gameId, playerId)
-     playerN -> system : fetchResultsForRound(gameId, playerId)
- end
+system --> player1
+system --> playerN
+loop wait all player to select proposition or timeout
+    player1 -> system : fetchResultsForRound(gameId, playerId)
+    player2 -> system : fetchResultsForRound(gameId, playerId)
+    playerN -> system : fetchResultsForRound(gameId, playerId)
+end
 
  system --> player1: ranking
  system --> player2: ranking

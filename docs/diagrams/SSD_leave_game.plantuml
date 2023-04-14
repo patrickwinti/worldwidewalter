@@ -1,0 +1,44 @@
+@startuml
+skinparam sequence {
+    BackgroundColor white
+    BorderColor Black
+    ArrowColor Firebrick
+    BorderThickness 2
+    LifeLineBackgroundColor #FFD966
+
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam participant {
+    BackgroundColor white
+    BorderThickness 2
+}
+skinparam responseMessageBelowArrow true
+skinparam style strictuml
+
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant "game:Game" as game
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> gs: leaveGame(gameId, playerId)
+gs -> ges: editGame(gameId)
+activate ges
+ges -> gr : findById(gameId))
+gr  --> ges: Game
+ges --> gs: editable game
+gs -> game: removePlayer(gameId))
+game ->game: remove waiting room player
+game ->game: remove active player
+game ->game: remove sphinx canditate
+ges -> gr : save(game)
+game --> gs
+gr --> ges
+ges --> gs
+gs --> gc
+
+
+@enduml

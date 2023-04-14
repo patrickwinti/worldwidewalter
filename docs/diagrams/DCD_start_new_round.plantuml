@@ -12,35 +12,36 @@ skinparam roundcorner 0
 skinparam packagestyle Frame
 hide empty members
 
-package backend{
-   class GameController {
-      +enterRound(gameId: String, playerId: String) : RoundDto
-   }
-   class Game {
-      -id: String
-      +getState(): Game.State
-      +addRound(round:Round)
-      +hasCapacityForNewActivePlayer(): boolean
-      +hasPlayer(playerId: String): boolean
-      +moveToActivePlayers(playerId: String)
-   }
-   class Round {
-      +getState(): Round.State
-   }
-   interface EntityService {
-      editGame(gameId: String, editor: Consumer)
-   }
-   interface RoundService{
-      -gameProperties: GameProperties
-      createNewRound(game: Game);
-   }
-   interface GameService{
-      enterRound(gameId: String,playerId: String)
-   }
-   interface GameRepository {
-      save(game: Game)
-      findById(id: String)
-   }
+class GameController {
+   -gameService: GameService
+   +enterRound(gameId: String, playerId: String) : RoundDto
+}
+class Game {
+   -id: String
+   +getState(): Game.State
+   +addRound(round:Round)
+   +hasCapacityForNewActivePlayer(): boolean
+   +hasPlayer(playerId: String): boolean
+   +moveToActivePlayers(playerId: String)
+}
+class Round {
+   +getState(): Round.State
+}
+interface EntityService {
+   -gameRepository: GameRepository
+   editGame(gameId: String, editor: Consumer)
+}
+interface RoundService{
+   -entityService: EntityService
+   -gameProperties: GameProperties
+   createNewRound(game: Game);
+}
+interface GameService{
+   enterRound(gameId: String,playerId: String)
+}
+interface GameRepository {
+   save(game: Game)
+   findById(id: String)
 }
 note left of Game: Information Expert
 note top of EntityService: Protected variation

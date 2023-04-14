@@ -14,6 +14,7 @@ hide empty members
 skinparam linetype ortho
 
 class GameController {
+    -roundService: RoundService
     +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
 }
 class Game {
@@ -33,9 +34,11 @@ class Round {
      +addProposition(proposition: Proposition)
 }
 interface RoundService{
+    -entityService: EntityService
     submitProposition(roundId: String, playerId: String, gaps: List<String>)
 }
 interface EntityService{
+   -gameRepository: GameRepository
     isPlayerActiveInRound(roundId: String, playerId: String): boolean
     editRound(roundId: String, editor: Consumer<Round>)
 }

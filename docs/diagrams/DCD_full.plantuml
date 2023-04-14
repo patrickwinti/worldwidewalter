@@ -79,6 +79,7 @@ package backend{
     }
     package service {
         interface GameService{
+            -entityService: EntityService
            createGame(): Game
            leaveGame(gameId: String, playerId: String)
            getGame(gameId: String) : Game
@@ -86,6 +87,7 @@ package backend{
            enterRound(gameId: String, playerId: String) : Round
         }
         interface RoundService{
+            -entityService: EntityService
             selectSphinx(game: Game);
             createNewRound(game: Game);
             getRound(roundId: String, playerId: String):Round
@@ -93,6 +95,7 @@ package backend{
             selectProposition(roundId: String, playerId: String, propositionId: String)
         }
         interface EntityService{
+           -gameRepository: GameRepository
             getGame(gameId: String): Game
             editGame(gameId: String, editor: Consumer<Game>)
             getRound(roundId: String): Round

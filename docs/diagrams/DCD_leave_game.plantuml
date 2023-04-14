@@ -1,0 +1,48 @@
+@startuml
+skinparam class {
+    BackgroundColor white
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam roundcorner 0
+skinparam packagestyle Frame
+hide empty members
+'left to right direction
+skinparam linetype ortho
+class GameController {
+   -gameService: GameService
+   +leaveGame(gameId: String, playerId: String) : void
+}
+class Game {
+   -waitingRoom: Map<String, Player>
+   -activePlayers: Map<String, Player>
+   -sphinxCandidates: List<Player>
+   +removePlayer(playerId: String)
+}
+interface EntityService {
+    -gameRepository:GameRepository
+    editGame(gameId: String, editor: Consumer)
+}
+interface GameService{
+    -entityService: EntityService
+    leaveGame(gameId: String, playerId: String): void
+}
+interface GameRepository {
+   save(game: Game)
+   findById(id: String)
+}
+class Player {
+    -id: String
+    -name: String
+}
+
+GameController-->GameService
+GameService ..> Game
+GameService --> EntityService
+EntityService --> GameRepository
+Game --> Player
+@enduml

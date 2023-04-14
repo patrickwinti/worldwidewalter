@@ -13,13 +13,13 @@ export class EnterPropositionComponent implements OnInit {
 
   proposition: Array<WalterReplacement>;
 
-  get numberOfGaps(): number {
-    return this.round.numberOfGaps;
+  get numberOfPlaceholders(): number {
+    return this.round.numberOfPlaceholders;
   }
 
   ngOnInit(): void {
     this.proposition = new Array<WalterReplacement>();
-    for (let i = 0; i < this.numberOfGaps; i++) {
+    for (let i = 0; i < this.numberOfPlaceholders; i++) {
       this.proposition.push({text: ''} as WalterReplacement);
     }
   }

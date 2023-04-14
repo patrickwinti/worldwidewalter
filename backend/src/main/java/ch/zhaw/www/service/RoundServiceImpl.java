@@ -15,12 +15,21 @@ class RoundServiceImpl implements RoundService {
     
     private final GameProperties gameProperties;
     private final EntityService entityService;
-    
+    /**
+
+     Constructs a RoundServiceImpl object with the specified GameProperties and EntityService instances.
+     @param gameProperties the GameProperties instance to use
+     @param entityService the EntityService instance to use
+     */
     RoundServiceImpl(GameProperties gameProperties, EntityService entityService) {
         this.gameProperties = gameProperties;
         this.entityService = entityService;
     }
-    
+    /**
+
+     Selects a sphinx player for the current round of the specified game.
+     @param game the game to select a sphinx player for
+     */
     @Override
     public void selectSphinx(Game game) {
         var round = game.getCurrentRound();
@@ -44,7 +53,11 @@ class RoundServiceImpl implements RoundService {
             round.setSphinx(sphinx);
         }
     }
-    
+    /**
+
+     Creates a new round for the specified game.
+     @param game the game to create a new round for
+     */
     @Override
     public void createNewRound(final Game game) {
         game.addRound(new Round(UUID.randomUUID().toString(),
@@ -57,7 +70,13 @@ class RoundServiceImpl implements RoundService {
                 .takeWhile(player -> game.hasCapacityForNewActivePlayer())
                 .forEach(game::moveToActivePlayers);
     }
-    
+    /**
+
+     Submits a proposition with the specified gaps for the round with the specified ID and player with the specified ID.
+     @param roundId the ID of the round to submit the proposition for
+     @param playerId the ID of the player submitting the proposition
+     @param gaps the gaps in the proposition
+     */
     @Override
     public void submitProposition(String roundId, String playerId, List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
@@ -76,19 +95,36 @@ class RoundServiceImpl implements RoundService {
             }
         });
     }
-    
+    /**
+
+     Selects a proposition with the specified ID for the round with the specified ID and player with the specified ID.
+     @param roundId the ID of the round to select the proposition for
+     @param playerId the ID of the player selecting the proposition
+     @param propositionId the ID of the proposition to select
+     */
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
         
     }
-    
+    /**
+
+     Gets the round with the specified ID for the player with the specified ID.
+     @param roundId the ID of the round to get
+     @param playerId the ID of the player to get the round for
+     @return the round with the specified ID for the player with the specified ID
+     */
     @Override
     public Round getRound(String roundId, String playerId) {
         verifyPlayerIsActive(roundId, playerId);
         return entityService.getRound(roundId);
     }
-    
+    /**
+
+     Verifies that the player with the specified ID is active in the round with the specified ID.
+     @param roundId the ID of the round to verify the player for
+     @param playerId the ID of the player to verify
+     */
     private void verifyPlayerIsActive(String roundId, String playerId) {
         if (!entityService.isPlayerActiveInRound(roundId, playerId)) {
             throw new PlayerError.NotFoundException(playerId);

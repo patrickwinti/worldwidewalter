@@ -20,7 +20,14 @@ import java.util.stream.Stream;
 class TextFileReader implements FileReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
     private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
-    
+    /**
+     * Reads a file and returns a list of prompts.
+     *
+     * @param file the file to read
+     * @return a list of prompts
+     * @throws FileReaderError.WrongFileFormatException if the file has the wrong format
+     * @throws IOException if an I/O error occurs while reading the file
+     */
     @Override
     public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatException, IOException {
         try (Stream<String> stream = Files.lines(file.toPath())) {
@@ -41,12 +48,12 @@ class TextFileReader implements FileReader {
             throw new FileReaderError.WrongFileFormatException();
         }
     }
-    
-    /*
+
+    /**
      * Method to count the total number of WALTER words (or variations) that appear in one statement.
      *
-     * @param input: sentence to be analysed.
-     * @return total number of "WALTER" words.
+     * @param input the sentence to be analyzed
+     * @return the total number of WALTER words
      */
     protected long countPlaceholders(String input) {
         Matcher matcher = PATTERN.matcher(input);

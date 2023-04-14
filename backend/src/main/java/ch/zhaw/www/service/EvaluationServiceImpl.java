@@ -1,59 +1,47 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Proposition;
+import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class EvaluationServiceImpl implements EvaluationService {
-    public static final AtomicBoolean AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED = new AtomicBoolean(false);
-    public static final int NONE = 0;
+    private static final int NONE = 0;
     private static final int SINGLE_POINT = 1;
     private final EntityService entityService;
-    private final GameService gameService;
 
-    public EvaluationServiceImpl(EntityService entityService, GameService gameService) {
+    public EvaluationServiceImpl(EntityService entityService) {
         this.entityService = entityService;
-        this.gameService = gameService;
     }
 
+    // Technically all the parameters could be fetched from roundId but this would make testing a lot more costly.
     @Override
-    public void evaluateRound(String gameId) throws GameError.NotFoundException, RoundError.NotFoundException {
-        AtomicInteger tempSphinxPoints = new AtomicInteger();
-        Game game = gameService.getGame(gameId);
-        String sphinxId = game.getCurrentRound().getSphinx().getId();
+    public Map<String, Integer> evaluateSelection(String roundId, String sphinxId, List<Proposition> propositions,
+                                                  String selectedPropositionId, String propositionOriginatorIdOfSelection) {
+        Round round = entityService.getRound(roundId);
+        Map<String, Integer> points = new ConcurrentHashMap<>();
+        propositions.forEach(proposition -> {
+            if (selectedPropositionId.equals(proposition.getId()) && !propositionOriginatorIdOfSelection.equals(sphinxId)) {
+                points.put(proposition.getPlayerId(), SINGLE_POINT);
+                round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().set(true);
+                points.put(sphinxId, round.getTempSphinxPoints().get());
+                round.getTempSphinxPoints().set(NONE);
+            }
+            if (selectedPropositionId.equals(proposition.getId()) && propositionOriginatorIdOfSelection.equals(sphinxId)
+                    && round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().get()) {
+                points.put(proposition.getPlayerId(), SINGLE_POINT);
+                points.put(sphinxId, SINGLE_POINT);
 
-        game.getCurrentRound().getSelections().forEach((key, value) -> {
-            game.getCurrentRound().getPropositions().forEach(proposition -> {
-                if (value.equals(proposition.getId()) && !key.equals(sphinxId)) {
-                    addPoint(proposition.getPlayerId(), gameId);
-                    AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.set(true);
-                    addTempPointsToSphinx(gameId, tempSphinxPoints.get());
-                    tempSphinxPoints.set(NONE);
-                }
-                if (value.equals(proposition.getId()) && key.equals(sphinxId) && AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.get()) {
-                    addPoint(proposition.getPlayerId(), gameId);
-                    addPoint(sphinxId, gameId);
-
-                } else if (value.equals(proposition.getId()) && key.equals(sphinxId) && AT_LEAST_ONE_SPHINX_PROPOSITION_HAS_BEEN_SELECTED.get()) {
-                    tempSphinxPoints.getAndIncrement();
-                }
-            });
+            } else if (selectedPropositionId.equals(proposition.getId()) && propositionOriginatorIdOfSelection.equals(sphinxId)
+                    && !round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().get()) {
+                points.put(proposition.getPlayerId(), SINGLE_POINT);
+                round.getTempSphinxPoints().set(SINGLE_POINT);
+            }
         });
-    }
-
-
-    private void addPoint(String playerId, String gameId) throws GameError.NotFoundException {
-        entityService.editGame(gameId, game -> {
-            game.getPoints().put(playerId, SINGLE_POINT);
-        });
-    }
-
-    private void addTempPointsToSphinx(String gameId, int points) throws GameError.NotFoundException{
-        entityService.editGame(gameId, game -> {
-            game.getPoints().put(game.getCurrentRound().getSphinx().getId(), points);
-        });
+        return points;
     }
 }

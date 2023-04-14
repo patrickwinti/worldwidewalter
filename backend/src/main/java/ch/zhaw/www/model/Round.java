@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Model class with round information
@@ -32,6 +34,9 @@ public class Round {
     private final Duration enterLimitDuration;
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
+    @Getter
+    private AtomicInteger tempSphinxPoints = new AtomicInteger(0);
+    private AtomicBoolean atLeastOneNoneSphinxPropositionHasBeenSelected = new AtomicBoolean(false);
     
     private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();

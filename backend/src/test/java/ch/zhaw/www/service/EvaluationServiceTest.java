@@ -29,22 +29,22 @@ public class EvaluationServiceTest {
     private EntityService entityService;
     private EvaluationService evaluationService;
 
-    @Test
+//    @Test
     //TODO
-    public void testEvaluateRound() {
-        Game game = mockGameInRepository();
-        List<Proposition> propositions = new ArrayList<>();
-        propositions.add(createProposition("1", "orange"));
-        propositions.add(createProposition("2", "blue"));
-        propositions.add(createProposition("3", "green"));
-        Map<String, String> selections = new HashMap<>();
-        selections.put(propositions.get(0).getPlayerId(), propositions.get(0).getId());
-        selections.put(propositions.get(1).getPlayerId(), propositions.get(1).getId());
-        selections.put(propositions.get(2).getPlayerId(), propositions.get(2).getId());
+//    public void testEvaluateRound() {
+//        Game game = mockGameInRepository();
+//        List<Proposition> propositions = new ArrayList<>();
+//        propositions.add(createProposition("1", "orange"));
+//        propositions.add(createProposition("2", "blue"));
+//        propositions.add(createProposition("3", "green"));
+//        Map<String, String> selections = new HashMap<>();
+//        selections.put(propositions.get(0).getPlayerId(), propositions.get(0).getId());
+//        selections.put(propositions.get(1).getPlayerId(), propositions.get(1).getId());
+//        selections.put(propositions.get(2).getPlayerId(), propositions.get(2).getId());
+//
+//        evaluationService.evaluateRound(game.getId());
 
-        evaluationService.evaluateRound(game.getId());
-
-    }
+//    }
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
 

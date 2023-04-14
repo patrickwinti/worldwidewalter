@@ -15,8 +15,7 @@ pipeline {
                     url: 'https://github.zhaw.ch/PM3-FS23-IT21ta-ZH-Team4/PM3_FS23_IT21ta-ZH-Team4'
 
                 // Run Maven on a Unix agent.
-                sh "mvn -P -DskipTests=true prod clean package"
-            }
+                sh "mvn -P prod -DskipTests=true clean package"            }
 
             post {
                 // record the test results and archive the jar file.

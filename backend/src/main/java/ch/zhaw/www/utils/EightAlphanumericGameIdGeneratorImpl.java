@@ -1,0 +1,36 @@
+package ch.zhaw.www.utils;
+
+import org.springframework.stereotype.Service;
+
+import java.util.Random;
+
+
+/**
+ * Generates IDs that are not longer than
+ * 7 characters long. The method produces unique
+ * IDs within a 99.997%.
+ */
+@Service
+public class EightAlphanumericGameIdGeneratorImpl implements GameIdGenerator {
+    
+    private final char[] CHARS = new char[]{
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    };
+    private static final int MIN_GAME_ID_LENGTH = 7;
+    private static final Random RANDOM = new Random(0);
+    
+    public String generateId() {
+        StringBuilder id = new StringBuilder();
+        for (int i = 0; id.length() < MIN_GAME_ID_LENGTH; i++) {
+            int index = RANDOM.nextInt(CHARS.length - i - 1);
+            char a = CHARS[i + index];
+            CHARS[i + index] = CHARS[i];
+            CHARS[i] = a;
+            id.append(a);
+        }
+        return id.toString();
+    }
+    
+}

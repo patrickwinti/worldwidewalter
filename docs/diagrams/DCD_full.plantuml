@@ -104,7 +104,7 @@ package backend{
     package repository {
         interface GameRepository
          interface FileReader{
-                readFile(file: File): List<Prompt>
+              readFile(file: File): List<Prompt>
          }
     }
 
@@ -120,23 +120,26 @@ package backend{
     }
 }
 
-    controller ->dto
-    GameController -> RoundService
-    GameController --> GameService
+controller ->dto
 
-    GameService ..> Game
-    GameService ..> Player
-    GameService --> EntityService
-    GameService ..> Proposition
-    GameService --> PostfixGenerator
-    GameService --> GameIdGenerator
-    GameService --> RoundService
+GameController -> RoundService
+GameController --> GameService
 
-    EntityService --> GameRepository
+GameService ..> Game
+GameService ..> Player
+GameService --> EntityService
+GameService --> PostfixGenerator
+GameService --> GameIdGenerator
+GameService --> RoundService
 
-    RoundService --> EntityService
+RoundService ..>Game
+RoundService ..>Round
+RoundService ..> Proposition
+RoundService --> EntityService
 
-    FileReader -> Prompt
+EntityService --> GameRepository
 
-    Game -> Round
+FileReader -> Prompt
+
+Game -> Round
 @enduml

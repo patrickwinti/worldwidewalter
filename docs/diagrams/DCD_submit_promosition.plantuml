@@ -1,0 +1,57 @@
+@startuml
+skinparam class {
+    BackgroundColor white
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam roundcorner 0
+skinparam packagestyle Frame
+hide empty members
+skinparam linetype ortho
+
+class GameController {
+    +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+}
+class Game {
+    id: String
+}
+class Proposition{
+    -id: String
+    -playerId: String
+    -gaps: List<String>
+    -duplicates: List<Proposition>
+    +hasSameGaps(proposition: Proposition): Boolean
+}
+class Round {
+     -id: String
+     -prompt: Prompt
+     -propositions: Map<Proposition>
+     +addProposition(proposition: Proposition)
+}
+interface RoundService{
+    submitProposition(roundId: String, playerId: String, gaps: List<String>)
+}
+interface EntityService{
+    isPlayerActiveInRound(roundId: String, playerId: String): boolean
+    editRound(roundId: String, editor: Consumer<Round>)
+}
+interface GameRepository {
+    +findAll(): List<Game>
+    +save(game: Game)
+}
+
+GameController -> RoundService
+
+RoundService ..> Game
+RoundService ..> Player
+RoundService ..> Proposition
+RoundService --> EntityService
+
+EntityService --> GameRepository
+
+Game -> Round
+@enduml

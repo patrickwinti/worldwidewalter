@@ -11,7 +11,7 @@ public abstract class RoundError extends RuntimeException {
     private RoundError(String message) {
         super(message);
     }
-    
+
     /**
      * Round ID passed has not been found
      */
@@ -26,7 +26,7 @@ public abstract class RoundError extends RuntimeException {
             super(String.format("Round with ID = %s could not be found", roundId));
         }
     }
-    
+
     /**
      * Round has not enough players os is currently running
      */

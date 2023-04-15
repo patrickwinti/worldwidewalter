@@ -16,7 +16,7 @@ public class PlayerDto {
     @Valid
     @NotNull
     private final String id;
-    
+
     @Nullable
     private String playerName;
 }

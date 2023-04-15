@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class Proposition {
     private static final String DELIMITER = "";
-    
+
     @NotNull
     private final String id;
     @NotNull
@@ -40,7 +40,7 @@ public class Proposition {
                         .count() == gaps.size();
     }
 
-    /**
+    /*
      * Compares the gaps at the given position between the current proposition and the given proposition.
      *
      * @param proposition The proposition to compare gaps with.

@@ -4,7 +4,7 @@ public abstract class FileReaderError extends RuntimeException {
     FileReaderError(String message) {
         super(message);
     }
-    
+
     /**
      * Exception for when the loaded file does not have the expected format
      */

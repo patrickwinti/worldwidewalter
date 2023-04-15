@@ -11,7 +11,7 @@ public abstract class GameError extends RuntimeException {
     GameError(String message) {
         super(message);
     }
-    
+
     /**
      * Game has no room for a new player to be added. Registrations cannot be accepted anymore
      */
@@ -21,7 +21,7 @@ public abstract class GameError extends RuntimeException {
             super("Game it at capacity");
         }
     }
-    
+
     /**
      * Game with given ID already exists
      */
@@ -31,7 +31,7 @@ public abstract class GameError extends RuntimeException {
             super("Game already exists");
         }
     }
-    
+
     /**
      * Exception for cases where there is no game for the given ID
      */

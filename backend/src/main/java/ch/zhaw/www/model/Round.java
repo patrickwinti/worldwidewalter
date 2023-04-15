@@ -25,24 +25,24 @@ public class Round {
     private final String id;
     @NotNull
     private final Prompt prompt;
-    
+
     @Getter(AccessLevel.NONE)
     private final Duration propositionDuration;
     @Getter(AccessLevel.NONE)
     private final Duration enterLimitDuration;
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
-    
+
     private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
-    
+
     @Nullable
     private Player sphinx;
     @Nullable
     private Instant propositionSubmissionEnd;
     @Nullable
     private Instant selectionSubmissionEnd;
-    
+
     /**
      * Sets the sphinx player for the round.
      *
@@ -55,11 +55,11 @@ public class Round {
             this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(selectionDuration));
         }
     }
-    
+
     /**
      * Adds a player's selection for a proposition.
      *
-     * @param playerId The ID of the player making the selection
+     * @param playerId      The ID of the player making the selection
      * @param propositionId The ID of the proposition being selected
      */
     public void addSelection(String playerId, String propositionId) {
@@ -67,7 +67,7 @@ public class Round {
             selections.put(playerId, propositionId);
         }
     }
-    
+
     /**
      * Checks whether the round can be entered by players.
      *
@@ -76,7 +76,7 @@ public class Round {
     public boolean canEnterRound() {
         return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
     }
-    
+
     /**
      * Adds a player's proposition for the prompt.
      *
@@ -89,7 +89,7 @@ public class Round {
         }
         propositions.add(proposition);
     }
-    
+
     /**
      * Gets the state of the round.
      *
@@ -106,11 +106,11 @@ public class Round {
             return State.FINISHED;
         }
     }
-    
+
     private boolean canSendPropositions() {
         return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd);
     }
-    
+
     /**
      * Checks whether players can still make their selections.
      *
@@ -119,7 +119,7 @@ public class Round {
     private boolean canSendSelections() {
         return selectionSubmissionEnd != null && InstantWrapper.isAfterNow(selectionSubmissionEnd);
     }
-    
+
     /**
      * Gets the number of selections submitted by players.
      *
@@ -128,7 +128,7 @@ public class Round {
     int getNumberOfSelectionsSubmitted() {
         return selections.size();
     }
-    
+
     /**
      * Gets the number of propositions submitted by players.
      *
@@ -137,7 +137,7 @@ public class Round {
     int getNumberOfPropositionsSubmitted() {
         return propositions.size();
     }
-    
+
     /**
      * Enum representing the possible states of a round.
      */

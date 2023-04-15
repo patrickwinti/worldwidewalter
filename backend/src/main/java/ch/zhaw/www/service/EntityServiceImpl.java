@@ -10,9 +10,9 @@ import java.util.stream.StreamSupport;
 
 @Service
 class EntityServiceImpl implements EntityService {
-    
+
     private final GameRepository gamesRepository;
-    
+
     /**
      * Constructor that injects the GameRepository.
      *
@@ -21,28 +21,16 @@ class EntityServiceImpl implements EntityService {
     EntityServiceImpl(GameRepository gamesRepository) {
         this.gamesRepository = gamesRepository;
     }
-    
-    /**
-     * Gets a game from the repository.
-     *
-     * @param gameId The ID of the game to get
-     * @return The game with the specified ID
-     * @throws GameError.NotFoundException if no game with the specified ID is found
-     */
+
+
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             return findGame(gameId);
         }
     }
-    
-    /**
-     * Edits a game in the repository.
-     *
-     * @param gameId The ID of the game to edit
-     * @param editor A consumer that performs the edits on the game
-     * @throws GameError.NotFoundException if no game with the specified ID is found
-     */
+
+
     @Override
     public void editGame(String gameId, Consumer<Game> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
@@ -51,28 +39,16 @@ class EntityServiceImpl implements EntityService {
             gamesRepository.save(game);
         }
     }
-    
-    /**
-     * Gets a round from the repository.
-     *
-     * @param roundId The ID of the round to get
-     * @return The round with the specified ID
-     * @throws RoundError.NotFoundException if no round with the specified ID is found
-     */
+
+
     @Override
     public Round getRound(String roundId) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             return findGameForRound(roundId).getCurrentRound();
         }
     }
-    
-    /**
-     * Edits a round in the repository.
-     *
-     * @param roundId The ID of the round to edit
-     * @param editor A consumer that performs the edits on the round
-     * @throws RoundError.NotFoundException if no round with the specified ID is found
-     */
+
+
     @Override
     public void editRound(String roundId, Consumer<Round> editor) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
@@ -81,26 +57,14 @@ class EntityServiceImpl implements EntityService {
             gamesRepository.save(game);
         }
     }
-    
-    /**
-     * Checks whether a player is active in a round.
-     *
-     * @param roundId The ID of the round to check
-     * @param playerId The ID of the player to check
-     * @return true if the player is active in the round; false otherwise
-     * @throws RoundError.NotFoundException if no round with the specified ID is found
-     */
+
+
     @Override
     public boolean isPlayerActiveInRound(final String roundId, final String playerId) throws RoundError.NotFoundException {
         return findGameForRound(roundId).hasActivePlayer(playerId);
     }
-    
-    /**
-     * Saves a new game to the repository.
-     *
-     * @param game The game to be saved
-     * @throws GameError.ExistAlready if a game with the same ID already exists in the repository
-     */
+
+
     @Override
     public void saveNewGame(Game game) {
         synchronized (gamesRepository) {
@@ -111,6 +75,7 @@ class EntityServiceImpl implements EntityService {
             }
         }
     }
+
     /**
      * Finds a game in the repository by ID.
      *
@@ -118,12 +83,12 @@ class EntityServiceImpl implements EntityService {
      * @return The game with the specified ID
      * @throws GameError.NotFoundException if no game with the specified ID is found
      */
-    
+
     private Game findGame(String gameId) {
         return gamesRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
     }
-    
-    /**
+
+    /*
      * Finds the game that contains a round with the specified ID.
      *
      * @param roundId The ID of the round to find
@@ -138,5 +103,5 @@ class EntityServiceImpl implements EntityService {
                 })
                 .findFirst().orElseThrow(() -> new RoundError.NotFoundException(roundId));
     }
-    
+
 }

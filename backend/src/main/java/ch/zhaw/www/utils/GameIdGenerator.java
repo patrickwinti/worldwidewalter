@@ -8,10 +8,10 @@ import java.util.Random;
  * IDs within a 99.997%.
  */
 public class GameIdGenerator {
-    
+
     private GameIdGenerator() {
     }
-    
+
     private static final char[] CHARS = new char[]{
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -19,7 +19,7 @@ public class GameIdGenerator {
     };
     private static final int MIN_GAME_ID_LENGTH = 7;
     private static final Random RANDOM = new Random(0);
-    
+
     public static String generateId() {
         StringBuilder id = new StringBuilder();
         for (int i = 0; id.length() < MIN_GAME_ID_LENGTH; i++) {
@@ -31,5 +31,5 @@ public class GameIdGenerator {
         }
         return id.toString();
     }
-    
+
 }

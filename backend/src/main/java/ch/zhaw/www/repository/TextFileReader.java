@@ -20,13 +20,14 @@ import java.util.stream.Stream;
 class TextFileReader implements FileReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
     private static final Logger LOGGER = Logger.getLogger(TextFileReader.class.getSimpleName());
+
     /**
      * Reads a file and returns a list of prompts.
      *
      * @param file the file to read
      * @return a list of prompts
      * @throws FileReaderError.WrongFileFormatException if the file has the wrong format
-     * @throws IOException if an I/O error occurs while reading the file
+     * @throws IOException                              if an I/O error occurs while reading the file
      */
     @Override
     public List<Prompt> readFile(File file) throws FileReaderError.WrongFileFormatException, IOException {
@@ -57,9 +58,9 @@ class TextFileReader implements FileReader {
      */
     protected long countPlaceholders(String input) {
         Matcher matcher = PATTERN.matcher(input);
-        
+
         long count = matcher.results().count();
-        
+
         if (count == 0) {
             LOGGER.log(Level.WARNING, "No placeholder match found");
         }

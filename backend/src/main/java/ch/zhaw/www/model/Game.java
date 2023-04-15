@@ -73,7 +73,7 @@ public class Game {
         }
     }
 
-    /**
+    /*
      * Helper function to check if all active players have submitted a selection.
      *
      * @param round current round
@@ -83,7 +83,7 @@ public class Game {
         return round.getNumberOfSelectionsSubmitted() == activePlayers.size() - 1;
     }
 
-    /**
+    /*
      * Helper function to check if selections can be made for the current round.
      *
      * @param round current round
@@ -94,7 +94,7 @@ public class Game {
                 round.getState() == Round.State.OPEN_FOR_SELECTIONS;
     }
 
-    /**
+    /*
      * Checks if there are enough players to start the game.
      *
      * @return true if the number of active players is greater than or equal to the minimum required players, false otherwise.
@@ -103,7 +103,7 @@ public class Game {
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
 
-    /**
+    /*
      * Checks if the given round can accept new propositions.
      *
      * @param round The round object to check for the possibility of accepting new propositions.
@@ -114,7 +114,7 @@ public class Game {
                 round.getState() == Round.State.OPEN_FOR_SUBMISSIONS;
     }
 
-    /**
+    /*
      * Checks if the given round has not started yet.
      *
      * @param round The round object to check if it has started or not.
@@ -123,9 +123,10 @@ public class Game {
     private boolean hasRoundNotStartedYet(final Round round) {
         return round.getState() == Round.State.CREATED;
     }
+
     /**
      * Returns the first prompt in the list of prompts and removes it from the list.
-     *
+     * <p>
      * Note: The implementation currently returns the same prompt every time, as the deck has not yet been implemented.
      *
      * @return the first prompt in the list of prompts
@@ -238,7 +239,29 @@ public class Game {
         return sphinxCandidates;
     }
 
+    /**
+     * An enumeration representing the possible states of a game.
+     */
     public enum State {
-        NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
+        /**
+         * Indicates that there are not enough players to start a new round.
+         */
+        NO_VALID_ROUND,
+
+        /**
+         * Indicates that the game is waiting for more players to join.
+         */
+        WAITING_FOR_PLAYERS,
+
+        /**
+         * Indicates that the game is waiting for all players to make a proposition.
+         */
+        WAITING_FOR_ALL_PROPOSITIONS,
+
+        /**
+         * Indicates that the game is waiting for all players to select a proposition.
+         */
+        WAITING_FOR_ALL_SELECTIONS
     }
+
 }

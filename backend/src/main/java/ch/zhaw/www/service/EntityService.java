@@ -18,7 +18,7 @@ public interface EntityService {
      * @throws GameError.NotFoundException if game does not exist
      */
     Game getGame(@NotNull String gameId) throws GameError.NotFoundException;
-    
+
     /**
      * Fetches the game for the provided ID. Changes needed to the game state can be done through the edit operator.
      *
@@ -27,7 +27,7 @@ public interface EntityService {
      * @throws GameError.NotFoundException if game does not exist
      */
     void editGame(@NotNull String gameId, Consumer<Game> editor) throws GameError.NotFoundException;
-    
+
     /**
      * Fetches the round for given round ID
      *
@@ -36,7 +36,7 @@ public interface EntityService {
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
     Round getRound(@NotNull String roundId) throws RoundError.NotFoundException;
-    
+
     /**
      * Checks if player is active for given round id
      *
@@ -45,7 +45,7 @@ public interface EntityService {
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
     boolean isPlayerActiveInRound(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException;
-    
+
     /**
      * Edits round with given round ID
      *
@@ -54,12 +54,12 @@ public interface EntityService {
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
     void editRound(@NotNull String roundId, Consumer<Round> editor) throws RoundError.NotFoundException;
-    
+
     /**
      * Saves a new game. If game is already saved it will throw an exception.
      *
      * @param game to be saved
      */
-    
+
     void saveNewGame(@NotNull Game game) throws GameError.ExistAlready;
 }

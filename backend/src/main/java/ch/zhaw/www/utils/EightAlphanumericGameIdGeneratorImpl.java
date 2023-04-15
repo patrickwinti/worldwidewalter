@@ -4,12 +4,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
-
-/**
- * Generates IDs that are not longer than
- * 7 characters long. The method produces unique
- * IDs within a 99.997%.
- */
 @Service
 public class EightAlphanumericGameIdGeneratorImpl implements GameIdGenerator {
     

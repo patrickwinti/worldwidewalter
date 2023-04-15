@@ -1,0 +1,55 @@
+@startuml
+skinparam class {
+    BackgroundColor white
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam roundcorner 0
+skinparam packagestyle Frame
+hide empty members
+
+class GameController {
+   -gameService: GameService
+   +createGame() : GameDto
+}
+class GameDto{
+    -id: String
+}
+class Game {
+   -id: String
+   -minimumAmountOfPlayers:Int
+   -maximumAmountOfPlayers:Int
+   -numberOfRoundsInTurn:Int
+}
+interface EntityService {
+   -gameRepository: GameRepository
+   saveNewGame(game: Game)
+}
+interface GameService{
+    -gameProperties: GameProperties
+    -entityService: EntityService
+    createGame()
+}
+interface GameRepository {
+   save(game: Game)
+   existsById(id: String)
+}
+class GameProperties{
+    -minimumAmountOfPlayers:Int
+    -maximumAmountOfPlayers:Int
+}
+interface GameIdGenerator{
+    generateId(): String
+}
+
+GameController-->GameService
+GameService ..> Game
+GameService --> EntityService
+GameService --> GameProperties
+EntityService --> GameRepository
+GameController ..> GameDto
+@enduml

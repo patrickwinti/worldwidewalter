@@ -1,0 +1,41 @@
+@startuml
+skinparam sequence {
+    BackgroundColor white
+    BorderColor Black
+    ArrowColor Firebrick
+    BorderThickness 2
+    LifeLineBackgroundColor #FFD966
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam participant {
+    BackgroundColor white
+    BorderThickness 2
+}
+skinparam responseMessageBelowArrow true
+skinparam style strictuml
+
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant ":GameIdGenerator" as gid
+participant ":GameProperties" as gp
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> gs: createGame()
+gs -> gid: generateId()
+gid --> gs: random alphanumeric id
+gs -> gp: getMinimumAmountOfActivePlayersPerGame()
+gp --> gs: minimum amount of players
+gs -> gp: getMaximumAmountOfActivePlayersPerGame()
+gp --> gs: maximum amount of players
+gs -> ges : saveNewGame(game)
+ges -> gr : existsById(gameId)
+gr  --> ges: does not exist
+ges -> gr : save(game)
+gr --> ges
+ges --> gs
+gs --> gc: created game
+@enduml

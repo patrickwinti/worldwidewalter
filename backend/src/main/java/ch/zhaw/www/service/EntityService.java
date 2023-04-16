@@ -10,6 +10,7 @@ import java.util.function.Consumer;
  * Game repository with protected access to game instances
  */
 public interface EntityService {
+
     /**
      * Gets a read only instance of the game. This game can not be read and is subject to dirty reads.
      *
@@ -60,6 +61,5 @@ public interface EntityService {
      *
      * @param game to be saved
      */
-
     void saveNewGame(@NotNull Game game) throws GameError.ExistAlready;
 }

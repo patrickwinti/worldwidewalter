@@ -107,11 +107,14 @@ public class Round {
         }
     }
 
+    /*
+     * Checks whether player can send a proposition
+     */
     private boolean canSendPropositions() {
         return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd);
     }
 
-    /**
+    /*
      * Checks whether players can still make their selections.
      *
      * @return true if players can still make their selections; false otherwise
@@ -120,7 +123,7 @@ public class Round {
         return selectionSubmissionEnd != null && InstantWrapper.isAfterNow(selectionSubmissionEnd);
     }
 
-    /**
+    /*
      * Gets the number of selections submitted by players.
      *
      * @return the number of selections submitted
@@ -129,7 +132,7 @@ public class Round {
         return selections.size();
     }
 
-    /**
+    /*
      * Gets the number of propositions submitted by players.
      *
      * @return the number of propositions submitted

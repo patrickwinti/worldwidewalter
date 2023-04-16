@@ -10,6 +10,5 @@ public interface PostfixGenerator {
      *
      * @return random postfix
      */
-
     int getRandomPostfix();
 }

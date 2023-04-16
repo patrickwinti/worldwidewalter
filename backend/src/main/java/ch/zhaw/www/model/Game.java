@@ -131,7 +131,6 @@ public class Game {
      *
      * @return the first prompt in the list of prompts
      */
-
     public Prompt consumePrompt() {
         // TODO correct code
         return prompts.get(0);
@@ -142,7 +141,6 @@ public class Game {
      *
      * @param round the round to add
      */
-
     public void addRound(Round round) {
         rounds.add(round);
     }
@@ -152,7 +150,6 @@ public class Game {
      *
      * @return a stream of all players in the game
      */
-
     public Stream<Player> getAllPlayers() {
         List<Player> players = new ArrayList<>(waitingRoom.values());
         players.addAll(activePlayers.values());
@@ -247,21 +244,8 @@ public class Game {
          * Indicates that there are not enough players to start a new round.
          */
         NO_VALID_ROUND,
-
-        /**
-         * Indicates that the game is waiting for more players to join.
-         */
         WAITING_FOR_PLAYERS,
-
-        /**
-         * Indicates that the game is waiting for all players to make a proposition.
-         */
         WAITING_FOR_ALL_PROPOSITIONS,
-
-        /**
-         * Indicates that the game is waiting for all players to select a proposition.
-         */
         WAITING_FOR_ALL_SELECTIONS
     }
-
 }

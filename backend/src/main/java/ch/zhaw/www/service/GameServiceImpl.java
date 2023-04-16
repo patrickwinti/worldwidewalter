@@ -42,7 +42,6 @@ class GameServiceImpl implements GameService {
         this.postfixGenerator = postfixGenerator;
     }
 
-
     @Override
     public Game createGame() throws GameError.ExistAlready {
         var game = new Game(GameIdGenerator.generateId(),
@@ -53,12 +52,10 @@ class GameServiceImpl implements GameService {
         return game;
     }
 
-
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         return entityService.getGame(gameId);
     }
-
 
     @Override
     public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
@@ -110,15 +107,6 @@ class GameServiceImpl implements GameService {
         });
     }
 
-    /**
-     * Returns the current round in a game for a specified player.
-     *
-     * @param gameId   the ID of the game to retrieve the round from
-     * @param playerId the ID of the player to retrieve the round for
-     * @return the current round in the game
-     * @throws GameError.NotFoundException      if the game cannot be found
-     * @throws RoundError.IllegalStateException if the player is not active or the game is not in the correct state
-     */
     @Override
     public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = entityService.getGame(gameId);
@@ -129,7 +117,6 @@ class GameServiceImpl implements GameService {
     }
 
     /*
-
      Moves the specified player to the active player list of the game if there is capacity for a new active player,
      otherwise throws a {@link GameError.FullCapacityException}. If the player is not found in the game, a
      {@link PlayerError.NotFoundException} is thrown.
@@ -148,5 +135,4 @@ class GameServiceImpl implements GameService {
             throw new GameError.FullCapacityException();
         }
     }
-
 }

@@ -86,7 +86,6 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
-
     }
 
     @Override

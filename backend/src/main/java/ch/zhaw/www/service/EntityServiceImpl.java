@@ -30,7 +30,6 @@ class EntityServiceImpl implements EntityService {
         }
     }
 
-
     @Override
     public void editGame(String gameId, Consumer<Game> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
@@ -40,14 +39,12 @@ class EntityServiceImpl implements EntityService {
         }
     }
 
-
     @Override
     public Round getRound(String roundId) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             return findGameForRound(roundId).getCurrentRound();
         }
     }
-
 
     @Override
     public void editRound(String roundId, Consumer<Round> editor) throws RoundError.NotFoundException {
@@ -58,12 +55,10 @@ class EntityServiceImpl implements EntityService {
         }
     }
 
-
     @Override
     public boolean isPlayerActiveInRound(final String roundId, final String playerId) throws RoundError.NotFoundException {
         return findGameForRound(roundId).hasActivePlayer(playerId);
     }
-
 
     @Override
     public void saveNewGame(Game game) {
@@ -103,5 +98,4 @@ class EntityServiceImpl implements EntityService {
                 })
                 .findFirst().orElseThrow(() -> new RoundError.NotFoundException(roundId));
     }
-
 }

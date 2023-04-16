@@ -26,6 +26,7 @@ class GameServiceImpl implements GameService {
     private final GameProperties gameProperties;
     private final RoundService roundService;
     private final PostfixGenerator postfixGenerator;
+    private final GameIdGenerator gameIdGenerator;
 
     /**
      * Constructor that injects the EntityService, GameProperties, RoundService, and PostfixGenerator.
@@ -33,18 +34,22 @@ class GameServiceImpl implements GameService {
      * @param entityService    The EntityService to be injected
      * @param gameProperties   The GameProperties to be injected
      * @param roundService     The RoundService to be injected
-     * @param postfixGenerator The PostfixGenerator to be injected
+     * @param postfixGenerator  The PostfixGenerator to be injected
+     * @param gameIdGenerator  The GameIdGenerator to be injected
      */
-    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, final PostfixGenerator postfixGenerator) {
+
+    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
+                    final PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
         this.postfixGenerator = postfixGenerator;
+        this.gameIdGenerator = gameIdGenerator;
     }
 
     @Override
     public Game createGame() throws GameError.ExistAlready {
-        var game = new Game(GameIdGenerator.generateId(),
+        var game = new Game(gameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
                 DEFAULT_NUMBER_OF_ROUNDS);

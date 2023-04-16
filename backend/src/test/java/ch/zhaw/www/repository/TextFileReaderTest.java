@@ -31,14 +31,14 @@ class TextFileReaderTest {
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
         assertEquals("WALTER WALTERN WALTER", prompts.get(3).getStatement());
-        assertEquals(3, prompts.get(3).getTotalPlaceholders());
+        assertEquals(3, prompts.get(3).getNumberOfPlaceholders());
     }
     
     private static Stream<Arguments> provideWalterStatements() {
         return Stream.of(
                 Arguments.of("Vielleicht habe ich in einem früheren Leben schon mal gelebt - bestimmt war ich aber nicht unter den Leuten, die WALTERTEN.", 1),
                 Arguments.of("Auszug aus dem Parteiprogramm der Grünen in zehn Jahren: \"Wir verlangen, dass WALTER\".", 1),
-                Arguments.of("Viele Männer reden ihre Geliebten mit \"Mäuschen\" oder \"Spätchen\" an. Ich finde das beleidigend. Wenn schon, so möchte ich bitteschön mit \"WALTERchen\" angeredet werden!", 1),
+                Arguments.of("Viele Männer reden ihre Geliebten mit \"Mäuschen\" oder \"Spätzchen\" an. Ich finde das beleidigend. Wenn schon, so möchte ich bitteschön mit \"WALTERchen\" angeredet werden!", 1),
                 Arguments.of("WALTER ist ein unvorstellbar dummes Lebewesen; es WALTERT.", 2),
                 Arguments.of("Manchmal verspüre ich den seltsamen Drang, WALTER zu WALTERN.", 2),
                 Arguments.of("Ein guter Rat: Küss nie ein(e/n) WALTER!", 1),
@@ -72,7 +72,7 @@ class TextFileReaderTest {
         List<Prompt> prompts = txtFileReader.readFile(file.toFile());
         
         assertEquals(1, prompts.size());
-        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getTotalPlaceholders());
+        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getNumberOfPlaceholders());
     }
     
     @Test

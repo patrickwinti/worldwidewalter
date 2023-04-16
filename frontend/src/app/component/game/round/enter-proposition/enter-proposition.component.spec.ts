@@ -26,7 +26,7 @@ describe('EnterPropositionComponent', () => {
   it('ngOnInit should initialize Array of Propositions', () => {
     // arrange
     component.round = {
-      numberOfGaps: 4
+      numberOfPlaceholders: 4
     } as RoundDto;
 
     // act

@@ -1,6 +1,7 @@
 package ch.zhaw.www.utils;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.Setter;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -10,7 +11,8 @@ import java.time.Instant;
  * Helper class for tests. Per default, it takes UTC timezone.
  */
 public class InstantWrapper {
-    public static Clock clock = Clock.systemUTC();
+    @Setter
+    private static Clock clock = Clock.systemUTC();
     
     private InstantWrapper() {
     }

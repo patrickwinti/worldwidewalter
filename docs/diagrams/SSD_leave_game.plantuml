@@ -30,12 +30,12 @@ activate ges
 ges -> gr : findById(gameId))
 gr  --> ges: Game
 ges --> gs: editable game
-gs -> game: removePlayer(gameId))
+gs -> game: removePlayer(gameId)
 game ->game: remove waiting room player
 game ->game: remove active player
 game ->game: remove sphinx canditate
-ges -> gr : save(game)
 game --> gs
+ges -> gr : save(game)
 gr --> ges
 ges --> gs
 gs --> gc

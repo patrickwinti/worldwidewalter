@@ -49,6 +49,7 @@ interface GameIdGenerator{
 GameController-->GameService
 GameService ..> Game
 GameService --> EntityService
+GameService --> GameIdGenerator
 GameService --> GameProperties
 EntityService --> GameRepository
 GameController ..> GameDto

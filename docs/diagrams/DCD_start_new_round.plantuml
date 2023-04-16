@@ -37,6 +37,8 @@ interface RoundService{
    createNewRound(game: Game);
 }
 interface GameService{
+   -entityService: EntityService
+   -roundService: RoundService
    enterRound(gameId: String,playerId: String)
 }
 interface GameRepository {

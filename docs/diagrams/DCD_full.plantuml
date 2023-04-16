@@ -18,6 +18,7 @@ package backend{
     package controller {
         class GameController {
             -gameService: GameService
+            -roundService: RoundService
             +createGame(): GameDto
             +getGame(gameId: String) : GameDto
             +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
@@ -80,6 +81,7 @@ package backend{
     package service {
         interface GameService{
             -entityService: EntityService
+            -roundService: RoundService
            createGame(): Game
            leaveGame(gameId: String, playerId: String)
            getGame(gameId: String) : Game
@@ -117,8 +119,8 @@ package backend{
             +getRandomPostfix(): Integer
         }
 
-        class GameIdGenerator {
-            +generateId():String{static}
+        interface GameIdGenerator {
+            +generateId():String
         }
     }
 }

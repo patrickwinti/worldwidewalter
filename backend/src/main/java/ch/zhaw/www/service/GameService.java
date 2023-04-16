@@ -14,7 +14,7 @@ public interface GameService {
      * @return new game
      */
     Game createGame() throws GameError.ExistAlready;
-    
+
     /**
      * Fetches the current state of the game for given game ID
      *
@@ -23,7 +23,7 @@ public interface GameService {
      * @throws GameError.NotFoundException if game is not found
      */
     Game getGame(@NotNull String gameId) throws GameError.NotFoundException;
-    
+
     /**
      * Registration of a new player to a running game
      *
@@ -34,7 +34,7 @@ public interface GameService {
      * @throws GameError.FullCapacityException if game has no available seats
      */
     String enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
-    
+
     /**
      * Request to leave a game
      *
@@ -43,7 +43,7 @@ public interface GameService {
      * @throws GameError.NotFoundException if game is not found
      */
     void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException;
-    
+
     /**
      * Player requested to be added to round.
      *
@@ -54,7 +54,7 @@ public interface GameService {
      * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
     Round getCurrentRoundInGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
-    
+
     /**
      * Player requested to participate in the current round of the game. If round is currently not available
      * a new one will be created
@@ -65,5 +65,5 @@ public interface GameService {
      * @throws PlayerError.NotFoundException if player is not found
      */
     void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
-    
+
 }

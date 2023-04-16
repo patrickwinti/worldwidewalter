@@ -9,14 +9,13 @@ import lombok.Data;
 /**
  * Data object representing the player id
  */
-
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlayerDto {
     @Valid
     @NotNull
     private final String id;
-    
+
     @Nullable
     private String playerName;
 }

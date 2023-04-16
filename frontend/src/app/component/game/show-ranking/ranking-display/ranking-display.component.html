@@ -10,10 +10,10 @@
   </tr>
   </thead>
   <tbody>
-  <ng-container *ngFor="let rank of sortedResults.entries()">
+  <ng-container *ngFor="let playerResult of sortedResults">
     <tr>
-      <td>{{rank[0]}}</td>
-      <td>{{rank[1]}}</td>
+      <td>{{playerResult.points}}</td>
+      <td>{{playerResult.playerName}}</td>
     </tr>
   </ng-container>
   </tbody>

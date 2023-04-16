@@ -17,14 +17,14 @@ public class TimeHelper {
     }
     
     public static void enableFixedClocked() {
-        InstantWrapper.clock = FIXED_CLOCK;
+        InstantWrapper.setClock(FIXED_CLOCK);
     }
     
     public static void disableFixedClocked() {
-        InstantWrapper.clock = Clock.systemUTC();
+        InstantWrapper.setClock(Clock.systemUTC());
     }
     
     public static void offsetFixedClockBy(Duration offset) {
-        InstantWrapper.clock = Clock.offset(FIXED_CLOCK, offset);
+        InstantWrapper.setClock(Clock.offset(FIXED_CLOCK, offset));
     }
 }

@@ -3,16 +3,16 @@ import { StateService } from "../../../service/state.service";
 import { RoundDto } from "../../../dto/round-dto";
 import { Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
-import { ResultsDto } from "../../../dto/results-dto";
+import { ResultDto } from "../../../dto/results-dto";
 
 @Component({
   selector: 'www-ranking-container',
   templateUrl: './ranking-container.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RankingContainerComponent implements OnInit{
+export class RankingContainerComponent implements OnInit {
   @Input() round: RoundDto;
-  ranking$: Observable<ResultsDto>;
+  ranking$: Observable<ResultDto[]>;
 
   constructor(private stateService: StateService,
               private gameService: GameService) {
@@ -26,7 +26,7 @@ export class RankingContainerComponent implements OnInit{
     this.stateService.goToNextState();
   }
 
-  sortRanking(ranking: Map<string, number>): Map<string, number> {
-    return new Map([...ranking.entries()].sort((a, b) => b[1] - a[1]))
+  sortRanking(ranking: ResultDto[]): ResultDto[] {
+    return ranking.sort((a, b) => b.points - a.points);
   }
 }

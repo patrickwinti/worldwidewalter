@@ -14,6 +14,6 @@ import lombok.Data;
 public class Prompt {
     @NotNull
     private final String statement;
-    private final long totalPlaceholders;
+    private final long numberOfPlaceholders;
     private boolean hasBeenUsed = false;
 }

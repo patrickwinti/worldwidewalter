@@ -19,6 +19,8 @@ public class RoundDto {
     private final String id;
     @NotNull
     private final String prompt;
+    @NotNull
+    private final long numberOfPlaceholders;
     @Nullable
     private final PlayerDto sphinx;
     @Nullable

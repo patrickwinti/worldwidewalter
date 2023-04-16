@@ -22,7 +22,7 @@ public class PropositionSelectionDto {
     @Nullable
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private final Instant selectionSubmissionEndInUtc;
-    
+
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Proposition {

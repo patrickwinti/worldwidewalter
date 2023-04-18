@@ -23,6 +23,6 @@ public class GameProperties {
     private int maximumAmountOfActivePlayersPerGame;
     @Value("${game.minimum-players}")
     private int minimumAmountOfActivePlayersPerGame;
-    @Value("prompt.deck-default")
+    @Value("${prompt.deck-default.location}")
     private Resource defaultDeck;
 }

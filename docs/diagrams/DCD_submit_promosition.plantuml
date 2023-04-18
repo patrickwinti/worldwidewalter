@@ -49,12 +49,12 @@ interface GameRepository {
 
 GameController -> RoundService
 
-RoundService ..> Game
-RoundService ..> Player
-RoundService ..> Proposition
-RoundService --> EntityService
+RoundService "1"-->"n"  Game
+RoundService "1"-->"n"  Player
+RoundService "1"-->"n"  Proposition
+RoundService "1"-->"1" EntityService
 
-EntityService --> GameRepository
+EntityService "1"-->"1" GameRepository
 
 Game -> Round
 @enduml

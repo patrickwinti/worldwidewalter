@@ -41,12 +41,12 @@ class GameController {
 }
 
 
-GameController --> GameService
-GameService --> EntityService
-GameService --> RoundEvaluator
-GameService ..> Game
-EntityService --> GameRepository
-Game --> Round
+GameController "1"-->"1" GameService
+GameService "1"-->"1" EntityService
+GameService "1"-->"1" RoundEvaluator
+GameService "1"..>"n" Game
+EntityService "1"-->"1" GameRepository
+Game "1"-->"n" Round
 
 
 @enduml

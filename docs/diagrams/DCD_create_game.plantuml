@@ -46,11 +46,11 @@ interface GameIdGenerator{
     generateId(): String
 }
 
-GameController-->GameService
-GameService ..> Game
-GameService --> EntityService
-GameService --> GameIdGenerator
-GameService --> GameProperties
-EntityService --> GameRepository
-GameController ..> GameDto
+GameController "1"-->"1" GameService
+GameService "1"..>"n" Game
+GameService "1"-->"1" EntityService
+GameService "1"-->"1" GameIdGenerator
+GameService "1"-->"1" GameProperties
+EntityService "1"-->"1" GameRepository
+GameController "1"..>"n" GameDto
 @enduml

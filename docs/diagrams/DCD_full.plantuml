@@ -127,24 +127,24 @@ package backend{
 
 controller ->dto
 
-GameController -> RoundService
-GameController --> GameService
+GameController "1"->"1" RoundService
+GameController "1"-->"1" GameService
 
-GameService ..> Game
-GameService ..> Player
-GameService --> EntityService
-GameService --> PostfixGenerator
-GameService --> GameIdGenerator
-GameService --> RoundService
+GameService "1"..>"n" Game
+GameService "1"..>"n" Player
+GameService "1"-->"1" EntityService
+GameService "1"-->"1" PostfixGenerator
+GameService "1"-->"1" GameIdGenerator
+GameService "1"-->"1" RoundService
 
-RoundService ..>Game
-RoundService ..>Round
-RoundService ..> Proposition
-RoundService --> EntityService
+RoundService "1"-->"n" Game
+RoundService "1"-->"n" Round
+RoundService "1"-->"n"  Proposition
+RoundService "1"--> EntityService
 
-EntityService --> GameRepository
+EntityService "1"-->"1" GameRepository
 
-FileReader -> Prompt
+FileReader "1"..>"n" Prompt
 
-Game -> Round
+Game "1"->"n" Round
 @enduml

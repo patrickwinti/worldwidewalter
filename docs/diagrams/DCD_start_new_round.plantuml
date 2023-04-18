@@ -48,10 +48,10 @@ interface GameRepository {
 note left of Game: Information Expert
 note top of EntityService: Protected variation
 GameController "1"-->"1" GameService
-GameService "1"..>"n" Game
-Game "1"-->"n" Round
-RoundService "1"-->"n"  Round
-RoundService "1"-->"n"  Game
+GameService "1"..>"*" Game
+Game "1"-->"*" Round
+RoundService "1"-->"*"  Round
+RoundService "1"-->"*"  Game
 GameService "1"-->"1" EntityService
 GameService "1"-->"1" RoundService
 EntityService "1"-->"1" GameRepository

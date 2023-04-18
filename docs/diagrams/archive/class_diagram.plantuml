@@ -118,13 +118,13 @@ package backend{
     GameController..>PlayerJoinRequestDto
     GameController..>PropositionSubmissionDto
     GameController..>RoundDto
-    GameController "1"..>"n" GameDto
+    GameController "1"..>"*" GameDto
     GameController "1"-->"1" RoundService
     GameController "1"-->"1" GameService
 
-    GameService "1"..>"n" Game
+    GameService "1"..>"*" Game
     GameService ..> Player
-    GameService "1"..>"n" GameError
+    GameService "1"..>"*" GameError
     GameService ..> RoundError
     GameService ..> PlayerError
     GameService ..> PropositionError

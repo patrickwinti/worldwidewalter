@@ -47,10 +47,10 @@ interface GameIdGenerator{
 }
 
 GameController "1"-->"1" GameService
-GameService "1"..>"n" Game
+GameService "1"..>"*" Game
 GameService "1"-->"1" EntityService
 GameService "1"-->"1" GameIdGenerator
 GameService "1"-->"1" GameProperties
 EntityService "1"-->"1" GameRepository
-GameController "1"..>"n" GameDto
+GameController "1"..>"*" GameDto
 @enduml

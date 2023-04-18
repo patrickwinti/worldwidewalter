@@ -41,8 +41,8 @@ class Player {
 }
 
 GameController-->GameService
-GameService "1"..>"n" Game
+GameService "1"..>"*" Game
 GameService "1"-->"1" EntityService
 EntityService "1"-->"1" GameRepository
-Game "1"-->"n" Player
+Game "1"-->"*" Player
 @enduml

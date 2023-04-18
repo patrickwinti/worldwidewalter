@@ -49,9 +49,9 @@ interface GameRepository {
 
 GameController -> RoundService
 
-RoundService "1"-->"n"  Game
-RoundService "1"-->"n"  Player
-RoundService "1"-->"n"  Proposition
+RoundService "1"-->"*"  Game
+RoundService "1"-->"*"  Player
+RoundService "1"-->"*"  Proposition
 RoundService "1"-->"1" EntityService
 
 EntityService "1"-->"1" GameRepository

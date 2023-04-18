@@ -1,11 +1,7 @@
 @startuml
-skinparam usecase {
-    BackgroundColor white
-    BorderColor Black
-    ArrowColor Firebrick
-    BorderThickness 2
-}
-skinparam packageStyle Frame
+!include globals/stylesheets.iuml
+
+
 skinparam linetype ortho
 left to right direction
 

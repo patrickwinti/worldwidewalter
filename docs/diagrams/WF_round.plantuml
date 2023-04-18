@@ -1,7 +1,6 @@
 @startuml
-skinparam ArrowColor Firebrick
-skinparam ActivityBackgroundColor White
-skinparam dpi 200
+!include globals/stylesheets.iuml
+
 
 (*) -down-> "
 {{

@@ -1,0 +1,151 @@
+# Project Stylesheet
+@startuml
+
+' Load preset styles.
+!define STYLEPATH .
+!include STYLEPATH/style-presets.iuml
+
+' Color Definition
+' Choose the style you want by applying them here.
+
+!define STYLE_ACCENT STYLE_DEFAULT_ACCENT
+!define STYLE_NEUTRAL STYLE_DEFAULT_FGC
+!define STYLE_BGC STYLE_DEFAULT_BGC
+!define STYLE_FGC STYLE_DEFAULT_FGC
+!define BORDER_THICKNESS 2
+
+' RECOMMENDED STYLE
+' -=- DO NOT EDIT THIS SECTION. -=-
+' See Custom Style section below to override items here.
+
+skinparam {
+
+    ' Global Options
+    DPI 200
+    Shadowing false
+    DefaultFontName Roboto Condensed
+    DefaultMonospacedFontName Inconsolata
+    DefaultFontColor STYLE_FGC
+
+    ' Styles - Borders
+
+    ArrowColor STYLE_ACCENT
+    ActivityBorderColor STYLE_NEUTRAL
+    ActivityDiamondBorderColor STYLE_NEUTRAL
+    ActorBorderColor STYLE_NEUTRAL
+    AgentBorderColor STYLE_NEUTRAL
+    ArtifactBorderColor STYLE_NEUTRAL
+    BoundaryBorderColor STYLE_NEUTRAL
+    ClassBorderColor STYLE_NEUTRAL
+    CloudBorderColor STYLE_NEUTRAL
+    CollectionsBorderColor STYLE_NEUTRAL
+    ComponentBorderColor STYLE_NEUTRAL
+    ControlBorderColor STYLE_NEUTRAL
+    DatabaseBorderColor STYLE_NEUTRAL
+    EntityBorderColor STYLE_NEUTRAL
+    FileBorderColor STYLE_NEUTRAL
+    FolderBorderColor STYLE_NEUTRAL
+    FrameBorderColor STYLE_NEUTRAL
+    InterfaceBorderColor STYLE_NEUTRAL
+    LegendBorderColor STYLE_NEUTRAL
+    NodeBorderColor STYLE_NEUTRAL
+    NoteBorderColor STYLE_NEUTRAL
+    ObjectBorderColor STYLE_NEUTRAL
+    PackageBorderColor STYLE_NEUTRAL
+    ParticipantBorderColor STYLE_NEUTRAL
+    PartitionBorderColor STYLE_NEUTRAL
+    QueueBorderColor STYLE_NEUTRAL
+    RectangleBorderColor STYLE_NEUTRAL
+    SequenceBoxBorderColor STYLE_NEUTRAL
+    SequenceDividerBorderColor STYLE_NEUTRAL
+    SequenceGroupBorderColor STYLE_NEUTRAL
+    SequenceLifeLineBorderColor STYLE_NEUTRAL
+    SequenceReferenceBorderColor STYLE_NEUTRAL
+    StackBorderColor STYLE_NEUTRAL
+    StateBorderColor STYLE_NEUTRAL
+    StorageBorderColor STYLE_NEUTRAL
+    SwimlaneBorderColor STYLE_NEUTRAL
+    UsecaseBorderColor STYLE_NEUTRAL
+
+    ' Styles - Backgrounds
+
+  ActivityBackgroundColor STYLE_BGC
+    ActivityDiamondBackgroundColor STYLE_BGC
+    ActorBackgroundColor STYLE_BGC
+    AgentBackgroundColor STYLE_BGC
+    ArtifactBackgroundColor STYLE_BGC
+    BackgroundColor STYLE_BGC
+    BoundaryBackgroundColor STYLE_BGC
+    ClassBackgroundColor STYLE_BGC
+    ClassHeaderBackgroundColor STYLE_BGC
+    CloudBackgroundColor STYLE_BGC
+    CollectionsBackgroundColor STYLE_BGC
+    ComponentBackgroundColor STYLE_BGC
+    ControlBackgroundColor STYLE_BGC
+    DatabaseBackgroundColor STYLE_BGC
+    EntityBackgroundColor STYLE_BGC
+    FileBackgroundColor STYLE_BGC
+    FolderBackgroundColor STYLE_BGC
+    FrameBackgroundColor STYLE_BGC
+    IconPackageBackgroundColor STYLE_BGC
+    IconPrivateBackgroundColor STYLE_BGC
+    IconProtectedBackgroundColor STYLE_BGC
+    IconPublicBackgroundColor STYLE_BGC
+    InterfaceBackgroundColor STYLE_BGC
+    LegendBackgroundColor STYLE_BGC
+    NodeBackgroundColor STYLE_BGC
+    NoteBackgroundColor STYLE_BGC
+    ObjectBackgroundColor STYLE_BGC
+    PackageBackgroundColor STYLE_BGC
+    ParticipantBackgroundColor STYLE_BGC
+    PartitionBackgroundColor STYLE_BGC
+    QueueBackgroundColor STYLE_BGC
+    RectangleBackgroundColor STYLE_BGC
+    SequenceBoxBackgroundColor STYLE_BGC
+    SequenceDividerBackgroundColor STYLE_BGC
+    SequenceGroupBackgroundColor STYLE_BGC
+    SequenceGroupBodyBackgroundColor STYLE_BGC
+    SequenceLifeLineBackgroundColor STYLE_BGC
+    SequenceReferenceBackgroundColor STYLE_BGC
+    SequenceReferenceHeaderBackgroundColor STYLE_BGC
+    StackBackgroundColor STYLE_BGC
+    StateBackgroundColor STYLE_BGC
+    StereotypeABackgroundColor STYLE_BGC
+    StereotypeCBackgroundColor STYLE_BGC
+    StereotypeEBackgroundColor STYLE_BGC
+    StereotypeIBackgroundColor STYLE_BGC
+    StereotypeNBackgroundColor STYLE_BGC
+    StorageBackgroundColor STYLE_BGC
+    TitleBackgroundColor STYLE_BGC
+    UsecaseBackgroundColor STYLE_BGC
+
+    ' -=- END OF RECOMMENDED STYLE -=-
+
+    ' Other Settings
+    ' These settings are included in the language specs, but
+    ' it's not recommended to be applied.
+
+        'TitleBorderColor STYLE_NEUTRAL
+        'DiagramBorderColor STYLE_NEUTRAL
+
+    ' CUSTOM STYLE
+    ' All items below can be safely commented out.
+    ' This will override the options listed above.
+    roundcorner 0
+    'Monochrome true
+
+    NoteFontName Roboto Condensed
+    NoteBackgroundColor STYLE_BGC
+    NoteFontStyle Italic
+    ClassBorderThickness BORDER_THICKNESS
+    SequenceBorderThickness BORDER_THICKNESS
+    ObjectBorderThickness BORDER_THICKNESS
+    PackageBorderThickness BORDER_THICKNESS
+
+    responseMessageBelowArrow true
+    style strictuml
+
+    packagestyle Frame
+}
+hide empty members
+@enduml

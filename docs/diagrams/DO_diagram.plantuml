@@ -1,14 +1,6 @@
 @startuml
+!include globals/stylesheets.iuml
 skinparam ranksep 100
-
-skinparam object {
-    BackgroundColor White
-    ArrowColor Firebrick
-    BorderThickness 2
-}
-
-skinparam roundcorner 0
-hide empty members
 
 object Player
 object Game

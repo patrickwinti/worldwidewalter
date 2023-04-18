@@ -1,17 +1,8 @@
 @startuml
-top to bottom direction
+!include globals/stylesheets.iuml
 skinparam linetype ortho
-skinparam ArrowColor Firebrick
-skinparam packageStyle rectangle
-skinparam package {
-    BackgroundColor white
-    BorderThickness 2
-}
-skinparam rectangle {
-    BackgroundColor white
-    BorderThickness 2
-}
 skinparam ranksep  20
+top to bottom direction
 
 package "Technical Service" {
     package Angular

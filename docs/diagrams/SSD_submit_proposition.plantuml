@@ -1,22 +1,6 @@
 @startuml
-skinparam sequence {
-    BackgroundColor white
-    BorderColor Black
-    ArrowColor Firebrick
-    BorderThickness 2
-    LifeLineBackgroundColor #FFD966
+!include globals/stylesheets.iuml
 
-}
-skinparam Note{
-    BorderColor #FFD966
-    BackgroundColor #FFD966
-}
-skinparam participant {
-    BackgroundColor white
-    BorderThickness 2
-}
-skinparam responseMessageBelowArrow true
-skinparam style strictuml
 
 participant ":GameController" as gc
 participant ":RoundService" as rs

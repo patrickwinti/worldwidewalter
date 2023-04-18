@@ -10,7 +10,7 @@ skinparam Note{
     BackgroundColor #FFD966
 }
 skinparam responseMessageBelowArrow true
-skinparam style strictuml
+
 
 actor       player1
 actor       player2

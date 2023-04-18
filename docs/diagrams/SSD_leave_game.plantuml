@@ -33,7 +33,7 @@ ges --> gs: editable game
 gs -> game: removePlayer(gameId)
 game ->game: remove waiting room player
 game ->game: remove active player
-game ->game: remove sphinx canditate
+game ->game: remove sphinx candidate
 game --> gs
 ges -> gr : save(game)
 gr --> ges

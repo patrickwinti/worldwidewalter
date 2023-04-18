@@ -32,7 +32,6 @@ public class Game {
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts;
-    
     /**
      * Gets current round,
      * when the SphinxElector has been selected
@@ -48,7 +47,7 @@ public class Game {
             return round.getState() != Round.State.FINISHED ? round : null;
         }
     }
-    
+
     /**
      * Returns state of the current game:
      * - Waiting for player: Not enough players active or no valid round
@@ -72,54 +71,90 @@ public class Game {
             return State.NO_VALID_ROUND;
         }
     }
-    
+
+    /*
+     * Helper function to check if all active players have submitted a selection.
+     *
+     * @param round current round
+     * @return true if all players have submitted a selection, false otherwise
+     */
     private boolean haveAllPlayersSubmittedASelection(final Round round) {
         return round.getNumberOfSelectionsSubmitted() == activePlayers.size() - 1;
     }
-    
+
+    /*
+     * Helper function to check if selections can be made for the current round.
+     *
+     * @param round current round
+     * @return true if selections can be made, false otherwise
+     */
     private boolean canAcceptSelections(final Round round) {
         return round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
                 round.getState() == Round.State.OPEN_FOR_SELECTIONS;
     }
-    
+
+    /*
+     * Checks if there are enough players to start the game.
+     *
+     * @return true if the number of active players is greater than or equal to the minimum required players, false otherwise.
+     */
     private boolean hasEnoughPlayers() {
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
-    
+
+    /*
+     * Checks if the given round can accept new propositions.
+     *
+     * @param round The round object to check for the possibility of accepting new propositions.
+     * @return true if the number of propositions submitted is less than the number of active players and the round state is OPEN_FOR_SUBMISSIONS, false otherwise.
+     */
     private boolean canAcceptPropositions(final Round round) {
         return round.getNumberOfPropositionsSubmitted() < activePlayers.size() &&
                 round.getState() == Round.State.OPEN_FOR_SUBMISSIONS;
     }
-    
+
+    /*
+     * Checks if the given round has not started yet.
+     *
+     * @param round The round object to check if it has started or not.
+     * @return true if the round state is CREATED, false otherwise.
+     */
     private boolean hasRoundNotStartedYet(final Round round) {
         return round.getState() == Round.State.CREATED;
     }
-    
+
+    /**
+     * Returns the first prompt in the list of prompts and removes it from the list.
+     * <p>
+     * Note: The implementation currently returns the same prompt every time, as the deck has not yet been implemented.
+     *
+     * @return the first prompt in the list of prompts
+     */
     public Prompt consumePrompt() {
         // TODO correct code
         return prompts.get(0);
     }
-    
+
     /**
-     * Adds new round to game
+     * Adds a new round to the game.
      *
-     * @param round new round
+     * @param round the round to add
      */
     public void addRound(Round round) {
         rounds.add(round);
     }
-    
+
     /**
-     * Returns stream of all active and waiting room players
+     * Returns a stream of all players in the game, including those in the waiting room and those who are active.
      *
-     * @return stream with all valid games
+     * @return a stream of all players in the game
      */
     public Stream<Player> getAllPlayers() {
         List<Player> players = new ArrayList<>(waitingRoom.values());
         players.addAll(activePlayers.values());
         return players.stream();
     }
-    
+
     /**
      * Moves players in the waiting room into the active list, if there is space in current round
      *
@@ -134,7 +169,7 @@ public class Game {
                 .ifPresentOrElse(entry -> {
                 }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
     }
-    
+
     /**
      * Checks if player ID is currently an active player
      *
@@ -144,7 +179,7 @@ public class Game {
     public boolean hasActivePlayer(@NotNull String playerId) {
         return activePlayers.containsKey(playerId);
     }
-    
+
     /**
      * Checks if player ID is currently a player
      *
@@ -154,7 +189,7 @@ public class Game {
     public boolean hasPlayer(@NotNull String playerId) {
         return getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
     }
-    
+
     /**
      * Adds player to waiting room if not already active
      *
@@ -163,7 +198,7 @@ public class Game {
     public void addPlayerToWaitingRoom(@NotNull Player player) {
         waitingRoom.put(player.getId(), player);
     }
-    
+
     /**
      * Removes player from waiting room or active players
      *
@@ -175,7 +210,7 @@ public class Game {
         sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);
     }
-    
+
     /**
      * There is room for more active player in this or next round
      *
@@ -184,7 +219,7 @@ public class Game {
     public boolean hasCapacityForNewActivePlayer() {
         return activePlayers.size() < maximumAmountOfPlayers;
     }
-    
+
     /**
      * Fetches sphinx candidates. If there are no candidates, then it returns
      * a set of entries.
@@ -199,8 +234,17 @@ public class Game {
         }
         return sphinxCandidates;
     }
-    
+
+    /**
+     * An enumeration representing the possible states of a game.
+     */
     public enum State {
-        NO_VALID_ROUND, WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS, WAITING_FOR_ALL_SELECTIONS
+        /**
+         * Indicates that there are not enough players to start a new round.
+         */
+        NO_VALID_ROUND,
+        WAITING_FOR_PLAYERS,
+        WAITING_FOR_ALL_PROPOSITIONS,
+        WAITING_FOR_ALL_SELECTIONS
     }
 }

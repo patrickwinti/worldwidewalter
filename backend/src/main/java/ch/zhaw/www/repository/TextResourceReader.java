@@ -5,6 +5,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Repository;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Objects;
@@ -22,6 +23,14 @@ class TextResourceReader implements ResourceReader {
     private static final Pattern PATTERN = Pattern.compile("\\bWALTER(E|T|TEN|TE|N|ST|chen)?\\b");
     private static final Logger LOGGER = Logger.getLogger(TextResourceReader.class.getSimpleName());
     
+    /**
+     * Reads a file and returns a list of prompts.
+     *
+     * @param file the file to read
+     * @return a list of prompts
+     * @throws FileReaderError.WrongFileFormatException if the file has the wrong format
+     * @throws IOException                              if an I/O error occurs while reading the file
+     */
     @Override
     public List<Prompt> readResource(Resource resource) throws ResourceReaderError.WrongResourceFormatException {
         try (var inputStreamReader = new InputStreamReader(resource.getInputStream());
@@ -47,8 +56,8 @@ class TextResourceReader implements ResourceReader {
     /**
      * Method to count the total number of WALTER words (or variations) that appear in one statement.
      *
-     * @param input: sentence to be analysed.
-     * @return total number of "WALTER" words.
+     * @param input the sentence to be analyzed
+     * @return the total number of WALTER words
      */
     protected long countPlaceholders(String input) {
         Matcher matcher = PATTERN.matcher(input);

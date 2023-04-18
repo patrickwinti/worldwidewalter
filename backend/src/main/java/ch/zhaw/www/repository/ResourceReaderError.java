@@ -1,6 +1,8 @@
 package ch.zhaw.www.repository;
 
 public abstract class ResourceReaderError extends RuntimeException {
+    private static final String ERROR_MESSAGE = "The given resource does not have the proper format, please check the format and try again";
+    
     ResourceReaderError(String message) {
         super(message);
     }
@@ -10,7 +12,7 @@ public abstract class ResourceReaderError extends RuntimeException {
      */
     public static class WrongResourceFormatException extends ResourceReaderError {
         public WrongResourceFormatException() {
-            super("The given file does not have the proper format, please check the format and try again");
+            super(ERROR_MESSAGE);
         }
     }
 }

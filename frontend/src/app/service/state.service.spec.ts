@@ -17,6 +17,9 @@ describe('StateService', () => {
 
   it('goToNextState should go to correct state', () => {
     // assert initial condition
+    expect(service.getCurrentState()).toBe(GameState.ENTERING_ROUND);
+
+    service.goToNextState();
     expect(service.getCurrentState()).toBe(GameState.ENTER_PROPOSITION);
 
     service.goToNextState();

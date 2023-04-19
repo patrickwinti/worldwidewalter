@@ -1,4 +1,4 @@
-<div *ngIf="gameState == GameState.ENTER_PROPOSITION || gameState == GameState.SELECT_PROPOSITION">
+<div *ngIf="isInRoundComponent()">
   <www-round *ngIf="round$ | async as round"
              [round]="round">
   </www-round>

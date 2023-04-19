@@ -24,17 +24,31 @@ export class GameContainerComponent implements OnInit {
     this.stateService.getStateObservable()
       .subscribe(next => {
         this.gameState = next;
+        if (this.gameState == GameState.ENTERING_ROUND) {
+          this.enterAndGetRound();
+        }
       });
+  }
 
+  private enterAndGetRound() {
     firstValueFrom(this.gameService.enterRound(this.stateService.getGameId())).then(
       () => {
         this.enteredRound = true;
         this.getRound();
+        this.stateService.goToNextState();
       },
       (err: HttpErrorResponse) => console.log('error: ' + err.status));
   }
 
-  getRound(): void {
+  private getRound(): void {
     this.round$ = this.gameService.getRound(this.stateService.getGameId());
+  }
+
+  isInRoundComponent(): boolean {
+    return (
+      this.gameState === GameState.ENTERING_ROUND ||
+      this.gameState === GameState.ENTER_PROPOSITION ||
+      this.gameState === GameState.SELECT_PROPOSITION
+    )
   }
 }

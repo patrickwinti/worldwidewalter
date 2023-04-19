@@ -6,7 +6,7 @@ import { GameState } from "../model/game-state";
   providedIn: 'root'
 })
 export class StateService {
-  private state = new BehaviorSubject<GameState>(GameState.ENTER_PROPOSITION);
+  private state = new BehaviorSubject<GameState>(GameState.ENTERING_ROUND);
   private gameId: string;
   private playerId: string;
 
@@ -40,12 +40,14 @@ export class StateService {
 
   private getNextState(currentState: GameState): GameState {
     switch (currentState) {
+      case GameState.ENTERING_ROUND:
+        return GameState.ENTER_PROPOSITION;
       case GameState.ENTER_PROPOSITION:
         return GameState.SELECT_PROPOSITION;
       case GameState.SELECT_PROPOSITION:
         return GameState.SHOW_RANKING;
       case GameState.SHOW_RANKING:
-        return GameState.ENTER_PROPOSITION
+        return GameState.ENTERING_ROUND;
     }
   }
 }

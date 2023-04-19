@@ -14,38 +14,54 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Implementation of the GameService interface that interacts with the EntityService and RoundService.
+ */
 @Service
 class GameServiceImpl implements GameService {
     private static final Logger LOGGER = Logger.getLogger(GameService.class.getSimpleName());
     private static final int DEFAULT_NUMBER_OF_ROUNDS = 1;
-    
+
     private final EntityService entityService;
     private final GameProperties gameProperties;
     private final RoundService roundService;
     private final PostfixGenerator postfixGenerator;
-    
-    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, final PostfixGenerator postfixGenerator) {
+    private final GameIdGenerator gameIdGenerator;
+
+    /**
+     * Constructor that injects the EntityService, GameProperties, RoundService, and PostfixGenerator.
+     *
+     * @param entityService    The EntityService to be injected
+     * @param gameProperties   The GameProperties to be injected
+     * @param roundService     The RoundService to be injected
+     * @param postfixGenerator  The PostfixGenerator to be injected
+     * @param gameIdGenerator  The GameIdGenerator to be injected
+     */
+
+    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
+                    final PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
         this.postfixGenerator = postfixGenerator;
+        this.gameIdGenerator = gameIdGenerator;
     }
-    
+
     @Override
     public Game createGame() throws GameError.ExistAlready {
-        var game = new Game(GameIdGenerator.generateId(),
+        var game = new Game(gameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
                 DEFAULT_NUMBER_OF_ROUNDS);
         entityService.saveNewGame(game);
         return game;
     }
-    
+
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         return entityService.getGame(gameId);
     }
-    
+
     @Override
     public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
@@ -59,7 +75,7 @@ class GameServiceImpl implements GameService {
         });
         return uuid;
     }
-    
+
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
         entityService.editGame(gameId, game -> {
@@ -69,7 +85,7 @@ class GameServiceImpl implements GameService {
             game.removePlayer(playerId);
         });
     }
-    
+
     @Override
     public void enterRound(String gameId, String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         entityService.editGame(gameId, game -> {
@@ -95,7 +111,7 @@ class GameServiceImpl implements GameService {
             LOGGER.log(Level.INFO, () -> String.format("Game %s moved to state: %s", gameId, game.getState()));
         });
     }
-    
+
     @Override
     public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         Game game = entityService.getGame(gameId);
@@ -104,7 +120,16 @@ class GameServiceImpl implements GameService {
         }
         return game.getCurrentRound();
     }
-    
+
+    /*
+     Moves the specified player to the active player list of the game if there is capacity for a new active player,
+     otherwise throws a {@link GameError.FullCapacityException}. If the player is not found in the game, a
+     {@link PlayerError.NotFoundException} is thrown.
+     @param game The game object.
+     @param player The player object to move to the active player list.
+     @throws PlayerError.NotFoundException If the player is not found in the game.
+     @throws GameError.FullCapacityException If there is no capacity for a new active player in the game.
+     */
     private static void movePlayerToActive(final Game game, final Player player) {
         if (game.hasCapacityForNewActivePlayer()) {
             if (!game.hasPlayer(player.getId())) {
@@ -115,5 +140,4 @@ class GameServiceImpl implements GameService {
             throw new GameError.FullCapacityException();
         }
     }
-    
 }

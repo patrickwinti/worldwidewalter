@@ -1,0 +1,47 @@
+@startuml
+!include globals/stylesheets.iuml
+
+class GameController {
+   -gameService: GameService
+   +enterRound(gameId: String, playerId: String) : RoundDto
+}
+class Game {
+   -id: String
+   +getState(): Game.State
+   +addRound(round:Round)
+   +hasCapacityForNewActivePlayer(): boolean
+   +hasPlayer(playerId: String): boolean
+   +moveToActivePlayers(playerId: String)
+}
+class Round {
+   +getState(): Round.State
+}
+interface EntityService {
+   -gameRepository: GameRepository
+   editGame(gameId: String, editor: Consumer)
+}
+interface RoundService{
+   -entityService: EntityService
+   -gameProperties: GameProperties
+   createNewRound(game: Game);
+}
+interface GameService{
+   -entityService: EntityService
+   -roundService: RoundService
+   enterRound(gameId: String,playerId: String)
+}
+interface GameRepository {
+   save(game: Game)
+   findById(id: String)
+}
+note left of Game: Information Expert
+note top of EntityService: Protected variation
+GameController "1"-->"1" GameService
+GameService "1"..>"*" Game
+Game "1"-->"*" Round
+RoundService "1"-->"*"  Round
+RoundService "1"-->"*"  Game
+GameService "1"-->"1" EntityService
+GameService "1"-->"1" RoundService
+EntityService "1"-->"1" GameRepository
+@enduml

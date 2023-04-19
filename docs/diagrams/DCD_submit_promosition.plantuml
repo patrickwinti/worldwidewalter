@@ -1,0 +1,49 @@
+@startuml
+!include globals/stylesheets.iuml
+skinparam linetype ortho
+
+class GameController {
+    -roundService: RoundService
+    +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+}
+class Game {
+    id: String
+}
+class Proposition{
+    -id: String
+    -playerId: String
+    -gaps: List<String>
+    -duplicates: List<Proposition>
+    +hasSameGaps(proposition: Proposition): Boolean
+}
+class Round {
+     -id: String
+     -prompt: Prompt
+     -propositions: Map<Proposition>
+     +addProposition(proposition: Proposition)
+}
+interface RoundService{
+    -entityService: EntityService
+    submitProposition(roundId: String, playerId: String, gaps: List<String>)
+}
+interface EntityService{
+   -gameRepository: GameRepository
+    isPlayerActiveInRound(roundId: String, playerId: String): boolean
+    editRound(roundId: String, editor: Consumer<Round>)
+}
+interface GameRepository {
+    +findAll(): List<Game>
+    +save(game: Game)
+}
+
+GameController -> RoundService
+
+RoundService "1"-->"*"  Game
+RoundService "1"-->"*"  Player
+RoundService "1"-->"*"  Proposition
+RoundService "1"-->"1" EntityService
+
+EntityService "1"-->"1" GameRepository
+
+Game -> Round
+@enduml

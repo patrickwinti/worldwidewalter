@@ -1,0 +1,45 @@
+@startuml
+!include globals/stylesheets.iuml
+
+class GameController {
+   -gameService: GameService
+   +createGame() : GameDto
+}
+class GameDto{
+    -id: String
+}
+class Game {
+   -id: String
+   -minimumAmountOfPlayers:Int
+   -maximumAmountOfPlayers:Int
+   -numberOfRoundsInTurn:Int
+}
+interface EntityService {
+   -gameRepository: GameRepository
+   saveNewGame(game: Game)
+}
+interface GameService{
+    -gameProperties: GameProperties
+    -entityService: EntityService
+    createGame()
+}
+interface GameRepository {
+   save(game: Game)
+   existsById(id: String)
+}
+class GameProperties{
+    -minimumAmountOfPlayers:Int
+    -maximumAmountOfPlayers:Int
+}
+interface GameIdGenerator{
+    generateId(): String
+}
+
+GameController "1"-->"1" GameService
+GameService "1"..>"*" Game
+GameService "1"-->"1" EntityService
+GameService "1"-->"1" GameIdGenerator
+GameService "1"-->"1" GameProperties
+EntityService "1"-->"1" GameRepository
+GameController "1"..>"*" GameDto
+@enduml

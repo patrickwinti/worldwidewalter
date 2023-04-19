@@ -1,0 +1,94 @@
+@startuml
+!include globals/stylesheets.iuml
+
+
+(*) -down-> "
+{{
+salt
+{
+    <b><&clock> Waiting for other players to join
+    .
+    The game will start as soon
+    as four players have joined
+    .
+    2/4
+}
+}}
+" as waiting_room_inactive
+
+waiting_room_inactive -right->"
+{{
+salt
+{
+    <b>Round N
+    .
+    ~~
+    **Reto** is the Sphinx
+    ~~
+    <&double-quote-serif-left>
+    I always wanted to learn //WALTER//.
+    <&double-quote-serif-right>
+    .
+    "           "
+    .
+    [Submit]
+}
+}}
+" as submit_proposition
+
+submit_proposition  -down->[Other players]"
+{{
+salt
+{
+    <b>Choose one
+    .
+    Select proposition that **Reto** wrote
+    .
+    {T#
+     Quidditch
+     Tapdance
+     Pizzabox-origami
+     Walking on hands
+    }
+    .
+    [Confirm selection]
+}
+}}
+" as selection_proposition
+
+submit_proposition  -down->[Sphinx]"
+{{
+salt
+{
+    <b>Propositions submitted
+    .
+    {T#
+     Quidditch
+     Tapdance
+     Pizzabox-origami
+     Walking on hands
+    }
+    .
+    [To the results]
+}
+}}
+" as shinpx_propositions
+
+selection_proposition  -down->"
+{{
+salt
+{
+    <b>Ranking
+    .
+    1. Lennox-Luis
+    2. Reto
+    3. Noah-Jakob
+    4. Marvin-Gerold
+    .
+    [Next round]
+}
+}}
+" as ranking
+shinpx_propositions --> ranking
+
+@enduml

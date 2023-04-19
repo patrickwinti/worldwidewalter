@@ -1,0 +1,41 @@
+@startuml
+!include globals/stylesheets.iuml
+
+(*) --> "
+{{
+salt
+<style>
+saltDiagram {
+  FontColor Black
+}
+</style>
+{
+    <b> Worldwide walter
+    .
+    Bonding through WALTER
+    sentences since 2022.
+    Minimum 4 player needed
+    to play game
+    .
+    [Create game]
+    [Join game]
+}
+}}
+" as start_page
+
+start_page -right->[clicks on Create Game]"
+{{
+salt
+{
+    <b>Game created
+    .
+    ID: >gB2-59l
+    .
+    <&person> Player name| "           "
+    .
+    [Join game]
+}
+}}
+" as game_session_created
+
+@enduml

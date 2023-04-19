@@ -16,6 +16,12 @@ class RoundServiceImpl implements RoundService {
     private final GameProperties gameProperties;
     private final EntityService entityService;
     
+    /**
+     * Constructs a RoundServiceImpl object with the specified GameProperties and EntityService instances.
+     *
+     * @param gameProperties the GameProperties instance to use
+     * @param entityService  the EntityService instance to use
+     */
     RoundServiceImpl(GameProperties gameProperties, EntityService entityService) {
         this.gameProperties = gameProperties;
         this.entityService = entityService;
@@ -62,6 +68,9 @@ class RoundServiceImpl implements RoundService {
     public void submitProposition(String roundId, String playerId, List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
+            if (round.getSphinx() == null) {
+                throw new RoundError.IllegalStateException();
+            }
             Proposition temp = new Proposition(UUID.randomUUID().toString(), playerId, gaps);
             boolean isDuplicate = false;
             for (Proposition proposition : round.getPropositions()) {
@@ -80,7 +89,6 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
-        
     }
     
     @Override
@@ -89,6 +97,12 @@ class RoundServiceImpl implements RoundService {
         return entityService.getRound(roundId);
     }
     
+    /**
+     * Verifies that the player with the specified ID is active in the round with the specified ID.
+     *
+     * @param roundId  the ID of the round to verify the player for
+     * @param playerId the ID of the player to verify
+     */
     private void verifyPlayerIsActive(String roundId, String playerId) {
         if (!entityService.isPlayerActiveInRound(roundId, playerId)) {
             throw new PlayerError.NotFoundException(playerId);

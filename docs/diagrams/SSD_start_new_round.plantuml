@@ -1,0 +1,37 @@
+@startuml
+!include globals/stylesheets.iuml
+
+
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant ":RoundService" as rs
+participant "game:Game" as game
+participant "round:Round" as round
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> gs: enterRound(gameId, playerId)
+gs -> ges: editGame(gameId)
+activate ges
+ges -> gr : findById(gameId)
+gr  --> ges: Game
+ges --> gs
+gs -> game: getState()
+game -> round: getState()
+round --> game: Round state FINISHED
+game --> gs: Game state NO_VALID_ROUND
+gs -> game: hasCapacityForNewActivePlayer()
+game --> gs: true or false depending on nr of players
+gs -> game: hasPlayer(playerId)
+game --> gs: true if player is in the game
+gs -> rs :createNewRound(game)
+rs -> game :addRound(round)
+game --> rs
+rs -->gs
+gs -> game : moveToActivePlayers(playerId)
+game --> gs
+ges -> gr : save(game)
+gr --> ges
+ges --> gs
+gs --> gc
+@enduml

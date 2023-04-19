@@ -1,4 +1,16 @@
 @startuml
+skinparam sequence {
+    BackgroundColor white
+    BorderColor Black
+    ArrowColor Firebrick
+    BorderThickness 2
+}
+skinparam Note{
+    BorderColor #FFD966
+    BackgroundColor #FFD966
+}
+skinparam responseMessageBelowArrow true
+
 
 actor       player1
 actor       player2
@@ -11,7 +23,7 @@ system --> player1: new game created, gameId
 player2 -> system: enterGame(gameId, playerName)
 system --> player2: added to game, playerId
 
-playerN -> system: join session (sessionID, username)
+playerN -> system: join (sessionID, username)
 system --> playerN: confirm
 
 playerN -> system: enterGame(gameId, playerName)

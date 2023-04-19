@@ -1,0 +1,28 @@
+@startuml
+!include globals/stylesheets.iuml
+
+
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant "game:Game" as game
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> gs: leaveGame(gameId, playerId)
+gs -> ges: editGame(gameId)
+activate ges
+ges -> gr : findById(gameId))
+gr  --> ges: Game
+ges --> gs: editable game
+gs -> game: removePlayer(gameId)
+game ->game: remove waiting room player
+game ->game: remove active player
+game ->game: remove sphinx candidate
+game --> gs
+ges -> gr : save(game)
+gr --> ges
+ges --> gs
+gs --> gc
+
+
+@enduml

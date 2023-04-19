@@ -1,6 +1,5 @@
 package ch.zhaw.www.model;
 
-import ch.zhaw.www.service.RoundError;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,11 +101,11 @@ class RoundTest {
     void addProposition() {
         Round round = getRound();
         Proposition proposition1 = new Proposition(UUID.randomUUID().toString(), "1", List.of("Bruce", "Martha", "Selina"));
-        assertThrows(RoundError.IllegalStateException.class, () -> round.addProposition(proposition1));
+        round.addProposition(proposition1);
         Proposition proposition2 = new Proposition(UUID.randomUUID().toString(), "2", List.of("Barry", "Wally"));
         round.setSphinx(createPlayer());
         round.addProposition(proposition2);
-        assertEquals(1, round.getPropositions().size());
+        assertEquals(2, round.getPropositions().size());
     }
     
     private static Round getRound() {

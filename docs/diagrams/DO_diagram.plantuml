@@ -1,0 +1,39 @@
+@startuml
+!include globals/stylesheets.iuml
+skinparam ranksep 100
+
+object Player
+object Game
+object Turn
+object Round
+object Prompt
+object Proposition
+object GameState
+together{
+    object WaitingForPlayers
+    object WaitingForPropositions
+    object WaitingForSelections
+}
+
+Player : name
+Player : ID
+Game : ID
+Prompt : text
+Proposition : text
+
+
+Prompt "1"--"1..*" Proposition : < completes
+Game "1"--"*" Player : < participates
+Game "1"*--"*" Turn
+Turn "1"*--"1..3" Round
+Round  "*"--"1" Game : updates points >
+Round "1"--"1" Prompt : presents >
+Player "1"--"1" Turn: < has Sphinx
+Player "1"--"1" Proposition : submits >
+Player "1"--"1" Proposition : selects (if not Sphinx) >
+WaitingForPlayers --|> GameState
+WaitingForPropositions --|> GameState
+WaitingForSelections --|> GameState
+GameState "1"--"*" Game : < is in
+
+@enduml

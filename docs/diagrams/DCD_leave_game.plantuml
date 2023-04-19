@@ -1,0 +1,37 @@
+@startuml
+!include globals/stylesheets.iuml
+skinparam linetype ortho
+
+class GameController {
+   -gameService: GameService
+   +leaveGame(gameId: String, playerId: String) : void
+}
+class Game {
+   -waitingRoom: Map<String, Player>
+   -activePlayers: Map<String, Player>
+   -sphinxCandidates: List<Player>
+   +removePlayer(playerId: String)
+}
+interface EntityService {
+    -gameRepository:GameRepository
+    editGame(gameId: String, editor: Consumer)
+}
+interface GameService{
+    -entityService: EntityService
+    leaveGame(gameId: String, playerId: String): void
+}
+interface GameRepository {
+   save(game: Game)
+   findById(id: String)
+}
+class Player {
+    -id: String
+    -name: String
+}
+
+GameController-->GameService
+GameService "1"..>"*" Game
+GameService "1"-->"1" EntityService
+EntityService "1"-->"1" GameRepository
+Game "1"-->"*" Player
+@enduml

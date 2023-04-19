@@ -1,0 +1,32 @@
+@startuml
+!include globals/stylesheets.iuml
+
+
+participant ":GameController" as gc
+participant ":RoundService" as rs
+participant "game:Game" as game
+participant "round:Round" as round
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> rs: submitProposition(roundId, playerId, gaps)
+rs->ges: isPlayerActiveInRound(roundId, playerId)
+ges-->rs: true if player active for game
+rs -> ges: editRound(roundId)
+activate ges
+ges -> gr : findAll()
+gr  --> ges: List<Game>
+ges --> rs: editable round
+rs -> round: addProposition(proposition)
+note left
+Only if proposition
+is not a duplicate
+end note
+round-->rs
+ges -> gr : save(game)
+gr --> ges
+ges --> rs
+rs --> gc
+
+
+@enduml

@@ -33,9 +33,9 @@ public class Round {
     private final Duration enterLimitDuration;
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
-
+    @Setter
     private int tempSphinxPoints = 0;
-    @Getter(AccessLevel.NONE)
+    @Setter
     private Boolean atLeastOneNoneSphinxPropositionHasBeenSelected = false;
 
     private final List<Proposition> propositions = new ArrayList<>();

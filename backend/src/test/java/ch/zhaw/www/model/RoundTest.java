@@ -100,9 +100,9 @@ class RoundTest {
     @Test
     void addProposition() {
         Round round = getRound();
-        Proposition proposition1 = new Proposition(UUID.randomUUID().toString(), "1", List.of("Bruce", "Martha", "Selina"));
+        Proposition proposition1 = new Proposition(UUID.randomUUID().toString(), List.of("Bruce", "Martha", "Selina"));
         round.addProposition(proposition1);
-        Proposition proposition2 = new Proposition(UUID.randomUUID().toString(), "2", List.of("Barry", "Wally"));
+        Proposition proposition2 = new Proposition(UUID.randomUUID().toString(), List.of("Barry", "Wally"));
         round.setSphinx(createPlayer());
         round.addProposition(proposition2);
         assertEquals(2, round.getPropositions().size());

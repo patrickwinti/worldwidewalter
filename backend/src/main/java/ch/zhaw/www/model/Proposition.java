@@ -23,6 +23,13 @@ public class Proposition {
     
     private final List<String> playerIds = new ArrayList<>();
     
+    /**
+     * Adds player that submitted the given proposition.
+     * Players that submitted duplicates of the prompt
+     * will be added to the player IDs.
+     *
+     * @param playerId player identifier
+     */
     public void submittedBy(final String playerId) {
         playerIds.add(playerId);
     }

@@ -6,6 +6,7 @@ participant ":GameController" as gc
 participant ":GameService" as gs
 participant ":GameIdGenerator" as gid
 participant ":GameProperties" as gp
+participant ":PromptRepository" as pr
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
@@ -16,6 +17,8 @@ gs -> gp: getMinimumAmountOfActivePlayersPerGame()
 gp --> gs: minimum amount of players
 gs -> gp: getMaximumAmountOfActivePlayersPerGame()
 gp --> gs: maximum amount of players
+gs -> pr: getPrompts()
+pr --> gs: prompts
 gs -> ges : saveNewGame(game)
 ges -> gr : existsById(gameId)
 gr  --> ges: does not exist
@@ -23,4 +26,5 @@ ges -> gr : save(game)
 gr --> ges
 ges --> gs
 gs --> gc: created game
+
 @enduml

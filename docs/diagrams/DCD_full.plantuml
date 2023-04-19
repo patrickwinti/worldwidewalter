@@ -96,9 +96,14 @@ package backend{
     }
     package repository {
         interface GameRepository
-         interface FileReader{
-              readFile(file: File): List<Prompt>
+         interface ResourceReader{
+              readResource(resource: Resource): List<Prompt>
          }
+         interface PromptRepository{
+                       -defaultDeck: List<Prompt>
+                       getPrompts():List<Prompt>
+                  }
+
     }
 
     package utils{
@@ -124,11 +129,15 @@ GameService "1"-->"1" EntityService
 GameService "1"-->"1" PostfixGenerator
 GameService "1"-->"1" GameIdGenerator
 GameService "1"-->"1" RoundService
+GameService "1"-->"1" PromptRepository
 
 RoundService "1"-->"*" Game
 RoundService "1"-->"*" Round
 RoundService "1"-->"*"  Proposition
-RoundService "1"--> EntityService
+RoundService "1"-->"1" EntityService
+
+PromptRepository "1"-->"1" ResourceReader
+
 
 EntityService "1"-->"1" GameRepository
 

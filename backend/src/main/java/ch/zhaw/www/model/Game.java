@@ -32,6 +32,7 @@ public class Game {
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts;
+
     /**
      * Gets current round,
      * when the SphinxElector has been selected
@@ -131,7 +132,7 @@ public class Game {
      * @return the first prompt in the list of prompts
      */
     public Prompt consumePrompt() {
-        return prompts.get(rounds.size()%prompts.size());
+        return prompts.get(rounds.size() % prompts.size());
     }
 
     /**

@@ -131,8 +131,7 @@ public class Game {
      * @return the first prompt in the list of prompts
      */
     public Prompt consumePrompt() {
-        // TODO correct code
-        return prompts.get(0);
+        return prompts.get(rounds.size()%prompts.size());
     }
 
     /**

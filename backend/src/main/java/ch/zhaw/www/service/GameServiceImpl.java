@@ -5,6 +5,7 @@ import ch.zhaw.www.bean.PostfixGenerator;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.repository.PromptRepository;
 import ch.zhaw.www.utils.GameIdGenerator;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -27,15 +28,15 @@ class GameServiceImpl implements GameService {
     private final RoundService roundService;
     private final PostfixGenerator postfixGenerator;
     private final GameIdGenerator gameIdGenerator;
-    private final PromptService promptService;
+    private final PromptRepository promptRepository;
     
-    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator, PromptService promptService) {
+    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator, PromptRepository promptRepository) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
         this.postfixGenerator = postfixGenerator;
         this.gameIdGenerator = gameIdGenerator;
-        this.promptService = promptService;
+        this.promptRepository = promptRepository;
     }
     
     @Override
@@ -43,7 +44,7 @@ class GameServiceImpl implements GameService {
         var game = new Game(gameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
-                DEFAULT_NUMBER_OF_ROUNDS, promptService.getPrompts());
+                DEFAULT_NUMBER_OF_ROUNDS, promptRepository.getPrompts());
         entityService.saveNewGame(game);
         return game;
     }

@@ -1,8 +1,7 @@
-package ch.zhaw.www.service;
+package ch.zhaw.www.repository;
 
 import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Prompt;
-import ch.zhaw.www.repository.ResourceReader;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,11 +9,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-class PromptServiceImpl implements PromptService {
+class PromptRepositoryImpl implements PromptRepository {
     
     private final List<Prompt> defaultDeck;
     
-    PromptServiceImpl(ResourceReader resourceReader, GameProperties gameProperties) {
+    PromptRepositoryImpl(ResourceReader resourceReader, GameProperties gameProperties) {
         defaultDeck = resourceReader.readResource(gameProperties.getDefaultDeck());
     }
     

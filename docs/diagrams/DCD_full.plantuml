@@ -1,0 +1,138 @@
+@startuml
+!include globals/stylesheets.iuml
+skinparam linetype ortho
+
+package backend{
+    package controller {
+        class GameController {
+            -gameService: GameService
+            -roundService: RoundService
+            +createGame(): GameDto
+            +getGame(gameId: String) : GameDto
+            +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+            +leaveGame(gameId: String, playerId: String)
+            +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+            +selectProposition(roundId: String, propositionId: String, playerId: String)
+            +getRound(gameId: String, playerId: String) : RoundDto
+            +enterRound(gameId: String, playerId: String) : RoundDto
+        }
+    }
+    package dto {
+        class GameDto {
+           -id: String
+        }
+        class PlayerDto {
+           -id: String
+        }
+        class PlayerJoinRequestDto {
+            -playerName:String
+        }
+        class PropositionSubmissionDto {
+            -gaps: List<String>
+        }
+        class RoundDto {
+            -id: String
+            -prompt: String
+        }
+    }
+    package model {
+        class Game {
+            id: String
+            waitingRoom: Map<Player>
+            activePlayers: Map<Player>
+            getState(): Game.State
+        }
+        class Prompt{
+            -statement: String
+            -totalPlaceholders: int
+            -hasBeenUsed: boolean
+        }
+        class Proposition{
+            -id: String
+            -playerId: String
+            -gaps: List<String>
+            -duplicates: List<Proposition>
+            +hasSameGaps(proposition: Proposition): Boolean
+        }
+        class Player {
+              -id: String
+              -name: String
+        }
+        class Round {
+             -id: String
+             -prompt: Prompt
+             -propositions: Map<Proposition>
+             -selections: Map<Selection>
+             +getState(): Round.State
+        }
+    }
+    package service {
+        interface GameService {
+            -entityService: EntityService
+            -roundService: RoundService
+           createGame(): Game
+           leaveGame(gameId: String, playerId: String)
+           getGame(gameId: String) : Game
+           enterGame(gameId: String, playerName: String) : Player
+           enterRound(gameId: String, playerId: String) : Round
+        }
+        interface RoundService{
+            -entityService: EntityService
+            selectSphinx(game: Game);
+            createNewRound(game: Game);
+            getRound(roundId: String, playerId: String):Round
+            submitProposition(roundId: String, playerId: String, gaps: List<String>)
+            selectProposition(roundId: String, playerId: String, propositionId: String)
+        }
+        interface EntityService{
+           -gameRepository: GameRepository
+            getGame(gameId: String): Game
+            editGame(gameId: String, editor: Consumer<Game>)
+            getRound(roundId: String): Round
+            isPlayerActiveInRound(roundId: String, playerId: String): boolean
+            editRound(roundId: String, editor: Consumer<Round>)
+            saveNewGame(game: Game)
+        }
+    }
+    package repository {
+        interface GameRepository
+         interface FileReader{
+              readFile(file: File): List<Prompt>
+         }
+    }
+
+    package utils{
+        class PostfixGenerator {
+            -postFixes: Random
+            +getRandomPostfix(): Integer
+        }
+
+        interface GameIdGenerator {
+            +generateId():String
+        }
+    }
+}
+
+controller ->dto
+
+GameController "1"->"1" RoundService
+GameController "1"-->"1" GameService
+
+GameService "1"..>"*" Game
+GameService "1"..>"*" Player
+GameService "1"-->"1" EntityService
+GameService "1"-->"1" PostfixGenerator
+GameService "1"-->"1" GameIdGenerator
+GameService "1"-->"1" RoundService
+
+RoundService "1"-->"*" Game
+RoundService "1"-->"*" Round
+RoundService "1"-->"*"  Proposition
+RoundService "1"--> EntityService
+
+EntityService "1"-->"1" GameRepository
+
+FileReader "1"..>"*" Prompt
+
+Game "1"->"*" Round
+@enduml

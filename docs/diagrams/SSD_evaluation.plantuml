@@ -1,0 +1,33 @@
+@startuml
+!include globals/stylesheets.iuml
+
+
+participant ":GameController" as gc
+participant ":GameService" as gs
+participant ":RoundEvaluator" as ev
+participant "game:Game" as game
+participant "round:Round" as round
+participant ":EntityService" as ges
+participant ":GameRepository" as gr
+
+gc -> gs: selectProposition(roundId,playerId,propositionId)
+gs -> ges: editGame(gameId)
+activate ges
+ges -> gr : findById(gameId)
+gr  --> ges: Game
+ges --> gs
+gs -> game: getCurrentRound()
+game -> round: getState()
+round --> game: Round state
+game --> gs: Round
+gs -> ev :eval(round, proposition)
+ev --> gs : Result
+gs -> game : updateResults(result: Result)
+game --> gs
+ges -> gr : save(game)
+gr --> ges
+ges --> gs
+gs --> gc
+
+
+@enduml

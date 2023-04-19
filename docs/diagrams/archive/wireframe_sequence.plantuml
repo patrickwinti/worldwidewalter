@@ -19,10 +19,10 @@ start_page -right->[Start game] "
 {{
 salt
 {
-    <b>Game session created
+    <b>Game created
     ID: >gB2-59l
     <&share> share with other players
-    User name| "           "
+    <&person> Player name| "           "
     [Join game]
 }
 }}
@@ -33,14 +33,14 @@ start_page -left->[Join game] "
 salt
 {
     <b>Join session
-    ID: | "Session ID "
-    User name| "           "
+    ID: | "Game ID    "
+    <&person> Player name| "           "
     [Join game]
 }
 }}
 " as join_session
 
-join_session -down-> "
+join_-down-> "
 {{
 salt
 {

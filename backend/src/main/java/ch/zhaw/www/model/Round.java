@@ -33,10 +33,11 @@ public class Round {
     private final Duration enterLimitDuration;
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
-    @Getter
-    private AtomicInteger tempSphinxPoints = new AtomicInteger(0);
-    private AtomicBoolean atLeastOneNoneSphinxPropositionHasBeenSelected = new AtomicBoolean(false);
-    
+
+    private int tempSphinxPoints = 0;
+    @Getter(AccessLevel.NONE)
+    private Boolean atLeastOneNoneSphinxPropositionHasBeenSelected = false;
+
     private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
     

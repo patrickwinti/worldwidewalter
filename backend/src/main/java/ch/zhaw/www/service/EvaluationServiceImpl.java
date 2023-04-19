@@ -20,23 +20,23 @@ public class EvaluationServiceImpl implements EvaluationService {
 
     // Technically all the parameters could be fetched from roundId but this would make testing a lot more costly.
     @Override
-    public Map<String, Integer> evaluateSelection(String roundId, String sphinxId, List<Proposition> propositions,
-                                                  String selectedPropositionId, String propositionOriginatorIdOfSelection) {
-        Round round = entityService.getRound(roundId);
+    public Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) {
+
         Map<String, Integer> points = new ConcurrentHashMap<>();
-        propositions.forEach(proposition -> {
-            if (selectedPropositionId.equals(proposition.getId()) && !propositionOriginatorIdOfSelection.equals(sphinxId)) {
+        String sphinxId = round.getSphinx().getId();
+        round.getPropositions().forEach(proposition -> {
+            if (selectedPropositionId.equals(proposition.getPropositionId()) && !proposition.getPlayerId().equals(sphinxId) {
                 points.put(proposition.getPlayerId(), SINGLE_POINT);
-                round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().set(true);
+                round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()
                 points.put(sphinxId, round.getTempSphinxPoints().get());
-                round.getTempSphinxPoints().set(NONE);
+                round.getTempSphinxPoints
             }
-            if (selectedPropositionId.equals(proposition.getId()) && propositionOriginatorIdOfSelection.equals(sphinxId)
+            if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
                     && round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().get()) {
                 points.put(proposition.getPlayerId(), SINGLE_POINT);
                 points.put(sphinxId, SINGLE_POINT);
 
-            } else if (selectedPropositionId.equals(proposition.getId()) && propositionOriginatorIdOfSelection.equals(sphinxId)
+            } else if (selectedPropositionId.equals(proposition.getPropositionId()) && propositionOriginatorIdOfSelection.equals(sphinxId)
                     && !round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().get()) {
                 points.put(proposition.getPlayerId(), SINGLE_POINT);
                 round.getTempSphinxPoints().set(SINGLE_POINT);

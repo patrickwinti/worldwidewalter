@@ -322,7 +322,7 @@ class GameControllerTest {
                                 "[{\"id\":\"%s\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"%s\"," +
                                 "\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}]," +
                                 "\"selectionSubmissionEndInUtc\":\"%s\"}",
-                        ROUND_ID, propositions.get(0).getId(), propositions.get(1).getId(), expectedDate)));
+                        ROUND_ID, propositions.get(0).getPropositionId(), propositions.get(1).getPropositionId(), expectedDate)));
         verify(roundService).getRound(ROUND_ID, PLAYER_ID);
     }
     

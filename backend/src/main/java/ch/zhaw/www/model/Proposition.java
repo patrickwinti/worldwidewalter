@@ -21,7 +21,7 @@ public class Proposition {
     private static final String DELIMITER = "";
 
     @NotNull
-    private final String id;
+    private final String propositionId;
     @NotNull
     private final String playerId;
     private final List<String> gaps;

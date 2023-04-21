@@ -10,5 +10,5 @@ import java.util.Map;
  * Service for evaluating the submitted selections for a round
  */
 public interface EvaluationService {
-    Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) throws GameError.NotFoundException, RoundError.NotFoundException;
+    Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) throws RoundError.NotFoundException;
 }

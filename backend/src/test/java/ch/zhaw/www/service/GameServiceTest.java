@@ -264,6 +264,22 @@ class GameServiceTest {
         var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
         assertEquals(MAX_NUMBER_OF_PLAYERS, activePlayers);
         assertEquals(MAX_NUMBER_OF_PLAYERS / 2, waitingRoomPlayers);
+        
+        assertNotNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
+    }
+    
+    @Test
+    void createNewRound_NotAtCapacity() {
+        var game = mockGameInRepository();
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS - 1).forEach(value -> addWaitingRoomPlayer(game));
+        
+        gameService.enterRound(game.getId(), getRandomPlayer(game).getId());
+        var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
+        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
+        assertEquals(MAX_NUMBER_OF_PLAYERS - 1, activePlayers);
+        assertEquals(0, waitingRoomPlayers);
+        
+        assertNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
     }
     
     private Game mockGameInRepository() {

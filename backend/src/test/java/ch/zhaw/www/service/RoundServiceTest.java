@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -159,19 +158,6 @@ class RoundServiceTest {
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
         assertNotNull(selected);
-    }
-    
-    @Test
-    void createNewRound_AtCapacity() {
-        var game = createGame();
-        IntStream.range(0, MAX_NUMBER_OF_PLAYERS / 2).forEach(value -> addWaitingRoomPlayer(game));
-        IntStream.range(0, MAX_NUMBER_OF_PLAYERS).forEach(value -> addWaitingRoomPlayer(game));
-        
-        roundService.createNewRound(game);
-        var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
-        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
-        assertEquals(MAX_NUMBER_OF_PLAYERS, activePlayers);
-        assertEquals(MAX_NUMBER_OF_PLAYERS / 2, waitingRoomPlayers);
     }
     
     @SuppressWarnings("unchecked")

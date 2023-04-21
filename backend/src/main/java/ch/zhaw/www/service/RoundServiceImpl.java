@@ -52,16 +52,12 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public void createNewRound(final Game game) {
-        game.addRound(new Round(UUID.randomUUID().toString(),
+    public Round createNewRound(final Game game) {
+        return new Round(UUID.randomUUID().toString(),
                 game.consumePrompt(),
                 gameProperties.getPropositionSubmissionDuration(),
                 gameProperties.getRoundEnterLimitDuration(),
-                gameProperties.getSelectionSubmissionDuration()));
-        game.getAllPlayers()
-                .filter(player -> !game.hasActivePlayer(player.getId()))
-                .takeWhile(player -> game.hasCapacityForNewActivePlayer())
-                .forEach(game::moveToActivePlayers);
+                gameProperties.getSelectionSubmissionDuration());
     }
     
     @Override

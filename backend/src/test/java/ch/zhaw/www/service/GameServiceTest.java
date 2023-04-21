@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -98,7 +99,7 @@ class GameServiceTest {
         addWaitingRoomPlayer(game);
         round.setSphinx(getRandomPlayer(game));
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
@@ -251,6 +252,18 @@ class GameServiceTest {
         assertEquals(0, game.getAllPlayers().count());
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(0)));
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(1)));
+    }
+    
+    @Test
+    void createNewRound_AtCapacity() {
+        var game = mockGameInRepository();
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS + MAX_NUMBER_OF_PLAYERS / 2).forEach(value -> addWaitingRoomPlayer(game));
+        
+        gameService.enterRound(game.getId(), getRandomPlayer(game).getId());
+        var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
+        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
+        assertEquals(MAX_NUMBER_OF_PLAYERS, activePlayers);
+        assertEquals(MAX_NUMBER_OF_PLAYERS / 2, waitingRoomPlayers);
     }
     
     private Game mockGameInRepository() {

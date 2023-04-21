@@ -18,37 +18,68 @@ public class EvaluationServiceTest {
 
 
     private EvaluationService evaluationService = new EvaluationServiceImpl();
-    private static final String Round_ID = "Round-ID";
+    private static final String SphinxId = "Sphinx-ID";
 
-    private Round mockRoundInRepository() {
+    private Round mockRoundInRepository(int tempSphinxPoints, boolean atLeastOneNoneSphinxPropositionHasBeenSelected) {
         Round roundMock = mock(Round.class);
         when(roundMock.getPropositions()).thenReturn(List.of(
                 createProposition("Player-ID-1", "orange"),
-                createProposition("Sphinx-ID", "blue"),
-                createProposition("Player-ID-3", "green")
-        ));
+                createProposition("Player-ID-2", "green"),
+                createProposition("Player-ID-3", "red"),
+                createProposition(SphinxId, "blue")
+                ));
 
-        when(roundMock.getSphinx()).thenReturn(new Player("Sphinx-ID", "Sphinx-Name"));
-        when(roundMock.getAtLeastOneNoneSphinxPropositionHasBeenSelected()).thenReturn(false);
-        when(roundMock.getTempSphinxPoints()).thenReturn(1);
+        when(roundMock.getSphinx()).thenReturn(new Player(SphinxId, "Sphinx-Name"));
+        when(roundMock.getAtLeastOneNoneSphinxPropositionHasBeenSelected()).thenReturn(atLeastOneNoneSphinxPropositionHasBeenSelected);
+        when(roundMock.getTempSphinxPoints()).thenReturn(tempSphinxPoints);
 
         return roundMock;
     }
 
 
     @Test
-    public void evaluateSelection_shouldReturnPointsForSelectedProposition() {
+    public void evaluateSelectionOfNonSphinxPropositionWithTempSpinxPoints() {
 
-        Round roundMock = mockRoundInRepository();
+        Round roundMock = mockRoundInRepository(3, false);
         String idOfSelectedProposition = roundMock.getPropositions().get(0).getPropositionId();
+        String selectorId = roundMock.getPropositions().get(2).getPlayerId();
+
+        Map<String, Integer> result = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+        List<Integer> distributedPoints = List.copyOf(result.values());
+
+        assertEquals(2, result.size());
+        assertEquals(1, distributedPoints.get(0));
+        assertEquals(3, distributedPoints.get(1));
+
+    }
+
+    @Test
+    public void evaluateSelectionOfOnlySphinxPropositions() {
+
+        Round roundMock = mockRoundInRepository(3,false);
+        String idOfSelectedProposition = roundMock.getPropositions().get(3).getPropositionId();
         String idOfPlayerWhoSelectedProposition = roundMock.getPropositions().get(2).getPlayerId();
 
         Map<String, Integer> result = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, idOfPlayerWhoSelectedProposition);
+        List<Integer> distributedPoints = List.copyOf(result.values());
 
-        assertEquals(2, result.size());
-        assertEquals(Integer.valueOf(1), result.get(idOfPlayerWhoSelectedProposition));
-        assertEquals(Integer.valueOf(0), result.get("sphinxId"));
-//        verify(roundMock.getAtLeastOneNoneSphinxPropositionHasBeenSelected(), times(1)).set(true);
+        assertEquals(1, result.size());
+        assertEquals(1, distributedPoints.get(0));
+    }
+
+    @Test
+    public void evaluateSelectionOfSphinxPropositionWithNoTempSpinxPoints() {
+
+            Round roundMock = mockRoundInRepository(0, true);
+            String idOfSelectedProposition = roundMock.getPropositions().get(3).getPropositionId();
+            String selectorId = roundMock.getPropositions().get(2).getPlayerId();
+
+            Map<String, Integer> result = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+            List<Integer> distributedPoints = List.copyOf(result.values());
+
+            assertEquals(2, result.size());
+            assertEquals(1, distributedPoints.get(0));
+            assertEquals(1, distributedPoints.get(1));
     }
 
 

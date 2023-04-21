@@ -31,7 +31,7 @@ public class EvaluationServiceImpl implements EvaluationService {
 
             } else if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
                     && !round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()) {
-                points.put(proposition.getPlayerId(), SINGLE_POINT);
+                points.put(selectorId, SINGLE_POINT);
                 round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
             }
         });

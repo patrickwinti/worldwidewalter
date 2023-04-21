@@ -35,10 +35,10 @@ public interface RoundService {
      * @param roundId  round identifier
      * @param playerId player requesting round
      * @return new or existing round
-     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.NotFoundException     if round is not found
      * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
-    Round getRound(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    Round getRound(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException;
     
     /**
      * Player submits their propositions for the prompt

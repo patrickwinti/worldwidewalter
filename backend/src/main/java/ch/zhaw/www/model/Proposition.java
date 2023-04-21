@@ -19,19 +19,20 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class Proposition {
     private static final String DELIMITER = "";
-
+    
     @NotNull
-    private final String propositionId;
+    private final String id;
     @NotNull
     private final String playerId;
     private final List<String> gaps;
     private final List<Proposition> duplicates = new ArrayList<>();
-
+    
     /**
      * Checks if the current proposition has the same gaps as the given proposition.
      *
      * @param proposition The proposition to compare gaps with.
-     * @return true if both propositions have the same number of gaps and each pair of corresponding gaps has the same value, ignoring case and leading/trailing whitespace, false otherwise.
+     * @return true if both propositions have the same number of gaps and each pair of corresponding gaps has the same
+     * value, ignoring case and leading/trailing whitespace, false otherwise.
      */
     public boolean hasSameGaps(Proposition proposition) {
         return gaps.size() == proposition.gaps.size() &&
@@ -39,7 +40,7 @@ public class Proposition {
                         .filter(i -> areGapsAtPositionTheSame(proposition, i))
                         .count() == gaps.size();
     }
-
+    
     /*
      * Compares the gaps at the given position between the current proposition and the given proposition.
      *

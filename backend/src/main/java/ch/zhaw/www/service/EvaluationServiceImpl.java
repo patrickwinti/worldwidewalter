@@ -15,26 +15,26 @@ public class EvaluationServiceImpl implements EvaluationService {
     @Override
     public Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) {
 
-        Map<String, Integer> points = new HashMap<>();
+        Map<String, Integer> evaluation = new HashMap<>();
         String sphinxId = round.getSphinx().getId();
         round.getPropositions().forEach(proposition -> {
             if (selectedPropositionId.equals(proposition.getPropositionId()) && !proposition.getPlayerId().equals(sphinxId)) {
-                points.put(proposition.getPlayerId(), SINGLE_POINT);
+                evaluation.put(proposition.getPlayerId(), SINGLE_POINT);
                 round.setAtLeastOneNoneSphinxPropositionHasBeenSelected(true);
-                points.put(sphinxId, round.getTempSphinxPoints());
+                evaluation.put(sphinxId, round.getTempSphinxPoints());
                 round.setTempSphinxPoints(NONE);
             }
             if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
                     && round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()) {
-                points.put(selectorId, SINGLE_POINT);
-                points.put(sphinxId, SINGLE_POINT);
+                evaluation.put(selectorId, SINGLE_POINT);
+                evaluation.put(sphinxId, SINGLE_POINT);
 
             } else if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
                     && !round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()) {
-                points.put(selectorId, SINGLE_POINT);
+                evaluation.put(selectorId, SINGLE_POINT);
                 round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
             }
         });
-        return points;
+        return evaluation;
     }
 }

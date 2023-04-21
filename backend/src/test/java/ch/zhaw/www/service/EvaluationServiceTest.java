@@ -27,7 +27,7 @@ public class EvaluationServiceTest {
                 createProposition("Player-ID-2", "green"),
                 createProposition("Player-ID-3", "red"),
                 createProposition(sphinxId, "blue")
-                ));
+        ));
 
         when(roundMock.getSphinx()).thenReturn(new Player(sphinxId, "Sphinx-Name"));
         when(roundMock.getAtLeastOneNoneSphinxPropositionHasBeenSelected()).thenReturn(atLeastOneNoneSphinxPropositionHasBeenSelected);
@@ -45,11 +45,11 @@ public class EvaluationServiceTest {
         String propositionOriginatorId = roundMock.getPropositions().get(0).getPlayerId();
         String selectorId = roundMock.getPropositions().get(2).getPlayerId();
 
-        Map<String, Integer> result = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
-        List<Integer> distributedPoints = List.copyOf(result.values());
-        List<String> playerIds = List.copyOf(result.keySet());
+        Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+        List<Integer> distributedPoints = List.copyOf(evaluation.values());
+        List<String> playerIds = List.copyOf(evaluation.keySet());
 
-        assertEquals(2, result.size());
+        assertEquals(2, evaluation.size());
 
         assertEquals(propositionOriginatorId, playerIds.get(0));
         assertEquals(1, distributedPoints.get(0));
@@ -62,16 +62,15 @@ public class EvaluationServiceTest {
     @Test
     public void evaluateSelectionOfOnlySphinxPropositions() {
 
-        Round roundMock = mockRoundInRepository(3,false);
+        Round roundMock = mockRoundInRepository(3, false);
         String idOfSelectedProposition = roundMock.getPropositions().get(3).getPropositionId();
         String selectorId = roundMock.getPropositions().get(2).getPlayerId();
 
-        Map<String, Integer> result = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
-        List<Integer> distributedPoints = List.copyOf(result.values());
-        List<String> playerIds = List.copyOf(result.keySet());
+        Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+        List<Integer> distributedPoints = List.copyOf(evaluation.values());
+        List<String> playerIds = List.copyOf(evaluation.keySet());
 
-
-        assertEquals(1, result.size());
+        assertEquals(1, evaluation.size());
 
         assertEquals(selectorId, playerIds.get(0));
         assertEquals(1, distributedPoints.get(0));
@@ -80,22 +79,21 @@ public class EvaluationServiceTest {
     @Test
     public void evaluateSelectionOfSphinxPropositionWithNoTempSpinxPoints() {
 
-            Round roundMock = mockRoundInRepository(0, true);
-            String idOfSelectedProposition = roundMock.getPropositions().get(3).getPropositionId();
-            String selectorId = roundMock.getPropositions().get(2).getPlayerId();
+        Round roundMock = mockRoundInRepository(0, true);
+        String idOfSelectedProposition = roundMock.getPropositions().get(3).getPropositionId();
+        String selectorId = roundMock.getPropositions().get(2).getPlayerId();
 
-            Map<String, Integer> result = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
-            List<Integer> distributedPoints = List.copyOf(result.values());
-            List<String> playerIds = List.copyOf(result.keySet());
+        Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+        List<Integer> distributedPoints = List.copyOf(evaluation.values());
+        List<String> playerIds = List.copyOf(evaluation.keySet());
 
-            assertEquals(2, result.size());
+        assertEquals(2, evaluation.size());
 
-            assertEquals(selectorId, playerIds.get(0));
-            assertEquals(1, distributedPoints.get(0));
+        assertEquals(selectorId, playerIds.get(0));
+        assertEquals(1, distributedPoints.get(0));
 
-            assertEquals(sphinxId, playerIds.get(1));
-            assertEquals(1, distributedPoints.get(1));
+        assertEquals(sphinxId, playerIds.get(1));
+        assertEquals(1, distributedPoints.get(1));
     }
-
 
 }

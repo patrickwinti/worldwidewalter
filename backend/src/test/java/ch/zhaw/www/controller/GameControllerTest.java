@@ -1,7 +1,9 @@
 package ch.zhaw.www.controller;
 
-import ch.zhaw.www.model.Proposition;
-import ch.zhaw.www.service.*;
+import ch.zhaw.www.service.GameError;
+import ch.zhaw.www.service.GameService;
+import ch.zhaw.www.service.PlayerError;
+import ch.zhaw.www.service.RoundError;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -34,15 +35,12 @@ class GameControllerTest {
     private static final String GAME_ID = "123";
     private static final String PLAYER_ID = "456";
     private static final String ROUND_ID = "789";
-    private static final String PROPOSITION_ID = "-0-";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
     
     @Autowired
     private MockMvc mvc;
     @MockBean
     private GameService gameService;
-    @MockBean
-    private RoundService roundService;
     
     private static String getExpectedDateInTheFuture(Duration duration) {
         enableFixedClocked();
@@ -123,66 +121,6 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/games"))
                 .andExpect(status().isConflict());
         verify(gameService).createGame();
-    }
-    
-    @Test
-    void testSubmitProposition_204() throws Exception {
-        doNothing().when(roundService).submitProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions", ROUND_ID)
-                        .content("{\"gaps\":[\"one\"]}")
-                        .header(HEADER_PLAYER, PLAYER_ID)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
-        verify(roundService).submitProposition(ROUND_ID, PLAYER_ID, List.of("one"));
-    }
-    
-    @Test
-    void testSubmitProposition_404_round() throws Exception {
-        doThrow(new RoundError.NotFoundException(ROUND_ID)).when(roundService).submitProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions", ROUND_ID)
-                        .content("{\"gaps\":[\"one\"]}")
-                        .header(HEADER_PLAYER, PLAYER_ID)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-        verify(roundService).submitProposition(ROUND_ID, PLAYER_ID, List.of("one"));
-    }
-    
-    @Test
-    void testSelectProposition_204() throws Exception {
-        doNothing().when(roundService).selectProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions/{propositionId}", ROUND_ID, PROPOSITION_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isNoContent());
-        
-        verify(roundService).selectProposition(ROUND_ID, PLAYER_ID, PROPOSITION_ID);
-    }
-    
-    @Test
-    void testSelectProposition_404_round() throws Exception {
-        doThrow(new RoundError.NotFoundException(ROUND_ID)).when(roundService).selectProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions/{propositionId}", ROUND_ID, PROPOSITION_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isNotFound());
-        verify(roundService).selectProposition(ROUND_ID, PLAYER_ID, PROPOSITION_ID);
-    }
-    
-    @Test
-    void testSelectProposition_404_player() throws Exception {
-        doThrow(new GameError.NotFoundException(GAME_ID)).when(roundService).selectProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions/{propositionId}", ROUND_ID, PROPOSITION_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isNotFound());
-    }
-    
-    @Test
-    void testSubmitProposition_404() throws Exception {
-        doThrow(new PlayerError.NotFoundException(PLAYER_ID)).when(roundService).submitProposition(any(), any(), any());
-        mvc.perform(MockMvcRequestBuilders.post("/api/rounds/{roundId}/propositions", ROUND_ID)
-                        .content("{\"gaps\":[\"one\"]}")
-                        .header(HEADER_PLAYER, PLAYER_ID)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-        verify(roundService).submitProposition(ROUND_ID, PLAYER_ID, List.of("one"));
     }
     
     @Test
@@ -305,42 +243,4 @@ class GameControllerTest {
         verify(gameService).getGame(GAME_ID);
     }
     
-    @Test
-    void testGetAllPropositionForRound_200() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
-        var round = createRound();
-        round.setSphinx(createPlayer());
-        
-        round.addProposition(createProposition("1", "prop 1"));
-        round.addProposition(createProposition(PLAYER_ID, "prop 2", "prop 3"));
-        List<Proposition> propositions = round.getPropositions();
-        when(roundService.getRound(any(), any())).thenReturn(round);
-        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":" +
-                                "[{\"id\":\"%s\",\"gaps\":[\"prop 1\"],\"readOnly\":false},{\"id\":\"%s\"," +
-                                "\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}]," +
-                                "\"selectionSubmissionEndInUtc\":\"%s\"}",
-                        ROUND_ID, propositions.get(0).getId(), propositions.get(1).getId(), expectedDate)));
-        verify(roundService).getRound(ROUND_ID, PLAYER_ID);
-    }
-    
-    @Test
-    void testGetAllPropositionForRound_404_round() throws Exception {
-        doThrow(new RoundError.NotFoundException(ROUND_ID)).when(roundService).getRound(any(), any());
-        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isNotFound());
-        verify(roundService).getRound(ROUND_ID, PLAYER_ID);
-    }
-    
-    @Test
-    void testGetAllPropositionForRound_404_player() throws Exception {
-        doThrow(new PlayerError.NotFoundException(ROUND_ID)).when(roundService).getRound(any(), any());
-        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
-                        .header(HEADER_PLAYER, PLAYER_ID))
-                .andExpect(status().isNotFound());
-        verify(roundService).getRound(ROUND_ID, PLAYER_ID);
-    }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Service
 public class EvaluationServiceImpl implements EvaluationService {
-    private static final int NONE = 0;
+    private static final int ZERO = 0;
     private static final int SINGLE_POINT = 1;
 
 
@@ -22,7 +22,7 @@ public class EvaluationServiceImpl implements EvaluationService {
                 evaluation.put(proposition.getPlayerId(), SINGLE_POINT);
                 round.setAtLeastOneNoneSphinxPropositionHasBeenSelected(true);
                 evaluation.put(sphinxId, round.getTempSphinxPoints());
-                round.setTempSphinxPoints(NONE);
+                round.setTempSphinxPoints(ZERO);
             }
             if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
                     && round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()) {

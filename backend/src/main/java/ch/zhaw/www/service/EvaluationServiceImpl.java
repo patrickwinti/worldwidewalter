@@ -26,7 +26,7 @@ public class EvaluationServiceImpl implements EvaluationService {
             }
             if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
                     && round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()) {
-                points.put(proposition.getPlayerId(), SINGLE_POINT);
+                points.put(selectorId, SINGLE_POINT);
                 points.put(sphinxId, SINGLE_POINT);
 
             } else if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)

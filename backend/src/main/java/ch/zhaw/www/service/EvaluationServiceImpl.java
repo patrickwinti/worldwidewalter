@@ -30,7 +30,7 @@ public class EvaluationServiceImpl implements EvaluationService {
                 points.put(sphinxId, SINGLE_POINT);
 
             } else if (selectedPropositionId.equals(proposition.getPropositionId()) && proposition.getPlayerId().equals(sphinxId)
-                    && !round.getAtLeastOneNoneSphinxPropositionHasBeenSelected().booleanValue()) {
+                    && !round.getAtLeastOneNoneSphinxPropositionHasBeenSelected()) {
                 points.put(proposition.getPlayerId(), SINGLE_POINT);
                 round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
             }

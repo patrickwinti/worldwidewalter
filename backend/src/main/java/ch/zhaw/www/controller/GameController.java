@@ -2,7 +2,9 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.GameService;
+import ch.zhaw.www.service.RoundError;
 import ch.zhaw.www.service.RoundService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,11 +89,30 @@ public class GameController {
     })
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId) {
+    public ResponseEntity<ResultDto> fetchResultsForRound(@PathVariable String gameId) {
         var game = gameService.getGame(gameId);
-        logger.log(Level.INFO, "game results returned {0}", game);
+        var currentRound = game.getCurrentRound();
+        if(currentRound == null) {
+            throw new RoundError.NotFoundException("not current round for game " + gameId);
+        }
+        var propositions = currentRound.getPropositions();
+
+//        var selections = game.getCurrentRound().getSelections();
+        var selections = new HashMap<String, String>();
+        for (Proposition proposition: propositions) {
+            selections.put(proposition.getPlayerId(), proposition.getId());
+        }
+
+        List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
+
+        var resultDto = new ResultDto(
+                Arrays.asList(new RankingDto("Elias", 10), new RankingDto("Jenny", 1), new RankingDto("Sara", 12)),
+                selectionDtos);
+
         //TODO return valid results
-        return ResponseEntity.ok(Arrays.asList(new ResultDto("Elias", 10), new ResultDto("Jenny", 1), new ResultDto("Sara", 12)));
+
+        logger.log(Level.INFO, "game results returned {0}", game);
+        return ResponseEntity.ok(resultDto);
     }
     //endregion
     
@@ -185,5 +204,23 @@ public class GameController {
     public void enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         gameService.enterRound(gameId, playerId);
         logger.log(Level.INFO, "{0} will participate next round", playerId);
+    }
+
+    private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, HashMap<String, String> selections) {
+        List<SelectionDto> selectionDtos = new ArrayList<>();
+        propositions.forEach(proposition -> {
+            List<String> selectors = new ArrayList<>();
+            selections.entrySet().stream()
+                    .filter(entry -> entry.getValue().equals(proposition.getId()))
+                    .forEach(entry -> selectors.add(game.getPlayerNameFromId(entry.getKey())));
+
+            selectionDtos.add(
+                    new SelectionDto(
+                            Collections.singletonList(game.getPlayerNameFromId(proposition.getPlayerId())),
+                            proposition.getGaps(),
+                            selectors
+                    ));
+        });
+        return selectionDtos;
     }
 }

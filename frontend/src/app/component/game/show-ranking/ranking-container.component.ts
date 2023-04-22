@@ -3,7 +3,7 @@ import { StateService } from "../../../service/state.service";
 import { RoundDto } from "../../../dto/round-dto";
 import { Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
-import { ResultDto } from "../../../dto/results-dto";
+import { RankingDto, ResultDto } from "../../../dto/result-dto";
 
 @Component({
   selector: 'www-ranking-container',
@@ -12,21 +12,21 @@ import { ResultDto } from "../../../dto/results-dto";
 })
 export class RankingContainerComponent implements OnInit {
   @Input() round: RoundDto;
-  ranking$: Observable<ResultDto[]>;
+  result$: Observable<ResultDto>;
 
   constructor(private stateService: StateService,
               private gameService: GameService) {
   }
 
   ngOnInit(): void {
-    this.ranking$ = this.gameService.getResults(this.stateService.getGameId());
+    this.result$ = this.gameService.getResults(this.stateService.getGameId());
   }
 
   continue() {
     this.stateService.goToNextState();
   }
 
-  sortRanking(ranking: ResultDto[]): ResultDto[] {
+  sortRanking(ranking: RankingDto[]): RankingDto[] {
     return ranking.sort((a, b) => b.points - a.points);
   }
 }

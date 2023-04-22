@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Model class for the proposition sent by players
@@ -33,5 +34,18 @@ public class Proposition {
     public void submittedBy(final String playerId) {
         playerIds.add(playerId);
     }
+    
+    /**
+     * Checks if the current proposition has the same gaps as the given proposition.
+     *
+     * @param otherGaps The gaps of other proposition to compare with.
+     * @return true if both propositions have the same number of gaps and each pair of corresponding gaps has the same
+     * value, ignoring case and leading/trailing whitespace, false otherwise.
+     */
+    public boolean hasSameGaps(List<String> otherGaps) {
+        return otherGaps.size() == gaps.size() &&
+                otherGaps.size() == IntStream.range(0, gaps.size())
+                        .filter(i -> otherGaps.get(i).trim().equalsIgnoreCase(gaps.get(i).trim()))
+                        .count();
+    }
 }
-

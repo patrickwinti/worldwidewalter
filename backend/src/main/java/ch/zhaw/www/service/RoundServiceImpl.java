@@ -8,7 +8,6 @@ import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 class RoundServiceImpl implements RoundService {
@@ -71,7 +70,7 @@ class RoundServiceImpl implements RoundService {
         entityService.editRound(roundId, round -> {
             round.getPropositions()
                     .stream()
-                    .filter(proposition -> hasSameGaps(proposition, gaps))
+                    .filter(proposition -> proposition.hasSameGaps(gaps))
                     .findFirst()
                     .ifPresentOrElse(proposition -> proposition.submittedBy(playerId), () -> {
                         Proposition proposition = new Proposition(UUID.randomUUID().toString(), gaps);
@@ -105,13 +104,6 @@ class RoundServiceImpl implements RoundService {
         if (!entityService.isPlayerActiveInRound(roundId, playerId)) {
             throw new PlayerError.NotFoundException(playerId);
         }
-    }
-    
-    private boolean hasSameGaps(Proposition proposition, List<String> gaps) {
-        return gaps.size() == proposition.getGaps().size() &&
-                IntStream.range(0, gaps.size())
-                        .filter(i -> gaps.get(i).trim().equalsIgnoreCase(proposition.getGaps().get(i).trim()))
-                        .count() == gaps.size();
     }
     
 }

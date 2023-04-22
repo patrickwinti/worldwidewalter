@@ -4,6 +4,7 @@ import { RoundDto } from "../../../dto/round-dto";
 import { Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { ResultDto } from "../../../dto/results-dto";
+import { GameState } from "../../../model/game-state";
 
 @Component({
   selector: 'www-ranking-container',
@@ -23,10 +24,15 @@ export class RankingContainerComponent implements OnInit {
   }
 
   continue() {
-    this.stateService.goToNextState();
+    this.stateService.setState(GameState.ENTERING_ROUND);
   }
 
   sortRanking(ranking: ResultDto[]): ResultDto[] {
     return ranking.sort((a, b) => b.points - a.points);
+  }
+
+  leaveGame() {
+    this.stateService.leaveGame();
+    this.gameService.leaveGame();
   }
 }

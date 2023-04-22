@@ -26,6 +26,7 @@ export class RoundComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.stateService.setState(GameState.ENTER_PROPOSITION);
     this.stateObservable$ = this.stateService.getStateObservable();
     this.propositionSelectionDto$ = this.gameService.getAllPropositions(this.round.id);
   }
@@ -34,7 +35,7 @@ export class RoundComponent implements OnInit {
     firstValueFrom(this.gameService.submitPropositionSelection(this.round.id, selectedPropositionId)).then(
       () => {
         console.log('selection submission successful');
-        this.stateService.goToNextState();
+        this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
       },
       (error: HttpErrorResponse) => {
         console.log('an error occurred: ' + error.status);
@@ -48,7 +49,7 @@ export class RoundComponent implements OnInit {
       .then(
         () => {
           console.log('submission successful');
-          this.stateService.goToNextState();
+          this.stateService.setState(GameState.SELECT_PROPOSITION);
         },
         (error: HttpErrorResponse) => {
           console.log('an error occurred: ' + error.status);

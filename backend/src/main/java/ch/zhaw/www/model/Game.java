@@ -32,7 +32,7 @@ public class Game {
     private final Map<String, Integer> points = new HashMap<>();
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
-    private final List<Prompt> prompts = List.of(new Prompt("I've always wanted to WALTER", 1));
+    private final List<Prompt> prompts;
 
     /**
      * Gets current round,
@@ -133,8 +133,7 @@ public class Game {
      * @return the first prompt in the list of prompts
      */
     public Prompt consumePrompt() {
-        // TODO correct code
-        return prompts.get(0);
+        return prompts.get(rounds.size() % prompts.size());
     }
 
     /**

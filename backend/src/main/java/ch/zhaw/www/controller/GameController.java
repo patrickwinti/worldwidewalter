@@ -140,7 +140,7 @@ public class GameController {
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
         round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(proposition.getId(),
                 proposition.getGaps(),
-                playerId.equals(proposition.getPlayerId()) || isSphinx)));
+                proposition.getPlayerIds().contains(playerId) || isSphinx)));
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
     //endregion

@@ -3,6 +3,7 @@ package ch.zhaw.www.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -169,6 +170,34 @@ class GameTest {
         assertFalse(game.hasActivePlayer(player.getId()));
         game.moveToActivePlayers(player);
         assertTrue(game.hasActivePlayer(player.getId()));
+    }
+
+    @Test
+    void consumePrompts() {
+        List<Prompt> originalList = List.of(new Prompt("WALTER WALTER WALTEROO", 2),
+                                            new Prompt("WALTER WALTER hello", 1),
+                                            new Prompt("WALTER says hi", 1));
+
+        Game game = new Game("12345", 4, 10, 1, originalList);
+
+        var prompt1 = game.consumePrompt();
+        assertEquals(prompt1, originalList.get(0));
+        var prompt2 = game.consumePrompt();
+        assertEquals(prompt2, originalList.get(0));
+
+        game.addRound(createRound());
+        var prompt3 = game.consumePrompt();
+        assertEquals(prompt3, originalList.get(1));
+        var prompt4 = game.consumePrompt();
+        assertNotEquals(prompt4, originalList.get(2));
+
+        game.addRound(createRound());
+        var prompt5 = game.consumePrompt();
+        assertEquals(prompt5, originalList.get(2));
+        game.addRound(createRound());
+
+        var prompt6 = game.consumePrompt();
+        assertEquals(prompt6, originalList.get(0));
     }
     
 }

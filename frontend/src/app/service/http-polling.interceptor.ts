@@ -13,7 +13,8 @@ import { LoadingService } from "./loading.service";
 
 @Injectable()
 export class HttpPollingInterceptor implements HttpInterceptor {
-  private readonly RETRIES = 100;
+  private readonly RETRIES: number = 100;
+  private activeRequests: number = 0;
 
   constructor(private stateService: StateService,
               private loadingService: LoadingService) {
@@ -23,13 +24,19 @@ export class HttpPollingInterceptor implements HttpInterceptor {
 
     const requestWithHeader = this.addPlayerIdToHeader(request);
 
-    this.loadingService.startLoading();
+    if (this.activeRequests === 0) {
+      this.loadingService.startLoading();
+    }
+    this.activeRequests++;
 
     return next.handle(requestWithHeader)
       .pipe(
         retry({count: this.RETRIES, delay: this.shouldRetry}),
         finalize(() => {
-          this.loadingService.stopLoading();
+          this.activeRequests--;
+          if(this.activeRequests === 0) {
+            this.loadingService.stopLoading();
+          }
         })
       )
   }

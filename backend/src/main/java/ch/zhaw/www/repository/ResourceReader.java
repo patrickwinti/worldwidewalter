@@ -6,14 +6,14 @@ import org.springframework.core.io.Resource;
 import java.util.List;
 
 /**
- * Interface to read and parse the "WALTER" prompts from a file
+ * Reads and parses the "WALTER" prompts from a file
  */
 public interface ResourceReader {
     
     /**
-     * Method to read file and return a list of Prompts from a file
+     * Reads resource and returns a list of Prompts from a resource
      *
-     * @param resource input file to be read
+     * @param resource input resource to be read
      * @return List with parsed prompts
      */
     List<Prompt> readResource(Resource resource) throws ResourceReaderError.WrongResourceFormatException;

@@ -44,7 +44,8 @@ class GameServiceImpl implements GameService {
         var game = new Game(gameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
-                DEFAULT_NUMBER_OF_ROUNDS, promptRepository.getPrompts());
+                DEFAULT_NUMBER_OF_ROUNDS,
+                promptRepository.getPrompts());
         entityService.saveNewGame(game);
         return game;
     }

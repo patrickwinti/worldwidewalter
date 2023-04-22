@@ -179,6 +179,7 @@ class GameTest {
                                             new Prompt("WALTER says hi", 1));
 
         Game game = new Game("12345", 4, 10, 1, originalList);
+
         var prompt1 = game.consumePrompt();
         assertEquals(prompt1, originalList.get(0));
         var prompt2 = game.consumePrompt();
@@ -191,11 +192,12 @@ class GameTest {
         assertNotEquals(prompt4, originalList.get(2));
 
         game.addRound(createRound());
-        assertEquals(game.consumePrompt(), originalList.get(2));
+        var prompt5 = game.consumePrompt();
+        assertEquals(prompt5, originalList.get(2));
         game.addRound(createRound());
 
-        var prompt5 = game.consumePrompt();
-        assertEquals(prompt5, originalList.get(0));
+        var prompt6 = game.consumePrompt();
+        assertEquals(prompt6, originalList.get(0));
     }
     
 }

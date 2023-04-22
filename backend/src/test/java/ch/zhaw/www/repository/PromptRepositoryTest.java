@@ -4,6 +4,7 @@ import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Prompt;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
 
 import java.util.List;
@@ -15,18 +16,24 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 class PromptRepositoryTest {
 
+    @MockBean
+    GameProperties gameProperties;
+
+    @MockBean
+    ResourceReader resourceReader;
+
+    @MockBean
+    Resource resource;
+
     @Test
     void getPrompts() {
         List<Prompt> originalList = List.of(new Prompt("WALTER WALTER WALTEROO", 2),
                                             new Prompt("WALTER WALTER hello", 1),
                                             new Prompt("WALTER says hi", 1));
 
-        ResourceReader resourceReader = mock(ResourceReader.class);
         when(resourceReader.readResource(any())).thenReturn(originalList);
-        GameProperties gameProperties = mock(GameProperties.class);
-        when(gameProperties.getDefaultDeck()).thenReturn(mock(Resource.class));
-        PromptRepository promptRepository = new PromptRepositoryImpl(resourceReader, gameProperties);
 
+        PromptRepository promptRepository = new PromptRepositoryImpl(resourceReader, gameProperties);
         List<Prompt> prompts = promptRepository.getPrompts();
 
         assertTrue(prompts.containsAll(originalList));
@@ -36,11 +43,7 @@ class PromptRepositoryTest {
     @Test
     void getPromptsException() {
 
-        ResourceReader resourceReader = mock(ResourceReader.class);
         doThrow(ResourceReaderError.WrongResourceFormatException.class).when(resourceReader).readResource(any());
-
-        GameProperties gameProperties = mock(GameProperties.class);
-        when(gameProperties.getDefaultDeck()).thenReturn(mock(Resource.class));
 
         assertThrows(ResourceReaderError.WrongResourceFormatException.class, ()-> new PromptRepositoryImpl(resourceReader, gameProperties));
     }

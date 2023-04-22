@@ -5,14 +5,14 @@ import ch.zhaw.www.model.Prompt;
 import java.util.List;
 
 /**
- * Prompt Service class to integrate prompts into the game.
+ * Prompt repository to integrate prompts into the game.
  */
 public interface PromptRepository {
 
     /**
-     * Method to read text file with WALTER prompts
+     * Returns a list of Prompt objects
      *
-     * @return List with read WALTER prompts
+     * @return List of prompts
      */
     List<Prompt> getPrompts();
 }

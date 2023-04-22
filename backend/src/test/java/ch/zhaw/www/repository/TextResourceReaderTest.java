@@ -6,6 +6,8 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -20,16 +22,19 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+@SpringBootTest
 class TextResourceReaderTest {
     @TempDir
     private Path tempDir;
-    
+
+    @MockBean
+    private static Resource resource;
+
     @Test
     void readResource() throws IOException {
         File testFile = new File("src/test/resources/testDeck.txt");
-        TextResourceReader txtFileReader = new TextResourceReader();
-        List<Prompt> prompts = new ArrayList<>(txtFileReader.readResource(getResourceFromFile(testFile)));
+        TextResourceReader textResourceReader = new TextResourceReader();
+        List<Prompt> prompts = new ArrayList<>(textResourceReader.readResource(getResourceFromFile(testFile)));
         
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
@@ -81,7 +86,6 @@ class TextResourceReaderTest {
     
     @Test
     void testReadFileIOExceptionThrowing() throws IOException {
-        Resource resource = mock(Resource.class);
         doThrow(FileNotFoundException.class).when(resource).getInputStream();
         
         TextResourceReader txtFileReader = new TextResourceReader();
@@ -89,9 +93,7 @@ class TextResourceReaderTest {
     }
     
     private static Resource getResourceFromFile(File file) throws IOException {
-        Resource resource = mock(Resource.class);
         when(resource.getInputStream()).thenReturn(new FileInputStream(file));
         return resource;
     }
-    
 }

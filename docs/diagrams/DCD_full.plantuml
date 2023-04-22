@@ -49,10 +49,8 @@ package backend{
         }
         class Proposition{
             -id: String
-            -playerId: String
+            -playerId: List<String>
             -gaps: List<String>
-            -duplicates: List<Proposition>
-            +hasSameGaps(proposition: Proposition): Boolean
         }
         class Player {
               -id: String

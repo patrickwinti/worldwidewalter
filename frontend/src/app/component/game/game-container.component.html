@@ -1,9 +1,9 @@
-<div *ngIf="isInRoundComponent()">
+<div *ngIf="isEnteringOrEnteredRound()">
   <www-round *ngIf="round$ | async as round"
              [round]="round">
   </www-round>
 </div>
 
 
-<www-ranking-container *ngIf="gameState == GameState.SHOW_RANKING">
+<www-ranking-container *ngIf="gameState == GameState.SHOW_RESULTS_AND_RANKING">
 </www-ranking-container>

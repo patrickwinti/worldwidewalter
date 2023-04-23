@@ -29,7 +29,6 @@ public class Game {
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
-    private final Map<String, Integer> points = new HashMap<>();
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts;

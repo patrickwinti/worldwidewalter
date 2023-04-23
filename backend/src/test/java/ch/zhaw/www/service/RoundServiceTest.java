@@ -19,8 +19,7 @@ import static ch.zhaw.www.TestHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class RoundServiceTest {
@@ -162,6 +161,71 @@ class RoundServiceTest {
         assertNotNull(selected);
     }
     
+    @Test
+    void testPropositionsRequestedTooEarly() {
+        var game = mockRoundInRepository();
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        final Player sphinx = createPlayer("Sphinx");
+        var allPlayers = List.of(createPlayer("Buffy"), createPlayer("Angel"), createPlayer("Spike"), sphinx);
+        var propositions = List.of("Holy Water", "Scowl", "Hydrogen Peroxide", "Beer");
+        when(entityService.isPlayerActiveInRound(eq(round.getId()), any())).thenReturn(true);
+        
+        allPlayers.forEach(player -> {
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundPropositions(round.getId(), String.valueOf(sphinx)));
+            game.addPlayerToWaitingRoom(player);
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundPropositions(round.getId(), String.valueOf(sphinx)));
+            game.moveToActivePlayers(player);
+        });
+        for (int i = 0; i < allPlayers.size(); i++) {
+            final var player = allPlayers.get(i).getId();
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundPropositions(round.getId(), player));
+            round.addProposition(createProposition(player, propositions.get(i)));
+        }
+        var result = roundService.getRoundPropositions(round.getId(), sphinx.getId());
+        assertEquals(4, result.size());
+        for (int i = 0; i < propositions.size(); i++) {
+            assertEquals(propositions.get(i), result.get(i).getGaps().get(0));
+        }
+    }
+    
+    @Test
+    void testPropositionsRequested_GameNotFound() {
+        var roundId = "round-1";
+        var playerId = "Chuck Norris does not need an id";
+        when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
+        doThrow(RoundError.NotFoundException.class).when(entityService).getGameForRound(roundId);
+        assertThrows(RoundError.NotFoundException.class, () -> roundService.getRoundPropositions(roundId, playerId));
+    }
+    
+    @Test
+    void testPropositionsRequested_NoRound() {
+        var roundId = "round-1";
+        var playerId = "Watermelon";
+        when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
+        var game = createGame();
+        when(entityService.getGameForRound(roundId)).thenReturn(game);
+        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundPropositions(roundId, playerId));
+    }
+    
+    @Test
+    void testPropositionsRequested_WrongRound() {
+        var roundId = "round-1";
+        var playerId = "Faberge";
+        when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
+        var game = mock(Game.class);
+        when(game.getCurrentRound()).thenReturn(createRound());
+        when(entityService.getGameForRound(roundId)).thenReturn(game);
+        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundPropositions(roundId, playerId));
+    }
+    
+    @Test
+    void testPropositionsRequested_PlayerNotActive() {
+        var roundId = "round-1";
+        var playerId = "Lorry";
+        when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(false);
+        assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundPropositions(roundId, playerId));
+    }
+    
     @SuppressWarnings("unchecked")
     private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);
@@ -174,6 +238,7 @@ class RoundServiceTest {
             return null;
         }).when(entityService).editRound(eq(round.getId()), any());
         when(entityService.getRound(round.getId())).thenReturn(round);
+        when(entityService.getGameForRound(round.getId())).thenReturn(game);
         return game;
     }
     

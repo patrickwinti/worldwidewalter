@@ -28,6 +28,14 @@ public interface EntityService {
      * @throws GameError.NotFoundException if game does not exist
      */
     void editGame(@NotNull String gameId, Consumer<Game> editor) throws GameError.NotFoundException;
+    /**
+     * Fetches game for given round ID
+     *
+     * @param roundId round id that needs to be found
+     * @return game with round given identifier
+     * @throws RoundError.NotFoundException if no round is found matching the ID
+     */
+    Game getGameForRound(String roundId);
 
     /**
      * Fetches the round for given round ID
@@ -62,4 +70,5 @@ public interface EntityService {
      * @param game to be saved
      */
     void saveNewGame(@NotNull Game game) throws GameError.ExistAlready;
+    
 }

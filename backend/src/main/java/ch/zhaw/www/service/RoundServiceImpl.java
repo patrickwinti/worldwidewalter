@@ -90,6 +90,17 @@ class RoundServiceImpl implements RoundService {
         return entityService.getRound(roundId);
     }
     
+    @Override
+    public List<Proposition> getRoundPropositions(final String roundId, final String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
+        verifyPlayerIsActive(roundId, playerId);
+        var game =  entityService.getGameForRound(roundId);
+        var round = game.getCurrentRound();
+        if(game.getState() != Game.State.WAITING_FOR_ALL_SELECTIONS || round ==null || !round.getId().equals(roundId)){
+            throw  new RoundError.IllegalStateException();
+        }
+        return round.getPropositions();
+    }
+    
     /**
      * Verifies that the player with the specified ID is active in the round with the specified ID.
      *

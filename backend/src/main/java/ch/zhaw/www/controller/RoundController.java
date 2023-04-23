@@ -66,6 +66,7 @@ public class RoundController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Propositions in round to be selected by players"),
             @ApiResponse(responseCode = "404", description = "Either round or player has not been found"),
+            @ApiResponse(responseCode = "405", description = "Not all players have sent their proposition"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/rounds/{roundId}/propositions", produces = "application/json")
@@ -73,11 +74,15 @@ public class RoundController {
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = roundService.getRound(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
-        List<PropositionSelectionDto.Proposition> propositions = new ArrayList<>();
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
-        round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(proposition.getId(),
-                proposition.getGaps(),
-                playerId.equals(proposition.getPlayerId()) || isSphinx)));
+        List<PropositionSelectionDto.Proposition> propositions = round.getPropositions()
+                .stream()
+                .map(proposition ->
+                        new PropositionSelectionDto.Proposition(
+                                proposition.getId(),
+                                proposition.getGaps(),
+                                proposition.getPlayerIds().contains(playerId) || isSphinx))
+                .toList();
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
     //endregion

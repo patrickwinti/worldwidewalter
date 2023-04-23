@@ -100,7 +100,7 @@ public class GameController {
 //        var selections = game.getCurrentRound().getSelections();
         var selections = new HashMap<String, String>();
         for (Proposition proposition: propositions) {
-            selections.put(proposition.getPlayerId(), proposition.getId());
+            selections.put(proposition.getPlayerIds().get(0), proposition.getId());
         }
 
         List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
@@ -216,7 +216,7 @@ public class GameController {
 
             selectionDtos.add(
                     new SelectionDto(
-                            Collections.singletonList(game.getPlayerNameFromId(proposition.getPlayerId())),
+                            proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
                             proposition.getGaps(),
                             selectors
                     ));

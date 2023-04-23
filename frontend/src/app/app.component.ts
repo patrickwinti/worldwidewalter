@@ -1,20 +1,35 @@
-import { Component, OnInit } from '@angular/core';
-import { AppState } from "./model/app-state";
+import { Component, HostListener } from '@angular/core';
+import { StateService } from "./service/state.service";
+import { GameState } from "./model/game-state";
+import { GameService } from "./service/game.service";
 
 @Component({
   selector: 'www-root',
   templateUrl: './app.component.html',
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title = 'www-ui';
-  appState: AppState;
-  AppState = AppState;
 
-  ngOnInit(): void {
-    this.appState = AppState.INITIALIZATION;
+  @HostListener('window:beforeunload', ['event'])
+  beforeUnloadHandler() {
+    this.leaveGame();
+  }
+
+  constructor(private stateService: StateService,
+              private gameService: GameService) {
   }
 
   startGame() {
-    this.appState = AppState.GAME;
+    this.stateService.setState(GameState.ENTERING_ROUND);
+  }
+
+  gameIsInitializing(): boolean {
+    return this.stateService.isInitializing();
+  }
+
+  private leaveGame() {
+    if (this.stateService.getPlayerId() !== undefined && this.stateService.getGameId() !== undefined) {
+      this.gameService.leaveGameAfterDestruction(this.stateService.getPlayerId(), this.stateService.getGameId());
+    }
   }
 }

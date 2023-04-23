@@ -25,7 +25,7 @@ export class GameService {
     return this.http.post<GameDto>(this.BASE_URL + '/games', null);
   }
 
-  joinGame(playerJoinRequestDto: PlayerJoinRequestDto, gameId: string,): Observable<PlayerDto> {
+  joinGame(playerJoinRequestDto: PlayerJoinRequestDto, gameId: string): Observable<PlayerDto> {
     return this.http.post<PlayerDto>(this.BASE_URL + '/games/' + gameId + '/players', playerJoinRequestDto);
   }
 
@@ -59,4 +59,11 @@ export class GameService {
     return this.http.get<ResultDto>(this.BASE_URL + '/games/' + gameId + '/results')
   }
 
+  leaveGame(playerId: string, gameId: string): Observable<void> {
+    return this.http.delete<void>(this.BASE_URL + '/games/' + gameId + '/players/' + playerId)
+  }
+
+  leaveGameAfterDestruction(playerId: string, gameId: string): boolean {
+    return navigator.sendBeacon(this.BASE_URL + '/games/' + gameId + '/players/' + playerId)
+  }
 }

@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { StateService } from "../../../service/state.service";
 import { RoundDto } from "../../../dto/round-dto";
-import { Observable } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { RankingDto, ResultDto } from "../../../dto/result-dto";
+import { ResultDto } from "../../../dto/results-dto";
+import { GameState } from "../../../model/game-state";
 
 @Component({
   selector: 'www-result-container',
@@ -23,10 +25,16 @@ export class ResultContainerComponent implements OnInit {
   }
 
   continue() {
-    this.stateService.goToNextState();
+    this.stateService.setState(GameState.ENTERING_ROUND);
   }
 
   sortRanking(ranking: RankingDto[]): RankingDto[] {
     return ranking.sort((a, b) => b.points - a.points);
+  }
+
+  leaveGame() {
+    firstValueFrom(this.gameService.leaveGame(this.stateService.getPlayerId(), this.stateService.getGameId())).then(() => {
+      this.stateService.leaveGame()
+    });
   }
 }

@@ -21,7 +21,6 @@ public class Proposition {
     @NotNull
     private final String id;
     private final List<String> gaps;
-    
     private final List<String> playerIds = new ArrayList<>();
     
     /**

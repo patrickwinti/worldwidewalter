@@ -48,11 +48,15 @@ public class TestHelper {
     }
     
     public static Proposition createProposition(String playerId, String gap) {
-        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap));
+        var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap));
+        proposition.submittedBy(playerId);
+        return proposition;
     }
     
     public static Proposition createProposition(String playerId, String gap1, String gap2) {
-        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap1, gap2));
+        var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap1, gap2));
+        proposition.submittedBy(playerId);
+        return proposition;
     }
     
     public static Round createRound(Duration duration) {

@@ -68,20 +68,17 @@ class RoundServiceImpl implements RoundService {
     public void submitProposition(String roundId, String playerId, List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
+            round.getPropositions()
+                    .stream()
+                    .filter(proposition -> proposition.hasSameGaps(gaps))
+                    .findFirst()
+                    .ifPresentOrElse(proposition -> proposition.submittedBy(playerId), () -> {
+                        Proposition proposition = new Proposition(UUID.randomUUID().toString(), gaps);
+                        proposition.submittedBy(playerId);
+                        round.addProposition(proposition);
+                    });
             if (round.getSphinx() == null) {
                 throw new RoundError.IllegalStateException();
-            }
-            Proposition temp = new Proposition(UUID.randomUUID().toString(), playerId, gaps);
-            boolean isDuplicate = false;
-            for (Proposition proposition : round.getPropositions()) {
-                if (proposition.hasSameGaps(temp)) {
-                    proposition.getDuplicates().add(temp);
-                    isDuplicate = true;
-                    break;
-                }
-            }
-            if (!isDuplicate) {
-                round.addProposition(temp);
             }
         });
     }
@@ -108,4 +105,5 @@ class RoundServiceImpl implements RoundService {
             throw new PlayerError.NotFoundException(playerId);
         }
     }
+    
 }

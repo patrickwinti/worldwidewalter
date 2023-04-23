@@ -196,4 +196,13 @@ class EvaluationServiceTest {
         assertThrows(SelectionError.IllegalSelection.class, () -> evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId));
     }
 
+    @Test
+    void evaluateIllegalSelectionSphinxIsSelector(){
+        Round roundMock = mockRoundInRepository(0, false);
+        String idOfSelectedProposition = roundMock.getPropositions().get(2).getId();
+        String selectorId = roundMock.getPropositions().get(3).getPlayerIds().get(0);
+
+        assertThrows(SelectionError.IllegalSelector.class, () -> evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId));
+    }
+
 }

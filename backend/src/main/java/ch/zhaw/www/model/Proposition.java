@@ -48,7 +48,7 @@ public class Proposition {
                         .count();
     }
 
-    public boolean hasSubmitted(final String playerId) {
+    public boolean hasProposer(final String playerId) {
         return playerIds.contains(playerId);
     }
 

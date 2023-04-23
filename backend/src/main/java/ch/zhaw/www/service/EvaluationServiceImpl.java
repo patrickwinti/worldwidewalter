@@ -24,7 +24,7 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .ifPresent(proposition -> {
                     if (!proposition.hasDuplicates()) {
                         String proposerId = proposition.getPlayerIds().get(0);
-                        if (proposition.hasSubmitted(sphinxId)) {
+                        if (proposition.hasProposer(sphinxId)) {
                             evaluation.put(selectorId, SINGLE_POINT);
                             if (round.isHasNonSphinxPropositionBeenSelected()) {
                                 evaluation.put(sphinxId, SINGLE_POINT);
@@ -37,7 +37,7 @@ public class EvaluationServiceImpl implements EvaluationService {
                             round.setTempSphinxPoints(ZERO);
                             round.setHasNonSphinxPropositionBeenSelected(true);
                         }
-                    } else if (proposition.hasSubmitted(sphinxId)) {
+                    } else if (proposition.hasProposer(sphinxId)) {
                         evaluation.put(selectorId, SINGLE_POINT);
 
                     } else {
@@ -61,8 +61,11 @@ public class EvaluationServiceImpl implements EvaluationService {
 
         findProposition(round, selectedPropositionId)
                 .ifPresent(proposition -> {
-                    if (proposition.getPlayerIds().size() == 1 && proposition.getPlayerIds().get(0).equals(selectorId)) {
+                    if (!proposition.hasDuplicates() && proposition.hasProposer(selectorId)) {
                         throw new SelectionError.IllegalSelection(selectedPropositionId);
+                    }
+                    if (selectorId.equals(round.getSphinx().getId())){
+                        throw new SelectionError.IllegalSelector(selectorId);
                     }
                 });
     }

@@ -26,4 +26,19 @@ public abstract class SelectionError extends RuntimeException {
             super(String.format("Selection of proposition with ID = %s is not valid", propositionId));
         }
     }
+
+    /**
+     * Selector is Sphinx
+     */
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class IllegalSelector extends SelectionError {
+        /**
+         * Constructor for exception with message
+         *
+         * @param selectorId for clarification in the exception
+         */
+        public IllegalSelector(@NotNull String selectorId) {
+            super(String.format("Id of selector: %s belongs to Sphinx", selectorId));
+        }
+    }
 }

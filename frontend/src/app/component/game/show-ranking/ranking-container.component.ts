@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { StateService } from "../../../service/state.service";
 import { RoundDto } from "../../../dto/round-dto";
-import { Observable } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { ResultDto } from "../../../dto/results-dto";
 import { GameState } from "../../../model/game-state";
@@ -32,7 +32,8 @@ export class RankingContainerComponent implements OnInit {
   }
 
   leaveGame() {
-    this.stateService.leaveGame();
-    this.gameService.leaveGame();
+    firstValueFrom(this.gameService.leaveGame(this.stateService.getPlayerId(), this.stateService.getGameId())).then(() => {
+      this.stateService.leaveGame()
+    });
   }
 }

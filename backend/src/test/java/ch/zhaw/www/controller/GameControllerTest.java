@@ -126,12 +126,12 @@ class GameControllerTest {
     @Test
     void testGetRound_200_noSphinx() throws Exception {
         var round = createRound();
-        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        when(gameService.getRoundOpenForPropositions(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\"}"));
-        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
+        verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     
     @Test
@@ -139,12 +139,12 @@ class GameControllerTest {
         var round = createRound();
         var sphinx = createPlayer("Sphinx");
         round.setSphinx(sphinx);
-        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        when(gameService.getRoundOpenForPropositions(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, sphinx.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"sphinx\":{\"id\":\"" + sphinx.getId() + "\",\"playerName\":\"Sphinx\"}}"));
-        verify(gameService).getCurrentRoundInGame(GAME_ID, sphinx.getId());
+        verify(gameService).getRoundOpenForPropositions(GAME_ID, sphinx.getId());
     }
     
     @Test
@@ -152,12 +152,12 @@ class GameControllerTest {
         var round = createRound();
         var sphinx = createPlayer("Sphinx");
         round.setSphinx(sphinx);
-        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        when(gameService.getRoundOpenForPropositions(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"sphinx\":{\"playerName\":\"Sphinx\"}}"));
-        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
+        verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     
     @Test
@@ -165,21 +165,21 @@ class GameControllerTest {
         String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
         var round = createRound();
         round.setSphinx(createPlayer("Sphinx"));
-        when(gameService.getCurrentRoundInGame(any(), any())).thenReturn(round);
+        when(gameService.getRoundOpenForPropositions(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"endOfSubmissionsInUtc\":\"" + expectedDate + "\"}"));
-        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
+        verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     
     @Test
     void testGetRound_425() throws Exception {
-        when(gameService.getCurrentRoundInGame(any(), any())).thenThrow(new RoundError.IllegalStateException());
+        when(gameService.getRoundOpenForPropositions(any(), any())).thenThrow(new RoundError.IllegalStateException());
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isTooEarly());
-        verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
+        verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     
     @Test
@@ -224,23 +224,28 @@ class GameControllerTest {
     
     @Test
     void testFetchResults_200() throws Exception {
-        var game = createGame();
         var round = createRound();
-        game.addRound(round);
-        when(gameService.getGame(any())).thenReturn(game);
+        when(gameService.getRoundClosedForSelections(any(),any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk());
-        verify(gameService).getGame(GAME_ID);
+        verify(gameService).getRoundClosedForSelections(GAME_ID, PLAYER_ID);
     }
     
     @Test
     void testFetchResults_404_game() throws Exception {
-        doThrow(new GameError.NotFoundException(ROUND_ID)).when(gameService).getGame(any());
+        doThrow(new GameError.NotFoundException(ROUND_ID)).when(gameService).getRoundClosedForSelections(any(),any());
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
-        verify(gameService).getGame(GAME_ID);
+        verify(gameService).getRoundClosedForSelections(GAME_ID, PLAYER_ID);
     }
-    
+    @Test
+    void testFetchResults_425() throws Exception {
+        doThrow(new RoundError.IllegalStateException()).when(gameService).getRoundClosedForSelections(any(),any());
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isTooEarly());
+        verify(gameService).getRoundClosedForSelections(GAME_ID, PLAYER_ID);
+    }
 }

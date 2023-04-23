@@ -87,7 +87,7 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var game = gameService.getCurrentRoundInGame(gameId,playerId);
+        var game = gameService.getRoundClosedForSelections(gameId,playerId);
         logger.log(Level.INFO, "game results returned {0}", game);
         //TODO return valid results
         return ResponseEntity.ok(Arrays.asList(new ResultDto("Elias", 10), new ResultDto("Jenny", 1), new ResultDto("Sara", 12)));
@@ -104,7 +104,7 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}/rounds", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var round = gameService.getCurrentRoundInGame(gameId, playerId);
+        var round = gameService.getRoundOpenForPropositions(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
         
         PlayerDto sphinx = null;

@@ -149,6 +149,15 @@ class RoundControllerTest {
         verify(roundService).getRoundWithAllPropositions(ROUND_ID, PLAYER_ID);
     }
     
+    @Test
+    void testGetAllPropositionForRound_425() throws Exception {
+        doThrow(new RoundError.IllegalStateException()).when(roundService).getRoundWithAllPropositions(any(), any());
+        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isTooEarly());
+        verify(roundService).getRoundWithAllPropositions(ROUND_ID, PLAYER_ID);
+    }
+    
     private static String getExpectedDateInTheFuture(Duration duration) {
         enableFixedClocked();
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

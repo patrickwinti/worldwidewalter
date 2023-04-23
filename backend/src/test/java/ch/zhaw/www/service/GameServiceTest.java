@@ -67,13 +67,13 @@ class GameServiceTest {
         game.addRound(round);
         
         Player player1 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
         Player player2 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
         Player player3 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
         Player player4 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
         
         enableFixedClocked();
         round.setSphinx(getRandomPlayer(game));
@@ -81,11 +81,11 @@ class GameServiceTest {
         game.moveToActivePlayers(player2);
         game.moveToActivePlayers(player3);
         game.moveToActivePlayers(player4);
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
         
         offsetFixedClockBy(ROUND_DURATION);
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
     }
     
     @Test
@@ -99,14 +99,14 @@ class GameServiceTest {
         addWaitingRoomPlayer(game);
         round.setSphinx(getRandomPlayer(game));
         
-        assertThrows(PlayerError.NotFoundException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
     void testGetCurrentRound_GameNotFound() {
         mockGameNotFoundInRepository(GAME_ID);
         
-        assertThrows(GameError.NotFoundException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
+        assertThrows(GameError.NotFoundException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
@@ -124,10 +124,10 @@ class GameServiceTest {
         game.moveToActivePlayers(player3);
         game.moveToActivePlayers(player4);
         
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player2.getId()));
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player3.getId()));
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player4.getId()));
+        assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, player1.getId()));
+        assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, player2.getId()));
+        assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, player3.getId()));
+        assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, player4.getId()));
     }
     
     @Test

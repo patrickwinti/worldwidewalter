@@ -78,7 +78,7 @@ package backend{
             -entityService: EntityService
             selectSphinx(game: Game);
             createNewRound(game: Game);
-            getRound(roundId: String, playerId: String):Round
+            getRoundWithAllPropositions(roundId: String, playerId: String):Round
             submitProposition(roundId: String, playerId: String, gaps: List<String>)
             selectProposition(roundId: String, playerId: String, propositionId: String)
         }
@@ -86,6 +86,7 @@ package backend{
            -gameRepository: GameRepository
             getGame(gameId: String): Game
             editGame(gameId: String, editor: Consumer<Game>)
+            getGameForRound(roundId: String): Game
             getRound(roundId: String): Round
             isPlayerActiveInRound(roundId: String, playerId: String): boolean
             editRound(roundId: String, editor: Consumer<Round>)

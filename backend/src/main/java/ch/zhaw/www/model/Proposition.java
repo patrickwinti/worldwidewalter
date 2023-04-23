@@ -21,7 +21,6 @@ public class Proposition {
     @NotNull
     private final String id;
     private final List<String> gaps;
-
     private final List<String> playerIds = new ArrayList<>();
 
     /**
@@ -48,4 +47,21 @@ public class Proposition {
                         .filter(i -> otherGaps.get(i).trim().equalsIgnoreCase(gaps.get(i).trim()))
                         .count();
     }
+
+    public boolean hasProposer(final String playerId) {
+        return playerIds.contains(playerId);
+    }
+
+    public boolean hasDuplicates() {
+        return playerIds.size() > 1;
+    }
+
+    public String getProposerId() {
+        if (playerIds.size() == 1) {
+            return playerIds.get(0);
+        } else throw new IllegalStateException("Proposition has more than one proposer");
+    }
+
+
+
 }

@@ -34,7 +34,7 @@ public class Round {
     @Setter
     private int tempSphinxPoints = 0;
     @Setter
-    private boolean atLeastOneNoneSphinxPropositionHasBeenSelected = false;
+    private boolean hasNonSphinxPropositionBeenSelected = false;
     
     private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();

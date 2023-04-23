@@ -52,6 +52,13 @@ public class TestHelper {
         proposition.submittedBy(playerId);
         return proposition;
     }
+
+    public static Proposition createDoubleSubmissionProposition(String playerId, String secondPlayerId, String gap){
+        var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap));
+        proposition.submittedBy(playerId);
+        proposition.submittedBy(secondPlayerId);
+        return proposition;
+    }
     
     public static Proposition createProposition(String playerId, String gap1, String gap2) {
         var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap1, gap2));

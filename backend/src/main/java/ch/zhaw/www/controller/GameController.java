@@ -81,12 +81,13 @@ public class GameController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "405", description = "Not all selections have been submitted yet"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId) {
-        var game = gameService.getGame(gameId);
+    public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        var game = gameService.getCurrentRoundInGame(gameId,playerId);
         logger.log(Level.INFO, "game results returned {0}", game);
         //TODO return valid results
         return ResponseEntity.ok(Arrays.asList(new ResultDto("Elias", 10), new ResultDto("Jenny", 1), new ResultDto("Sara", 12)));

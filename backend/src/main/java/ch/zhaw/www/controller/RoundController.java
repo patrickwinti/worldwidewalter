@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,7 +71,7 @@ public class RoundController {
     @GetMapping(value = "/rounds/{roundId}/propositions", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var round = roundService.getRound(roundId, playerId);
+        var round = roundService.getRoundWithAllPropositions(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
         List<PropositionSelectionDto.Proposition> propositions = round.getPropositions()

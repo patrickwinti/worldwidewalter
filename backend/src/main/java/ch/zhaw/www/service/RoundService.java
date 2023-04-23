@@ -1,7 +1,6 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
-import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
 
@@ -37,21 +36,10 @@ public interface RoundService {
      * @param playerId player requesting round
      * @return new or existing round
      * @throws RoundError.NotFoundException     if round is not found
+     * @throws RoundError.IllegalStateException if not all players submitted their proposition
      * @throws PlayerError.NotFoundException    player not active in round
      */
-    Round getRound(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException, PlayerError.NotFoundException;
-    
-    /**
-     * Returns propositions for round with given identifier
-     *
-     * @param roundId  round identifier
-     * @param playerId player requesting round
-     * @return new or existing round
-     * @throws RoundError.NotFoundException     if round is not found
-     * @throws RoundError.IllegalStateException if there are not enough players anymore
-     * @throws PlayerError.NotFoundException    player not active in round
-     */
-    List<Proposition> getRoundPropositions(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException;
+    Round getRoundWithAllPropositions(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException;
     
     /**
      * Player submits their propositions for the prompt
@@ -73,4 +61,5 @@ public interface RoundService {
      * @throws PlayerError.NotFoundException if player is not found
      */
     void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
+    
 }

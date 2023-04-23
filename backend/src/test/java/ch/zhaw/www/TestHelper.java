@@ -14,7 +14,9 @@ public class TestHelper {
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
-    
+    public static final List<Prompt> PROMPTS = List.of(new Prompt("WALTER ist cool", 1));
+
+
     public static Player addWaitingRoomPlayer(Game game) {
         Player player = createPlayer();
         game.addPlayerToWaitingRoom(player);
@@ -46,11 +48,15 @@ public class TestHelper {
     }
     
     public static Proposition createProposition(String playerId, String gap) {
-        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap));
+        var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap));
+        proposition.submittedBy(playerId);
+        return proposition;
     }
     
     public static Proposition createProposition(String playerId, String gap1, String gap2) {
-        return new Proposition(UUID.randomUUID().toString(), playerId, List.of(gap1, gap2));
+        var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap1, gap2));
+        proposition.submittedBy(playerId);
+        return proposition;
     }
     
     public static Round createRound(Duration duration) {
@@ -66,11 +72,11 @@ public class TestHelper {
     }
     
     public static Game createGame(String id) {
-        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1);
+        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1, PROMPTS);
     }
     
     public static Game createGame(int roundsPerTurn) {
-        return new Game(UUID.randomUUID().toString(), MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, roundsPerTurn);
+        return new Game(UUID.randomUUID().toString(), MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, roundsPerTurn, PROMPTS);
     }
     
     private static String getId() {

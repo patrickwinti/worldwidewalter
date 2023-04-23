@@ -156,7 +156,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"sphinx\":{\"id\":\"\",\"playerName\":\"Sphinx\"}}"));
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am WALTER\",\"sphinx\":{\"playerName\":\"Sphinx\"}}"));
         verify(gameService).getCurrentRoundInGame(GAME_ID, PLAYER_ID);
     }
     

@@ -6,7 +6,7 @@ import { GameState } from "../model/game-state";
   providedIn: 'root'
 })
 export class StateService {
-  private state = new BehaviorSubject<GameState>(GameState.ENTER_PROPOSITION);
+  private gameState = new BehaviorSubject<GameState>(GameState.INITIALIZATION);
   private gameId: string;
   private playerId: string;
 
@@ -26,26 +26,37 @@ export class StateService {
     this.playerId = value;
   }
 
-  goToNextState() {
-    this.state.next(this.getNextState(this.state.getValue()));
-  }
-
   getCurrentState(): GameState {
-    return this.state.getValue();
+    return this.gameState.getValue();
   }
 
   getStateObservable(): Observable<GameState> {
-    return this.state.asObservable();
+    return this.gameState.asObservable();
   }
 
-  private getNextState(currentState: GameState): GameState {
-    switch (currentState) {
-      case GameState.ENTER_PROPOSITION:
-        return GameState.SELECT_PROPOSITION;
-      case GameState.SELECT_PROPOSITION:
-        return GameState.SHOW_RANKING;
-      case GameState.SHOW_RANKING:
-        return GameState.ENTER_PROPOSITION
-    }
+  setState(state: GameState): void {
+    this.gameState.next(state);
+  }
+
+  leaveGame() {
+    this.setState(GameState.INITIALIZATION);
+  }
+
+  isEnteringRound(): boolean {
+    return GameState.ENTERING_ROUND === this.getCurrentState();
+  }
+
+  isInRound(): boolean {
+    return (
+      [
+        GameState.ENTER_PROPOSITION,
+        GameState.SELECT_PROPOSITION
+      ].includes(this.getCurrentState())
+    )
+  }
+
+
+  isInitializing(): boolean {
+    return this.getCurrentState() === GameState.INITIALIZATION;
   }
 }

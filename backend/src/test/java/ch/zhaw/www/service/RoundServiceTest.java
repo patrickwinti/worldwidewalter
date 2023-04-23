@@ -45,9 +45,11 @@ class RoundServiceTest {
         roundService.submitProposition(round.getId(), players.get(1).getId(), List.of("WASSER", "gummi"));
         roundService.submitProposition(round.getId(), players.get(2).getId(), List.of("Wasser ", "  gummi"));
         assertEquals(1, round.getPropositions().size());
-        assertEquals(2, round.getPropositions().get(0).getDuplicates().size());
-        assertEquals(players.get(1).getId(), round.getPropositions().get(0).getDuplicates().get(0).getPlayerId());
-        assertEquals(players.get(2).getId(), round.getPropositions().get(0).getDuplicates().get(1).getPlayerId());
+        assertEquals(3, round.getPropositions().get(0).getPlayerIds().size());
+        
+        assertEquals(players.get(0).getId(), round.getPropositions().get(0).getPlayerIds().get(0));
+        assertEquals(players.get(1).getId(), round.getPropositions().get(0).getPlayerIds().get(1));
+        assertEquals(players.get(2).getId(), round.getPropositions().get(0).getPlayerIds().get(2));
     }
     
     @Test

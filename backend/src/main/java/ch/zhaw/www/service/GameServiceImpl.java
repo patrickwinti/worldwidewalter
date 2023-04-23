@@ -5,6 +5,7 @@ import ch.zhaw.www.bean.PostfixGenerator;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.repository.PromptRepository;
 import ch.zhaw.www.utils.GameIdGenerator;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -28,23 +29,16 @@ class GameServiceImpl implements GameService {
     private final PostfixGenerator postfixGenerator;
     private final GameIdGenerator gameIdGenerator;
     
-    /**
-     * Constructor that injects the EntityService, GameProperties, RoundService, and PostfixGenerator.
-     *
-     * @param entityService    The EntityService to be injected
-     * @param gameProperties   The GameProperties to be injected
-     * @param roundService     The RoundService to be injected
-     * @param postfixGenerator The PostfixGenerator to be injected
-     * @param gameIdGenerator  The GameIdGenerator to be injected
-     */
+    private final PromptRepository promptRepository;
     
     GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
-                    final PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator) {
+                     PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator, PromptRepository promptRepository) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
         this.postfixGenerator = postfixGenerator;
         this.gameIdGenerator = gameIdGenerator;
+        this.promptRepository = promptRepository;
     }
     
     @Override
@@ -52,7 +46,8 @@ class GameServiceImpl implements GameService {
         var game = new Game(gameIdGenerator.generateId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
-                DEFAULT_NUMBER_OF_ROUNDS);
+                DEFAULT_NUMBER_OF_ROUNDS,
+                promptRepository.getPrompts());
         entityService.saveNewGame(game);
         return game;
     }

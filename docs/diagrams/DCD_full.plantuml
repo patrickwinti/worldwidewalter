@@ -105,13 +105,9 @@ package backend{
     }
 
     package utils{
-        class PostfixGenerator {
-            -postFixes: Random
-            +getRandomPostfix(): Integer
-        }
-
-        interface GameIdGenerator {
-            +generateId():String
+        interface RandomProvider {
+            +getPostfix(): Integer
+            +getEightCharacterId: String
         }
     }
 }
@@ -124,8 +120,7 @@ GameController "1"-->"1" GameService
 GameService "1"..>"*" Game
 GameService "1"..>"*" Player
 GameService "1"-->"1" EntityService
-GameService "1"-->"1" PostfixGenerator
-GameService "1"-->"1" GameIdGenerator
+GameService "1"-->"1" RandomProvider
 GameService "1"-->"1" RoundService
 GameService "1"-->"1" PromptRepository
 

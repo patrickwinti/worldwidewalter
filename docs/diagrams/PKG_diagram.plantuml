@@ -31,7 +31,6 @@ package Domain {
     together {
        package Service
        package Repository
-       package Bean
     }
     together {
         package Model
@@ -55,7 +54,6 @@ Web ..> Angular
 Controller ..> Swagger
 Service ..> "Spring Boot"
 Repository .r.> "Spring Boot"
-Bean ..> "Spring Boot"
 Domain ...> Jacoco
 Angular -[hidden]- "Spring Boot"
 Jakarta -[hidden]- Swagger

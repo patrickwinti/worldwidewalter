@@ -20,7 +20,7 @@ public abstract class SelectionError extends RuntimeException {
         /**
          * Constructor for exception with message
          *
-         * @param propositionId propositionId for clarification in the exception
+         * @param propositionId for clarification in the exception
          */
         public IllegalSelection(@NotNull String propositionId) {
             super(String.format("Selection of proposition with ID = %s is not valid", propositionId));

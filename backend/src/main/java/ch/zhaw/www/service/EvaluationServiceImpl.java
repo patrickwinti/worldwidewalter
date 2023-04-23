@@ -1,11 +1,13 @@
 package ch.zhaw.www.service;
 
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class EvaluationServiceImpl implements EvaluationService {
@@ -18,16 +20,11 @@ public class EvaluationServiceImpl implements EvaluationService {
         Map<String, Integer> evaluation = new HashMap<>();
         String sphinxId = Objects.requireNonNull(round.getSphinx()).getId();
 
-        round.getPropositions()
-                .stream()
-                .filter(proposition -> selectedPropositionId.equals(proposition.getId()))
-                .findFirst()
+        findProposition(round, selectedPropositionId)
                 .ifPresent(proposition -> {
                     if (proposition.getPlayerIds().size() == 1) {
                         if (proposition.getPlayerIds().get(0).equals(sphinxId)) {
-                    if (proposition.getPlayerIds().size() > 1) {
-                        evaluation.put(selectorId, SINGLE_POINT);
-                    }
+                            evaluation.put(selectorId, SINGLE_POINT);
                             if (round.isHasNonSphinxPropositionBeenSelected()) {
                                 evaluation.put(sphinxId, SINGLE_POINT);
                             } else {
@@ -49,23 +46,22 @@ public class EvaluationServiceImpl implements EvaluationService {
         return evaluation;
     }
 
-    private void checkIfLegalSelection(Round round, String selectedPropositionId, String selectorId) {
-
-        round.getPropositions()
+    private static Optional<Proposition> findProposition(Round round, String selectedPropositionId) {
+        return round.getPropositions()
                 .stream()
                 .filter(proposition -> selectedPropositionId.equals(proposition.getId()))
-                .findFirst()
-                .ifPresent(proposition -> {
-                    if (proposition.getPlayerIds().size() == 1) {
-                        if (proposition.getPlayerIds().get(0).equals(selectorId)) {
-                            throw new SelectionError.IllegalSelection(selectedPropositionId);
-                        }
-                    }
-                });
+                .findFirst();
     }
 
-    private void isSubmittedBy(Proposition proposition, String proposerId) {
 
+    private void checkIfLegalSelection(Round round, String selectedPropositionId, String selectorId) {
+
+        findProposition(round, selectedPropositionId)
+                .ifPresent(proposition -> {
+                    if (proposition.getPlayerIds().size() == 1 && proposition.getPlayerIds().get(0).equals(selectorId)) {
+                            throw new SelectionError.IllegalSelection(selectedPropositionId);
+                    }
+                });
     }
 
     private boolean selectorIdHasSubmittedDoubleProposition(Round round, String selectorId) {
@@ -74,5 +70,4 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .filter(proposition -> proposition.getPlayerIds().size() > 1)
                 .anyMatch(proposition -> proposition.getPlayerIds().contains(selectorId));
     }
-
 }

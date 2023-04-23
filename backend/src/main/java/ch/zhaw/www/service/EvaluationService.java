@@ -18,5 +18,5 @@ public interface EvaluationService {
      * @param selectorId            The ID of the player who selected the proposition.
      * @return A map containing the player IDs and the corresponding points earned in the evaluation.
      */
-    Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) throws RoundError.NotFoundException, SelectionError.IllegalSelection;
+    Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) throws SelectionError.IllegalSelection, SelectionError.IllegalSelector;
 }

@@ -1,12 +1,11 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.GameProperties;
-import ch.zhaw.www.bean.PostfixGenerator;
+import ch.zhaw.www.utils.RandomProvider;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.PromptRepository;
-import ch.zhaw.www.utils.GameIdGenerator;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -26,24 +25,22 @@ class GameServiceImpl implements GameService {
     private final EntityService entityService;
     private final GameProperties gameProperties;
     private final RoundService roundService;
-    private final PostfixGenerator postfixGenerator;
-    private final GameIdGenerator gameIdGenerator;
+    private final RandomProvider randomProvider;
     
     private final PromptRepository promptRepository;
     
     GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
-                     PostfixGenerator postfixGenerator, GameIdGenerator gameIdGenerator, PromptRepository promptRepository) {
+                     RandomProvider randomProvider, PromptRepository promptRepository) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
-        this.postfixGenerator = postfixGenerator;
-        this.gameIdGenerator = gameIdGenerator;
+        this.randomProvider = randomProvider;
         this.promptRepository = promptRepository;
     }
     
     @Override
     public Game createGame() throws GameError.ExistAlready {
-        var game = new Game(gameIdGenerator.generateId(),
+        var game = new Game(randomProvider.getEightCharacterId(),
                 gameProperties.getMinimumAmountOfActivePlayersPerGame(),
                 gameProperties.getMaximumAmountOfActivePlayersPerGame(),
                 DEFAULT_NUMBER_OF_ROUNDS,
@@ -63,7 +60,7 @@ class GameServiceImpl implements GameService {
         entityService.editGame(gameId, game -> {
             StringBuilder name = new StringBuilder(playerName);
             while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
-                name.append(postfixGenerator.getRandomPostfix());
+                name.append(randomProvider.getPostfix());
             }
             Player tempPlayer = new Player(uuid, name.toString());
             game.addPlayerToWaitingRoom(tempPlayer);

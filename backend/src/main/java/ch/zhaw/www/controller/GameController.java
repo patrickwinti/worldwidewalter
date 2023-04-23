@@ -135,4 +135,11 @@ public class GameController {
         gameService.enterRound(gameId, playerId);
         logger.log(Level.INFO, "{0} will participate next round", playerId);
     }
+
+    @Operation(summary = "Player leaves game by destroying webapp")
+    @PostMapping(value = "/games/{gameId}/players/{playerId}")
+    public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {
+        gameService.leaveGame(gameId, playerId);
+        logger.log(Level.INFO, "left game ungracefully by destroying webapp");
+    }
 }

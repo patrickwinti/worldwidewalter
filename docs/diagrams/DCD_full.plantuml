@@ -6,15 +6,19 @@ package backend{
     package controller {
         class GameController {
             -gameService: GameService
-            -roundService: RoundService
             +createGame(): GameDto
-            +getGame(gameId: String) : GameDto
             +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
             +leaveGame(gameId: String, playerId: String)
-            +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
-            +selectProposition(roundId: String, propositionId: String, playerId: String)
+            +fetchResultsForRound(gameId: String, playerId: String)
             +getRound(gameId: String, playerId: String) : RoundDto
             +enterRound(gameId: String, playerId: String) : RoundDto
+            +leaveGameAfterDestruction(gameId: String, playerId: String)
+        }
+        class RoundController {
+            -roundService: RoundService
+            +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+            +selectProposition(roundId: String, propositionId: String, playerId: String)
+            +getAllPropositionForRound(roundId: String, playerId: String): PropositionSelectionDto
         }
     }
     package dto {
@@ -67,17 +71,22 @@ package backend{
     package service {
         interface GameService {
             -entityService: EntityService
+            -gameProperties: GameProperties
             -roundService: RoundService
-           createGame(): Game
-           leaveGame(gameId: String, playerId: String)
-           getGame(gameId: String) : Game
-           enterGame(gameId: String, playerName: String) : Player
-           enterRound(gameId: String, playerId: String) : Round
+            -randomProvider: RandomProvider
+            createGame(): Game
+            leaveGame(gameId: String, playerId: String)
+            getGame(gameId: String): Game
+            enterGame(gameId: String, playerName: String): Player
+            enterRound(gameId: String, playerId: String): Round
+            getRoundOpenForPropositions(gameId: String, playerId: String): Round
+            getRoundClosedForSelections(gameId: String, playerId: String): Round
         }
         interface RoundService{
             -entityService: EntityService
-            selectSphinx(game: Game);
-            createNewRound(game: Game);
+            -gameProperties: GameProperties
+            selectSphinx(game: Game)
+            createNewRound(game: Game): Round
             getRoundWithAllPropositions(roundId: String, playerId: String):Round
             submitProposition(roundId: String, playerId: String, gaps: List<String>)
             selectProposition(roundId: String, playerId: String, propositionId: String)
@@ -99,23 +108,23 @@ package backend{
               readResource(resource: Resource): List<Prompt>
          }
          interface PromptRepository{
-                       -defaultDeck: List<Prompt>
-                       getPrompts():List<Prompt>
-                  }
+              -defaultDeck: List<Prompt>
+              getPrompts():List<Prompt>
+         }
 
     }
 
     package utils{
         interface RandomProvider {
             +getPostfix(): Integer
-            +getEightCharacterId: String
+            +getEightCharacterId(): String
         }
     }
 }
 
 controller ->dto
 
-GameController "1"->"1" RoundService
+RoundController "1"->"1" RoundService
 GameController "1"-->"1" GameService
 
 GameService "1"..>"*" Game
@@ -131,11 +140,9 @@ RoundService "1"-->"*"  Proposition
 RoundService "1"-->"1" EntityService
 
 PromptRepository "1"-->"1" ResourceReader
-
+ResourceReader "1"..>"*" Prompt
 
 EntityService "1"-->"1" GameRepository
-
-FileReader "1"..>"*" Prompt
 
 Game "1"->"*" Round
 @enduml

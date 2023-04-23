@@ -2,14 +2,14 @@
 !include globals/stylesheets.iuml
 
 
-participant ":GameController" as gc
+participant ":RoundContoller" as rc
 participant ":RoundService" as rs
 participant "game:Game" as game
 participant "round:Round" as round
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-gc -> rs: submitProposition(roundId, playerId, gaps)
+rc -> rs: submitProposition(roundId, playerId, gaps)
 rs->ges: isPlayerActiveInRound(roundId, playerId)
 ges-->rs: true if player active for game
 rs -> ges: editRound(roundId)
@@ -27,7 +27,7 @@ round-->rs
 ges -> gr : save(game)
 gr --> ges
 ges --> rs
-rs --> gc
+rs --> rc
 
 
 @enduml

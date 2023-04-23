@@ -4,15 +4,15 @@
 
 participant ":GameController" as gc
 participant ":GameService" as gs
-participant ":GameIdGenerator" as gid
+participant ":RandomProvider" as rp
 participant ":GameProperties" as gp
 participant ":PromptRepository" as pr
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
 gc -> gs: createGame()
-gs -> gid: generateId()
-gid --> gs: random alphanumeric id
+gs -> rp: getEightCharacterId()
+rp --> gs: random alphanumeric id
 gs -> gp: getMinimumAmountOfActivePlayersPerGame()
 gp --> gs: minimum amount of players
 gs -> gp: getMaximumAmountOfActivePlayersPerGame()

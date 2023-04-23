@@ -4,7 +4,6 @@ import { RoundDto } from "../../../dto/round-dto";
 import { firstValueFrom, Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { RankingDto, ResultDto } from "../../../dto/result-dto";
-import { ResultDto } from "../../../dto/results-dto";
 import { GameState } from "../../../model/game-state";
 
 @Component({

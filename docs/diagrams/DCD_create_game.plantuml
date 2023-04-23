@@ -31,8 +31,8 @@ class GameProperties {
     -minimumAmountOfPlayers:Int
     -maximumAmountOfPlayers:Int
 }
-interface GameIdGenerator {
-    generateId(): String
+interface RandomProvider {
+    getEightCharacterId(): String
 }
 interface PromptRepository {
      -defaultDeck: List<Prompt>
@@ -42,7 +42,7 @@ interface PromptRepository {
 GameController "1"-->"1" GameService
 GameService "1"..>"*" Game
 GameService "1"-->"1" EntityService
-GameService "1"-->"1" GameIdGenerator
+GameService "1"-->"1" RandomProvider
 GameService "1"-->"1" GameProperties
 GameService "1"-->"1" PromptRepository
 EntityService "1"-->"1" GameRepository

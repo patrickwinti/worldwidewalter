@@ -15,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,12 +33,12 @@ public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
     private final RoundService roundService;
-    
+
     GameController(GameService gameService, RoundService roundService) {
         this.gameService = gameService;
         this.roundService = roundService;
     }
-    
+
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
@@ -50,7 +52,7 @@ public class GameController {
         logger.log(Level.INFO, "created game {0}", newGame);
         return ResponseEntity.ok(new GameDto(newGame.getId()));
     }
-    
+
     //region Game-Player endpoints
     @Operation(summary = "Player joins an existing game")
     @ApiResponses(value = {
@@ -67,7 +69,7 @@ public class GameController {
         logger.log(Level.INFO, () -> String.format("%s entered game %s", playerId, gameId));
         return ResponseEntity.ok(new PlayerDto(playerId));
     }
-    
+
     @Operation(summary = "Player leaves game gracefully")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Player left game"),
@@ -80,7 +82,7 @@ public class GameController {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game successfully");
     }
-    
+
     @Operation(summary = "Retrieves the points for each player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
@@ -115,7 +117,7 @@ public class GameController {
         return ResponseEntity.ok(resultDto);
     }
     //endregion
-    
+
     //region Round endpoints
     @Operation(summary = "Player submits propositions")
     @ApiResponses(value = {
@@ -130,7 +132,7 @@ public class GameController {
         roundService.submitProposition(roundId, playerId, proposition.getGaps());
         logger.log(Level.INFO, "proposition submitted successfully");
     }
-    
+
     @Operation(summary = "Player selects proposition")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Proposition choice saved"),
@@ -143,7 +145,7 @@ public class GameController {
         roundService.selectProposition(roundId, playerId, propositionId);
         logger.log(Level.INFO, "proposition selected successfully");
     }
-    
+
     @Operation(summary = "Get all propositions sent by the players in current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Propositions in round to be selected by players"),
@@ -163,7 +165,7 @@ public class GameController {
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
     //endregion
-    
+
     @Operation(summary = "Player requested current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
@@ -176,7 +178,7 @@ public class GameController {
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getCurrentRoundInGame(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
-        
+
         PlayerDto sphinx = null;
         if (round.getSphinx() != null) {
             if (round.getSphinx().getId().equals(playerId)) {
@@ -191,7 +193,7 @@ public class GameController {
         
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));
     }
-    
+
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
@@ -204,6 +206,13 @@ public class GameController {
     public void enterRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         gameService.enterRound(gameId, playerId);
         logger.log(Level.INFO, "{0} will participate next round", playerId);
+    }
+
+    @Operation(summary = "Player leaves game by destroying webapp")
+    @PostMapping(value = "/games/{gameId}/players/{playerId}")
+    public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {
+        gameService.leaveGame(gameId, playerId);
+        logger.log(Level.INFO, "left game ungracefully by destroying webapp");
     }
 
     private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, HashMap<String, String> selections) {

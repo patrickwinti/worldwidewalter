@@ -22,8 +22,9 @@ public class EvaluationServiceImpl implements EvaluationService {
 
         findProposition(round, selectedPropositionId)
                 .ifPresent(proposition -> {
-                    if (proposition.getPlayerIds().size() == 1) {
-                        if (proposition.getPlayerIds().get(0).equals(sphinxId)) {
+                    if (!proposition.hasDuplicates()) {
+                        String proposerId = proposition.getPlayerIds().get(0);
+                        if (proposition.hasSubmitted(sphinxId)) {
                             evaluation.put(selectorId, SINGLE_POINT);
                             if (round.isHasNonSphinxPropositionBeenSelected()) {
                                 evaluation.put(sphinxId, SINGLE_POINT);
@@ -31,15 +32,18 @@ public class EvaluationServiceImpl implements EvaluationService {
                                 round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
                             }
                         } else {
-                            if (!selectorIdHasSubmittedDoubleProposition(round, selectorId)) {
-                                evaluation.put(proposition.getPlayerIds().get(0), SINGLE_POINT);
-                            }
+                            evaluation.put(proposerId, SINGLE_POINT);
                             evaluation.put(sphinxId, round.getTempSphinxPoints());
                             round.setTempSphinxPoints(ZERO);
                             round.setHasNonSphinxPropositionBeenSelected(true);
                         }
-                    } else if (proposition.getPlayerIds().size() > 1 && proposition.getPlayerIds().contains(sphinxId)) {
+                    } else if (proposition.hasSubmitted(sphinxId)) {
                         evaluation.put(selectorId, SINGLE_POINT);
+
+                    } else {
+                        evaluation.put(sphinxId, round.getTempSphinxPoints());
+                        round.setTempSphinxPoints(ZERO);
+                        round.setHasNonSphinxPropositionBeenSelected(true);
                     }
 
                 });
@@ -53,21 +57,13 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .findFirst();
     }
 
-
     private void checkIfLegalSelection(Round round, String selectedPropositionId, String selectorId) {
 
         findProposition(round, selectedPropositionId)
                 .ifPresent(proposition -> {
                     if (proposition.getPlayerIds().size() == 1 && proposition.getPlayerIds().get(0).equals(selectorId)) {
-                            throw new SelectionError.IllegalSelection(selectedPropositionId);
+                        throw new SelectionError.IllegalSelection(selectedPropositionId);
                     }
                 });
-    }
-
-    private boolean selectorIdHasSubmittedDoubleProposition(Round round, String selectorId) {
-        return round.getPropositions()
-                .stream()
-                .filter(proposition -> proposition.getPlayerIds().size() > 1)
-                .anyMatch(proposition -> proposition.getPlayerIds().contains(selectorId));
     }
 }

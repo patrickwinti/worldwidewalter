@@ -15,7 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -100,7 +103,7 @@ public class GameController {
 //        var selections = game.getCurrentRound().getSelections();
         var selections = new HashMap<String, String>();
         for (Proposition proposition: propositions) {
-            selections.put(proposition.getPlayerId(), proposition.getId());
+            selections.put(proposition.getPlayerIds().get(0), proposition.getId());
         }
 
         List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
@@ -223,7 +226,7 @@ public class GameController {
 
             selectionDtos.add(
                     new SelectionDto(
-                            Collections.singletonList(game.getPlayerNameFromId(proposition.getPlayerId())),
+                            proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
                             proposition.getGaps(),
                             selectors
                     ));

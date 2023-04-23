@@ -1,9 +1,7 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,12 +10,13 @@ import java.util.Map;
 public interface EvaluationService {
 
     /**
-     This method evaluates the selected proposition in a round of the game and returns a map
-     containing the player IDs and the corresponding points earned in the evaluation.
-     @param round The round to evaluate.
-     @param selectedPropositionId The ID of the selected proposition to evaluate.
-     @param selectorId The ID of the player who selected the proposition.
-     @return A map containing the player IDs and the corresponding points earned in the evaluation.
+     * This method evaluates the selected proposition in a round of the game and returns a map
+     * containing the player IDs and the corresponding points earned in the evaluation.
+     *
+     * @param round                 The round to evaluate.
+     * @param selectedPropositionId The ID of the selected proposition to evaluate.
+     * @param selectorId            The ID of the player who selected the proposition.
+     * @return A map containing the player IDs and the corresponding points earned in the evaluation.
      */
-    Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) throws RoundError.NotFoundException;
+    Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) throws SelectionError.IllegalSelection, SelectionError.IllegalSelector;
 }

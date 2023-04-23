@@ -54,9 +54,10 @@ class EvaluationServiceTest {
     private Round mockRoundWithoutSphinxDoublePropositionInRepository(int tempSphinxPoints, boolean atLeastOneNoneSphinxPropositionHasBeenSelected) {
         Round roundMock = mock(Round.class);
         when(roundMock.getPropositions()).thenReturn(List.of(
-                createDoubleSubmissionProposition("Player-ID-1","Player-ID-3" , "water"),
-                createProposition("Player-ID-2", "cognac"),
-                createProposition(sphinxId, "tea")
+                createDoubleSubmissionProposition("Player-ID-1","Player-ID-2" , "orange"),
+                createProposition("Player-ID-2", "green"),
+                createProposition("Player-ID-3", "red"),
+                createProposition(sphinxId, "blue")
 
         ));
 
@@ -174,7 +175,6 @@ class EvaluationServiceTest {
 
         String selectorId = roundMock.getPropositions().get(0).getPlayerIds().get(0);
         String idOfSelectedProposition = roundMock.getPropositions().get(0).getId();
-        String proposerId = roundMock.getPropositions().get(0).getPlayerIds().get(1);
 
         Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
         verify(roundMock).getTempSphinxPoints();

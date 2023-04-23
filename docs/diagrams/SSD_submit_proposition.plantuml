@@ -17,6 +17,7 @@ activate ges
 ges -> gr : findAll()
 gr  --> ges: List<Game>
 ges --> rs: editable round
+rs->rs: check is duplicate
 rs -> round: addProposition(proposition)
 note left
 Only if proposition

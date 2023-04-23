@@ -17,7 +17,7 @@ class PropositionTest {
     void testNotNullViolation() {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         
-        Proposition proposition = new Proposition(null, "1", List.of("Car", "Plane", "boat"));
+        Proposition proposition = new Proposition(null, List.of("Car", "Plane", "boat"));
         Set<ConstraintViolation<Proposition>> violations = validator.validate(proposition);
         
         assertEquals(1, violations.size());
@@ -27,7 +27,7 @@ class PropositionTest {
     void testNoViolation() {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         
-        Proposition proposition = new Proposition(UUID.randomUUID().toString(), "1", List.of("Car", "Plane", "boat"));
+        Proposition proposition = new Proposition(UUID.randomUUID().toString(), List.of("Car", "Plane", "boat"));
         Set<ConstraintViolation<Proposition>> violations = validator.validate(proposition);
         
         assertEquals(0, violations.size());

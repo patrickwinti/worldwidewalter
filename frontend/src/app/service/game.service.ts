@@ -59,4 +59,7 @@ export class GameService {
     return this.http.get<ResultDto>(this.BASE_URL + '/games/' + gameId + '/results')
   }
 
+  leaveGame() {
+    // todo: to be implemented
+  }
 }

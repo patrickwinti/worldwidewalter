@@ -3,6 +3,7 @@ package ch.zhaw.www;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 
 import java.time.Duration;
 
@@ -22,4 +23,6 @@ public class GameProperties {
     private int maximumAmountOfActivePlayersPerGame;
     @Value("${game.minimum-players}")
     private int minimumAmountOfActivePlayersPerGame;
+    @Value("${prompt.deck-default.location}")
+    private Resource defaultDeck;
 }

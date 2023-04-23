@@ -100,6 +100,7 @@ public class GameController {
         }
         var propositions = currentRound.getPropositions();
 
+        // todo (schwipa2, 23.04.23): uncomment as soon as selections are persisted in backend
 //        var selections = game.getCurrentRound().getSelections();
         var selections = new HashMap<String, String>();
         for (Proposition proposition: propositions) {
@@ -108,11 +109,10 @@ public class GameController {
 
         List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
 
+        // todo (schwipa2, 23.04.23): add real ranking values as soon as available
         var resultDto = new ResultDto(
                 Arrays.asList(new RankingDto("Elias", 10), new RankingDto("Jenny", 1), new RankingDto("Sara", 12)),
                 selectionDtos);
-
-        //TODO return valid results
 
         logger.log(Level.INFO, "game results returned {0}", game);
         return ResponseEntity.ok(resultDto);

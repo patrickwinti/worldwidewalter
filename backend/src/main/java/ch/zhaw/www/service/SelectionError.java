@@ -13,7 +13,7 @@ public abstract class SelectionError extends RuntimeException {
     }
 
     /**
-     * Round ID passed has not been found
+     * Selector has selected his own proposition and no double proposition has been submitted by the selector
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     public static class IllegalSelection extends SelectionError {

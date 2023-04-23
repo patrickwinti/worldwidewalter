@@ -114,19 +114,18 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Round getRoundOpenForPropositions(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        Game game = entityService.getGame(gameId);
-        checkPlayerInGame(game, playerId);
-        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.hasActivePlayer(playerId)) {
-            throw new RoundError.IllegalStateException();
-        }
-        return game.getCurrentRound();
+        return getCurrentRoundForDesiredState(gameId, playerId, Game.State.WAITING_FOR_ALL_PROPOSITIONS);
     }
     
     @Override
     public Round getRoundClosedForSelections(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        return getCurrentRoundForDesiredState(gameId, playerId, Game.State.WAITING_FOR_NEW_ROUND);
+    }
+    
+    private Round getCurrentRoundForDesiredState(final String gameId, final String playerId, final Game.State state) {
         Game game = entityService.getGame(gameId);
         checkPlayerInGame(game, playerId);
-        if (game.getState() != Game.State.WAITING_FOR_ALL_SELECTIONS || !game.hasActivePlayer(playerId)) {
+        if (game.getState() != state || !game.hasActivePlayer(playerId)) {
             throw new RoundError.IllegalStateException();
         }
         return game.getCurrentRound();

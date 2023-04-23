@@ -14,10 +14,9 @@ public class EvaluationServiceImpl implements EvaluationService {
 
     @Override
     public Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) {
+        checkIfLegalSelection(round, selectedPropositionId, selectorId);
         Map<String, Integer> evaluation = new HashMap<>();
         String sphinxId = Objects.requireNonNull(round.getSphinx()).getId();
-
-        checkIfValidSelection(round, selectedPropositionId, selectorId);
 
         round.getPropositions()
                 .stream()
@@ -48,7 +47,7 @@ public class EvaluationServiceImpl implements EvaluationService {
         return evaluation;
     }
 
-    private void checkIfValidSelection(Round round, String selectedPropositionId, String selectorId) {
+    private void checkIfLegalSelection(Round round, String selectedPropositionId, String selectorId) {
 
         round.getPropositions()
                 .stream()

@@ -1,25 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RankingContainerComponent } from './ranking-container.component';
+import { ResultContainerComponent } from './result-container.component';
 import { NO_ERRORS_SCHEMA } from "@angular/core";
 import { getGameServiceMock } from "../../../testing/mock-services";
 import { GameService } from "../../../service/game.service";
 import { RankingDto } from "../../../dto/result-dto";
 
 describe('ShowRankingComponent', () => {
-  let component: RankingContainerComponent;
-  let fixture: ComponentFixture<RankingContainerComponent>;
+  let component: ResultContainerComponent;
+  let fixture: ComponentFixture<ResultContainerComponent>;
   let gameService = getGameServiceMock();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RankingContainerComponent],
+      declarations: [ResultContainerComponent],
       providers: [{provide: GameService, useValue: gameService}],
       schemas: [NO_ERRORS_SCHEMA]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(RankingContainerComponent);
+    fixture = TestBed.createComponent(ResultContainerComponent);
     component = fixture.componentInstance;
   });
 

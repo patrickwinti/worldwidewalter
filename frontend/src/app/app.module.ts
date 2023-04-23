@@ -10,7 +10,7 @@ import { JoinComponent } from './component/initialization/join/join.component';
 import { FormsModule } from "@angular/forms";
 import { GameContainerComponent } from './component/game/game-container.component';
 import { HttpPollingInterceptor } from "./service/http-polling.interceptor";
-import { RankingContainerComponent } from "./component/game/show-ranking/ranking-container.component";
+import { ResultContainerComponent } from "./component/game/show-ranking/result-container.component";
 import { RoundComponent } from './component/game/round/round.component';
 import { OverlaySpinnerComponent } from './component/overlay-spinner/overlay-spinner.component';
 import { SphinxDisplayComponent } from './component/game/round/sphinx-display/sphinx-display.component';
@@ -18,6 +18,7 @@ import { CountDownComponent } from './component/count-down/count-down.component'
 import { RankingDisplayComponent } from './component/game/show-ranking/ranking-display/ranking-display.component';
 import { EnterPropositionComponent } from "./component/game/round/enter-proposition/enter-proposition.component";
 import { SelectPropositionComponent } from "./component/game/round/select-proposition/select-proposition.component";
+import { SelectionDisclosureComponent } from './component/game/show-ranking/selection-disclosure/selection-disclosure.component';
 
 @NgModule({
   declarations: [
@@ -28,12 +29,13 @@ import { SelectPropositionComponent } from "./component/game/round/select-propos
     GameContainerComponent,
     EnterPropositionComponent,
     SelectPropositionComponent,
-    RankingContainerComponent,
+    ResultContainerComponent,
     RoundComponent,
     OverlaySpinnerComponent,
     CountDownComponent,
     RankingDisplayComponent,
     SphinxDisplayComponent,
+    SelectionDisclosureComponent,
   ],
   imports: [
     BrowserModule,

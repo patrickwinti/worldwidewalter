@@ -3,6 +3,7 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.utils.RandomProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,9 @@ class GameServiceTest {
     private GameService gameService;
     @MockBean
     private EntityService entityService;
-    
+    @MockBean
+    private RandomProvider randomProvider;
+
     @AfterEach
     void tearDown() {
         disableFixedClocked();
@@ -39,6 +42,7 @@ class GameServiceTest {
     
     @Test
     void testAddGameSavesItToRepository() {
+        when(randomProvider.getEightCharacterId()).thenReturn("randomId");
         var game = gameService.createGame();
         verify(entityService).saveNewGame(game);
         assertNotNull(game.getId());
@@ -227,15 +231,17 @@ class GameServiceTest {
     @Test
     void enterGameWithExistingPlayerOfSameName() {
         Game game = mockGameInRepository();
-        
+        when(randomProvider.getPostfix()).thenReturn(1982);
+
         gameService.enterGame(game.getId(), "Nora");
         gameService.enterGame(game.getId(), "Nora");
         
         var allPlayersInGame = game.getAllPlayers().count();
         assertEquals(2, allPlayersInGame);
+
         List<String> waitingListNames = game.getAllPlayers().map(Player::getName).sorted().toList();
         assertEquals("Nora", waitingListNames.get(0));
-        assertEquals("Nora1360", waitingListNames.get(1));
+        assertEquals("Nora1982", waitingListNames.get(1));
     }
     
     @Test

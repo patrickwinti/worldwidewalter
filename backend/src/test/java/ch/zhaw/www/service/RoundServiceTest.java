@@ -192,7 +192,6 @@ class RoundServiceTest {
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
         doThrow(RoundError.NotFoundException.class).when(entityService).getGameForRound(roundId);
         assertThrows(RoundError.NotFoundException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
-        assertThrows(RoundError.NotFoundException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
     }
     
     @Test
@@ -202,7 +201,6 @@ class RoundServiceTest {
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
         var game = createGame();
         when(entityService.getGameForRound(roundId)).thenReturn(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
         assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
     }
     
@@ -215,7 +213,6 @@ class RoundServiceTest {
         when(game.getCurrentRound()).thenReturn(createRound());
         when(entityService.getGameForRound(roundId)).thenReturn(game);
         assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
-        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
     }
     
     @Test
@@ -223,7 +220,6 @@ class RoundServiceTest {
         var roundId = "round-1";
         var playerId = "Lorry";
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(false);
-        assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
         assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
     }
     

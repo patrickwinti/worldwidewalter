@@ -1,5 +1,6 @@
 package ch.zhaw.www.service;
 
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class EvaluationServiceImpl implements EvaluationService {
                     if (proposition.getPlayerIds().size() == 1) {
                         if (proposition.getPlayerIds().get(0).equals(sphinxId)) {
                             evaluation.put(selectorId, SINGLE_POINT);
-                            if (round.isAtLeastOneNoneSphinxPropositionHasBeenSelected()) {
+                            if (round.isHasNonSphinxPropositionBeenSelected()) {
                                 evaluation.put(sphinxId, SINGLE_POINT);
                             } else {
                                 round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
@@ -37,7 +38,7 @@ public class EvaluationServiceImpl implements EvaluationService {
                             }
                             evaluation.put(sphinxId, round.getTempSphinxPoints());
                             round.setTempSphinxPoints(ZERO);
-                            round.setAtLeastOneNoneSphinxPropositionHasBeenSelected(true);
+                            round.setHasNonSphinxPropositionBeenSelected(true);
                         }
                     } else if (proposition.getPlayerIds().size() > 1 && proposition.getPlayerIds().contains(sphinxId)) {
                         evaluation.put(selectorId, SINGLE_POINT);
@@ -60,6 +61,10 @@ public class EvaluationServiceImpl implements EvaluationService {
                         }
                     }
                 });
+    }
+
+    private void isSubmittedBy(Proposition proposition, String proposerId) {
+
     }
 
     private boolean selectorIdHasSubmittedDoubleProposition(Round round, String selectorId) {

@@ -30,7 +30,7 @@ class EvaluationServiceTest {
         ));
 
         when(roundMock.getSphinx()).thenReturn(new Player(sphinxId, "Sphinx-Name"));
-        when(roundMock.isAtLeastOneNoneSphinxPropositionHasBeenSelected()).thenReturn(atLeastOneNoneSphinxPropositionHasBeenSelected);
+        when(roundMock.isHasNonSphinxPropositionBeenSelected()).thenReturn(atLeastOneNoneSphinxPropositionHasBeenSelected);
         when(roundMock.getTempSphinxPoints()).thenReturn(tempSphinxPoints);
 
         return roundMock;
@@ -45,7 +45,7 @@ class EvaluationServiceTest {
         ));
 
         when(roundMock.getSphinx()).thenReturn(new Player(sphinxId, "Sphinx-Name"));
-        when(roundMock.isAtLeastOneNoneSphinxPropositionHasBeenSelected()).thenReturn(atLeastOneNoneSphinxPropositionHasBeenSelected);
+        when(roundMock.isHasNonSphinxPropositionBeenSelected()).thenReturn(atLeastOneNoneSphinxPropositionHasBeenSelected);
         when(roundMock.getTempSphinxPoints()).thenReturn(tempSphinxPoints);
 
         return roundMock;
@@ -63,7 +63,7 @@ class EvaluationServiceTest {
         List<Integer> distributedPoints = List.copyOf(evaluation.values());
         List<String> playerIds = List.copyOf(evaluation.keySet());
         verify(roundMock).setTempSphinxPoints(0);
-        verify(roundMock).setAtLeastOneNoneSphinxPropositionHasBeenSelected(true);
+        verify(roundMock).setHasNonSphinxPropositionBeenSelected(true);
 
         assertEquals(2, evaluation.size());
 

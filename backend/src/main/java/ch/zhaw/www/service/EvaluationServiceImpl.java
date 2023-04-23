@@ -1,6 +1,5 @@
 package ch.zhaw.www.service;
 
-import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,9 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .ifPresent(proposition -> {
                     if (proposition.getPlayerIds().size() == 1) {
                         if (proposition.getPlayerIds().get(0).equals(sphinxId)) {
-                            evaluation.put(selectorId, SINGLE_POINT);
+                    if (proposition.getPlayerIds().size() > 1) {
+                        evaluation.put(selectorId, SINGLE_POINT);
+                    }
                             if (round.isHasNonSphinxPropositionBeenSelected()) {
                                 evaluation.put(sphinxId, SINGLE_POINT);
                             } else {

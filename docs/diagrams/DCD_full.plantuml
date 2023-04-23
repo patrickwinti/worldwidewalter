@@ -34,6 +34,19 @@ package backend{
             -id: String
             -prompt: String
         }
+        class RankingDto {
+            -playerName: String
+            -points: int
+        }
+        class SelectionDto {
+            -authors: List<string>
+            -gaps: List<String>
+            -selectors: List<string>
+        }
+        class ResultDto {
+            -ranking: RankingDto
+            -selections: SelectionDto
+        }
     }
     package model {
         class Game {

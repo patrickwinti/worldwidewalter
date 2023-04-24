@@ -55,7 +55,6 @@ export class StateService {
     )
   }
 
-
   isInitializing(): boolean {
     return this.getCurrentState() === GameState.INITIALIZATION;
   }

@@ -5,7 +5,7 @@ import { BehaviorSubject, Observable } from "rxjs";
   providedIn: 'root'
 })
 export class LoadingService {
-  isLoading$: Observable<boolean>;
+  private readonly isLoading$: Observable<boolean>;
   private isLoading = new BehaviorSubject<boolean>(false);
 
   constructor() {
@@ -20,5 +20,9 @@ export class LoadingService {
   stopLoading(): void {
     this.isLoading.next(false);
     console.log('finish polling');
+  }
+
+  getIsLoadingObservable(): Observable<boolean> {
+    return this.isLoading$;
   }
 }

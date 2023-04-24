@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { GameService } from "../service/game.service";
 import { StateService } from "../service/state.service";
 import { AppConfigService } from "../service/app-config.service";
+import { LoadingService } from "../service/loading.service";
 
 export function getHttpClientMock(): jasmine.SpyObj<HttpClient> {
   return jasmine.createSpyObj(
@@ -48,6 +49,17 @@ export function getAppConfigServiceMock(): jasmine.SpyObj<AppConfigService> {
     'AppConfigService',
     [
       'getBaseUrl'
+    ]
+  )
+}
+
+export function getLoadingServiceMock(): jasmine.SpyObj<LoadingService> {
+  return jasmine.createSpyObj(
+    'LoadingService',
+    [
+      'startLoading',
+      'stopLoading',
+      'getIsLoadingObservable'
     ]
   )
 }

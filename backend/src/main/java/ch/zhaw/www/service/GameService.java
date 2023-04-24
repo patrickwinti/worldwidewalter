@@ -56,7 +56,7 @@ public interface GameService {
     Round getRoundOpenForPropositions(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
 
     /**
-     * Player round that has all selections already submitted
+     * Player requested round that has all selections already submitted
      *
      * @param gameId   game requested to enter
      * @param playerId player requesting round

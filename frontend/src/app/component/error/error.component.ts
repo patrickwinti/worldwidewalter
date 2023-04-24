@@ -33,8 +33,7 @@ export class ErrorComponent implements OnInit, OnDestroy {
   }
 
   leaveGame() {
-    // todo: uncomment as soon as leaveGame is implemented
-    // his.gameService.leaveGame(this.stateService.getPlayerId(), this.stateService.getGameId());
+    this.gameService.leaveGame(this.stateService.getPlayerId(), this.stateService.getGameId());
     this.stateService.leaveGame();
   }
 

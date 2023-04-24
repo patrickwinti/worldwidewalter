@@ -1,5 +1,6 @@
 export interface PropositionDto {
   gaps: Array<string>;
   id: string;
-  readonly: boolean;
+  numberOfAuthors: number;
+  readOnly: boolean;
 }

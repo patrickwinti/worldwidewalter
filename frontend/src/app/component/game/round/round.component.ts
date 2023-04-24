@@ -57,7 +57,11 @@ export class RoundComponent implements OnInit {
       );
   }
 
-  getCurrentPlayerId(): String {
+  getCurrentPlayerId(): string {
     return this.stateService.getPlayerId();
+  }
+
+  goToResults(): void {
+    this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
   }
 }

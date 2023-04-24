@@ -138,9 +138,12 @@ public class GameController {
         logger.log(Level.INFO, "round selections returned {0}", round);
         List<PropositionSelectionDto.Proposition> propositions = new ArrayList<>();
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
-        round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(proposition.getId(),
+        round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(
+                proposition.getId(),
                 proposition.getGaps(),
-                proposition.getPlayerIds().contains(playerId) || isSphinx)));
+                proposition.getPlayerIds().size(),
+                isSphinx || (proposition.getPlayerIds().contains(playerId) && proposition.getPlayerIds().size() == 1)
+        )));
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
     //endregion

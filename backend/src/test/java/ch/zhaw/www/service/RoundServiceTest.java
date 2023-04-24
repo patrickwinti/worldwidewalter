@@ -170,16 +170,14 @@ class RoundServiceTest {
         var propositions = List.of("Holy Water", "Scowl", "Hydrogen Peroxide", "Beer");
         when(entityService.isPlayerActiveInRound(eq(round.getId()), any())).thenReturn(true);
         
-        allPlayers.forEach(player -> {
-            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), sphinx.getId()));
-            game.addPlayerToWaitingRoom(player);
-            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), sphinx.getId()));
-            game.moveToActivePlayers(player);
-        });
         for (int i = 0; i < allPlayers.size(); i++) {
-            final var player = allPlayers.get(i).getId();
-            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), player));
-            round.addProposition(createProposition(player, propositions.get(i)));
+            final var player = allPlayers.get(i);
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), player.getId()));
+            game.addPlayerToWaitingRoom(player);
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), player.getId()));
+            game.moveToActivePlayers(player);
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), player.getId()));
+            round.addProposition(createProposition(player.getId(), propositions.get(i)));
         }
         var result = roundService.getRoundReadyForSelections(round.getId(), sphinx.getId());
         assertEquals(round, result);

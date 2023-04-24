@@ -71,7 +71,7 @@ public class RoundController {
     @GetMapping(value = "/rounds/{roundId}/propositions", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var round = roundService.getRoundWithAllPropositions(roundId, playerId);
+        var round = roundService.getRoundReadyForSelections(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
         List<PropositionSelectionDto.Proposition> propositions = round.getPropositions()

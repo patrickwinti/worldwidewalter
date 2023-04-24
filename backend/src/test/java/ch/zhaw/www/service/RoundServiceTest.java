@@ -171,17 +171,17 @@ class RoundServiceTest {
         when(entityService.isPlayerActiveInRound(eq(round.getId()), any())).thenReturn(true);
         
         allPlayers.forEach(player -> {
-            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(round.getId(), sphinx.getId()));
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), sphinx.getId()));
             game.addPlayerToWaitingRoom(player);
-            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(round.getId(), sphinx.getId()));
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), sphinx.getId()));
             game.moveToActivePlayers(player);
         });
         for (int i = 0; i < allPlayers.size(); i++) {
             final var player = allPlayers.get(i).getId();
-            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(round.getId(), player));
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(round.getId(), player));
             round.addProposition(createProposition(player, propositions.get(i)));
         }
-        var result = roundService.getRoundWithAllPropositions(round.getId(), sphinx.getId());
+        var result = roundService.getRoundReadyForSelections(round.getId(), sphinx.getId());
         assertEquals(round, result);
     }
     
@@ -191,7 +191,7 @@ class RoundServiceTest {
         var playerId = "Chuck Norris does not need an id";
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
         doThrow(RoundError.NotFoundException.class).when(entityService).getGameForRound(roundId);
-        assertThrows(RoundError.NotFoundException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
+        assertThrows(RoundError.NotFoundException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
     }
     
     @Test
@@ -201,7 +201,7 @@ class RoundServiceTest {
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
         var game = createGame();
         when(entityService.getGameForRound(roundId)).thenReturn(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
     }
     
     @Test
@@ -212,7 +212,7 @@ class RoundServiceTest {
         var game = mock(Game.class);
         when(game.getCurrentRound()).thenReturn(createRound());
         when(entityService.getGameForRound(roundId)).thenReturn(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
     }
     
     @Test
@@ -220,7 +220,7 @@ class RoundServiceTest {
         var roundId = "round-1";
         var playerId = "Lorry";
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(false);
-        assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundWithAllPropositions(roundId, playerId));
+        assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
     }
     
     @SuppressWarnings("unchecked")

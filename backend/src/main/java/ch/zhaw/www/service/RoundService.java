@@ -39,7 +39,7 @@ public interface RoundService {
      * @throws RoundError.IllegalStateException if not all players submitted their proposition
      * @throws PlayerError.NotFoundException    player not active in round
      */
-    Round getRoundWithAllPropositions(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException;
+    Round getRoundReadyForSelections(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException;
     
     /**
      * Player submits their propositions for the prompt

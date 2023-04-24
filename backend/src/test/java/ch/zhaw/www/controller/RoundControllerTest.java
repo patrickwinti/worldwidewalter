@@ -119,7 +119,7 @@ class RoundControllerTest {
         round.addProposition(createProposition("1", "prop 1"));
         round.addProposition(createProposition(PLAYER_ID, "prop 2", "prop 3"));
         List<Proposition> propositions = round.getPropositions();
-        when(roundService.getRoundWithAllPropositions(any(), any())).thenReturn(round);
+        when(roundService.getRoundReadyForSelections(any(), any())).thenReturn(round);
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
@@ -128,34 +128,34 @@ class RoundControllerTest {
                                 "\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}]," +
                                 "\"selectionSubmissionEndInUtc\":\"%s\"}",
                         ROUND_ID, propositions.get(0).getId(), propositions.get(1).getId(), expectedDate)));
-        verify(roundService).getRoundWithAllPropositions(ROUND_ID, PLAYER_ID);
+        verify(roundService).getRoundReadyForSelections(ROUND_ID, PLAYER_ID);
     }
     
     @Test
     void testGetAllPropositionForRound_404_round() throws Exception {
-        doThrow(new RoundError.NotFoundException(ROUND_ID)).when(roundService).getRoundWithAllPropositions(any(), any());
+        doThrow(new RoundError.NotFoundException(ROUND_ID)).when(roundService).getRoundReadyForSelections(any(), any());
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
-        verify(roundService).getRoundWithAllPropositions(ROUND_ID, PLAYER_ID);
+        verify(roundService).getRoundReadyForSelections(ROUND_ID, PLAYER_ID);
     }
     
     @Test
     void testGetAllPropositionForRound_404_player() throws Exception {
-        doThrow(new PlayerError.NotFoundException(ROUND_ID)).when(roundService).getRoundWithAllPropositions(any(), any());
+        doThrow(new PlayerError.NotFoundException(ROUND_ID)).when(roundService).getRoundReadyForSelections(any(), any());
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isNotFound());
-        verify(roundService).getRoundWithAllPropositions(ROUND_ID, PLAYER_ID);
+        verify(roundService).getRoundReadyForSelections(ROUND_ID, PLAYER_ID);
     }
     
     @Test
     void testGetAllPropositionForRound_425() throws Exception {
-        doThrow(new RoundError.IllegalStateException()).when(roundService).getRoundWithAllPropositions(any(), any());
+        doThrow(new RoundError.IllegalStateException()).when(roundService).getRoundReadyForSelections(any(), any());
         mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isTooEarly());
-        verify(roundService).getRoundWithAllPropositions(ROUND_ID, PLAYER_ID);
+        verify(roundService).getRoundReadyForSelections(ROUND_ID, PLAYER_ID);
     }
     
     private static String getExpectedDateInTheFuture(Duration duration) {

@@ -87,7 +87,7 @@ package backend{
             -gameProperties: GameProperties
             selectSphinx(game: Game)
             createNewRound(game: Game): Round
-            getRoundWithAllPropositions(roundId: String, playerId: String):Round
+            getRoundReadyForSelections(roundId: String, playerId: String):Round
             submitProposition(roundId: String, playerId: String, gaps: List<String>)
             selectProposition(roundId: String, playerId: String, propositionId: String)
         }

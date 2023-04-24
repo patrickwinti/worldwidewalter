@@ -87,7 +87,7 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var game = gameService.getRoundClosedForSelections(gameId,playerId);
+        var game = gameService.getRoundClosedForSelections(gameId, playerId);
         logger.log(Level.INFO, "game results returned {0}", game);
         //TODO return valid results
         return ResponseEntity.ok(Arrays.asList(new ResultDto("Elias", 10), new ResultDto("Jenny", 1), new ResultDto("Sara", 12)));
@@ -135,7 +135,7 @@ public class GameController {
         gameService.enterRound(gameId, playerId);
         logger.log(Level.INFO, "{0} will participate next round", playerId);
     }
-
+    
     @Operation(summary = "Player leaves game by destroying webapp")
     @PostMapping(value = "/games/{gameId}/players/{playerId}")
     public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {

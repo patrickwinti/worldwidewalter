@@ -20,9 +20,10 @@ public class EvaluationServiceImpl implements EvaluationService {
         if (optionalProposition.isEmpty() || isIllegalSelection(optionalProposition.get(), sphinxId, selectorId)) {
             return evaluation;
         }
-        Proposition proposition = optionalProposition.get();
 
+        Proposition proposition = optionalProposition.get();
         List<String> submitterIds = proposition.getPlayerIds();
+
         if (submitterIds.contains(sphinxId)) {
             evaluation.put(selectorId, SINGLE_POINT);
         } else {

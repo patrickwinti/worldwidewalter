@@ -3,6 +3,7 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
@@ -105,8 +106,12 @@ class EvaluationServiceTest {
 
     @Test
     void evaluateSelectionOfSphinxPropositionWithNoTempSpinxPoints() {
+        int tempSphinxPoints = 0;
 
-        Round roundMock = mockRoundInRepository(0, true);
+        Round roundMock = mockRoundInRepository(tempSphinxPoints, true);
+        InOrder inOrder = inOrder(roundMock);
+        when(roundMock.getTempSphinxPoints()).thenReturn(tempSphinxPoints + 1).thenReturn(tempSphinxPoints + 1);
+
         String idOfSelectedProposition = roundMock.getPropositions().get(3).getId();
         String selectorId = roundMock.getPropositions().get(2).getPlayerIds().get(0);
 
@@ -118,8 +123,11 @@ class EvaluationServiceTest {
         assertEquals(1, evaluation.get(selectorId).intValue());
 
         assertTrue(evaluation.containsKey(sphinxId));
-        verify(roundMock, times(1)).setTempSphinxPoints(1);
-        // I am not sure how to test that in the last if statement the points are transferred to the sphinx
+        assertEquals(tempSphinxPoints + 1, evaluation.get(sphinxId).intValue());
+
+        inOrder.verify(roundMock, times(1)).setTempSphinxPoints(tempSphinxPoints + 1);
+        inOrder.verify(roundMock, times(1)).setTempSphinxPoints(0);
+        inOrder.verifyNoMoreInteractions();
     }
 
     @Test

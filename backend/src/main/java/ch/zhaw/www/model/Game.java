@@ -68,6 +68,8 @@ public class Game {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
         } else if (canAcceptSelections(round) && !haveAllPlayersSubmittedASelection(round)) {
             return State.WAITING_FOR_ALL_SELECTIONS;
+        } else if(haveAllPlayersSubmittedASelection(round)){
+            return State.WAITING_FOR_NEW_ROUND;
         } else {
             return State.NO_VALID_ROUND;
         }
@@ -252,6 +254,7 @@ public class Game {
         NO_VALID_ROUND,
         WAITING_FOR_PLAYERS,
         WAITING_FOR_ALL_PROPOSITIONS,
-        WAITING_FOR_ALL_SELECTIONS
+        WAITING_FOR_ALL_SELECTIONS,
+        WAITING_FOR_NEW_ROUND
     }
 }

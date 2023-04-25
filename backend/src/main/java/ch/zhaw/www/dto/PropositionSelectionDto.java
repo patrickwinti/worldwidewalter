@@ -30,6 +30,7 @@ public class PropositionSelectionDto {
         private final String id;
         @NotNull
         private final List<String> gaps;
+        private final int numberOfAuthors;
         private final boolean readOnly;
     }
 }

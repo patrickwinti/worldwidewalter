@@ -5,6 +5,7 @@
 participant ":GameController" as gc
 participant ":GameService" as gs
 participant ":RoundService" as rs
+participant ":GameProperties" as gp
 participant "game:Game" as game
 participant "round:Round" as round
 participant ":EntityService" as ges
@@ -25,9 +26,16 @@ game --> gs: true or false depending on nr of players
 gs -> game: hasPlayer(playerId)
 game --> gs: true if player is in the game
 gs -> rs :createNewRound(game)
-rs -> game :addRound(round)
-game --> rs
-rs -->gs
+rs -> gp : getPropositionSubmissionDuration
+gp --> rs: proposition submission duration
+rs -> gp : getRoundEnterLimitDuration
+gp --> rs: round enter limit duration
+rs -> gp : getSelectionSubmissionDuration
+gp --> rs: selection submission duration
+
+rs --> gs : new round
+gs -> game :addRound(round)
+game --> gs
 gs -> game : moveToActivePlayers(playerId)
 game --> gs
 ges -> gr : save(game)

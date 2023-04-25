@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LoadingService } from "../../service/loading.service";
+import { HttpCancelService } from "../../service/http-cancel.service";
+import { StateService } from "../../service/state.service";
+import { GameState } from "../../model/game-state";
 
 @Component({
   selector: 'www-overlay-spinner',
@@ -8,10 +11,24 @@ import { LoadingService } from "../../service/loading.service";
 })
 
 export class OverlaySpinnerComponent {
-  isLoading$ = this.loadingService.isLoading$;
+  isLoading$ = this.loadingService.getIsLoadingObservable();
   displayText = 'loading';
 
-  constructor(private loadingService: LoadingService) {
+  get gameId(): string{
+    return this.stateService.getGameId();
   }
 
+  constructor(private loadingService: LoadingService,
+              private httpCancelService:HttpCancelService,
+              private stateService: StateService) {
+  }
+
+  abort() {
+    console.log('aborting');
+    this.httpCancelService.cancelPendingRequests();
+  }
+
+  isJoiningGame(): boolean {
+    return this.stateService.getCurrentState() == GameState.ENTERING_ROUND;
+  }
 }

@@ -1,7 +1,11 @@
 <div *ngIf="isEnteringOrEnteredRound()">
-  <www-round *ngIf="round$ | async as round"
+  <www-round *ngIf="round$ | async as round; else entering"
              [round]="round">
   </www-round>
+  <ng-template hidden="" #entering>
+    <www-error (retryEmitter)="tryAgain()">
+    </www-error>
+  </ng-template>
 </div>
 
 

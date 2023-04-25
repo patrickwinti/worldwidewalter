@@ -2,7 +2,9 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.GameService;
+import ch.zhaw.www.service.RoundError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,11 +32,11 @@ import java.util.logging.Logger;
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
-
+    
     GameController(GameService gameService) {
         this.gameService = gameService;
     }
-
+    
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
@@ -46,7 +50,7 @@ public class GameController {
         logger.log(Level.INFO, "created game {0}", newGame);
         return ResponseEntity.ok(new GameDto(newGame.getId()));
     }
-
+    
     //region Game-Player endpoints
     @Operation(summary = "Player joins an existing game")
     @ApiResponses(value = {
@@ -63,7 +67,7 @@ public class GameController {
         logger.log(Level.INFO, () -> String.format("%s entered game %s", playerId, gameId));
         return ResponseEntity.ok(new PlayerDto(playerId));
     }
-
+    
     @Operation(summary = "Player leaves game gracefully")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Player left game"),
@@ -76,24 +80,42 @@ public class GameController {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game successfully");
     }
-
+    
     @Operation(summary = "Retrieves the points for each player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
-            @ApiResponse(responseCode = "405", description = "Not all selections have been submitted yet"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<ResultDto>> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var game = gameService.getRoundClosedForSelections(gameId, playerId);
+    public ResponseEntity<ResultDto> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        var round = gameService.getRoundClosedForSelections(gameId, playerId);
+        var game = gameService.getGame(gameId);
+        
+        if (round == null) {
+            throw new RoundError.NotFoundException("not current round for game " + gameId);
+        }
+        var propositions = round.getPropositions();
+        
+        // todo (schwipa2, 23.04.23): uncomment as soon as selections are persisted in backend
+//        var selections = round.getSelections();
+        var selections = new HashMap<String, String>();
+        for (Proposition proposition : propositions) {
+            selections.put(proposition.getPlayerIds().get(0), proposition.getId());
+        }
+        
+        List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
+        
+        // todo (schwipa2, 23.04.23): add real ranking values as soon as available
+        var resultDto = new ResultDto(
+                Arrays.asList(new RankingDto("Elias", 10), new RankingDto("Jenny", 1), new RankingDto("Sara", 12)),
+                selectionDtos);
+        
         logger.log(Level.INFO, "game results returned {0}", game);
-        //TODO return valid results
-        return ResponseEntity.ok(Arrays.asList(new ResultDto("Elias", 10), new ResultDto("Jenny", 1), new ResultDto("Sara", 12)));
+        return ResponseEntity.ok(resultDto);
     }
-    //endregion
-
+    
     @Operation(summary = "Player requested current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "New round started"),
@@ -106,7 +128,7 @@ public class GameController {
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRoundOpenForPropositions(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
-
+        
         PlayerDto sphinx = null;
         if (round.getSphinx() != null) {
             if (round.getSphinx().getId().equals(playerId)) {
@@ -121,7 +143,7 @@ public class GameController {
         
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));
     }
-
+    
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
@@ -135,11 +157,29 @@ public class GameController {
         gameService.enterRound(gameId, playerId);
         logger.log(Level.INFO, "{0} will participate next round", playerId);
     }
-
+    
     @Operation(summary = "Player leaves game by destroying webapp")
     @PostMapping(value = "/games/{gameId}/players/{playerId}")
     public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game ungracefully by destroying webapp");
+    }
+    
+    private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, HashMap<String, String> selections) {
+        List<SelectionDto> selectionDtos = new ArrayList<>();
+        propositions.forEach(proposition -> {
+            List<String> selectors = new ArrayList<>();
+            selections.entrySet().stream()
+                    .filter(entry -> entry.getValue().equals(proposition.getId()))
+                    .forEach(entry -> selectors.add(game.getPlayerNameFromId(entry.getKey())));
+            
+            selectionDtos.add(
+                    new SelectionDto(
+                            proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
+                            proposition.getGaps(),
+                            selectors
+                    ));
+        });
+        return selectionDtos;
     }
 }

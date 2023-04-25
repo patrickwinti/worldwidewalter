@@ -62,7 +62,7 @@ public class Round {
      * @param propositionId The ID of the proposition being selected
      */
     public void addSelection(String playerId, String propositionId) {
-        if (canSendSelections() && !isSphinx(playerId)) {
+        if (!isSphinx(playerId)) {
             selections.put(playerId, propositionId);
         }
     }

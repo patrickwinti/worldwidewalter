@@ -3,13 +3,16 @@
 
   <div *ngFor="let proposition of propositionSelectionDto.propositions">
     <p>
-      <button [disabled]="proposition.readonly" (click)="selectProposition(proposition.id)">
-        {{proposition.gaps}}
+      <button [disabled]="proposition.readOnly" (click)="selectProposition(proposition.id)">
+        {{createDisplayTextForProposition(proposition)}}
       </button>
     </p>
   </div>
 </div>
+<div *ngIf="isSphinx()">
+  <button (click)="goToResultsPageEmitter.emit()">weiter</button>
+</div>
 
 <www-count-down [timeoutString]="propositionSelectionDto.selectionSubmissionEndInUtc"
-                (timeoutEmitter)="selectProposition(undefined)">
+                (timeoutEmitter)="continue()">
 </www-count-down>

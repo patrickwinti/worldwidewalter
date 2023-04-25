@@ -18,6 +18,7 @@ import { CountDownComponent } from './component/count-down/count-down.component'
 import { RankingDisplayComponent } from './component/game/show-ranking/ranking-display/ranking-display.component';
 import { EnterPropositionComponent } from "./component/game/round/enter-proposition/enter-proposition.component";
 import { SelectPropositionComponent } from "./component/game/round/select-proposition/select-proposition.component";
+import { ErrorComponent } from './component/error/error.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { SelectPropositionComponent } from "./component/game/round/select-propos
     CountDownComponent,
     RankingDisplayComponent,
     SphinxDisplayComponent,
+    ErrorComponent,
   ],
   imports: [
     BrowserModule,

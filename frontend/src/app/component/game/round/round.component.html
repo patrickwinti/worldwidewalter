@@ -9,7 +9,9 @@
     <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto"
                             [round]=round
                             [propositionSelectionDto]="propositionSelectionDto"
-                            (selectedPropositionEmitter)="submitSelection($event)">
+                            [currentPlayerId]="getCurrentPlayerId()"
+                            (selectedPropositionEmitter)="submitSelection($event)"
+                            (goToResultsPageEmitter)="goToResults()">
     </www-select-proposition>
 
   </ng-container>

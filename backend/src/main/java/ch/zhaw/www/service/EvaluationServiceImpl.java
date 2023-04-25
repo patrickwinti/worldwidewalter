@@ -15,10 +15,9 @@ public class EvaluationServiceImpl implements EvaluationService {
      * Rules for point distribution:
      * - If the selected proposition is the sphinx's, the selector gets 1 point.
      * The sphinx gets a point as well but only if at least one non-sphinx proposition has been selected in this round.
-     * - If the selected proposition is not the sphinx's, the selector gets no point and the submitter of the proposition get 1 point if he is the only submitter.
-     * - If the selected proposition is not the sphinx's and the submitter is not the only submitter, the selector gets no point and the submitter of the proposition gets no point.
+     * - If the selected proposition is not the sphinx's, the selector gets no point and the submitter of the proposition gets 1 point if they are the only submitter.
      * - The sphinx is not allowed to select any proposition.
-     * - A selector is only allowed to select its own proposition, if he/she is not the only submitter of that proposition.
+     * - Players are only allowed to select their own proposition if they are not the only submitter of that proposition.
      */
     @Override
     public Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) {

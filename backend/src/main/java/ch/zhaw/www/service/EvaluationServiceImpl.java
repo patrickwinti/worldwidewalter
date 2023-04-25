@@ -43,7 +43,6 @@ public class EvaluationServiceImpl implements EvaluationService {
             evaluation.put(sphinxId, round.getTempSphinxPoints());
             round.setTempSphinxPoints(ZERO);
         }
-
         return evaluation;
     }
 

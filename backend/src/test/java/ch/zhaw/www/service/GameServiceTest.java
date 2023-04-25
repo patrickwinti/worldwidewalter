@@ -11,10 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -26,7 +27,7 @@ class GameServiceTest {
     
     private static final String GAME_ID = "GAME ID";
     private static final String UNKNOWN_PLAYER_ID = "Unknown Player";
-    private static final Duration ROUND_DURATION = Duration.of(4, ChronoUnit.MINUTES);
+    private static final Duration ROUND_DURATION = DEFAULT_PROPOSITION_DURATION;
     
     @Autowired
     private GameService gameService;
@@ -63,74 +64,126 @@ class GameServiceTest {
     }
     
     @Test
-    void testGetCurrentRound_IllegalState() {
+    void testGetRoundOpenForPropositions_IllegalState() {
         var game = mockGameInRepository();
         
         Round round = createRound();
         game.addRound(round);
-        
-        Player player1 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        Player player2 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        Player player3 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        Player player4 = addWaitingRoomPlayer(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game))
+                .peek(player -> assertThrows(RoundError.IllegalStateException.class,
+                        () -> gameService.getRoundOpenForPropositions(GAME_ID, player.getId())))
+                .toList();
         
         enableFixedClocked();
         round.setSphinx(getRandomPlayer(game));
-        game.moveToActivePlayers(player1);
-        game.moveToActivePlayers(player2);
-        game.moveToActivePlayers(player3);
-        game.moveToActivePlayers(player4);
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        players.forEach(game::moveToActivePlayers);
+        
+        final String anyPlayerId = players.get(0).getId();
+        assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, anyPlayerId));
         
         offsetFixedClockBy(ROUND_DURATION);
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, anyPlayerId));
     }
     
     @Test
-    void testGetCurrentRound_UnknownPlayer() {
+    void testGetRoundOpenForPropositions_UnknownPlayer() {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        addWaitingRoomPlayer(game);
-        addWaitingRoomPlayer(game);
-        addWaitingRoomPlayer(game);
-        addWaitingRoomPlayer(game);
+        IntStream.range(0, 4).forEach(i -> addWaitingRoomPlayer(game));
         round.setSphinx(getRandomPlayer(game));
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
-    void testGetCurrentRound_GameNotFound() {
+    void testGetRoundOpenForPropositions_GameNotFound() {
         mockGameNotFoundInRepository(GAME_ID);
         
-        assertThrows(GameError.NotFoundException.class, () -> gameService.getCurrentRoundInGame(GAME_ID, UNKNOWN_PLAYER_ID));
+        assertThrows(GameError.NotFoundException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
-    void testGetCurrentRound_ValidRound() {
+    void testGetRoundOpenForPropositions_ValidRound() {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        Player player1 = addWaitingRoomPlayer(game);
-        Player player2 = addWaitingRoomPlayer(game);
-        Player player3 = addWaitingRoomPlayer(game);
-        Player player4 = addWaitingRoomPlayer(game);
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game))
+                .peek(game::moveToActivePlayers)
+                .toList();
         round.setSphinx(getRandomPlayer(game));
-        game.moveToActivePlayers(player1);
-        game.moveToActivePlayers(player2);
-        game.moveToActivePlayers(player3);
-        game.moveToActivePlayers(player4);
         
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player1.getId()));
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player2.getId()));
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player3.getId()));
-        assertEquals(round, gameService.getCurrentRoundInGame(GAME_ID, player4.getId()));
+        players.forEach(player -> assertEquals(round, gameService.getRoundOpenForPropositions(GAME_ID, player.getId())));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_IllegalState() {
+        var game = mockGameInRepository();
+        
+        Round round = createRound();
+        game.addRound(round);
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game))
+                .peek(player -> assertThrows(RoundError.IllegalStateException.class,
+                        () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId())))
+                .toList();
+        
+        enableFixedClocked();
+        final Player sphinx = players.get(3);
+        round.setSphinx(sphinx);
+        players.forEach(player -> {
+            game.moveToActivePlayers(player);
+            assertThrows(RoundError.IllegalStateException.class,
+                    () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId()));
+            round.addProposition(createProposition(player.getId(), "Test"));
+            if (!player.equals(sphinx)) {
+                round.addSelection(player.getId(), UUID.randomUUID().toString());
+            }
+        });
+        
+        final String anyPlayerId = players.get(0).getId();
+        assertEquals(round, gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
+        offsetFixedClockBy(ROUND_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_UnknownPlayer() {
+        var game = mockGameInRepository();
+        Round round = createRound();
+        game.addRound(round);
+        IntStream.range(0, 4).forEach(i -> addWaitingRoomPlayer(game));
+        round.setSphinx(getRandomPlayer(game));
+        
+        assertThrows(PlayerError.NotFoundException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, UNKNOWN_PLAYER_ID));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_GameNotFound() {
+        mockGameNotFoundInRepository(GAME_ID);
+        
+        assertThrows(GameError.NotFoundException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, UNKNOWN_PLAYER_ID));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_ValidRound() {
+        var game = mockGameInRepository();
+        Round round = createRound();
+        game.addRound(round);
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game)).toList();
+        Player sphinx = getRandomPlayer(game);
+        round.setSphinx(sphinx);
+        players.forEach(player -> {
+            game.moveToActivePlayers(player);
+            assertThrows(RoundError.IllegalStateException.class,
+                    () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId()));
+            round.addProposition(createProposition(player.getId(), "Test"));
+            if (!player.equals(sphinx)) {
+                round.addSelection(player.getId(), UUID.randomUUID().toString());
+            }
+        });
+        
+        players.forEach(player -> assertEquals(round, gameService.getRoundClosedForSelections(GAME_ID, player.getId())));
     }
     
     @Test
@@ -257,6 +310,34 @@ class GameServiceTest {
         assertEquals(0, game.getAllPlayers().count());
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(0)));
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.leaveGame(game.getId(), playerIDs.get(1)));
+    }
+    
+    @Test
+    void createNewRound_AtCapacity() {
+        var game = mockGameInRepository();
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS + MAX_NUMBER_OF_PLAYERS / 2).forEach(value -> addWaitingRoomPlayer(game));
+        
+        gameService.enterRound(game.getId(), getRandomPlayer(game).getId());
+        var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
+        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
+        assertEquals(MAX_NUMBER_OF_PLAYERS, activePlayers);
+        assertEquals(MAX_NUMBER_OF_PLAYERS / 2, waitingRoomPlayers);
+        
+        assertNotNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
+    }
+    
+    @Test
+    void createNewRound_NotAtCapacity() {
+        var game = mockGameInRepository();
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS - 1).forEach(value -> addWaitingRoomPlayer(game));
+        
+        gameService.enterRound(game.getId(), getRandomPlayer(game).getId());
+        var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
+        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
+        assertEquals(MAX_NUMBER_OF_PLAYERS - 1, activePlayers);
+        assertEquals(0, waitingRoomPlayers);
+        
+        assertNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
     }
     
     private Game mockGameInRepository() {

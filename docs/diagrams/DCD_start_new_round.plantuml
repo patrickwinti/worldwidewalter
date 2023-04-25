@@ -14,7 +14,7 @@ class Game {
    +moveToActivePlayers(playerId: String)
 }
 class Round {
-   +getState(): Round.State
+   #getState(): Round.State
 }
 interface EntityService {
    -gameRepository: GameRepository
@@ -23,12 +23,12 @@ interface EntityService {
 interface RoundService{
    -entityService: EntityService
    -gameProperties: GameProperties
-   createNewRound(game: Game);
+   createNewRound(game: Game): Round
 }
 interface GameService{
    -entityService: EntityService
    -roundService: RoundService
-   enterRound(gameId: String,playerId: String)
+   enterRound(gameId: String, playerId: String)
 }
 interface GameRepository {
    save(game: Game)

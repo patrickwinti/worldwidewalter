@@ -72,19 +72,19 @@ class GameServiceIntegrationTest {
         var game = gameService.createGame();
         var mariaPlayerId = gameService.enterGame(game.getId(), "Maria");
         gameService.enterRound(game.getId(), mariaPlayerId);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(game.getId(), mariaPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayerId));
         var jesusPlayerId = gameService.enterGame(game.getId(), "Jesus");
         gameService.enterRound(game.getId(), jesusPlayerId);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(game.getId(), mariaPlayerId));
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(game.getId(), jesusPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), jesusPlayerId));
         var rockyPlayerId = gameService.enterGame(game.getId(), "Rocky");
         gameService.enterRound(game.getId(), rockyPlayerId);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(game.getId(), mariaPlayerId));
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(game.getId(), jesusPlayerId));
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(game.getId(), rockyPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), jesusPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), rockyPlayerId));
         var bellaPlayerId = gameService.enterGame(game.getId(), "Bella");
         gameService.enterRound(game.getId(), bellaPlayerId);
-        var round = gameService.getCurrentRoundInGame(game.getId(), bellaPlayerId);
+        var round = gameService.getRoundOpenForPropositions(game.getId(), bellaPlayerId);
         assertNotNull(round);
     }
     
@@ -103,40 +103,40 @@ class GameServiceIntegrationTest {
         gameService.enterRound(gameId, grifudPlayerId);
         gameService.enterRound(gameId, shulamitPlayerId);
         
-        var round1 = gameService.getCurrentRoundInGame(gameId, shulamitPlayerId);
+        var round1 = gameService.getRoundOpenForPropositions(gameId, shulamitPlayerId);
         roundService.submitProposition(round1.getId(), caelanPlayerId, List.of(" Perikles"));
         roundService.submitProposition(round1.getId(), cardeaPlayerId, List.of("Eleonore"));
         
         // can't participate in round anymore
         offsetFixedClockBy(gameProperties.getPropositionSubmissionDuration().minus(gameProperties.getRoundEnterLimitDuration()).plus(1, ChronoUnit.SECONDS));
         gameService.enterRound(gameId, neusPlayerId);
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(gameId, neusPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(gameId, neusPlayerId));
         
         roundService.submitProposition(round1.getId(), grifudPlayerId, List.of("Lysistrata"));
         roundService.submitProposition(round1.getId(), shulamitPlayerId, List.of("Yedidia"));
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(gameId, neusPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(gameId, neusPlayerId));
         
         // Done with selections
         offsetFixedClockBy(gameProperties.getSelectionSubmissionDuration()
                 .plus(gameProperties.getPropositionSubmissionDuration())
                 .plus(1, ChronoUnit.SECONDS));
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(gameId, neusPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(gameId, neusPlayerId));
         gameService.enterRound(gameId, caelanPlayerId);     //creates new round
         
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getCurrentRoundInGame(gameId, neusPlayerId));
+        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(gameId, neusPlayerId));
         gameService.enterRound(gameId, cardeaPlayerId);     //selects sphinx
-        var round2 = gameService.getCurrentRoundInGame(gameId, neusPlayerId);
+        var round2 = gameService.getRoundOpenForPropositions(gameId, neusPlayerId);
         
         gameService.enterRound(gameId, grifudPlayerId);
         gameService.enterRound(gameId, shulamitPlayerId);
         
-        var caelanRoundResponse = gameService.getCurrentRoundInGame(gameId, caelanPlayerId);
-        var cardeaRoundResponse = gameService.getCurrentRoundInGame(gameId, cardeaPlayerId);
-        var grifudRoundResponse = gameService.getCurrentRoundInGame(gameId, grifudPlayerId);
-        var shulamitRoundResponse = gameService.getCurrentRoundInGame(gameId, shulamitPlayerId);
-        var neusRoundResponse = gameService.getCurrentRoundInGame(gameId, neusPlayerId);
+        var caelanRoundResponse = gameService.getRoundOpenForPropositions(gameId, caelanPlayerId);
+        var cardeaRoundResponse = gameService.getRoundOpenForPropositions(gameId, cardeaPlayerId);
+        var grifudRoundResponse = gameService.getRoundOpenForPropositions(gameId, grifudPlayerId);
+        var shulamitRoundResponse = gameService.getRoundOpenForPropositions(gameId, shulamitPlayerId);
+        var neusRoundResponse = gameService.getRoundOpenForPropositions(gameId, neusPlayerId);
         
         assertNotEquals(round1.getId(), round2.getId());
         assertEquals(round2.getId(), caelanRoundResponse.getId());

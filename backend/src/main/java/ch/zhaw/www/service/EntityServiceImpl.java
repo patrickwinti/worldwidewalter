@@ -38,7 +38,14 @@ class EntityServiceImpl implements EntityService {
             gamesRepository.save(game);
         }
     }
-
+    
+    @Override
+    public Game getGameForRound(final String roundId) {
+        synchronized (gamesRepository) {
+            return findGameForRound(roundId);
+        }
+    }
+    
     @Override
     public Round getRound(String roundId) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {

@@ -2,6 +2,7 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.PropositionSelectionDto;
 import ch.zhaw.www.dto.PropositionSubmissionDto;
+import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.RoundService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,7 +62,7 @@ public class RoundController {
         roundService.selectProposition(roundId, playerId, propositionId);
         logger.log(Level.INFO, "proposition selected successfully");
     }
-    
+
     @Operation(summary = "Get all propositions sent by the players in current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Propositions in round to be selected by players"),
@@ -73,16 +75,18 @@ public class RoundController {
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = roundService.getRoundReadyForSelections(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
+        List<PropositionSelectionDto.Proposition> propositions = new ArrayList<>();
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
-        List<PropositionSelectionDto.Proposition> propositions = round.getPropositions()
-                .stream()
-                .map(proposition ->
-                        new PropositionSelectionDto.Proposition(
-                                proposition.getId(),
-                                proposition.getGaps(),
-                                proposition.getPlayerIds().contains(playerId) || isSphinx))
-                .toList();
+        round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(
+                proposition.getId(),
+                proposition.getGaps(),
+                proposition.getPlayerIds().size(),
+                isPropositionReadOnly(proposition, playerId, isSphinx)
+        )));
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
-    //endregion
+
+    private static boolean isPropositionReadOnly(Proposition proposition, String playerId, boolean isSphinx) {
+        return isSphinx || (proposition.getPlayerIds().contains(playerId) && proposition.getPlayerIds().size() == 1);
+    }
 }

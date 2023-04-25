@@ -12,7 +12,7 @@ public class EvaluationServiceImpl implements EvaluationService {
     private static final int SINGLE_POINT = 1;
 
     /**
-     * rules for point distribution:
+     * Rules for point distribution:
      * - If the selected proposition is the sphinx's, the selector gets 1 point.
      * The sphinx gets a point as well but only if at least one non-sphinx proposition has been selected in this round.
      * - If the selected proposition is not the sphinx's, the selector gets no point and the submitter of the proposition get 1 point if he is the only submitter.

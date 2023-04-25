@@ -14,17 +14,17 @@ public class EvaluationServiceImpl implements EvaluationService {
     @Override
     public Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) {
         Map<String, Integer> evaluation = new HashMap<>();
-        if (!handleAndPunishIllegalSelection(round, selectedPropositionId, selectorId, evaluation).isEmpty()) {
-            return evaluation;
-        }
-        ;
         String sphinxId = Objects.requireNonNull(round.getSphinx()).getId();
 
         Optional<Proposition> optionalProposition = findProposition(round, selectedPropositionId);
         if (optionalProposition.isPresent()) {
             Proposition proposition = optionalProposition.get();
-            List<String> submitterIds = proposition.getPlayerIds();
 
+            if (!handleAndPunishIllegalSelection(proposition, sphinxId, selectorId, evaluation).isEmpty()) {
+                return evaluation;
+            }
+
+            List<String> submitterIds = proposition.getPlayerIds();
             if (submitterIds.contains(sphinxId)) {
                 evaluation.put(selectorId, SINGLE_POINT);
             } else {
@@ -45,7 +45,6 @@ public class EvaluationServiceImpl implements EvaluationService {
                 round.setTempSphinxPoints(ZERO);
             }
         }
-
         return evaluation;
     }
 
@@ -57,18 +56,13 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .findFirst();
     }
 
-    private Map<String, Integer> handleAndPunishIllegalSelection(Round round, String selectedPropositionId, String selectorId, Map<String, Integer> evaluation) {
-
-        findProposition(round, selectedPropositionId)
-                .ifPresent(proposition -> {
-                    if (!proposition.hasDuplicates() && proposition.hasSubmitter(selectorId)) {
-                        evaluation.put(selectorId, ZERO);
-                        return;
-                    }
-                    if (selectorId.equals(round.getSphinx().getId())) {
-                        evaluation.put(selectorId, ZERO);
-                    }
-                });
+    private Map<String, Integer> handleAndPunishIllegalSelection(Proposition proposition, String sphinxId, String selectorId, Map<String, Integer> evaluation) {
+        if (!proposition.hasDuplicates() && proposition.hasSubmitter(selectorId)) {
+            evaluation.put(selectorId, ZERO);
+        }
+        if (selectorId.equals(sphinxId)) {
+            evaluation.put(selectorId, ZERO);
+        }
         return evaluation;
     }
 }

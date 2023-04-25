@@ -48,10 +48,19 @@ public class Proposition {
                         .count();
     }
 
+    /**
+     * Checks if a given player submitted the current proposition.
+     * @param playerId player identifier
+     * @return true if the player submitted the proposition, false otherwise.
+     */
     public boolean hasSubmitter(final String playerId) {
         return playerIds.contains(playerId);
     }
 
+    /**
+     * Checks if the current proposition has duplicates.
+     * @return true if the proposition has duplicates, false otherwise.
+     */
     public boolean hasDuplicates() {
         return playerIds.size() > 1;
     }

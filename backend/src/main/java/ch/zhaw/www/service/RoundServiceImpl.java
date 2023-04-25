@@ -78,7 +78,7 @@ class RoundServiceImpl implements RoundService {
             }
         });
     }
-
+    
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
@@ -88,9 +88,7 @@ class RoundServiceImpl implements RoundService {
             }
         });
     }
-
-
-
+    
     @Override
     public Round getRoundReadyForSelections(final String roundId, final String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);

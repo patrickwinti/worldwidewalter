@@ -62,7 +62,9 @@ public class Round {
      * @param propositionId The ID of the proposition being selected
      */
     public void addSelection(String playerId, String propositionId) {
-        selections.put(playerId, propositionId);
+        if (!isSphinx(playerId)) {
+            selections.put(playerId, propositionId);
+        }
     }
     
     /**
@@ -116,7 +118,7 @@ public class Round {
         return selectionSubmissionEnd != null && InstantWrapper.isAfterNow(selectionSubmissionEnd);
     }
     
-    /**
+    /*
      * Gets the number of selections submitted by players.
      *
      * @return the number of selections submitted
@@ -131,11 +133,11 @@ public class Round {
      * @return the number of propositions submitted
      */
     int getNumberOfPropositionsSubmitted() {
-        return propositions.stream().map(proposition -> proposition
-                .getPlayerIds().size())
+        return propositions.stream()
+                .map(proposition -> proposition.getPlayerIds().size())
                 .reduce(0, Integer::sum);
     }
-
+    
     /**
      * Checks if player with given playerId is sphinx in this round
      *
@@ -145,7 +147,7 @@ public class Round {
     public boolean isSphinx(String playerId) {
         return sphinx != null && sphinx.getId().equals(playerId);
     }
-
+    
     /**
      * Checks if proposition with given propositionId exisits in round
      *
@@ -155,7 +157,7 @@ public class Round {
     public boolean propositionExists(String propositionId) {
         return propositions.stream().anyMatch(proposition -> proposition.getId().equals(propositionId));
     }
-
+    
     /**
      * Enum representing the possible states of a round.
      */

@@ -62,7 +62,7 @@ public class Round {
      * @param propositionId The ID of the proposition being selected
      */
     public void addSelection(String playerId, String propositionId) {
-        if (sphinx != null && !sphinx.getId().equals(playerId)) {
+        if (canSendSelections() && !isSphinx(playerId)) {
             selections.put(playerId, propositionId);
         }
     }
@@ -137,7 +137,11 @@ public class Round {
                 .getPlayerIds().size())
                 .reduce(0, Integer::sum);
     }
-    
+
+    private boolean isSphinx(String playerId) {
+        return sphinx != null && sphinx.getId().equals(playerId);
+    }
+
     /**
      * Enum representing the possible states of a round.
      */

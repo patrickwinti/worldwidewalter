@@ -110,7 +110,7 @@ class EvaluationServiceTest {
 
         Round roundMock = mockRoundInRepository(tempSphinxPoints, true);
         InOrder inOrder = inOrder(roundMock);
-        when(roundMock.getTempSphinxPoints()).thenReturn(tempSphinxPoints + 1).thenReturn(tempSphinxPoints + 1);
+        when(roundMock.getTempSphinxPoints()).thenReturn(tempSphinxPoints).thenReturn(tempSphinxPoints + 1);
 
         String idOfSelectedProposition = roundMock.getPropositions().get(3).getId();
         String selectorId = roundMock.getPropositions().get(2).getPlayerIds().get(0);

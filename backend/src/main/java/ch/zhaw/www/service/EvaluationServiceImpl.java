@@ -46,7 +46,6 @@ public class EvaluationServiceImpl implements EvaluationService {
         return evaluation;
     }
 
-
     private static Optional<Proposition> findProposition(Round round, String selectedPropositionId) {
         return round.getPropositions()
                 .stream()

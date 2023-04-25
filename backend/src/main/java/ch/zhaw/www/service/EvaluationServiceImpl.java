@@ -57,9 +57,6 @@ public class EvaluationServiceImpl implements EvaluationService {
         if (!proposition.hasDuplicates() && proposition.hasSubmitter(selectorId)) {
             return true;
         }
-        if (selectorId.equals(sphinxId)) {
-            return true;
-        }
-        return false;
+        return selectorId.equals(sphinxId);
     }
 }

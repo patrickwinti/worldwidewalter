@@ -1,5 +1,7 @@
 <div *ngIf="isLoading$ | async" class="main-container">
   <div class="loading">
     <div class="spinner">{{displayText}}</div>
+    <button (click)="abort()">abbrechen</button>
+    <div *ngIf="isJoiningGame()">trete Spiel {{gameId}} bei</div>
   </div>
 </div>

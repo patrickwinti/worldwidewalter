@@ -45,7 +45,7 @@ public interface GameService {
     void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException;
 
     /**
-     * Player requested to be added to round.
+     * Player requested current round information to be able to submit propositions
      *
      * @param gameId   game requested to enter
      * @param playerId player requesting round
@@ -53,7 +53,18 @@ public interface GameService {
      * @throws GameError.NotFoundException      if game is not found
      * @throws RoundError.IllegalStateException if there are not enough players anymore
      */
-    Round getCurrentRoundInGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    Round getRoundOpenForPropositions(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+
+    /**
+     * Player requested round that has all selections already submitted
+     *
+     * @param gameId   game requested to enter
+     * @param playerId player requesting round
+     * @return new or existing round
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
+     */
+    Round getRoundClosedForSelections(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
 
     /**
      * Player requested to participate in the current round of the game. If round is currently not available

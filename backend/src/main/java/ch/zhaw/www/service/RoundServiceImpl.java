@@ -52,16 +52,12 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public void createNewRound(final Game game) {
-        game.addRound(new Round(UUID.randomUUID().toString(),
+    public Round createNewRound(final Game game) {
+        return new Round(UUID.randomUUID().toString(),
                 game.consumePrompt(),
                 gameProperties.getPropositionSubmissionDuration(),
                 gameProperties.getRoundEnterLimitDuration(),
-                gameProperties.getSelectionSubmissionDuration()));
-        game.getAllPlayers()
-                .filter(player -> !game.hasActivePlayer(player.getId()))
-                .takeWhile(player -> game.hasCapacityForNewActivePlayer())
-                .forEach(game::moveToActivePlayers);
+                gameProperties.getSelectionSubmissionDuration());
     }
     
     @Override
@@ -89,9 +85,14 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public Round getRound(String roundId, String playerId) {
+    public Round getRoundReadyForSelections(final String roundId, final String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);
-        return entityService.getRound(roundId);
+        var game = entityService.getGameForRound(roundId);
+        var round = game.getCurrentRound();
+        if (round == null || !round.getId().equals(roundId) || game.getState() != Game.State.WAITING_FOR_ALL_SELECTIONS) {
+            throw new RoundError.IllegalStateException();
+        }
+        return round;
     }
     
     /**

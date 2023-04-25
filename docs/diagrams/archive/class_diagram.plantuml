@@ -58,7 +58,7 @@ package backend{
     interface RoundService{
         selectSphinx(game: Game);
         createNewRound(game: Game);
-        getRound(roundId: String, playerId: String):Round
+        getRoundReadyForSelections(roundId: String, playerId: String):Round
         submitProposition(roundId: String, playerId: String, gaps: List<String>)
         selectProposition(roundId: String, playerId: String, propositionId: String)
     }

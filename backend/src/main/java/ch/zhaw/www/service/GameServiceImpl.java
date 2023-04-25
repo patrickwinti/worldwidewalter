@@ -26,9 +26,11 @@ class GameServiceImpl implements GameService {
     private final GameProperties gameProperties;
     private final RoundService roundService;
     private final RandomProvider randomProvider;
+    
     private final PromptRepository promptRepository;
     
-    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService, RandomProvider randomProvider, PromptRepository promptRepository) {
+    GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
+                     RandomProvider randomProvider, PromptRepository promptRepository) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
@@ -69,9 +71,7 @@ class GameServiceImpl implements GameService {
     @Override
     public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
         entityService.editGame(gameId, game -> {
-            if (!game.hasPlayer(playerId)) {
-                throw new PlayerError.NotFoundException(playerId);
-            }
+            checkPlayerInGame(game, playerId);
             game.removePlayer(playerId);
         });
     }
@@ -79,18 +79,25 @@ class GameServiceImpl implements GameService {
     @Override
     public void enterRound(String gameId, String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         entityService.editGame(gameId, game -> {
-            Player player = game.getAllPlayers()
-                    .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
-                    .orElseThrow(() -> new PlayerError.NotFoundException(playerId));
+            Player playerEnteringRound = checkPlayerInGame(game, playerId);
             Game.State state = game.getState();
             switch (state) {
                 case NO_VALID_ROUND -> {
-                    roundService.createNewRound(game);
+                    var round = roundService.createNewRound(game);
+                    game.addRound(round);
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", game);
-                    movePlayerToActive(game, player);
+                    movePlayerToActive(game, playerEnteringRound);
+                    game.getAllPlayers()
+                            .filter(player -> !game.hasActivePlayer(player.getId()))
+                            .takeWhile(player -> game.hasCapacityForNewActivePlayer())
+                            .forEach(game::moveToActivePlayers);
+                    //handle the case that no other play may enter the game
+                    if (!game.hasCapacityForNewActivePlayer()) {
+                        roundService.selectSphinx(game);
+                    }
                 }
                 case WAITING_FOR_PLAYERS, WAITING_FOR_ALL_PROPOSITIONS -> {
-                    movePlayerToActive(game, player);
+                    movePlayerToActive(game, playerEnteringRound);
                     LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
                     roundService.selectSphinx(game);
                 }
@@ -103,31 +110,45 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Round getCurrentRoundInGame(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+    public Round getRoundOpenForPropositions(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        return getCurrentRoundForDesiredState(gameId, playerId, Game.State.WAITING_FOR_ALL_PROPOSITIONS);
+    }
+    
+    @Override
+    public Round getRoundClosedForSelections(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        return getCurrentRoundForDesiredState(gameId, playerId, Game.State.WAITING_FOR_NEW_ROUND);
+    }
+    
+    private Round getCurrentRoundForDesiredState(final String gameId, final String playerId, final Game.State state) {
         Game game = entityService.getGame(gameId);
-        if (game.getState() != Game.State.WAITING_FOR_ALL_PROPOSITIONS || !game.hasActivePlayer(playerId)) {
+        checkPlayerInGame(game, playerId);
+        if (game.getState() != state || !game.hasActivePlayer(playerId)) {
             throw new RoundError.IllegalStateException();
         }
         return game.getCurrentRound();
     }
     
-    /*
-     Moves the specified player to the active player list of the game if there is capacity for a new active player,
-     otherwise throws a {@link GameError.FullCapacityException}. If the player is not found in the game, a
-     {@link PlayerError.NotFoundException} is thrown.
-     @param game The game object.
-     @param player The player object to move to the active player list.
-     @throws PlayerError.NotFoundException If the player is not found in the game.
-     @throws GameError.FullCapacityException If there is no capacity for a new active player in the game.
+    /**
+     * Moves the specified player to the active player list of the game if there is capacity for a new active player,
+     * otherwise throws a {@link GameError.FullCapacityException}. If the player is not found in the game, a
+     * {@link PlayerError.NotFoundException} is thrown.
+     *
+     * @param game   The game object.
+     * @param player The player object to move to the active player list.
+     * @throws PlayerError.NotFoundException   If the player is not found in the game.
+     * @throws GameError.FullCapacityException If there is no capacity for a new active player in the game.
      */
     private static void movePlayerToActive(final Game game, final Player player) {
         if (game.hasCapacityForNewActivePlayer()) {
-            if (!game.hasPlayer(player.getId())) {
-                throw new PlayerError.NotFoundException(player.getId());
-            }
             game.moveToActivePlayers(player);
         } else {
             throw new GameError.FullCapacityException();
         }
+    }
+    
+    private static Player checkPlayerInGame(final Game game, final String playerId) {
+        return game.getAllPlayers()
+                .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()
+                .orElseThrow(() -> new PlayerError.NotFoundException(playerId));
     }
 }

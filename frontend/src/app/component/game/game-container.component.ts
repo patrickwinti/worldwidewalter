@@ -41,4 +41,8 @@ export class GameContainerComponent implements OnInit {
   isEnteringOrEnteredRound(): boolean {
     return this.stateService.isInRound() || this.stateService.isEnteringRound();
   }
+
+  tryAgain() {
+    this.getRoundObservable();
+  }
 }

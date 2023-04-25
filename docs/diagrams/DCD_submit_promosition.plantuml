@@ -2,7 +2,7 @@
 !include globals/stylesheets.iuml
 skinparam linetype ortho
 
-class GameController {
+class RoundController {
     -roundService: RoundService
     +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
 }
@@ -11,15 +11,15 @@ class Game {
 }
 class Proposition{
     -id: String
-    -playerId: List<String>
+    -playerIds: List<String>
     -gaps: List<String>
 }
 
 class Round {
-     -id: String
-     -prompt: Prompt
-     -propositions: Map<Proposition>
-     +addProposition(proposition: Proposition)
+  -id: String
+  -prompt: Prompt
+  -propositions: List<Proposition>
+  +addProposition(proposition: Proposition)
 }
 interface RoundService{
     -entityService: EntityService
@@ -35,7 +35,7 @@ interface GameRepository {
     +save(game: Game)
 }
 
-GameController -> RoundService
+RoundController -> RoundService
 
 RoundService "1"-->"*"  Game
 RoundService "1"-->"*"  Player

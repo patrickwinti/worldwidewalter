@@ -35,6 +35,7 @@ class EvaluationServiceTest {
 
         return roundMock;
     }
+
     private Round mockRoundWithSphinxDoublePropositionInRepository(int tempSphinxPoints, boolean atLeastOneNoneSphinxPropositionHasBeenSelected) {
         Round roundMock = mock(Round.class);
         when(roundMock.getPropositions()).thenReturn(List.of(
@@ -51,10 +52,11 @@ class EvaluationServiceTest {
 
         return roundMock;
     }
+
     private Round mockRoundWithoutSphinxDoublePropositionInRepository(int tempSphinxPoints, boolean atLeastOneNoneSphinxPropositionHasBeenSelected) {
         Round roundMock = mock(Round.class);
         when(roundMock.getPropositions()).thenReturn(List.of(
-                createDoubleSubmissionProposition("Player-ID-1","Player-ID-2" , "orange"),
+                createDoubleSubmissionProposition("Player-ID-1", "Player-ID-2", "orange"),
                 createProposition("Player-ID-2", "green"),
                 createProposition("Player-ID-3", "red"),
                 createProposition(sphinxId, "blue")
@@ -143,7 +145,7 @@ class EvaluationServiceTest {
         assertTrue(evaluation.containsKey(selectorId));
         assertEquals(1, evaluation.get(selectorId).intValue());
         assertTrue(evaluation.containsKey(sphinxId));
-        assertEquals(0,evaluation.get(sphinxId).intValue());
+        assertEquals(0, evaluation.get(sphinxId).intValue());
     }
 
     @Test
@@ -166,6 +168,7 @@ class EvaluationServiceTest {
         assertTrue(evaluation.containsKey(sphinxId));
         assertEquals(3, evaluation.get(sphinxId).intValue());
     }
+
     @Test
     void evaluateSelectorHasSubmittedDuplicatePropositionAndSelectedDuplicateNonSphinxProposition() {
         Round roundMock = mockRoundWithoutSphinxDoublePropositionInRepository(3, true);
@@ -182,8 +185,9 @@ class EvaluationServiceTest {
         assertTrue(evaluation.containsKey(sphinxId));
         assertEquals(3, evaluation.get(sphinxId));
     }
+
     @Test
-    void evaluateIllegalSelection(){
+    void evaluateIllegalSelection() {
         Round roundMock = mockRoundInRepository(0, false);
         String idOfSelectedProposition = roundMock.getPropositions().get(2).getId();
         String selectorId = roundMock.getPropositions().get(2).getPlayerIds().get(0);
@@ -194,7 +198,7 @@ class EvaluationServiceTest {
     }
 
     @Test
-    void evaluateIllegalSelectionSphinxIsSelector(){
+    void evaluateIllegalSelectionSphinxIsSelector() {
         Round roundMock = mockRoundInRepository(0, false);
         String idOfSelectedProposition = roundMock.getPropositions().get(2).getId();
         String selectorId = roundMock.getPropositions().get(3).getPlayerIds().get(0);
@@ -203,5 +207,4 @@ class EvaluationServiceTest {
 
         assertEquals(0, evaluation.size());
     }
-
 }

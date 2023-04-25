@@ -17,34 +17,32 @@ public class EvaluationServiceImpl implements EvaluationService {
         String sphinxId = Objects.requireNonNull(round.getSphinx()).getId();
 
         Optional<Proposition> optionalProposition = findProposition(round, selectedPropositionId);
-        if (optionalProposition.isPresent()) {
-            Proposition proposition = optionalProposition.get();
+        if (optionalProposition.isEmpty() || isIllegalSelection(optionalProposition.get(), sphinxId, selectorId)) {
+            return evaluation;
+        }
+        Proposition proposition = optionalProposition.get();
 
-            if (!handleAndPunishIllegalSelection(proposition, sphinxId, selectorId, evaluation).isEmpty()) {
-                return evaluation;
-            }
+        List<String> submitterIds = proposition.getPlayerIds();
+        if (submitterIds.contains(sphinxId)) {
+            evaluation.put(selectorId, SINGLE_POINT);
+        } else {
+            round.setHasNonSphinxPropositionBeenSelected(true);
+        }
 
-            List<String> submitterIds = proposition.getPlayerIds();
-            if (submitterIds.contains(sphinxId)) {
-                evaluation.put(selectorId, SINGLE_POINT);
+        if (submitterIds.size() == 1) {
+            String submitterId = submitterIds.get(0);
+            if (submitterId.equals(sphinxId)) {
+                round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
             } else {
-                round.setHasNonSphinxPropositionBeenSelected(true);
-            }
-
-            if (submitterIds.size() == 1) {
-                String submitterId = submitterIds.get(0);
-                if (submitterId.equals(sphinxId)) {
-                    round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
-                } else {
-                    evaluation.put(submitterId, SINGLE_POINT);
-                }
-            }
-
-            if (round.isHasNonSphinxPropositionBeenSelected()) {
-                evaluation.put(sphinxId, round.getTempSphinxPoints());
-                round.setTempSphinxPoints(ZERO);
+                evaluation.put(submitterId, SINGLE_POINT);
             }
         }
+
+        if (round.isHasNonSphinxPropositionBeenSelected()) {
+            evaluation.put(sphinxId, round.getTempSphinxPoints());
+            round.setTempSphinxPoints(ZERO);
+        }
+
         return evaluation;
     }
 
@@ -56,13 +54,13 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .findFirst();
     }
 
-    private Map<String, Integer> handleAndPunishIllegalSelection(Proposition proposition, String sphinxId, String selectorId, Map<String, Integer> evaluation) {
+    private boolean isIllegalSelection(Proposition proposition, String sphinxId, String selectorId) {
         if (!proposition.hasDuplicates() && proposition.hasSubmitter(selectorId)) {
-            evaluation.put(selectorId, ZERO);
+            return true;
         }
         if (selectorId.equals(sphinxId)) {
-            evaluation.put(selectorId, ZERO);
+            return true;
         }
-        return evaluation;
+        return false;
     }
 }

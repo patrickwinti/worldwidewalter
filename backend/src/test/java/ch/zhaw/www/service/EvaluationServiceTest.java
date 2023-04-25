@@ -182,10 +182,7 @@ class EvaluationServiceTest {
 
         Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
 
-        assertEquals(1, evaluation.size());
-        assertTrue(evaluation.containsKey(selectorId));
-        assertEquals(0, evaluation.get(selectorId));
-
+        assertEquals(0, evaluation.size());
     }
 
     @Test
@@ -196,9 +193,7 @@ class EvaluationServiceTest {
 
         Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
 
-        assertEquals(1, evaluation.size());
-        assertTrue(evaluation.containsKey(selectorId));
-        assertEquals(0, evaluation.get(selectorId));
+        assertEquals(0, evaluation.size());
     }
 
 }

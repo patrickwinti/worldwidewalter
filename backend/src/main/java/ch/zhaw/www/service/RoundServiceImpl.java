@@ -78,18 +78,19 @@ class RoundServiceImpl implements RoundService {
             }
         });
     }
-    
+
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
-            if (round.getSphinx() != null && round.getSphinx().getId().equals(playerId)) {
-                return;
+            if (!round.isSphinx(playerId) && round.propositionExists(propositionId)) {
+                round.addSelection(playerId, propositionId);
             }
-            round.addSelection(playerId, propositionId);
         });
     }
-    
+
+
+
     @Override
     public Round getRoundReadyForSelections(final String roundId, final String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);

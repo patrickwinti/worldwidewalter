@@ -82,8 +82,12 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
-        var round = this.getRoundReadyForSelections(roundId, playerId);
-        round.addSelection(playerId, propositionId);
+        entityService.editRound(roundId, round -> {
+            if (round.getSphinx() != null && round.getSphinx().getId().equals(playerId)) {
+                return;
+            }
+            round.addSelection(playerId, propositionId);
+        });
     }
     
     @Override

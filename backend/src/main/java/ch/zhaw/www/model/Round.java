@@ -133,7 +133,9 @@ public class Round {
      * @return the number of propositions submitted
      */
     int getNumberOfPropositionsSubmitted() {
-        return propositions.size();
+        return propositions.stream().map(proposition -> proposition
+                .getPlayerIds().size())
+                .reduce(0, Integer::sum);
     }
     
     /**

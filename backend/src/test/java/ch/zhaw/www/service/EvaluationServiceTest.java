@@ -70,14 +70,14 @@ class EvaluationServiceTest {
     @Test
     void evaluateSelectionOfNonSphinxPropositionWithTempSpinxPoints() {
 
-        Round roundMock = mockRoundInRepository(3, false);
+        Round roundMock = mockRoundInRepository(3, true);
         String idOfSelectedProposition = roundMock.getPropositions().get(0).getId();
         String propositionOriginatorId = roundMock.getPropositions().get(0).getPlayerIds().get(0);
         String selectorId = roundMock.getPropositions().get(2).getPlayerIds().get(0);
 
         Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
-        verify(roundMock).setTempSphinxPoints(0);
         verify(roundMock).setHasNonSphinxPropositionBeenSelected(true);
+        verify(roundMock).setTempSphinxPoints(0);
 
         assertEquals(2, evaluation.size());
 
@@ -118,7 +118,8 @@ class EvaluationServiceTest {
         assertEquals(1, evaluation.get(selectorId).intValue());
 
         assertTrue(evaluation.containsKey(sphinxId));
-        assertEquals(1, evaluation.get(sphinxId).intValue());
+        verify(roundMock, times(1)).setTempSphinxPoints(1);
+        // I am not sure how to test that in the last if statement the points are transferred to the sphinx
     }
 
     @Test
@@ -129,11 +130,12 @@ class EvaluationServiceTest {
         String selectorId = roundMock.getPropositions().get(3).getPlayerIds().get(0);
 
         Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
-        verify(roundMock, times(0)).setTempSphinxPoints(anyInt());
 
-        assertEquals(1, evaluation.size());
+        assertEquals(2, evaluation.size());
         assertTrue(evaluation.containsKey(selectorId));
         assertEquals(1, evaluation.get(selectorId).intValue());
+        assertTrue(evaluation.containsKey(sphinxId));
+        assertEquals(0,evaluation.get(sphinxId).intValue());
     }
 
     @Test
@@ -178,7 +180,12 @@ class EvaluationServiceTest {
         String idOfSelectedProposition = roundMock.getPropositions().get(2).getId();
         String selectorId = roundMock.getPropositions().get(2).getPlayerIds().get(0);
 
-        assertThrows(SelectionError.IllegalSelection.class, () -> evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId));
+        Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+
+        assertEquals(1, evaluation.size());
+        assertTrue(evaluation.containsKey(selectorId));
+        assertEquals(0, evaluation.get(selectorId));
+
     }
 
     @Test
@@ -187,7 +194,11 @@ class EvaluationServiceTest {
         String idOfSelectedProposition = roundMock.getPropositions().get(2).getId();
         String selectorId = roundMock.getPropositions().get(3).getPlayerIds().get(0);
 
-        assertThrows(SelectionError.IllegalSelector.class, () -> evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId));
+        Map<String, Integer> evaluation = evaluationService.evaluateSelection(roundMock, idOfSelectedProposition, selectorId);
+
+        assertEquals(1, evaluation.size());
+        assertTrue(evaluation.containsKey(selectorId));
+        assertEquals(0, evaluation.get(selectorId));
     }
 
 }

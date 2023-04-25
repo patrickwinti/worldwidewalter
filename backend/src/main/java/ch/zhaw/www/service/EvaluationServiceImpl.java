@@ -4,10 +4,7 @@ import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class EvaluationServiceImpl implements EvaluationService {
@@ -16,39 +13,42 @@ public class EvaluationServiceImpl implements EvaluationService {
 
     @Override
     public Map<String, Integer> evaluateSelection(Round round, String selectedPropositionId, String selectorId) {
-        checkIfLegalSelection(round, selectedPropositionId, selectorId);
         Map<String, Integer> evaluation = new HashMap<>();
+        if (!handleAndPunishIllegalSelection(round, selectedPropositionId, selectorId, evaluation).isEmpty()) {
+            return evaluation;
+        }
+        ;
         String sphinxId = Objects.requireNonNull(round.getSphinx()).getId();
 
-        findProposition(round, selectedPropositionId)
-                .ifPresent(proposition -> {
-                    if (!proposition.hasDuplicates()) {
-                        String proposerId = proposition.getPlayerIds().get(0);
-                        if (proposition.hasProposer(sphinxId)) {
-                            evaluation.put(selectorId, SINGLE_POINT);
-                            if (round.isHasNonSphinxPropositionBeenSelected()) {
-                                evaluation.put(sphinxId, SINGLE_POINT);
-                            } else {
-                                round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
-                            }
-                        } else {
-                            evaluation.put(proposerId, SINGLE_POINT);
-                            evaluation.put(sphinxId, round.getTempSphinxPoints());
-                            round.setTempSphinxPoints(ZERO);
-                            round.setHasNonSphinxPropositionBeenSelected(true);
-                        }
-                    } else if (proposition.hasProposer(sphinxId)) {
-                        evaluation.put(selectorId, SINGLE_POINT);
+        Optional<Proposition> optionalProposition = findProposition(round, selectedPropositionId);
+        if (optionalProposition.isPresent()) {
+            Proposition proposition = optionalProposition.get();
+            List<String> submitterIds = proposition.getPlayerIds();
 
-                    } else {
-                        evaluation.put(sphinxId, round.getTempSphinxPoints());
-                        round.setTempSphinxPoints(ZERO);
-                        round.setHasNonSphinxPropositionBeenSelected(true);
-                    }
+            if (submitterIds.contains(sphinxId)) {
+                evaluation.put(selectorId, SINGLE_POINT);
+            } else {
+                round.setHasNonSphinxPropositionBeenSelected(true);
+            }
 
-                });
+            if (submitterIds.size() == 1) {
+                String submitterId = submitterIds.get(0);
+                if (submitterId.equals(sphinxId)) {
+                    round.setTempSphinxPoints(round.getTempSphinxPoints() + SINGLE_POINT);
+                } else {
+                    evaluation.put(submitterId, SINGLE_POINT);
+                }
+            }
+
+            if (round.isHasNonSphinxPropositionBeenSelected()) {
+                evaluation.put(sphinxId, round.getTempSphinxPoints());
+                round.setTempSphinxPoints(ZERO);
+            }
+        }
+
         return evaluation;
     }
+
 
     private static Optional<Proposition> findProposition(Round round, String selectedPropositionId) {
         return round.getPropositions()
@@ -57,16 +57,18 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .findFirst();
     }
 
-    private void checkIfLegalSelection(Round round, String selectedPropositionId, String selectorId) {
+    private Map<String, Integer> handleAndPunishIllegalSelection(Round round, String selectedPropositionId, String selectorId, Map<String, Integer> evaluation) {
 
         findProposition(round, selectedPropositionId)
                 .ifPresent(proposition -> {
-                    if (!proposition.hasDuplicates() && proposition.hasProposer(selectorId)) {
-                        throw new SelectionError.IllegalSelection(selectedPropositionId);
+                    if (!proposition.hasDuplicates() && proposition.hasSubmitter(selectorId)) {
+                        evaluation.put(selectorId, ZERO);
+                        return;
                     }
-                    if (selectorId.equals(round.getSphinx().getId())){
-                        throw new SelectionError.IllegalSelector(selectorId);
+                    if (selectorId.equals(round.getSphinx().getId())) {
+                        evaluation.put(selectorId, ZERO);
                     }
                 });
+        return evaluation;
     }
 }

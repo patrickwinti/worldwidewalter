@@ -48,20 +48,12 @@ public class Proposition {
                         .count();
     }
 
-    public boolean hasProposer(final String playerId) {
+    public boolean hasSubmitter(final String playerId) {
         return playerIds.contains(playerId);
     }
 
     public boolean hasDuplicates() {
         return playerIds.size() > 1;
     }
-
-    public String getProposerId() {
-        if (playerIds.size() == 1) {
-            return playerIds.get(0);
-        } else throw new IllegalStateException("Proposition has more than one proposer");
-    }
-
-
 
 }

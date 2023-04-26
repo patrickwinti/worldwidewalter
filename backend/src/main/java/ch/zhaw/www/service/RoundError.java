@@ -36,4 +36,14 @@ public abstract class RoundError extends RuntimeException {
             super("Round has not enough players or is currently running");
         }
     }
+    
+    /**
+     * Operation is not allowed. E.g. Sphinx cannot select a proposition.
+     */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public static class IllegalOperationException extends RoundError {
+        public IllegalOperationException() {
+            super("This operation is forbidden.");
+        }
+    }
 }

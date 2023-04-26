@@ -15,6 +15,8 @@ import static ch.zhaw.www.TestHelper.createPlayer;
 import static ch.zhaw.www.TestHelper.createProposition;
 import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -106,6 +108,47 @@ class RoundTest {
         round.setSphinx(createPlayer());
         round.addProposition(proposition2);
         assertEquals(2, round.getPropositions().size());
+    }
+    
+    @Test
+    void addSelection() {
+        Round round = getRound();
+        String playerId = "playerId";
+        String propositionId = "propositionId";
+        round.addSelection(playerId, propositionId);
+        
+        assertTrue(round.getSelections().containsKey(playerId));
+        assertEquals(propositionId, round.getSelections().get(playerId));
+    }
+    
+    @Test
+    void getNumberOfPropositionsSubmitted() {
+        Proposition proposition1 = mock(Proposition.class);
+        when(proposition1.getPlayerIds()).thenReturn(List.of("1", "2"));
+        Proposition proposition2 = mock(Proposition.class);
+        when(proposition2.getPlayerIds()).thenReturn(List.of("34"));
+        
+        Round round = getRound();
+        round.addProposition(proposition1);
+        round.addProposition(proposition2);
+        
+        assertEquals(3, round.getNumberOfPropositionsSubmitted());
+    }
+    
+    @Test
+    void hasProposition() {
+        Proposition proposition1 = mock(Proposition.class);
+        when(proposition1.getId()).thenReturn("propId1");
+        Proposition proposition2 = mock(Proposition.class);
+        when(proposition2.getId()).thenReturn("propId2");
+        
+        Round round = getRound();
+        round.addProposition(proposition1);
+        round.addProposition(proposition2);
+        
+        assertTrue(round.hasProposition("propId1"));
+        assertTrue(round.hasProposition("propId2"));
+        assertFalse(round.hasProposition("notExistingId"));
     }
     
     private static Round getRound() {

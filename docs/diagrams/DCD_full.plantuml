@@ -79,6 +79,8 @@ package backend{
              -propositions: Map<Proposition>
              -selections: Map<Selection>
              +getState(): Round.State
+             +addSelection(playerId: String, propositionId: String): void
+             +addProposition(proposition: Proposition): void
         }
     }
     package service {

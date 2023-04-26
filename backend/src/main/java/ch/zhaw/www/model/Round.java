@@ -66,9 +66,7 @@ public class Round {
      * @param propositionId The ID of the proposition being selected
      */
     public void addSelection(String playerId, String propositionId) {
-        if (sphinx != null && !sphinx.getId().equals(playerId)) {
-            selections.put(playerId, propositionId);
-        }
+        selections.put(playerId, propositionId);
     }
     
     /**
@@ -137,7 +135,29 @@ public class Round {
      * @return the number of propositions submitted
      */
     int getNumberOfPropositionsSubmitted() {
-        return propositions.size();
+        return propositions.stream()
+                .map(proposition -> proposition.getPlayerIds().size())
+                .reduce(0, Integer::sum);
+    }
+    
+    /**
+     * Checks if player with given playerId is sphinx in this round
+     *
+     * @param playerId the playerId to be checked
+     * @return boolean if playerId is sphinx
+     */
+    public boolean isSphinx(String playerId) {
+        return sphinx != null && sphinx.getId().equals(playerId);
+    }
+    
+    /**
+     * Checks if proposition with given propositionId exisits in round
+     *
+     * @param propositionId the propositionId to be checked
+     * @return boolean if proposition exists in round
+     */
+    public boolean hasProposition(String propositionId) {
+        return propositions.stream().anyMatch(proposition -> proposition.getId().equals(propositionId));
     }
     
     /**

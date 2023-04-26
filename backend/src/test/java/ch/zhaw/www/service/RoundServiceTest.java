@@ -221,6 +221,67 @@ class RoundServiceTest {
         assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
     }
     
+    @Test
+    void selectProposition_playerNotActive() {
+        var roundId = "round-1";
+        var playerId = "Lorry";
+        var propositionId = "myProp";
+        when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(false);
+        assertThrows(PlayerError.NotFoundException.class, () -> roundService.selectProposition(roundId, playerId, propositionId));
+    }
+    
+    @Test
+    void selectProposition() {
+        var game = mockRoundInRepository();
+        var players = List.of(createPlayer(), createPlayer(), createPlayer());
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        players.forEach(player -> {
+            game.addPlayerToWaitingRoom(player);
+            game.moveToActivePlayers(player);
+        });
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
+        var propId = round.getPropositions().get(0).getId();
+        roundService.selectProposition(round.getId(), players.get(1).getId(), propId);
+        
+        assertEquals(1, round.getSelections().size());
+        assertTrue(round.getSelections().containsKey(players.get(1).getId()));
+        assertEquals(round.getSelections().get(players.get(1).getId()), propId);
+    }
+    
+    @Test
+    void selectProposition_isSphinx() {
+        var game = mockRoundInRepository();
+        var players = List.of(createPlayer(), createPlayer(), createPlayer());
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        players.forEach(player -> {
+            game.addPlayerToWaitingRoom(player);
+            game.moveToActivePlayers(player);
+        });
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        var sphinxId = Objects.requireNonNull(round.getSphinx()).getId();
+        roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
+        var propId = round.getPropositions().get(0).getId();
+        
+        assertThrows(RoundError.IllegalOperationException.class, () -> roundService.selectProposition(round.getId(), sphinxId, propId));
+    }
+    
+    @Test
+    void selectProposition_notExistingProposition() {
+        var game = mockRoundInRepository();
+        var players = List.of(createPlayer(), createPlayer(), createPlayer());
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        players.forEach(player -> {
+            game.addPlayerToWaitingRoom(player);
+            game.moveToActivePlayers(player);
+        });
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
+        var propId = "notExistingPropId";
+        
+        assertThrows(RoundError.IllegalOperationException.class, () -> roundService.selectProposition(round.getId(), players.get(0).getId(), propId));
+    }
+    
     @SuppressWarnings("unchecked")
     private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);

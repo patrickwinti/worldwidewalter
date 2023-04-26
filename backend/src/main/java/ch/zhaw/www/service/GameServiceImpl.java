@@ -82,7 +82,7 @@ class GameServiceImpl implements GameService {
             Player playerEnteringRound = checkPlayerInGame(game, playerId);
             Game.State state = game.getState();
             switch (state) {
-                case NO_VALID_ROUND -> {
+                case NO_VALID_ROUND, WAITING_FOR_NEW_ROUND -> {
                     var round = roundService.createNewRound(game);
                     game.addRound(round);
                     LOGGER.log(Level.INFO, "Creating a new round for game {0}", game);

@@ -83,7 +83,7 @@ class RoundServiceImpl implements RoundService {
     public void selectProposition(String roundId, String playerId, String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
-            if (!round.isSphinx(playerId) && round.propositionExists(propositionId)) {
+            if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
                 round.addSelection(playerId, propositionId);
             } else {
                 throw new RoundError.IllegalOperationException();

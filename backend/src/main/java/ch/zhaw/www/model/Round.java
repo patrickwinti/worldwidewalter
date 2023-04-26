@@ -152,7 +152,7 @@ public class Round {
      * @param propositionId the propositionId to be checked
      * @return boolean if proposition exists in round
      */
-    public boolean propositionExists(String propositionId) {
+    public boolean hasProposition(String propositionId) {
         return propositions.stream().anyMatch(proposition -> proposition.getId().equals(propositionId));
     }
     

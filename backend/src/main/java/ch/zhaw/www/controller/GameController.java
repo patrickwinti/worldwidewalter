@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,11 +31,11 @@ import java.util.logging.Logger;
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
-
+    
     GameController(GameService gameService) {
         this.gameService = gameService;
     }
-
+    
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
@@ -80,7 +79,7 @@ public class GameController {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game successfully");
     }
-
+    
     @Operation(summary = "Retrieves the points for each player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
@@ -124,7 +123,7 @@ public class GameController {
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRoundOpenForPropositions(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
-
+        
         PlayerDto sphinx = null;
         if (round.getSphinx() != null) {
             if (round.getSphinx().getId().equals(playerId)) {
@@ -139,7 +138,7 @@ public class GameController {
         
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));
     }
-
+    
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
@@ -162,20 +161,17 @@ public class GameController {
     }
     
     private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, Map<String, String> selections) {
-        List<SelectionDto> selectionDtos = new ArrayList<>();
-        propositions.forEach(proposition -> {
-            List<String> selectors = new ArrayList<>();
-            selections.entrySet().stream()
-                    .filter(entry -> entry.getValue().equals(proposition.getId()))
-                    .forEach(entry -> selectors.add(game.getPlayerNameFromId(entry.getKey())));
-            
-            selectionDtos.add(
-                    new SelectionDto(
-                            proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
-                            proposition.getGaps(),
-                            selectors
-                    ));
-        });
-        return selectionDtos;
+        return propositions.stream()
+                .map(proposition ->
+                        new SelectionDto(
+                                proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
+                                proposition.getGaps(),
+                                selections.entrySet().stream()
+                                        .filter(entry -> entry.getValue().equals(proposition.getId()))
+                                        .map(entry -> game.getPlayerNameFromId(entry.getKey()))
+                                        .toList()
+                        )
+                )
+                .toList();
     }
 }

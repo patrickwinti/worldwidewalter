@@ -85,6 +85,8 @@ class RoundServiceImpl implements RoundService {
         entityService.editRound(roundId, round -> {
             if (!round.isSphinx(playerId) && round.propositionExists(propositionId)) {
                 round.addSelection(playerId, propositionId);
+            } else {
+                throw new RoundError.IllegalOperationException();
             }
         });
     }

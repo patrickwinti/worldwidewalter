@@ -48,20 +48,21 @@ public class Proposition {
                         .count();
     }
 
-    public boolean hasProposer(final String playerId) {
+    /**
+     * Checks if a given player submitted the current proposition.
+     * @param playerId player identifier
+     * @return true if the player submitted the proposition, false otherwise.
+     */
+    public boolean hasSubmitter(final String playerId) {
         return playerIds.contains(playerId);
     }
 
+    /**
+     * Checks if the current proposition has duplicates.
+     * @return true if the proposition has duplicates, false otherwise.
+     */
     public boolean hasDuplicates() {
         return playerIds.size() > 1;
     }
-
-    public String getProposerId() {
-        if (playerIds.size() == 1) {
-            return playerIds.get(0);
-        } else throw new IllegalStateException("Proposition has more than one proposer");
-    }
-
-
 
 }

@@ -32,11 +32,11 @@ import java.util.logging.Logger;
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
-    
+
     GameController(GameService gameService) {
         this.gameService = gameService;
     }
-    
+
     @Operation(summary = "Creates a new game")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
@@ -80,11 +80,12 @@ public class GameController {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game successfully");
     }
-    
+
     @Operation(summary = "Retrieves the points for each player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "405", description = "Not all selections have been submitted yet"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
@@ -128,7 +129,7 @@ public class GameController {
     public ResponseEntity<RoundDto> getRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = gameService.getRoundOpenForPropositions(gameId, playerId);
         logger.log(Level.INFO, "get current round {0}", round);
-        
+
         PlayerDto sphinx = null;
         if (round.getSphinx() != null) {
             if (round.getSphinx().getId().equals(playerId)) {
@@ -143,7 +144,7 @@ public class GameController {
         
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));
     }
-    
+
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),

@@ -1,25 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RankingContainerComponent } from './ranking-container.component';
+import { ResultContainerComponent } from './result-container.component';
 import { NO_ERRORS_SCHEMA } from "@angular/core";
 import { getGameServiceMock } from "../../../testing/mock-services";
 import { GameService } from "../../../service/game.service";
-import { ResultDto } from "../../../dto/results-dto";
+import { RankingDto } from "../../../dto/result-dto";
 
 describe('ShowRankingComponent', () => {
-  let component: RankingContainerComponent;
-  let fixture: ComponentFixture<RankingContainerComponent>;
+  let component: ResultContainerComponent;
+  let fixture: ComponentFixture<ResultContainerComponent>;
   let gameService = getGameServiceMock();
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [RankingContainerComponent],
+      declarations: [ResultContainerComponent],
       providers: [{provide: GameService, useValue: gameService}],
       schemas: [NO_ERRORS_SCHEMA]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(RankingContainerComponent);
+    fixture = TestBed.createComponent(ResultContainerComponent);
     component = fixture.componentInstance;
   });
 
@@ -31,10 +31,10 @@ describe('ShowRankingComponent', () => {
   it('should sort ranking', () => {
     // arrange
     var unsorted = [
-      {playerName: 'Hanna', points: 12} as ResultDto,
-      {playerName: 'Mudi', points: 3} as ResultDto,
-      {playerName: 'Herzog', points: 9} as ResultDto,
-      {playerName: 'Herzog', points: 1} as ResultDto
+      {playerName: 'Hanna', points: 12} as RankingDto,
+      {playerName: 'Mudi', points: 3} as RankingDto,
+      {playerName: 'Herzog', points: 9} as RankingDto,
+      {playerName: 'Herzog', points: 1} as RankingDto
     ];
 
     // act
@@ -42,10 +42,10 @@ describe('ShowRankingComponent', () => {
 
     // assert
     expect(sorted).toEqual([
-      {playerName: 'Hanna', points: 12} as ResultDto,
-      {playerName: 'Herzog', points: 9} as ResultDto,
-      {playerName: 'Mudi', points: 3} as ResultDto,
-      {playerName: 'Herzog', points: 1} as ResultDto
+      {playerName: 'Hanna', points: 12} as RankingDto,
+      {playerName: 'Herzog', points: 9} as RankingDto,
+      {playerName: 'Mudi', points: 3} as RankingDto,
+      {playerName: 'Herzog', points: 1} as RankingDto
     ])
   })
 });

@@ -62,7 +62,7 @@ public class RoundController {
         roundService.selectProposition(roundId, playerId, propositionId);
         logger.log(Level.INFO, "proposition selected successfully");
     }
-
+    
     @Operation(summary = "Get all propositions sent by the players in current round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Propositions in round to be selected by players"),
@@ -85,7 +85,7 @@ public class RoundController {
         )));
         return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
     }
-
+    
     private static boolean isPropositionReadOnly(Proposition proposition, String playerId, boolean isSphinx) {
         return isSphinx || (proposition.getPlayerIds().contains(playerId) && proposition.getPlayerIds().size() == 1);
     }

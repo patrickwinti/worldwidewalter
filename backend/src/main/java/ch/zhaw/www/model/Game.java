@@ -157,6 +157,13 @@ public class Game {
         return players.stream();
     }
 
+    public String getPlayerNameFromId(String id) {
+        return getAllPlayers()
+                .filter(player -> player.getId().equals(id))
+                .map(Player::getName)
+                .findFirst().orElse(null);
+    }
+
     /**
      * Moves players in the waiting room into the active list, if there is space in current round
      *

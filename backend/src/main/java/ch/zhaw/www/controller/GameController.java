@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -99,12 +99,7 @@ public class GameController {
         }
         var propositions = round.getPropositions();
         
-        // todo (schwipa2, 23.04.23): uncomment as soon as selections are persisted in backend
-//        var selections = round.getSelections();
-        var selections = new HashMap<String, String>();
-        for (Proposition proposition : propositions) {
-            selections.put(proposition.getPlayerIds().get(0), proposition.getId());
-        }
+        var selections = round.getSelections();
         
         List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
         
@@ -166,7 +161,7 @@ public class GameController {
         logger.log(Level.INFO, "left game ungracefully by destroying webapp");
     }
     
-    private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, HashMap<String, String> selections) {
+    private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, Map<String, String> selections) {
         List<SelectionDto> selectionDtos = new ArrayList<>();
         propositions.forEach(proposition -> {
             List<String> selectors = new ArrayList<>();

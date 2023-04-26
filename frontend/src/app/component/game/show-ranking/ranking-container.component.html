@@ -1,5 +1,5 @@
-<www-ranking-display *ngIf="ranking$ | async as ranking"
-                     [sortedResults]="sortRanking(ranking)">
+<www-ranking-display *ngIf="result$ | async as result"
+                     [sortedResults]="sortRanking(result.ranking)">
 </www-ranking-display>
 
 

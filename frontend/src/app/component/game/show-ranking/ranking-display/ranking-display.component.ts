@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ResultDto } from "../../../../dto/results-dto";
+import { RankingDto } from "../../../../dto/result-dto";
 
 @Component({
   selector: 'www-ranking-display',
@@ -7,5 +7,5 @@ import { ResultDto } from "../../../../dto/results-dto";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RankingDisplayComponent {
-  @Input() sortedResults: ResultDto[];
+  @Input() sortedResults: RankingDto[];
 }

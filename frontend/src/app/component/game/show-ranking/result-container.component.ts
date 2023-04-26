@@ -7,11 +7,11 @@ import { RankingDto, ResultDto } from "../../../dto/result-dto";
 import { GameState } from "../../../model/game-state";
 
 @Component({
-  selector: 'www-ranking-container',
-  templateUrl: './ranking-container.component.html',
+  selector: 'www-result-container',
+  templateUrl: './result-container.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RankingContainerComponent implements OnInit {
+export class ResultContainerComponent implements OnInit {
   @Input() round: RoundDto;
   result$: Observable<ResultDto>;
 

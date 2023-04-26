@@ -21,9 +21,8 @@ public class Proposition {
     @NotNull
     private final String id;
     private final List<String> gaps;
-    
     private final List<String> playerIds = new ArrayList<>();
-    
+
     /**
      * Adds player that submitted the given proposition.
      * Players that submitted duplicates of the prompt
@@ -34,7 +33,7 @@ public class Proposition {
     public void submittedBy(final String playerId) {
         playerIds.add(playerId);
     }
-    
+
     /**
      * Checks if the current proposition has the same gaps as the given proposition.
      *
@@ -48,4 +47,22 @@ public class Proposition {
                         .filter(i -> otherGaps.get(i).trim().equalsIgnoreCase(gaps.get(i).trim()))
                         .count();
     }
+
+    /**
+     * Checks if a given player submitted the current proposition.
+     * @param playerId player identifier
+     * @return true if the player submitted the proposition, false otherwise.
+     */
+    public boolean hasSubmitter(final String playerId) {
+        return playerIds.contains(playerId);
+    }
+
+    /**
+     * Checks if the current proposition has duplicates.
+     * @return true if the proposition has duplicates, false otherwise.
+     */
+    public boolean hasDuplicates() {
+        return playerIds.size() > 1;
+    }
+
 }

@@ -3,7 +3,9 @@ package ch.zhaw.www.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -171,33 +173,62 @@ class GameTest {
         game.moveToActivePlayers(player);
         assertTrue(game.hasActivePlayer(player.getId()));
     }
-
+    
     @Test
     void consumePrompts() {
         List<Prompt> originalList = List.of(new Prompt("WALTER WALTER WALTEROO", 2),
-                                            new Prompt("WALTER WALTER hello", 1),
-                                            new Prompt("WALTER says hi", 1));
-
+                new Prompt("WALTER WALTER hello", 1),
+                new Prompt("WALTER says hi", 1));
+        
         Game game = new Game("12345", 4, 10, 1, originalList);
-
+        
         var prompt1 = game.consumePrompt();
         assertEquals(prompt1, originalList.get(0));
         var prompt2 = game.consumePrompt();
         assertEquals(prompt2, originalList.get(0));
-
+        
         game.addRound(createRound());
         var prompt3 = game.consumePrompt();
         assertEquals(prompt3, originalList.get(1));
         var prompt4 = game.consumePrompt();
         assertNotEquals(prompt4, originalList.get(2));
-
+        
         game.addRound(createRound());
         var prompt5 = game.consumePrompt();
         assertEquals(prompt5, originalList.get(2));
         game.addRound(createRound());
-
+        
         var prompt6 = game.consumePrompt();
         assertEquals(prompt6, originalList.get(0));
+    }
+    
+    @Test
+    void addPoints() {
+        var player1 = "player1";
+        var player2 = "player2";
+        var player3 = "player3";
+        Map<String, Integer> evaluation = new HashMap<>();
+        evaluation.put(player1, 2);
+        evaluation.put(player2, 1);
+        Game game = new Game("12345", 4, 10, 1, List.of());
+        
+        game.addPoints(evaluation);
+        assertTrue(game.getPoints().containsKey(player1));
+        assertEquals(2, game.getPoints().get(player1));
+        assertTrue(game.getPoints().containsKey(player2));
+        assertEquals(1, game.getPoints().get(player2));
+        
+        Map<String, Integer> evaluation2 = new HashMap<>();
+        evaluation2.put(player2, 1);
+        evaluation2.put(player3, 1);
+        game.addPoints(evaluation2);
+        
+        assertTrue(game.getPoints().containsKey(player1));
+        assertEquals(2, game.getPoints().get(player1));
+        assertTrue(game.getPoints().containsKey(player2));
+        assertEquals(2, game.getPoints().get(player2));
+        assertTrue(game.getPoints().containsKey(player3));
+        assertEquals(1, game.getPoints().get(player3));
     }
     
 }

@@ -102,10 +102,6 @@ class GameTest {
         Player sphinx = createPlayer();
         round.setSphinx(sphinx);
         assertSame(round, game.getCurrentRound());
-        
-        when(round.getState()).thenReturn(Round.State.FINISHED);
-        assertNull(game.getCurrentRound());
-        
     }
     
     @Test

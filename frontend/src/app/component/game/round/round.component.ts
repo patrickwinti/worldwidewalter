@@ -39,6 +39,7 @@ export class RoundComponent implements OnInit {
       },
       (error: HttpErrorResponse) => {
         console.log('an error occurred: ' + error.status);
+        this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
       });
   }
 
@@ -53,6 +54,7 @@ export class RoundComponent implements OnInit {
         },
         (error: HttpErrorResponse) => {
           console.log('an error occurred: ' + error.status);
+          this.stateService.setState(GameState.SELECT_PROPOSITION);
         }
       );
   }

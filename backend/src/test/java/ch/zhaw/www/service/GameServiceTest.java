@@ -144,7 +144,6 @@ class GameServiceTest {
         final String anyPlayerId = players.get(0).getId();
         assertEquals(round, gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
         offsetFixedClockBy(ROUND_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
     }
     
     @Test

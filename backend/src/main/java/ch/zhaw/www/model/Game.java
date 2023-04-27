@@ -45,8 +45,7 @@ public class Game {
         if (rounds.isEmpty()) {
             return null;
         } else {
-            var round = rounds.get(rounds.size() - 1);
-            return round.getState() != Round.State.FINISHED ? round : null;
+            return rounds.get(rounds.size() - 1);
         }
     }
     
@@ -69,7 +68,7 @@ public class Game {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
         } else if (canAcceptSelections(round) && !haveAllPlayersSubmittedASelection(round)) {
             return State.WAITING_FOR_ALL_SELECTIONS;
-        } else if (haveAllPlayersSubmittedASelection(round)) {
+        } else if (haveAllPlayersSubmittedASelection(round) || !canAcceptSelections(round)) {
             return State.WAITING_FOR_NEW_ROUND;
         } else {
             return State.NO_VALID_ROUND;

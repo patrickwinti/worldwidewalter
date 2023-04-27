@@ -29,6 +29,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
   private readonly milliSecondsInASecond = 1000;
   private readonly secondsInAMinute = 60;
   private readonly minutesInAnHour = 60;
+  private readonly TIMEOUT_REDUCTION = 2 * this.milliSecondsInASecond;
 
   constructor(private cd: ChangeDetectorRef) {
   }
@@ -43,7 +44,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
           this.timeoutEmitter.emit();
         }
       });
-    this.timeout = this.getUTCMilliseconds(this.timeoutString);
+    this.timeout = this.getUTCMilliseconds(this.timeoutString) - this.TIMEOUT_REDUCTION;
   }
 
   ngOnDestroy(): void {

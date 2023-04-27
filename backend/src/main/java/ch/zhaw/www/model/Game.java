@@ -244,6 +244,11 @@ public class Game {
         return sphinxCandidates;
     }
     
+    /**
+     * Adds and stores the points of the players in the game.
+     *
+     * @param evaluation a map containing the playerId as key and points as value
+     */
     public void addPoints(Map<String, Integer> evaluation) {
         evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
     }

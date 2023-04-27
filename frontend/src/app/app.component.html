@@ -1,14 +1,18 @@
-<div class="header">
-  <div class="textbox special-margin1">Worldwide</div>
-  <div class="textbox special-margin2">WALTER</div>
+<div>
+  <div class="header">
+    <img ngSrc="assets/WWW-logo.svg" width="175" height="175" alt="WWW-logo">
+  </div>
+
+  <www-initialization-container *ngIf="gameIsInitializing()"
+                                (startGameEmitter)="startGame()">
+  </www-initialization-container>
+
+  <www-game-container *ngIf="!gameIsInitializing()">
+  </www-game-container>
+
+  <www-overlay-spinner>
+  </www-overlay-spinner>
+
+  <www-info>
+  </www-info>
 </div>
-
-<www-initialization-container *ngIf="gameIsInitializing()"
-                              (startGameEmitter)="startGame()">
-</www-initialization-container>
-
-<www-game-container *ngIf="!gameIsInitializing()">
-</www-game-container>
-
-<www-overlay-spinner>
-</www-overlay-spinner>

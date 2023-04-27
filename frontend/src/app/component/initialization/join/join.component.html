@@ -1,11 +1,13 @@
-Spiel Id: <input type="text" name="gameId" placeholder="Spiel Id"
-                [readOnly]="gameIdIsReadOnly"
-                [(ngModel)]="joinGameId"/>
-Name: <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
-<button (click)="joinGame()" formtarget="_blank">beitreten</button>
+<div class="content">
+  <input type="text" name="gameId" placeholder="Spiel Id"
+         [readOnly]="gameIdIsReadOnly"
+         [(ngModel)]="joinGameId"/>
 
+  <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
+  <button (click)="joinGame()" formtarget="_blank">beitreten</button>
+</div>
 <ng-container *ngIf="error">
-  <div>
+  <p style="color: orangered">
     {{this.errorText}}
-  </div>
+  </p>
 </ng-container>

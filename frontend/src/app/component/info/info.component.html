@@ -1,0 +1,25 @@
+<div class="info">
+  <button (click)="collapsed=!collapsed" type="button" class="collapsible"> Info</button>
+  <div *ngIf="!collapsed" class="content_collapsed">
+    <b style="text-align: start;">Regeln:</b>
+    <ul>
+      <li>Pro Runde wird ein Spieler als Sphinx ausgewählt</li>
+      <li>Die Sphinx wird einen Satz vorlesen, bei welchem eine (oder mehrere Wörter) mit <i>WALTER</i> ersetzt ist</li>
+      <li>Euren Job ist nun, die <i>WALTER</i> Platzhalter mit einem Vorschlag ersetzen, welches ihr meint am besten zur
+        Sphinx
+        passt.
+      </li>
+      <li>Nachher musst ihr versuchen, aus allen Vorschläge den Vorschlag der Sphinx zu selektieren.</li>
+
+    </ul>
+  </div>
+
+  <div *ngIf="!collapsed" class="content_collapsed">
+    <b style="text-align: start;">Punkte:</b>
+    <ul>
+      <li>Jeder, der auf die Sphinx-Antwort getippt hat kriegt einen Punkt</li>
+      <li>Pro richtige tippt kriegt die Sphinx auch einen Punkt</li>
+      <li>Duplizierte Vorschläge werden ergeben keine Punkte, auch für die Sphinx</li>
+    </ul>
+  </div>
+</div>

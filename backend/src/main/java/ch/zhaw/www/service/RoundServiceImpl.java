@@ -15,6 +15,7 @@ class RoundServiceImpl implements RoundService {
     
     private final GameProperties gameProperties;
     private final EntityService entityService;
+    private final EvaluationService evaluationService;
     
     /**
      * Constructs a RoundServiceImpl object with the specified GameProperties and EntityService instances.
@@ -22,9 +23,12 @@ class RoundServiceImpl implements RoundService {
      * @param gameProperties the GameProperties instance to use
      * @param entityService  the EntityService instance to use
      */
-    RoundServiceImpl(GameProperties gameProperties, EntityService entityService) {
+    RoundServiceImpl(GameProperties gameProperties,
+                     EntityService entityService,
+                     EvaluationService evaluationService) {
         this.gameProperties = gameProperties;
         this.entityService = entityService;
+        this.evaluationService = evaluationService;
     }
     
     @Override
@@ -85,6 +89,9 @@ class RoundServiceImpl implements RoundService {
         entityService.editRound(roundId, round -> {
             if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
                 round.addSelection(playerId, propositionId);
+                var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
+                var game = entityService.getGameForRound(roundId);
+                game.addPoints(evaluation);
             } else {
                 throw new RoundError.IllegalOperationException();
             }

@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -97,14 +96,16 @@ public class GameController {
             throw new RoundError.NotFoundException("not current round for game " + gameId);
         }
         var propositions = round.getPropositions();
-        
         var selections = round.getSelections();
         
         List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
         
-        // todo (schwipa2, 23.04.23): add real ranking values as soon as available
         var resultDto = new ResultDto(
-                Arrays.asList(new RankingDto("Elias", 10), new RankingDto("Jenny", 1), new RankingDto("Sara", 12)),
+                game.getPoints()
+                        .entrySet()
+                        .stream()
+                        .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue()))
+                        .toList(),
                 selectionDtos);
         
         logger.log(Level.INFO, "game results returned {0}", game);

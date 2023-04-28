@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Class containing all the information related to a game.
- * It controls players in game, running rounds and prompts from the deck
+ * Class containing all the information related to a game. It controls players in game, running rounds and prompts from
+ * the deck
  */
 @ToString
 @EqualsAndHashCode
@@ -32,10 +32,11 @@ public class Game {
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts;
-
+    @Getter
+    private final Map<String, Integer> points = new HashMap<>();
+    
     /**
-     * Gets current round,
-     * when the SphinxElector has been selected
+     * Gets current round, when the SphinxElector has been selected
      *
      * @return {@link Round} or null
      */
@@ -48,7 +49,7 @@ public class Game {
             return round.getState() != Round.State.FINISHED ? round : null;
         }
     }
-
+    
     /**
      * Returns state of the current game:
      * - Waiting for player: Not enough players active or no valid round
@@ -68,13 +69,13 @@ public class Game {
             return State.WAITING_FOR_ALL_PROPOSITIONS;
         } else if (canAcceptSelections(round) && !haveAllPlayersSubmittedASelection(round)) {
             return State.WAITING_FOR_ALL_SELECTIONS;
-        } else if(haveAllPlayersSubmittedASelection(round)){
+        } else if (haveAllPlayersSubmittedASelection(round)) {
             return State.WAITING_FOR_NEW_ROUND;
         } else {
             return State.NO_VALID_ROUND;
         }
     }
-
+    
     /*
      * Helper function to check if all active players have submitted a selection.
      *
@@ -84,7 +85,7 @@ public class Game {
     private boolean haveAllPlayersSubmittedASelection(final Round round) {
         return round.getNumberOfSelectionsSubmitted() == activePlayers.size() - 1;
     }
-
+    
     /*
      * Helper function to check if selections can be made for the current round.
      *
@@ -95,7 +96,7 @@ public class Game {
         return round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
                 round.getState() == Round.State.OPEN_FOR_SELECTIONS;
     }
-
+    
     /*
      * Checks if there are enough players to start the game.
      *
@@ -104,7 +105,7 @@ public class Game {
     private boolean hasEnoughPlayers() {
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
-
+    
     /*
      * Checks if the given round can accept new propositions.
      *
@@ -115,7 +116,7 @@ public class Game {
         return round.getNumberOfPropositionsSubmitted() < activePlayers.size() &&
                 round.getState() == Round.State.OPEN_FOR_SUBMISSIONS;
     }
-
+    
     /*
      * Checks if the given round has not started yet.
      *
@@ -125,7 +126,7 @@ public class Game {
     private boolean hasRoundNotStartedYet(final Round round) {
         return round.getState() == Round.State.CREATED;
     }
-
+    
     /**
      * Returns the first prompt in the list of prompts and removes it from the list.
      * <p>
@@ -136,7 +137,7 @@ public class Game {
     public Prompt consumePrompt() {
         return prompts.get(rounds.size() % prompts.size());
     }
-
+    
     /**
      * Adds a new round to the game.
      *
@@ -145,7 +146,7 @@ public class Game {
     public void addRound(Round round) {
         rounds.add(round);
     }
-
+    
     /**
      * Returns a stream of all players in the game, including those in the waiting room and those who are active.
      *
@@ -156,14 +157,14 @@ public class Game {
         players.addAll(activePlayers.values());
         return players.stream();
     }
-
+    
     public String getPlayerNameFromId(String id) {
         return getAllPlayers()
                 .filter(player -> player.getId().equals(id))
                 .map(Player::getName)
                 .findFirst().orElse(null);
     }
-
+    
     /**
      * Moves players in the waiting room into the active list, if there is space in current round
      *
@@ -178,7 +179,7 @@ public class Game {
                 .ifPresentOrElse(entry -> {
                 }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
     }
-
+    
     /**
      * Checks if player ID is currently an active player
      *
@@ -188,7 +189,7 @@ public class Game {
     public boolean hasActivePlayer(@NotNull String playerId) {
         return activePlayers.containsKey(playerId);
     }
-
+    
     /**
      * Checks if player ID is currently a player
      *
@@ -198,7 +199,7 @@ public class Game {
     public boolean hasPlayer(@NotNull String playerId) {
         return getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
     }
-
+    
     /**
      * Adds player to waiting room if not already active
      *
@@ -207,7 +208,7 @@ public class Game {
     public void addPlayerToWaitingRoom(@NotNull Player player) {
         waitingRoom.put(player.getId(), player);
     }
-
+    
     /**
      * Removes player from waiting room or active players
      *
@@ -219,7 +220,7 @@ public class Game {
         sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);
     }
-
+    
     /**
      * There is room for more active player in this or next round
      *
@@ -228,10 +229,9 @@ public class Game {
     public boolean hasCapacityForNewActivePlayer() {
         return activePlayers.size() < maximumAmountOfPlayers;
     }
-
+    
     /**
-     * Fetches sphinx candidates. If there are no candidates, then it returns
-     * a set of entries.
+     * Fetches sphinx candidates. If there are no candidates, then it returns a set of entries.
      *
      * @return set of every map entry
      */
@@ -243,7 +243,16 @@ public class Game {
         }
         return sphinxCandidates;
     }
-
+    
+    /**
+     * Adds and stores the points of the players in the game.
+     *
+     * @param evaluation a map containing the playerId as key and points as value
+     */
+    public void addPoints(Map<String, Integer> evaluation) {
+        evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
+    }
+    
     /**
      * An enumeration representing the possible states of a game.
      */

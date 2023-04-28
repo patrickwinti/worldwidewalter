@@ -40,10 +40,12 @@ input {
   text-align: center;
   width: 150px;
   margin: 1px 0 2px 10px;
+  border-radius: 4px;
 }
 
 .special-margin2 {
   margin-left: 20px;
+  align-self: center;
 }
 
 .special-margin3 {

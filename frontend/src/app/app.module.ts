@@ -18,8 +18,12 @@ import { CountDownComponent } from './component/count-down/count-down.component'
 import { RankingDisplayComponent } from './component/game/show-ranking/ranking-display/ranking-display.component';
 import { EnterPropositionComponent } from "./component/game/round/enter-proposition/enter-proposition.component";
 import { SelectPropositionComponent } from "./component/game/round/select-proposition/select-proposition.component";
-import { SelectionDisclosureComponent } from './component/game/show-ranking/selection-disclosure/selection-disclosure.component';
+import {
+   SelectionDisclosureComponent
+} from './component/game/show-ranking/selection-disclosure/selection-disclosure.component';
 import { ErrorComponent } from './component/error/error.component';
+import { InfoComponent } from "./component/info/info.component";
+import { NgOptimizedImage } from "@angular/common";
 
 @NgModule({
   declarations: [
@@ -38,12 +42,14 @@ import { ErrorComponent } from './component/error/error.component';
     SphinxDisplayComponent,
     SelectionDisclosureComponent,
     ErrorComponent,
+    InfoComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    NgOptimizedImage
   ],
   providers: [
     {

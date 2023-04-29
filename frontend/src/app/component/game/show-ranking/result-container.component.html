@@ -1,8 +1,11 @@
 <ng-container *ngIf="result$ | async as result">
 
+  <h2>Ranking</h2>
   <www-ranking-display [sortedResults]="sortRanking(result.ranking)">
   </www-ranking-display>
-
+  <br>
+  <br>
+  <h2>Übersicht Vorschläge</h2>
   <www-selection-disclosure [selections]="result.selections">
   </www-selection-disclosure>
 </ng-container>

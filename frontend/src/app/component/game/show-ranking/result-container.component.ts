@@ -36,4 +36,8 @@ export class ResultContainerComponent implements OnInit {
       this.stateService.leaveGame()
     });
   }
+
+  get prompt(): String {
+    return this.stateService.getPrompt();
+  }
 }

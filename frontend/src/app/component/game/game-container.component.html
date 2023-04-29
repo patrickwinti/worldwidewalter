@@ -2,12 +2,12 @@
   <www-round *ngIf="round$ | async as round; else entering"
              [round]="round">
   </www-round>
+
   <ng-template hidden="" #entering>
     <www-error (retryEmitter)="tryAgain()">
     </www-error>
   </ng-template>
 </div>
-
 
 <www-result-container *ngIf="gameState == GameState.SHOW_RESULTS_AND_RANKING">
 </www-result-container>

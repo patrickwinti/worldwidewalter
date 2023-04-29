@@ -29,6 +29,7 @@ export class RoundComponent implements OnInit {
     this.stateService.setState(GameState.ENTER_PROPOSITION);
     this.stateObservable$ = this.stateService.getStateObservable();
     this.propositionSelectionDto$ = this.gameService.getAllPropositions(this.round.id);
+    this.stateService.setPrompt(this.round.prompt);
   }
 
   submitSelection(selectedPropositionId: string): void {

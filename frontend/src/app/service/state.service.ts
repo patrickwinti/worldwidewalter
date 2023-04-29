@@ -9,6 +9,7 @@ export class StateService {
   private gameState = new BehaviorSubject<GameState>(GameState.INITIALIZATION);
   private gameId: string;
   private playerId: string;
+  private prompt: string;
 
   getGameId(): string {
     return this.gameId ?? '';
@@ -57,5 +58,13 @@ export class StateService {
 
   isInitializing(): boolean {
     return this.getCurrentState() === GameState.INITIALIZATION;
+  }
+
+  setPrompt(prompt: string): void {
+    this.prompt = prompt;
+  }
+
+  getPrompt(): string {
+    return this.prompt;
   }
 }

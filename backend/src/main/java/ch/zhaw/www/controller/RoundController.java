@@ -13,10 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Controller for "rounds" resource.
@@ -75,15 +76,21 @@ public class RoundController {
     public ResponseEntity<PropositionSelectionDto> getAllPropositionForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
         var round = roundService.getRoundReadyForSelections(roundId, playerId);
         logger.log(Level.INFO, "round selections returned {0}", round);
-        List<PropositionSelectionDto.Proposition> propositions = new ArrayList<>();
         var isSphinx = round.getSphinx() != null && round.getSphinx().getId().equals(playerId);
-        round.getPropositions().forEach(proposition -> propositions.add(new PropositionSelectionDto.Proposition(
-                proposition.getId(),
-                proposition.getGaps(),
-                proposition.getPlayerIds().size(),
-                isPropositionReadOnly(proposition, playerId, isSphinx)
-        )));
-        return ResponseEntity.ok(new PropositionSelectionDto(roundId, propositions, round.getSelectionSubmissionEnd()));
+        List<PropositionSelectionDto.Proposition> propositions = round.getPropositions()
+                .stream()
+                .map(proposition -> new PropositionSelectionDto.Proposition(
+                        proposition.getId(),
+                        proposition.getGaps(),
+                        proposition.getPlayerIds().size(),
+                        isPropositionReadOnly(proposition, playerId, isSphinx)
+                )).collect(Collectors.toList());
+        Collections.shuffle(propositions);
+        
+        return ResponseEntity.ok(new PropositionSelectionDto(
+                roundId,
+                propositions,
+                round.getSelectionSubmissionEnd()));
     }
     
     private static boolean isPropositionReadOnly(Proposition proposition, String playerId, boolean isSphinx) {

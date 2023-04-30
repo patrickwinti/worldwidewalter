@@ -62,12 +62,15 @@ class GameControllerTest {
     @Test
     void testEnterGame_200() throws Exception {
         when(gameService.enterGame(any(), any())).thenReturn(PLAYER_ID);
+        Game game = mock(Game.class);
+        when(game.getPlayerNameFromId(PLAYER_ID)).thenReturn("Ulisses");
+        when(gameService.getGame(any())).thenReturn(game);
         
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/players", GAME_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"playerName\":\"Ulisses\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + PLAYER_ID + "\"}"));
+                .andExpect(content().json("{\"id\":\"" + PLAYER_ID + "\", \"playerName\":\"Ulisses\"}"));
         verify(gameService).enterGame(GAME_ID, "Ulisses");
     }
     

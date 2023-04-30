@@ -49,6 +49,7 @@ export class JoinComponent implements OnInit {
           (player: PlayerDto) => {
             this.stateService.setPlayerId(player.id);
             this.stateService.setGameId(this.joinGameId);
+            this.stateService.setPlayerName(player.playerName)
             this.initializationStateEmitter.emit(InitializationState.DONE);
             console.log('joining game: ' + this.joinGameId + 'with username: ' + this.playerName);
           },

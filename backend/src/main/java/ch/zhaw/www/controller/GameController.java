@@ -62,8 +62,9 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
         String playerId = gameService.enterGame(gameId, playerDto.getPlayerName());
+        String playerName = gameService.getGame(gameId).getPlayerNameFromId(playerId);
         logger.log(Level.INFO, () -> String.format("%s entered game %s", playerId, gameId));
-        return ResponseEntity.ok(new PlayerDto(playerId));
+        return ResponseEntity.ok(new PlayerDto(playerId, playerName));
     }
     
     @Operation(summary = "Player leaves game gracefully")
@@ -129,12 +130,11 @@ public class GameController {
         if (round.getSphinx() != null) {
             if (round.getSphinx().getId().equals(playerId)) {
                 logger.log(Level.INFO, "current sphinx requesting round {0}", playerId);
-                sphinx = new PlayerDto(round.getSphinx().getId());
+                sphinx = new PlayerDto(round.getSphinx().getId(), round.getSphinx().getName());
             } else {
                 // for security reasons only pass the sphinx id to the actual Sphinx
-                sphinx = new PlayerDto("");
+                sphinx = new PlayerDto("", round.getSphinx().getName());
             }
-            sphinx.setPlayerName(round.getSphinx().getName());
         }
         
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));

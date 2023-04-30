@@ -11,7 +11,7 @@ interface EntityService {
 }
 
 interface EvaluationService {
-    +evaluateSelection(round: Round, propositionId: String, selectorId: String): Evaluation
+    +evaluateSelection(round: Round, propositionId: String, selectorId: String): Map<String, Integer>
 }
 
 class Game {

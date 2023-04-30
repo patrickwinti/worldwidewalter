@@ -117,7 +117,7 @@ package backend{
             saveNewGame(game: Game)
         }
         interface EvaluationService{
-            evaluateSelection(round: Round, propositionId: String, SelectorId: String) : Evaluation
+            evaluateSelection(round: Round, propositionId: String, SelectorId: String) : Map<String, Integer>
         }
     }
     package repository {

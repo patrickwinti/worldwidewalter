@@ -31,12 +31,12 @@ input {
   font-size: 20px;
   color: black;
   position: relative;
-  background-color: #fcc603;
+  background:linear-gradient(#fcc650, #fcc603);
   padding: 2px;
   text-align: center;
   width: 150px;
   margin: 1px 0 2px 10px;
-  border-radius: 4px;
+  border-radius: 10px;
 }
 
 .textbox_table {
@@ -154,13 +154,14 @@ div {
 }
 
 .spinner {
-  width: 80px;
-  height: 60px;
+  width: 100px;
+  height: 85px;
   margin: 100px auto;
-  background-color: #333;
+  background: #058785;
   text-align: center;
-  padding-top: 20px;
-  border-radius: 100%;
+  padding-top: 18px;
+  font-size: large;
+  border-radius: 25px;
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -196,16 +197,6 @@ div {
 
 }
 
-.scoreboard {
-  width: 300px;
-  margin: 0 auto;
-  text-align: center;
-  background-color: yellow;
-  border-radius: 5px;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
 .loading {
   position: fixed;
   top: 0;
@@ -214,11 +205,16 @@ div {
   bottom: 0;
   padding-top: 10em;
   align-items: center;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0);
 }
 
 h2 {
   text-align: center;
+}
+
+.h2_sphinx {
+  text-align: center;
+  color: #fcc603;
 }
 
 h1 {

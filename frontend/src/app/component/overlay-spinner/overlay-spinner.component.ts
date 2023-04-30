@@ -12,7 +12,7 @@ import { GameState } from "../../model/game-state";
 
 export class OverlaySpinnerComponent {
   isLoading$ = this.loadingService.getIsLoadingObservable();
-  displayText = 'loading';
+  displayText = 'warten auf andere Spieler';
 
   get gameId(): string{
     return this.stateService.getGameId();
@@ -24,7 +24,7 @@ export class OverlaySpinnerComponent {
   }
 
   abort() {
-    console.log('aborting');
+    console.log('abbrechen');
     this.httpCancelService.cancelPendingRequests();
   }
 

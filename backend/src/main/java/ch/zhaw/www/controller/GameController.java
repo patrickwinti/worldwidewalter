@@ -2,6 +2,7 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.RoundError;
@@ -61,10 +62,9 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        String playerId = gameService.enterGame(gameId, playerDto.getPlayerName());
-        String playerName = gameService.getGame(gameId).getPlayerNameFromId(playerId);
-        logger.log(Level.INFO, () -> String.format("%s entered game %s", playerId, gameId));
-        return ResponseEntity.ok(new PlayerDto(playerId, playerName));
+        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
+        logger.log(Level.INFO, () -> String.format("%s entered game %s", player, gameId));
+        return ResponseEntity.ok(new PlayerDto(player.getId(), player.getName()));
     }
     
     @Operation(summary = "Player leaves game gracefully")

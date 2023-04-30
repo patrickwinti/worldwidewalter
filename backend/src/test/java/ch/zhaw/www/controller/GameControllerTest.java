@@ -1,6 +1,7 @@
 package ch.zhaw.www.controller;
 
 import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
@@ -61,9 +62,10 @@ class GameControllerTest {
     
     @Test
     void testEnterGame_200() throws Exception {
-        when(gameService.enterGame(any(), any())).thenReturn(PLAYER_ID);
         Game game = mock(Game.class);
-        when(game.getPlayerNameFromId(PLAYER_ID)).thenReturn("Ulisses");
+        Player player = new Player(PLAYER_ID, "Ulisses");
+        
+        when(gameService.enterGame(any(), any())).thenReturn(player);
         when(gameService.getGame(any())).thenReturn(game);
         
         mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/players", GAME_ID)

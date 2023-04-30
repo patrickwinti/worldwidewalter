@@ -20,7 +20,6 @@ rs -> round: addSelection(playerId, propositionId)
 round --> rs:
 rs -> ev :evaluateSelection(round, propositionId, selectorId)
 ev --> rs : result
-game --> rs: Round
 rs -> game : addPoints(result: Result)
 game --> rs
 ges -> gr : save(game)

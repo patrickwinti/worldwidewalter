@@ -3,31 +3,30 @@
 
 
 participant ":GameController" as gc
-participant ":GameService" as gs
+participant ":RoundService" as rs
 participant "game:Game" as game
 participant "round:Round" as round
 participant ":EvaluationService" as ev
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-gc -> gs: selectProposition(roundId,playerId,propositionId)
-gs -> ges: editGame(gameId)
+gc -> rs: selectProposition(roundId,playerId,propositionId)
+rs -> ges: editGame(gameId)
 activate ges
 ges -> gr : findById(gameId)
 gr  --> ges: Game
-ges --> gs
-gs -> game: getCurrentRound()
-game -> round: getState()
-round --> game: Round state
-round -> ev :evaluateSelection(round, propositionId, selectorId)
-ev --> round : Evaluation
-game --> gs: Round
-gs -> game : updateResults(result: Result)
-game --> gs
+ges --> rs
+rs -> round: addSelection(playerId, propositionId)
+round --> rs:
+rs -> ev :evaluateSelection(round, propositionId, selectorId)
+ev --> rs : result
+game --> rs: Round
+rs -> game : addPoints(result: Result)
+game --> rs
 ges -> gr : save(game)
 gr --> ges
-ges --> gs
-gs --> gc
+ges --> rs
+rs --> gc
 
 
 @enduml

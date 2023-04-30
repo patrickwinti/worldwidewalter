@@ -10,8 +10,8 @@ interface EntityService {
     +editRound(roundId: String, editor: Consumer)
 }
 
-interface RoundEvaluator {
-    +eval(round: Round, propositionId: String): Evaluation
+interface EvaluationService {
+    +evaluateSelection(round: Round, propositionId: String, selectorId: String): Evaluation
 }
 
 class Game {
@@ -37,7 +37,7 @@ class GameController {
 
 GameController "1"-->"1" GameService
 GameService "1"-->"1" EntityService
-GameService "1"-->"1" RoundEvaluator
+Round "1"-->"1" EvaluationService
 GameService "1"..>"*" Game
 EntityService "1"-->"1" GameRepository
 Game "1"-->"*" Round

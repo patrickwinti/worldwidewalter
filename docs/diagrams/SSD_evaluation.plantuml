@@ -4,9 +4,9 @@
 
 participant ":GameController" as gc
 participant ":GameService" as gs
-participant ":RoundEvaluator" as ev
 participant "game:Game" as game
 participant "round:Round" as round
+participant ":EvaluationService" as ev
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
@@ -19,9 +19,9 @@ ges --> gs
 gs -> game: getCurrentRound()
 game -> round: getState()
 round --> game: Round state
+round -> ev :evaluateSelection(round, propositionId, selectorId)
+ev --> round : Evaluation
 game --> gs: Round
-gs -> ev :eval(round, proposition)
-ev --> gs : Result
 gs -> game : updateResults(result: Result)
 game --> gs
 ges -> gr : save(game)

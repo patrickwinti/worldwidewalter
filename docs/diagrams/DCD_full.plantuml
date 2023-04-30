@@ -116,6 +116,9 @@ package backend{
             editRound(roundId: String, editor: Consumer<Round>)
             saveNewGame(game: Game)
         }
+        interface EvaluationService{
+            evaluateSelection(round: Round, propositionId: String, SelectorId: String) : Evaluation
+        }
     }
     package repository {
         interface GameRepository
@@ -160,4 +163,5 @@ ResourceReader "1"..>"*" Prompt
 EntityService "1"-->"1" GameRepository
 
 Game "1"->"*" Round
+Round "1"-->"1" EvaluationService
 @enduml

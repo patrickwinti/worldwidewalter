@@ -50,7 +50,11 @@ export class RoundComponent implements OnInit {
       .then(
         () => {
           console.log('submission successful');
-          this.stateService.setState(GameState.SELECT_PROPOSITION);
+          if (this.round.sphinx.id === this.getCurrentPlayerId()) {
+            this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
+          } else {
+            this.stateService.setState(GameState.SELECT_PROPOSITION);
+          }
         },
         (error: HttpErrorResponse) => {
           console.log('an error occurred: ' + error.status);

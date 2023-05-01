@@ -24,6 +24,7 @@ import {
 import { ErrorComponent } from './component/error/error.component';
 import { InfoComponent } from "./component/info/info.component";
 import { NgOptimizedImage } from "@angular/common";
+import { PromptDisplayComponent } from './component/game/prompt-display/prompt-display.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { NgOptimizedImage } from "@angular/common";
     SphinxDisplayComponent,
     SelectionDisclosureComponent,
     ErrorComponent,
-    InfoComponent
+    InfoComponent,
+    PromptDisplayComponent
   ],
   imports: [
     BrowserModule,

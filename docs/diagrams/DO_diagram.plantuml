@@ -27,8 +27,8 @@ together{
     object WaitingForSelections
 }
 
-WaitingForPlayers --|> GameState
-WaitingForPropositions --|> GameState
-WaitingForSelections --|> GameState
+WaitingForPlayers -up-|> GameState
+WaitingForPropositions -up-|> GameState
+WaitingForSelections -up-|> GameState
 
 @enduml

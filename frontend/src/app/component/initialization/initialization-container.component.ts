@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GameDto } from "../../dto/game-dto";
 import { InitializationState } from "../../model/initialization-state";
+import { StateService } from "../../service/state.service";
 
 @Component({
   selector: 'www-initialization-container',
@@ -9,11 +10,20 @@ import { InitializationState } from "../../model/initialization-state";
 })
 export class InitializationContainerComponent implements OnInit {
   @Output() startGameEmitter = new EventEmitter<GameDto>();
+  @Input() joinWithId: boolean;
   state: InitializationState;
   InitializationState = InitializationState;
+  id: string;
+
+  constructor(private stateService: StateService) {
+  }
 
   ngOnInit(): void {
-    this.state = InitializationState.WELCOME_PAGE;
+    if (this.joinWithId && this.stateService.getGameId() != '') {
+      this.state = InitializationState.JOIN_GAME;
+    } else {
+      this.state = InitializationState.WELCOME_PAGE;
+    }
   }
 
   setState(state: InitializationState) {

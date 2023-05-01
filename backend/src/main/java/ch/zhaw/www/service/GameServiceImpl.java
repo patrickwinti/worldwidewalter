@@ -56,8 +56,11 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
+        var wrapper = new Object() {
+            Player player;
+        };
         entityService.editGame(gameId, game -> {
             StringBuilder name = new StringBuilder(playerName);
             while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
@@ -65,8 +68,9 @@ class GameServiceImpl implements GameService {
             }
             Player tempPlayer = new Player(uuid, name.toString());
             game.addPlayerToWaitingRoom(tempPlayer);
+            wrapper.player = tempPlayer;
         });
-        return uuid;
+        return wrapper.player;
     }
     
     @Override

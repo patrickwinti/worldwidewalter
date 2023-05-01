@@ -2,6 +2,10 @@
 </www-prompt-display>
 
 <ng-container [ngSwitch]="stateObservable$ | async">
+  <www-sphinx-display [sphinx]="round.sphinx"
+                      [currentPlayerId]="getCurrentPlayerId()">
+  </www-sphinx-display>
+
   <www-enter-proposition *ngSwitchCase="GameState.ENTER_PROPOSITION"
                          [round]=round
                          (propositionEmitter)="sendProposition($event)">
@@ -15,7 +19,3 @@
   </ng-container>
 
 </ng-container>
-
-<www-sphinx-display [sphinx]="round.sphinx"
-                    [currentPlayerId]="getCurrentPlayerId()">
-</www-sphinx-display>

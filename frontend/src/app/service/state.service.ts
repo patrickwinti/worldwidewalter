@@ -7,9 +7,10 @@ import { GameState } from "../model/game-state";
 })
 export class StateService {
   private gameState = new BehaviorSubject<GameState>(GameState.INITIALIZATION);
-  private gameId: string;
-  private playerId: string;
-  private prompt: string;
+  private gameId: string = '';
+  private playerId: string = '';
+  private playerName: string = '';
+  private prompt: string = '';
 
   getGameId(): string {
     return this.gameId ?? '';
@@ -58,6 +59,14 @@ export class StateService {
 
   isInitializing(): boolean {
     return this.getCurrentState() === GameState.INITIALIZATION;
+  }
+
+  getPlayerName(): string {
+    return this.playerName;
+  }
+
+  setPlayerName(playerName: string): void {
+    this.playerName = playerName;
   }
 
   setPrompt(prompt: string): void {

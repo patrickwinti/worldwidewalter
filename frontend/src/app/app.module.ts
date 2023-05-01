@@ -19,11 +19,12 @@ import { RankingDisplayComponent } from './component/game/show-ranking/ranking-d
 import { EnterPropositionComponent } from "./component/game/round/enter-proposition/enter-proposition.component";
 import { SelectPropositionComponent } from "./component/game/round/select-proposition/select-proposition.component";
 import {
-   SelectionDisclosureComponent
+  SelectionDisclosureComponent
 } from './component/game/show-ranking/selection-disclosure/selection-disclosure.component';
 import { ErrorComponent } from './component/error/error.component';
 import { InfoComponent } from "./component/info/info.component";
 import { NgOptimizedImage } from "@angular/common";
+import { CurrentGameInfoComponent } from './component/game/current-game-info/current-game-info.component';
 import { PromptDisplayComponent } from './component/game/prompt-display/prompt-display.component';
 
 @NgModule({
@@ -44,6 +45,7 @@ import { PromptDisplayComponent } from './component/game/prompt-display/prompt-d
     SelectionDisclosureComponent,
     ErrorComponent,
     InfoComponent,
+    CurrentGameInfoComponent,
     PromptDisplayComponent
   ],
   imports: [

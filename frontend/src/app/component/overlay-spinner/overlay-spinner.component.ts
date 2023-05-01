@@ -24,7 +24,6 @@ export class OverlaySpinnerComponent {
   }
 
   abort() {
-    console.log('abbrechen');
     this.httpCancelService.cancelPendingRequests();
   }
 

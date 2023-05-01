@@ -13,7 +13,7 @@ participant ":GameRepository" as gr
 gc -> rs: selectProposition(roundId,playerId,propositionId)
 rs -> ges: editRound(roundId)
 activate ges
-ges -> gr : findById(gameId)
+ges -> gr : findById(roundId)
 gr  --> ges: Game
 ges --> rs
 rs -> round: addSelection(playerId, propositionId)

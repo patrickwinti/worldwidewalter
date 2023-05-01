@@ -8,7 +8,7 @@ import {
   OnInit,
   Output
 } from '@angular/core';
-import { Subscription, timer } from "rxjs";
+import { Subject, takeUntil, timer } from "rxjs";
 
 @Component({
   selector: 'www-count-down',
@@ -23,31 +23,40 @@ export class CountDownComponent implements OnInit, OnDestroy {
   public minutesToTimeout: number;
 
   private timeDifference: number;
-  private subscription: Subscription;
   private timeout: number;
 
   private readonly milliSecondsInASecond = 1000;
   private readonly secondsInAMinute = 60;
   private readonly minutesInAnHour = 60;
 
+  private readonly destroy$ = new Subject<boolean>();
+
   constructor(private cd: ChangeDetectorRef) {
   }
 
   ngOnInit(): void {
-    this.subscription = timer(0, 1000)
+    timer(0, 1000)
+      .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.timeDifference = this.getTimeDifference();
         this.allocateTimeUnits();
         this.cd.markForCheck();
-        if (this.timeDifference <= 1000) {
+        if (this.timeDifference <= 1000 && this.timeDifference >= 0) {
           this.timeoutEmitter.emit();
+        } else if (this.timeDifference < 0) {
+          this.timeoutEmitter.emit();
+          this.secondsToTimeout = 0;
+          this.minutesToTimeout = 0;
+          this.destroy$.next(true);
+          this.destroy$.complete();
         }
       });
     this.timeout = this.getUTCMilliseconds(this.timeoutString);
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 
   private getTimeDifference(): number {

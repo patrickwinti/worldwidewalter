@@ -2,6 +2,6 @@
   <div class="loading">
     <div class="spinner">{{displayText}}</div>
     <button (click)="abort()">abbrechen</button>
-    <div *ngIf="isJoiningGame()">trete Spiel {{gameId}} bei</div>
+    <p *ngIf="isJoiningGame()">trete Spiel {{gameId}} bei</p>
   </div>
 </div>

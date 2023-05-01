@@ -1,108 +1,160 @@
 /* Set global styles */
 body {
-  background-color: #181818; /* Set the background color to a dark gray */
-  color: #FFFFFF; /* Set the font color to white */
-  font-family: Arial, sans-serif; /* Set the font family to Arial or a sans-serif font */
-  font-size: 14px; /* Set the default font size to 14 pixels */
+  background-color: #333333;
+  color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* {  border: 1px solid red;}*/
+
+p {
+  text-align: center;
+}
+
+b {
+  text-align: center;
+}
+
+input {
+  min-width: 20em;
+  width: fit-content;
+  padding: 1em;
+  background: transparent;
+  border: none;
+  border-bottom: #058785 2px solid;
+  font-size: 15px;
+  color: white;
+  position: relative;
+  outline: none;
 }
 
 /* Style box element */
 .textbox {
-  font-size: 20px; /* Set the font size to 16 pixels */
-  color: black; /* Set the font color to black */
-  background-color: #fcc603; /* Set the background color to yellow */
-  padding: 1px; /* Add 2 pixels of padding */
-  text-align: center; /* Center the text */
-  width: 140px; /* Set the width to 150 pixels */
-  margin: 1px 0 2px 10px; /* Set the margin */
+  font-size: 20px;
+  color: black;
+  position: relative;
+  background-color: #fcc603;
+  padding: 2px;
+  text-align: center;
+  width: 150px;
+  margin: 1px 0 2px 10px;
+  border-radius: 4px;
 }
-.special-margin1 {
-  margin-left: 60px;
-}
+
 .special-margin2 {
   margin-left: 20px;
+  align-self: center;
 }
+
 .special-margin3 {
   width: 200px
 }
+
 /* Style button element */
 button {
-  top:50%; /* Position the button in the middle of the page */
-  background-color: #fcc603; /* Set the background color to gold */
-  color: black; /* Set the font color to a dark gray */
-  border: none; /* Remove the border */
-  padding: 2px 2px; /* Add 2 pixels of padding */
-  font-size: 20px; /* Set the font size to 16 pixels */
-  cursor: pointer; /* Add a cursor on hover */
-  /*margin: 10px 10px 10px 5px; /* Set the margin */
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
-  width: 150px; /* Set the width to 150 pixels */
+  background-color: #fcc603;
+  color: black;
+  border: white;
+  width: max-content;
+  margin-top: 2em;
+  padding: 1em 2em;
+  font-size: 150%;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  transition-duration: 0.6s;
+}
+
+button:hover {
+  background-color: #058785;
+  color: black;
+  border: white;
 }
 
 /* Set width for input element */
 .input[type="text"] {
-  width: 70%; /* Set the width to 70% */
-  height: 30px; /* Set the height to 30 pixels */
-  margin-left: 10px; /* Set the left margin to 10 pixels */
-  padding: 5px; /* Add 5 pixels of padding */
-  font-size: 16px; /* Set the font size to 16 pixels */
-  border-radius: 5px; /* Add a border radius */
-  border: none; /* Remove the border */
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); /* Add a box shadow */
+  width: 70%;
+  height: 30px;
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  border-bottom: #fcc603 solid 1px;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
-/* Set box-sizing for all elements */
 
-{
-  box-sizing: border-box;
-}
-/* Set margin to 0 for the body */
-body {
-  margin: 0;
-}
-
-/* Style the header */
 .header {
-  background-color: #333333; /* Set the background color to a dark gray */
-  padding: 10px; /* Add 5 pixels of padding */
-  text-align: center; /* Center the text */
-
+  background: linear-gradient(#000000, #333333);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  align-items: center;
 }
 
-/* Style the top navigation bar */
-.topnav {
-  overflow: hidden; /* Hide any overflow */
-  background-color: #333333; /* Set the background color to a dark gray */
+.collapsible {
+  background-color: #fcc603;
+  color: #444;
+  padding: 18px;
+  font-size: 20px;
+  margin-right: 2em;
 }
 
-/* Style the topnav links */
-.topnav a {
-  float: left; /* Float the links to the left */
-  display: block; /* Set the display to block */
-  color: #FFFFFF; /*Set the font color to white */
-  text-align: center;}
-/* Create three equal columns that floats next to each other */
-
-.column {
-  float: left;
-  width: 100%;
-  padding: 10px;
+.active, .collapsible:hover {
+  background-color: #058785;
 }
+
+div {
+  flex-flow: column;
+  display: flex;
+  width: 100vw;
+}
+
+.info {
+  flex-flow: wrap;
+  bottom: 0;
+}
+
+.button-container {
+  width: 80%;
+  align-self: center;
+  flex-flow: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+}
+
+.content {
+  row-gap: 1em;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  align-items: center;
+  width: initial;
+  padding: 1.5em;
+}
+
+.content_collapsed {
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  background: #333333;
+  padding-top: 3em;
+}
+
 /* Style the spinner */
 .spinner {
   width: 80px;
   height: 60px;
   margin: 100px auto;
   background-color: #333;
-  position: center;
   text-align: center;
   padding-top: 20px;
-
-
   border-radius: 100%;
   animation: pulse 2s ease-in-out infinite;
 }
-.sphinx{
+
+.sphinx {
   animation: pulse 10s ease-in-out infinite;
 }
 
@@ -134,6 +186,7 @@ body {
   }
 
 }
+
 .scoreboard {
   width: 300px;
   margin: 0 auto;
@@ -141,33 +194,7 @@ body {
   background-color: yellow;
   border-radius: 5px;
   padding: 20px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-}
-
-.team1, .team2 {
-  display: inline-block;
-  width: 130px;
-  margin: 10px;
-  padding: 10px;
-  background-color: black;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-}
-
-.team1 h3, .team2 h3 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.team1 p, .team2 p {
-  font-size: 18px;
-  margin: 0;
-}
-
-.team1 span, .team2 span {
-  font-weight: bold;
-  font-size: 36px;
-  color: #ff6347;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
 .loading {
@@ -176,5 +203,15 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  padding-top: 10em;
+  align-items: center;
   background: rgba(0, 0, 0, 0.5);
+}
+
+h2 {
+  text-align: center;
+}
+
+h1 {
+  text-align: center;
 }

@@ -10,7 +10,7 @@ object Turn
 object Prompt
 object Proposition
 
-GameState "1" -- "*" Game : < is in
+Game "1" -- "1" GameState : > is in
 
 Game "1" -- "*" Player : < participates
 Round  "*" -- "1" Game : updates points >

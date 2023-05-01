@@ -129,7 +129,7 @@ class GameServiceTest {
                 .toList();
         
         enableFixedClocked();
-        final Player sphinx = players.get(3);
+        final Player sphinx = players.get(2);
         round.setSphinx(sphinx);
         players.forEach(player -> {
             game.moveToActivePlayers(player);
@@ -170,7 +170,7 @@ class GameServiceTest {
         Round round = createRound();
         game.addRound(round);
         List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game)).toList();
-        Player sphinx = getRandomPlayer(game);
+        Player sphinx = players.get(0);
         round.setSphinx(sphinx);
         players.forEach(player -> {
             game.moveToActivePlayers(player);
@@ -272,7 +272,7 @@ class GameServiceTest {
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
         playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(createProposition(p.getId(), "Cereal")));
         
-        assertTrue(game.canAcceptedSelections());
+        assertTrue(game.canAcceptSelections());
         
         game.addPlayerToWaitingRoom(cannotEnterCurrentlyPlayer);
         assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));

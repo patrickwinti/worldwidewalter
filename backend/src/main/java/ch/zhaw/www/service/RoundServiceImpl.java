@@ -103,7 +103,7 @@ class RoundServiceImpl implements RoundService {
         verifyPlayerIsActive(roundId, playerId);
         var game = entityService.getGameForRound(roundId);
         var round = game.getCurrentRound();
-        if (!game.canAcceptedSelections()) {
+        if (!game.canAcceptSelections()) {
             throw new RoundError.IllegalStateException();
         }
         return round;

@@ -10,6 +10,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Math.max;
+
 /**
  * Class containing all the information related to a game. It controls players in game, running rounds and prompts from
  * the deck
@@ -49,14 +51,19 @@ public class Game {
         }
     }
     
+    private Optional<Round> getCurrentRoundOptional() {
+        return Optional.ofNullable(getCurrentRound());
+    }
+    
     /**
      * Check if there is an open round that is finished or if there is no round at all
      *
      * @return true if there is no round or it is finished
      */
     public boolean needsNewRound() {
-        var round = getCurrentRound();
-        return round == null || round.getState().atLeast(Round.State.OPEN_FOR_SELECTIONS) && !canAcceptSelections(round);
+        return getCurrentRoundOptional()
+                .map(round -> round.isFinished() || !isMissingPlayerSelections(round))
+                .orElse(true);
     }
     
     /**
@@ -65,8 +72,9 @@ public class Game {
      * @return true if the round has capacity, and it is still open for propositions
      */
     public boolean canRoundBeEntered() {
-        var round = getCurrentRound();
-        return round != null && round.canEnterRound() && hasCapacityForNewActivePlayer();
+        return getCurrentRoundOptional()
+                .map(round -> round.canEnterRound() && isMissingPlayerProposition(round) && hasCapacityForNewActivePlayer())
+                .orElse(false);
     }
     
     /**
@@ -75,8 +83,9 @@ public class Game {
      * @return true if round has not yet receive a proposition submission from each active player
      */
     public boolean canAcceptPropositions() {
-        var round = getCurrentRound();
-        return round != null && round.getState().atLeast(Round.State.OPEN_FOR_SUBMISSIONS) && canAcceptPropositions(round);
+        return getCurrentRoundOptional()
+                .map(round -> hasEnoughPlayers() && round.acceptsPropositions() && isMissingPlayerProposition(round))
+                .orElse(false);
     }
     
     /**
@@ -84,19 +93,23 @@ public class Game {
      *
      * @return true if round has not yet receive a selections submission from each active player but the sphinx
      */
-    public boolean canAcceptedSelections() {
-        var round = getCurrentRound();
-        return round != null &&
-                ((round.getState() == Round.State.OPEN_FOR_SUBMISSIONS && !canAcceptPropositions(round)) ||
-                        (round.getState() == Round.State.OPEN_FOR_SELECTIONS && canAcceptSelections(round)));
+    public boolean canAcceptSelections() {
+        return getCurrentRoundOptional()
+                .map(round -> (round.acceptsPropositions() && !isMissingPlayerProposition(round)) ||
+                        (round.acceptsSelections() && isMissingPlayerSelections(round)))
+                .orElse(false);
     }
     
-    private boolean canAcceptSelections(final Round round) {
-        return round.getNumberOfSelectionsSubmitted() < (activePlayers.size() - 1);
+    private boolean isMissingPlayerSelections(final Round round) {
+        return round.getNumberOfSelectionsSubmitted() < max(activePlayers.size(), minimumAmountOfPlayers) - 1;
     }
     
-    private boolean canAcceptPropositions(final Round round) {
-        return round.getNumberOfPropositionsSubmitted() < activePlayers.size();
+    private boolean isMissingPlayerProposition(final Round round) {
+        return round.getNumberOfPropositionsSubmitted() < max(activePlayers.size(), minimumAmountOfPlayers);
+    }
+    
+    private boolean hasEnoughPlayers() {
+        return activePlayers.size() >= minimumAmountOfPlayers;
     }
     
     /**

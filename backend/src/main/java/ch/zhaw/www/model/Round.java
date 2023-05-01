@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ch.zhaw.www.utils.InstantWrapper.isInFuture;
+
 /**
  * Model class with round information
  */
@@ -75,7 +77,7 @@ public class Round {
      * @return true if the round can be entered; false otherwise
      */
     public boolean canEnterRound() {
-        return propositionSubmissionEnd == null || InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+        return propositionSubmissionEnd == null || isInFuture(propositionSubmissionEnd.minus(enterLimitDuration));
     }
     
     /**
@@ -108,7 +110,7 @@ public class Round {
      * Checks whether player can send a proposition
      */
     private boolean canSendPropositions() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd);
+        return propositionSubmissionEnd != null && isInFuture(propositionSubmissionEnd);
     }
     
     /*
@@ -117,7 +119,7 @@ public class Round {
      * @return true if players can still make their selections; false otherwise
      */
     private boolean canSendSelections() {
-        return selectionSubmissionEnd != null && InstantWrapper.isAfterNow(selectionSubmissionEnd);
+        return selectionSubmissionEnd != null && isInFuture(selectionSubmissionEnd);
     }
     
     /*
@@ -138,6 +140,18 @@ public class Round {
         return propositions.stream()
                 .map(proposition -> proposition.getPlayerIds().size())
                 .reduce(0, Integer::sum);
+    }
+    
+    boolean acceptsPropositions() {
+        return getState() == State.OPEN_FOR_SUBMISSIONS;
+    }
+    
+    boolean acceptsSelections() {
+        return getState() == State.OPEN_FOR_SELECTIONS;
+    }
+    
+    boolean isFinished() {
+        return getState() == State.FINISHED;
     }
     
     /**
@@ -166,7 +180,7 @@ public class Round {
     enum State {
         CREATED, OPEN_FOR_SUBMISSIONS, OPEN_FOR_SELECTIONS, FINISHED;
         
-        public boolean atLeast(State state) {
+        boolean atLeast(State state) {
             return ordinal() >= state.ordinal();
         }
     }

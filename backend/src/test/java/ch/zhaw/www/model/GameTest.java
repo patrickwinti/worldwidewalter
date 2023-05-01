@@ -78,14 +78,14 @@ class GameTest {
         assertNotNull(round);
         
         game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
-        assertTrue(game.canAcceptedSelections());
+        assertTrue(game.canAcceptSelections());
         
         enableFixedClocked();
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
         game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
         offsetFixedClockBy(DEFAULT_PROPOSITION_DURATION);
-        assertTrue(game.canAcceptedSelections());
+        assertTrue(game.canAcceptSelections());
     }
     
     @Test

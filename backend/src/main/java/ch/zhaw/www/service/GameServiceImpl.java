@@ -1,11 +1,11 @@
 package ch.zhaw.www.service;
 
 import ch.zhaw.www.GameProperties;
-import ch.zhaw.www.utils.RandomProvider;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.PromptRepository;
+import ch.zhaw.www.utils.RandomProvider;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ class GameServiceImpl implements GameService {
     private final PromptRepository promptRepository;
     
     GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
-                     RandomProvider randomProvider, PromptRepository promptRepository) {
+                    RandomProvider randomProvider, PromptRepository promptRepository) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
@@ -55,8 +55,11 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public String enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         String uuid = UUID.randomUUID().toString();
+        var wrapper = new Object() {
+            Player player;
+        };
         entityService.editGame(gameId, game -> {
             StringBuilder name = new StringBuilder(playerName);
             while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
@@ -64,8 +67,9 @@ class GameServiceImpl implements GameService {
             }
             Player tempPlayer = new Player(uuid, name.toString());
             game.addPlayerToWaitingRoom(tempPlayer);
+            wrapper.player = tempPlayer;
         });
-        return uuid;
+        return wrapper.player;
     }
     
     @Override

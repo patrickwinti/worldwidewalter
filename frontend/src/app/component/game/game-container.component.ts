@@ -45,4 +45,16 @@ export class GameContainerComponent implements OnInit {
   tryAgain() {
     this.getRoundObservable();
   }
+
+  get playerName(): string {
+    return this.stateService.getPlayerName();
+  }
+
+  get gameId(): string {
+    return this.stateService.getGameId();
+  }
+
+  gameInfoAvailable(): boolean {
+    return !(this.playerName === '' || this.gameId === '');
+  }
 }

@@ -158,6 +158,7 @@ div {
   height: 85px;
   margin: 100px auto;
   background: #058785;
+  border: #0587 solid 1px;
   text-align: center;
   padding-top: 18px;
   font-size: large;

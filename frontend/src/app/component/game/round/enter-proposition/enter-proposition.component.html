@@ -1,9 +1,9 @@
 <div class="column">
   <div>
-    <div>{{round.prompt}}</div>
+    <div><h3>{{round.prompt}}</h3></div>
     <br>
     <br>
-    <div class="textbox special-margin2 special-margin3">Dein Vorschlag</div>
+    <div class="textbox special-margin2 special-margin3">Dein Vorschlag:</div>
     <br>
 
     <div *ngFor="let walter of proposition; let i = index">
@@ -14,7 +14,6 @@
   </div>
   <br>
   <button class="special-margin2" (click)="emitProposition()">Senden</button>
-  <h2></h2>
 </div>
 
 <www-count-down [timeoutString]="round.endOfSubmissionsInUtc"

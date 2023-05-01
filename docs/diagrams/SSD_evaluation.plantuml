@@ -11,7 +11,7 @@ participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
 gc -> rs: selectProposition(roundId,playerId,propositionId)
-rs -> ges: editGame(gameId)
+rs -> ges: editRound(roundId)
 activate ges
 ges -> gr : findById(gameId)
 gr  --> ges: Game

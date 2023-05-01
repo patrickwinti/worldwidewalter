@@ -14,7 +14,6 @@ package WorldwideWalter {
   usecase "Start game" as UC1
   usecase "Join game" as UC2
   usecase "Play round" as UC3
-  usecase "Choose prompt" as UC5
 }
 
 'Relationships

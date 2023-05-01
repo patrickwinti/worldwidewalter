@@ -4,6 +4,7 @@
   </div>
 
   <www-initialization-container *ngIf="gameIsInitializing()"
+                                [joinWithId]="joinWithId"
                                 (startGameEmitter)="startGame()">
   </www-initialization-container>
 

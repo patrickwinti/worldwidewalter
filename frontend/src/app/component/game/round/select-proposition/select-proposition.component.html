@@ -1,5 +1,5 @@
 <div class="column">
-  <div>Bitte einen Vorschlag aussuchen:</div>
+  <div><h3>Bitte einen Vorschlag aussuchen:</h3></div>
 
   <div *ngFor="let proposition of propositionSelectionDto.propositions">
     <p>
@@ -10,7 +10,7 @@
   </div>
 </div>
 <div *ngIf="isSphinx()">
-  <button (click)="goToResultsPageEmitter.emit()">weiter</button>
+  <button class="center" (click)="goToResultsPageEmitter.emit()">weiter</button>
 </div>
 
 <www-count-down [timeoutString]="propositionSelectionDto.selectionSubmissionEndInUtc"

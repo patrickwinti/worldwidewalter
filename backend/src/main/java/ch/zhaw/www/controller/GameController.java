@@ -2,6 +2,7 @@ package ch.zhaw.www.controller;
 
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
+import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.RoundError;
@@ -61,9 +62,9 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        String playerId = gameService.enterGame(gameId, playerDto.getPlayerName());
-        logger.log(Level.INFO, () -> String.format("%s entered game %s", playerId, gameId));
-        return ResponseEntity.ok(new PlayerDto(playerId));
+        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
+        logger.log(Level.INFO, () -> String.format("%s entered game %s", player, gameId));
+        return ResponseEntity.ok(new PlayerDto(player.getId(), player.getName()));
     }
     
     @Operation(summary = "Player leaves game gracefully")
@@ -129,12 +130,11 @@ public class GameController {
         if (round.getSphinx() != null) {
             if (round.getSphinx().getId().equals(playerId)) {
                 logger.log(Level.INFO, "current sphinx requesting round {0}", playerId);
-                sphinx = new PlayerDto(round.getSphinx().getId());
+                sphinx = new PlayerDto(round.getSphinx().getId(), round.getSphinx().getName());
             } else {
                 // for security reasons only pass the sphinx id to the actual Sphinx
-                sphinx = new PlayerDto("");
+                sphinx = new PlayerDto("", round.getSphinx().getName());
             }
-            sphinx.setPlayerName(round.getSphinx().getName());
         }
         
         return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));

@@ -89,39 +89,6 @@ public class Round {
         propositions.add(proposition);
     }
     
-    /**
-     * Gets the state of the round.
-     *
-     * @return the state of the round
-     */
-    State getState() {
-        if (sphinx == null) {
-            return State.CREATED;
-        } else if (canSendPropositions()) {
-            return State.OPEN_FOR_SUBMISSIONS;
-        } else if (canSendSelections()) {
-            return State.OPEN_FOR_SELECTIONS;
-        } else {
-            return State.FINISHED;
-        }
-    }
-    
-    /*
-     * Checks whether player can send a proposition
-     */
-    private boolean canSendPropositions() {
-        return propositionSubmissionEnd != null && isInFuture(propositionSubmissionEnd);
-    }
-    
-    /*
-     * Checks whether players can still make their selections.
-     *
-     * @return true if players can still make their selections; false otherwise
-     */
-    private boolean canSendSelections() {
-        return selectionSubmissionEnd != null && isInFuture(selectionSubmissionEnd);
-    }
-    
     /*
      * Gets the number of selections submitted by players.
      *
@@ -142,16 +109,31 @@ public class Round {
                 .reduce(0, Integer::sum);
     }
     
+    /**
+     * Checks whether player can send a proposition
+     *
+     * @return true if player can still submit propositions
+     */
     boolean acceptsPropositions() {
-        return getState() == State.OPEN_FOR_SUBMISSIONS;
+        return sphinx != null && propositionSubmissionEnd != null && isInFuture(propositionSubmissionEnd);
     }
     
+    /*
+     * Checks whether players can still make their selections.
+     *
+     * @return true if players can still make their selections; false otherwise
+     */
     boolean acceptsSelections() {
-        return getState() == State.OPEN_FOR_SELECTIONS;
+        return !acceptsPropositions() && selectionSubmissionEnd != null && isInFuture(selectionSubmissionEnd);
     }
     
+    /**
+     * Checks if round has timed out and no proposition or selections are possible
+     *
+     * @return true if round is finished
+     */
     boolean isFinished() {
-        return getState() == State.FINISHED;
+        return sphinx != null && !acceptsPropositions();
     }
     
     /**
@@ -172,16 +154,5 @@ public class Round {
      */
     public boolean hasProposition(String propositionId) {
         return propositions.stream().anyMatch(proposition -> proposition.getId().equals(propositionId));
-    }
-    
-    /**
-     * Enum representing the possible states of a round.
-     */
-    enum State {
-        CREATED, OPEN_FOR_SUBMISSIONS, OPEN_FOR_SELECTIONS, FINISHED;
-        
-        boolean atLeast(State state) {
-            return ordinal() >= state.ordinal();
-        }
     }
 }

@@ -94,11 +94,10 @@ class GameTest {
         assertNull(game.getCurrentRound());
         
         Round round = mock(Round.class);
-        when(round.getState()).thenReturn(Round.State.CREATED);
         game.addRound(round);
         assertSame(round, game.getCurrentRound());
         
-        when(round.getState()).thenReturn(Round.State.OPEN_FOR_SUBMISSIONS);
+        when(round.acceptsPropositions()).thenReturn(true);
         Player sphinx = createPlayer();
         round.setSphinx(sphinx);
         assertSame(round, game.getCurrentRound());

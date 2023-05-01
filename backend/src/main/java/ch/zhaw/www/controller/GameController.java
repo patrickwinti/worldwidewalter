@@ -45,7 +45,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
-        logger.log(Level.INFO, "created game {0}", newGame);
+        logger.log(Level.INFO, "created game {0}", newGame.getId());
         return ResponseEntity.ok(new GameDto(newGame.getId()));
     }
     

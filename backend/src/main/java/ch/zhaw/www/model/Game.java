@@ -50,80 +50,53 @@ public class Game {
     }
     
     /**
-     * Returns state of the current game:
-     * - Waiting for player: Not enough players active or no valid round
-     * - Waiting for propositions: Not all players did send propositions and is in time for sending any
-     * - Waiting for selections: Not all players did send propositions
+     * Check if there is an open round that is finished or if there is no round at all
      *
-     * @return {@link Game.State}
+     * @return true if there is no round or it is finished
      */
-    @NotNull
-    public State getState() {
+    public boolean needsNewRound() {
         var round = getCurrentRound();
-        if (round == null) {
-            return State.NO_VALID_ROUND;
-        } else if (!hasEnoughPlayers() || hasRoundNotStartedYet(round)) {
-            return State.WAITING_FOR_PLAYERS;
-        } else if (round.canEnterRound() && canAcceptPropositions(round)) {
-            return State.WAITING_FOR_ALL_PROPOSITIONS;
-        } else if (canAcceptSelections(round) && !haveAllPlayersSubmittedASelection(round)) {
-            return State.WAITING_FOR_ALL_SELECTIONS;
-        } else if (haveAllPlayersSubmittedASelection(round) || !canAcceptSelections(round)) {
-            return State.WAITING_FOR_NEW_ROUND;
-        } else {
-            return State.NO_VALID_ROUND;
-        }
+        return round == null || round.getState().atLeast(Round.State.OPEN_FOR_SELECTIONS) && !canAcceptSelections(round);
     }
     
-    /*
-     * Helper function to check if all active players have submitted a selection.
+    /**
+     * Checks whether player can enter current round or they will need to wait for another round
      *
-     * @param round current round
-     * @return true if all players have submitted a selection, false otherwise
+     * @return true if the round has capacity, and it is still open for propositions
      */
-    private boolean haveAllPlayersSubmittedASelection(final Round round) {
-        return round.getNumberOfSelectionsSubmitted() == activePlayers.size() - 1;
+    public boolean canRoundBeEntered() {
+        var round = getCurrentRound();
+        return round != null && round.canEnterRound() && hasCapacityForNewActivePlayer();
     }
     
-    /*
-     * Helper function to check if selections can be made for the current round.
+    /**
+     * Verifies game can accept any proposition sent
      *
-     * @param round current round
-     * @return true if selections can be made, false otherwise
+     * @return true if round has not yet receive a proposition submission from each active player
      */
+    public boolean canAcceptPropositions() {
+        var round = getCurrentRound();
+        return round != null && round.getState().atLeast(Round.State.OPEN_FOR_SUBMISSIONS) && canAcceptPropositions(round);
+    }
+    
+    /**
+     * Verifies game can accept send selections
+     *
+     * @return true if round has not yet receive a selections submission from each active player but the sphinx
+     */
+    public boolean canAcceptedSelections() {
+        var round = getCurrentRound();
+        return round != null &&
+                ((round.getState() == Round.State.OPEN_FOR_SUBMISSIONS && !canAcceptPropositions(round)) ||
+                        (round.getState() == Round.State.OPEN_FOR_SELECTIONS && canAcceptSelections(round)));
+    }
+    
     private boolean canAcceptSelections(final Round round) {
-        return round.getState() == Round.State.OPEN_FOR_SUBMISSIONS ||
-                round.getState() == Round.State.OPEN_FOR_SELECTIONS;
+        return round.getNumberOfSelectionsSubmitted() < (activePlayers.size() - 1);
     }
     
-    /*
-     * Checks if there are enough players to start the game.
-     *
-     * @return true if the number of active players is greater than or equal to the minimum required players, false otherwise.
-     */
-    private boolean hasEnoughPlayers() {
-        return activePlayers.size() >= minimumAmountOfPlayers;
-    }
-    
-    /*
-     * Checks if the given round can accept new propositions.
-     *
-     * @param round The round object to check for the possibility of accepting new propositions.
-     * @return true if the number of propositions submitted is less than the number of active players and the round state is OPEN_FOR_SUBMISSIONS, false otherwise.
-     */
     private boolean canAcceptPropositions(final Round round) {
-        return round.getNumberOfPropositionsSubmitted() < activePlayers.size() &&
-                round.getState() == Round.State.OPEN_FOR_SUBMISSIONS;
-    }
-    
-    /*
-     * Checks if the given round has not started yet.
-     *
-     * @param round The round object to check if it has started or not.
-     * @return true if the round state is CREATED, false otherwise.
-     */
-    private boolean hasRoundNotStartedYet(final Round round) {
-        return round.getState() == Round.State.CREATED;
+        return round.getNumberOfPropositionsSubmitted() < activePlayers.size();
     }
     
     /**
@@ -190,16 +163,6 @@ public class Game {
     }
     
     /**
-     * Checks if player ID is currently a player
-     *
-     * @param playerId player identifier
-     * @return is a player either in waiting room or is active
-     */
-    public boolean hasPlayer(@NotNull String playerId) {
-        return getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
-    }
-    
-    /**
      * Adds player to waiting room if not already active
      *
      * @param player player that shall be added
@@ -252,17 +215,4 @@ public class Game {
         evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
     }
     
-    /**
-     * An enumeration representing the possible states of a game.
-     */
-    public enum State {
-        /**
-         * Indicates that there are not enough players to start a new round.
-         */
-        NO_VALID_ROUND,
-        WAITING_FOR_PLAYERS,
-        WAITING_FOR_ALL_PROPOSITIONS,
-        WAITING_FOR_ALL_SELECTIONS,
-        WAITING_FOR_NEW_ROUND
-    }
 }

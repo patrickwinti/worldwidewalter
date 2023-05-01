@@ -75,7 +75,7 @@ public class Round {
      * @return true if the round can be entered; false otherwise
      */
     public boolean canEnterRound() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+        return propositionSubmissionEnd == null || InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
     }
     
     /**
@@ -164,6 +164,10 @@ public class Round {
      * Enum representing the possible states of a round.
      */
     enum State {
-        CREATED, OPEN_FOR_SUBMISSIONS, OPEN_FOR_SELECTIONS, FINISHED
+        CREATED, OPEN_FOR_SUBMISSIONS, OPEN_FOR_SELECTIONS, FINISHED;
+        
+        public boolean atLeast(State state) {
+            return ordinal() >= state.ordinal();
+        }
     }
 }

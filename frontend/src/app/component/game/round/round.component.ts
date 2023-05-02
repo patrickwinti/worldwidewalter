@@ -1,12 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { StateService } from "../../../service/state.service";
-import { GameService } from "../../../service/game.service";
-import { RoundDto } from "../../../dto/round-dto";
-import { GameState } from "../../../model/game-state";
-import { firstValueFrom, Observable } from "rxjs";
-import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
-import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
-import { HttpErrorResponse } from "@angular/common/http";
+import {ChangeDetectionStrategy, Component, Input, OnInit} from '@angular/core';
+import {StateService} from "../../../service/state.service";
+import {GameService} from "../../../service/game.service";
+import {RoundDto} from "../../../dto/round-dto";
+import {GameState} from "../../../model/game-state";
+import {firstValueFrom, Observable} from "rxjs";
+import {PropositionSelectionDto} from "../../../dto/proposition-selection-dto";
+import {PropositionSubmissionDto} from "../../../dto/proposition-submission-dto";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'www-round',
@@ -38,7 +38,8 @@ export class RoundComponent implements OnInit {
         this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
       },
       (error: HttpErrorResponse) => {
-        console.log('an error occurred: ' + error.status);
+        console.log('selection not successful, continuing');
+        this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
         this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
       });
   }
@@ -46,14 +47,14 @@ export class RoundComponent implements OnInit {
   sendProposition(gapReplacements: string[]) {
     firstValueFrom(this.gameService.submitProposition(this.round.id, {
       gaps: gapReplacements
-    } as PropositionSubmissionDto))
-      .then(
-        () => {
-          console.log('submission successful');
-          this.stateService.setState(GameState.SELECT_PROPOSITION);
-        },
-        (error: HttpErrorResponse) => {
-          console.log('an error occurred: ' + error.status);
+    } as PropositionSubmissionDto)).then(
+      () => {
+        console.log('submission successful');
+        this.stateService.setState(GameState.SELECT_PROPOSITION);
+      },
+      (error: HttpErrorResponse) => {
+        console.log('submission not successful, continuing');
+        this.stateService.setState(GameState.SELECT_PROPOSITION);
           this.stateService.setState(GameState.SELECT_PROPOSITION);
         }
       );

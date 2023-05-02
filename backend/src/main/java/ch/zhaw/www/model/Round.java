@@ -133,7 +133,7 @@ public class Round {
      * @return true if round is finished
      */
     boolean isFinished() {
-        return sphinx != null && !acceptsSelections();
+        return sphinx != null && !acceptsSelections() && !acceptsPropositions();
     }
     
     /**

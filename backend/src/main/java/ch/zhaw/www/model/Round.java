@@ -133,7 +133,7 @@ public class Round {
      * @return true if round is finished
      */
     boolean isFinished() {
-        return sphinx != null && !acceptsPropositions();
+        return sphinx != null && !acceptsSelections();
     }
     
     /**
@@ -147,7 +147,7 @@ public class Round {
     }
     
     /**
-     * Checks if proposition with given propositionId exisits in round
+     * Checks if proposition with given propositionId exists in round
      *
      * @param propositionId the propositionId to be checked
      * @return boolean if proposition exists in round

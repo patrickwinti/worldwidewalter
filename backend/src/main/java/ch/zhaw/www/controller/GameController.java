@@ -109,7 +109,7 @@ public class GameController {
                         .toList(),
                 selectionDtos);
         
-        logger.log(Level.INFO, "game results returned {0}", game);
+        logger.log(Level.INFO, "game results returned {0}", game.getId());
         return ResponseEntity.ok(resultDto);
     }
     

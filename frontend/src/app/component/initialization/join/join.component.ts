@@ -45,6 +45,9 @@ export class JoinComponent implements OnInit {
   }
 
   async joinGame() {
+    this.playerName = this.playerName.trim();
+    this.joinGameId = this.joinGameId.trim();
+
     if (isNonEmptyString(this.playerName)) {
       await firstValueFrom(this.gameService.joinGame({
           playerName: this.playerName

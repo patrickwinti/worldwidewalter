@@ -1,5 +1,5 @@
 export function isNonEmptyString(input: any): boolean {
-  return input !== undefined && typeof(input) === 'string' && input.length > 0;
+  return input !== undefined && typeof(input) === 'string' && input.trim().length > 0;
 }
 
 export function containsNonEmptyString(listOfStrings: string[]): boolean {

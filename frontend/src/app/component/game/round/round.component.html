@@ -13,7 +13,9 @@
 
   <ng-container *ngSwitchCase="GameState.SELECT_PROPOSITION">
     <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto"
+                            [round]=round
                             [propositionSelectionDto]="propositionSelectionDto"
+                            [currentPlayerId]="getCurrentPlayerId()"
                             (selectedPropositionEmitter)="submitSelection($event)">
     </www-select-proposition>
   </ng-container>

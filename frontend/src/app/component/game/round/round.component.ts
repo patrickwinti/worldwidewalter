@@ -7,6 +7,7 @@ import { firstValueFrom, Observable } from "rxjs";
 import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
 import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
 import { HttpErrorResponse } from "@angular/common/http";
+import { containsNonEmptyString, isNonEmptyString } from "../../../shared/util";
 
 @Component({
   selector: 'www-round',
@@ -32,38 +33,35 @@ export class RoundComponent implements OnInit {
     this.stateService.setPrompt(this.round.prompt);
   }
 
-  submitSelection(selectedPropositionId: string): void {
-    firstValueFrom(this.gameService.submitPropositionSelection(this.round.id, selectedPropositionId)).then(
-      () => {
-        console.log('selection submission successful');
-        this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
-      },
-      (error: HttpErrorResponse) => {
-        console.log('selection not successful, continuing');
-        this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
-      });
+  async submitSelection(selectedPropositionId: string): Promise<void> {
+    if (isNonEmptyString(selectedPropositionId)) {
+      await firstValueFrom(this.gameService.submitPropositionSelection(this.round.id, selectedPropositionId)).then(
+        () => {
+          console.log('selection submission successful');
+        },
+        (error: HttpErrorResponse) => {
+          console.log('selection not successful, continuing');
+        });
+    }
+    this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
   }
 
-  sendProposition(gapReplacements: string[]) {
-    firstValueFrom(this.gameService.submitProposition(this.round.id, {
-      gaps: gapReplacements
-    } as PropositionSubmissionDto)).then(
-      () => {
-        console.log('submission successful');
-        this.stateService.setState(GameState.SELECT_PROPOSITION);
-      },
-      (error: HttpErrorResponse) => {
-        console.log('submission not successful, continuing');
-        this.stateService.setState(GameState.SELECT_PROPOSITION);
-      }
-    );
+  async sendProposition(gapReplacements: string[]): Promise<void> {
+    if (containsNonEmptyString(gapReplacements)) {
+      await firstValueFrom(this.gameService.submitProposition(this.round.id, {
+        gaps: gapReplacements
+      } as PropositionSubmissionDto)).then(
+        () => {
+          console.log('submission successful');
+        },
+        (error: HttpErrorResponse) => {
+          console.log('submission not successful, continuing');
+        });
+    }
+    this.stateService.setState(GameState.SELECT_PROPOSITION);
   }
 
   getCurrentPlayerId(): string {
     return this.stateService.getPlayerId();
-  }
-
-  goToResults(): void {
-    this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
   }
 }

@@ -39,27 +39,24 @@ export class RoundComponent implements OnInit {
         this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
       },
       (error: HttpErrorResponse) => {
-        console.log('an error occurred: ' + error.status);
+        console.log('selection not successful, continuing');
+        this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
       });
   }
 
   sendProposition(gapReplacements: string[]) {
     firstValueFrom(this.gameService.submitProposition(this.round.id, {
       gaps: gapReplacements
-    } as PropositionSubmissionDto))
-      .then(
-        () => {
-          console.log('submission successful');
-          if (this.round.sphinx.id === this.getCurrentPlayerId()) {
-            this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
-          } else {
-            this.stateService.setState(GameState.SELECT_PROPOSITION);
-          }
-        },
-        (error: HttpErrorResponse) => {
-          console.log('an error occurred: ' + error.status);
-        }
-      );
+    } as PropositionSubmissionDto)).then(
+      () => {
+        console.log('submission successful');
+        this.stateService.setState(GameState.SELECT_PROPOSITION);
+      },
+      (error: HttpErrorResponse) => {
+        console.log('submission not successful, continuing');
+        this.stateService.setState(GameState.SELECT_PROPOSITION);
+      }
+    );
   }
 
   getCurrentPlayerId(): string {

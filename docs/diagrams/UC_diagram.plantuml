@@ -12,22 +12,12 @@ p<|-right-- s
 
 package WorldwideWalter {
   usecase "Start game" as UC1
-  together{
-    usecase "Support multiple sessions" as UC4
-    usecase "Choose bot player" as UC6
-    usecase "Customize rounds per turn" as UC7
-  }
   usecase "Join game" as UC2
   usecase "Play round" as UC3
-  usecase "Choose prompt" as UC5
 }
 
 'Relationships
 p -- UC1
-UC6 .up..> UC1: extends
-UC4 .up.> UC1: extends
-UC7 .up.> UC1: extends
 p -- UC2
 p -- UC3
-s -- UC5
 @enduml

@@ -134,13 +134,26 @@ class GameTest {
     @Test
     void testMarkPlayerAsActive_AlreadyInActive() {
         var game = createGame();
-        var player = createPlayer();
-        game.addPlayerToWaitingRoom(player);
-        game.moveToActivePlayers(player);
+        var player1 = createPlayer();
+        game.addPlayerToWaitingRoom(player1);
+        game.moveToActivePlayers(player1);
         
-        assertTrue(game.hasActivePlayer(player.getId()));
-        game.moveToActivePlayers(player);
-        assertTrue(game.hasActivePlayer(player.getId()));
+        assertTrue(game.hasActivePlayer(player1.getId()));
+        var player2 = createPlayer();
+        game.addPlayerToWaitingRoom(player2);
+        game.moveToActivePlayers(player2);
+        
+        var candidates = game.getSphinxCandidates();
+        assertEquals(2, candidates.size());
+        
+        candidates.remove(game.getSphinxCandidates().stream().findFirst().get());
+        game.setSphinxCandidates(candidates);
+        
+        game.moveToActivePlayers(player1);
+        game.moveToActivePlayers(player2);
+        assertTrue(game.hasActivePlayer(player1.getId()));
+        assertTrue(game.hasActivePlayer(player2.getId()));
+        assertEquals(1, game.getSphinxCandidates().size());
     }
     
     @Test

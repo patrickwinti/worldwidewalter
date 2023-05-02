@@ -156,13 +156,15 @@ public class Game {
      * @param player player that will be marked as active
      */
     public void moveToActivePlayers(Player player) {
-        waitingRoom.remove(player.getId());
-        activePlayers.put(player.getId(), player);
-        sphinxCandidates.stream()
-                .filter(entry -> entry.getKey().equals(player))
-                .findFirst()
-                .ifPresentOrElse(entry -> {
-                }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
+        if (waitingRoom.containsKey(player.getId())) {
+            waitingRoom.remove(player.getId());
+            activePlayers.put(player.getId(), player);
+            sphinxCandidates.stream()
+                    .filter(entry -> entry.getKey().equals(player))
+                    .findFirst()
+                    .ifPresentOrElse(entry -> {
+                    }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
+        }
     }
     
     /**

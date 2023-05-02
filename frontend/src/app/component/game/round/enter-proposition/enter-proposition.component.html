@@ -10,7 +10,7 @@
 
   </div>
   <br>
-  <button class="special-margin2" (click)="emitProposition()">Senden</button>
+  <button class="special-margin2" [disabled]="!canEmitProposition" (click)="emitProposition()">Senden</button>
 </div>
 
 <www-count-down [timeoutString]="round.endOfSubmissionsInUtc"

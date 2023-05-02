@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { StateService } from "./service/state.service";
 import { GameState } from "./model/game-state";
 import { GameService } from "./service/game.service";
+import { isNonEmptyString } from "./shared/util";
 
 @Component({
   selector: 'www-root',
@@ -29,7 +30,7 @@ export class AppComponent implements OnInit {
   }
 
   private leaveGame() {
-    if (this.stateService.getPlayerId() !== undefined && this.stateService.getGameId() !== undefined) {
+    if (isNonEmptyString(this.stateService.getPlayerId()) && isNonEmptyString(this.stateService.getGameId())) {
       this.gameService.leaveGameAfterDestruction(this.stateService.getPlayerId(), this.stateService.getGameId());
     }
   }

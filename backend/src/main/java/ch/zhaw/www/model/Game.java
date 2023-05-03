@@ -95,8 +95,8 @@ public class Game {
      */
     public boolean canAcceptSelections() {
         return getCurrentRoundOptional()
-                .map(round -> (round.acceptsPropositions() && !isMissingPlayerProposition(round)) ||
-                        (round.acceptsSelections() && isMissingPlayerSelections(round)))
+                .map(round -> isMissingPlayerSelections(round) &&
+                        ((round.acceptsPropositions() && !isMissingPlayerProposition(round)) || round.acceptsSelections()))
                 .orElse(false);
     }
     

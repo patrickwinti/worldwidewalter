@@ -3,7 +3,7 @@
 
   <div *ngFor="let proposition of propositionSelectionDto.propositions">
     <p>
-      <button [disabled]="proposition.readOnly" (click)="selectProposition(proposition.id)">
+      <button [disabled]="proposition.readOnly" (click)="selectProposition(proposition.id)" class="center">
         {{createDisplayTextForProposition(proposition)}}
       </button>
     </p>

@@ -1,9 +1,12 @@
 <div class="content">
-  <input type="text" name="gameId" placeholder="Spiel Id"
+
+  <input type="text" name="playerName" placeholder="Name eingeben" autofocus [(ngModel)]="playerName"/>
+
+  <input type="text" name="gameId" placeholder="Spiel Id eingeben"
          [readOnly]="gameIdIsReadOnly"
          [(ngModel)]="joinGameId"/>
 
-  <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
+
   <button (click)="joinGame()" formtarget="_blank">Beitreten</button>
 </div>
 <ng-container *ngIf="error">

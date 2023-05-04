@@ -65,8 +65,8 @@ button {
   color: black;
   border: white;
   width: max-content;
-  margin-top: 2em;
-  padding: 1em 2em;
+  margin-top: 1em;
+  padding: 0.5em 1em;
   font-size: 150%;
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
   border-radius: 2px;
@@ -85,6 +85,7 @@ button:disabled {
 }
 
 .input[type="text"] {
+  color: #058785;
   width: 70%;
   height: 30px;
   margin-left: 10px;
@@ -95,6 +96,11 @@ button:disabled {
   background: transparent;
   border-bottom: #fcc603 solid 1px;
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
+}
+
+input:read-only{
+  opacity: 55%;
+  color: #ffffff;
 }
 
 
@@ -108,9 +114,9 @@ button:disabled {
 .collapsible {
   background-color: #fcc603;
   color: #444;
-  padding: 18px;
-  font-size: 20px;
-  margin-right: 2em;
+  padding: 14px;
+  font-size: 16px;
+  margin-right: 1em;
 }
 
 .active, .collapsible:hover {

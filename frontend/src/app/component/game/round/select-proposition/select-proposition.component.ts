@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { RoundDto } from "../../../../dto/round-dto";
 import { PropositionSelectionDto } from "../../../../dto/proposition-selection-dto";
 import { PropositionDto } from "../../../../dto/proposition-dto";
+import { RoundDto } from "../../../../dto/round-dto";
 
 
 @Component({
@@ -14,14 +14,9 @@ export class SelectPropositionComponent {
   @Input() propositionSelectionDto: PropositionSelectionDto;
   @Input() currentPlayerId: string;
   @Output() selectedPropositionEmitter = new EventEmitter<string>();
-  @Output() goToResultsPageEmitter = new EventEmitter<void>();
 
   selectProposition(id: string | undefined): void {
-    if (id !== undefined) {
-      this.selectedPropositionEmitter.emit(id);
-    } else {
-      this.selectedPropositionEmitter.emit('no selection');
-    }
+    this.selectedPropositionEmitter.emit(id);
   }
 
   createDisplayTextForProposition(proposition: PropositionDto) {
@@ -36,12 +31,7 @@ export class SelectPropositionComponent {
     return this.round.sphinx.id === this.currentPlayerId;
   }
 
-
   continue() {
-    if (this.isSphinx()) {
-      this.goToResultsPageEmitter.emit();
-    } else {
-      this.selectedPropositionEmitter.emit(undefined);
-    }
+    this.selectedPropositionEmitter.emit(undefined);
   }
 }

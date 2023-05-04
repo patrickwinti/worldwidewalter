@@ -31,7 +31,7 @@ input {
   font-size: 20px;
   color: black;
   position: relative;
-  background:linear-gradient(#fcc650, #fcc603);
+  background: linear-gradient(#fcc650, #fcc603);
   padding: 2px;
   text-align: center;
   width: 150px;
@@ -206,7 +206,7 @@ div {
   bottom: 0;
   padding-top: 10em;
   align-items: center;
-  background: rgba(0, 0, 0, 0);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 h2 {
@@ -246,6 +246,29 @@ th, td {
 
 th {
   background-color: #058785;
+}
+
+.table_info {
+  border-collapse: collapse;
+  font-size: 1.2em;
+  font-family: "Helvetica Neue", sans-serif;
+  border: 2px solid gray;
+  width: 40%;
+  text-align: center;
+  align-self: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.th_info {
+  border: 1px dotted gray;
+  padding: 0.5em;
+  background-color: gray;
+}
+
+.td_info {
+  border: 1px dotted gray;
+  padding: 0.5em;
 }
 
 .center {

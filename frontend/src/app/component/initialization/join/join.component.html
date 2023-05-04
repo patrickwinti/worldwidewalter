@@ -1,9 +1,10 @@
 <div class="content">
-  <input type="text" name="gameId" placeholder="Spiel Id"
+  <input type="text" name="gameId" placeholder="Spiel Id" maxlength="{{GAME_ID_LENGTH}}"
          [readOnly]="gameIdIsReadOnly"
          [(ngModel)]="joinGameId"/>
 
-  <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
+  <input type="text" name="playerName" placeholder="Name eingeben" maxlength="{{MAX_INPUT_LENGTH}}"
+         [(ngModel)]="playerName"/>
   <button [disabled]="!canJoinGame" (click)="joinGame()" formtarget="_blank">beitreten</button>
 </div>
 <ng-container *ngIf="error">

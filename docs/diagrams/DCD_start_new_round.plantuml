@@ -20,7 +20,7 @@ class Round {
 }
 interface EntityService {
    -gameRepository: GameRepository
-   editGame(gameId: String, editor: Consumer)
+   editGame(gameId: String, editor: Function)
 }
 interface RoundService{
    -entityService: EntityService

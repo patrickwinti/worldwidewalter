@@ -26,6 +26,7 @@ import { InfoComponent } from "./component/info/info.component";
 import { NgOptimizedImage } from "@angular/common";
 import { CurrentGameInfoComponent } from './component/game/current-game-info/current-game-info.component';
 import { PromptDisplayComponent } from './component/game/prompt-display/prompt-display.component';
+import { ClipboardModule } from "ngx-clipboard";
 
 @NgModule({
   declarations: [
@@ -53,7 +54,8 @@ import { PromptDisplayComponent } from './component/game/prompt-display/prompt-d
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    NgOptimizedImage
+    NgOptimizedImage,
+    ClipboardModule
   ],
   providers: [
     {

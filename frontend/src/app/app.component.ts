@@ -14,6 +14,11 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:beforeunload', ['event'])
   beforeUnloadHandler() {
+    return false;
+  }
+
+  @HostListener('window:unload', ['event'])
+  unloadHandler() {
     this.leaveGame();
   }
 

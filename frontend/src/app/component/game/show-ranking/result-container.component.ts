@@ -37,7 +37,11 @@ export class ResultContainerComponent implements OnInit {
     });
   }
 
-  get prompt(): String {
+  get prompt(): string {
     return this.stateService.getPrompt();
+  }
+
+  getSphinxProposition(result: ResultDto) {
+    return result.selections.find(selection => selection.sphinxResponse)?.gaps ?? [''];
   }
 }

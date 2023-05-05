@@ -3,7 +3,7 @@ package ch.zhaw.www.controller;
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Proposition;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameService;
 import ch.zhaw.www.service.RoundError;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,10 +95,8 @@ public class GameController {
         if (round == null) {
             throw new RoundError.NotFoundException("not current round for game " + gameId);
         }
-        var propositions = round.getPropositions();
-        var selections = round.getSelections();
         
-        List<SelectionDto> selectionDtos = createSelectionDtos(game, propositions, selections);
+        List<SelectionDto> selectionDtos = createSelectionDtos(game, round);
         
         var resultDto = new ResultDto(
                 game.getPoints()
@@ -137,7 +134,13 @@ public class GameController {
             }
         }
         
-        return ResponseEntity.ok(new RoundDto(round.getId(), round.getPrompt().getStatement(), round.getPrompt().getNumberOfPlaceholders(), sphinx, round.getPropositionSubmissionEnd()));
+        return ResponseEntity.ok(new RoundDto(
+                round.getId(),
+                round.getPrompt().getStatement(),
+                round.getPrompt().getWalters(),
+                round.getPrompt().getNumberOfPlaceholders(),
+                sphinx,
+                round.getPropositionSubmissionEnd()));
     }
     
     @Operation(summary = "Player requested to enter round")
@@ -161,16 +164,17 @@ public class GameController {
         logger.log(Level.INFO, "left game ungracefully by destroying webapp");
     }
     
-    private static List<SelectionDto> createSelectionDtos(Game game, List<Proposition> propositions, Map<String, String> selections) {
-        return propositions.stream()
+    private static List<SelectionDto> createSelectionDtos(Game game, Round round) {
+        return round.getPropositions().stream()
                 .map(proposition ->
                         new SelectionDto(
                                 proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
                                 proposition.getGaps(),
-                                selections.entrySet().stream()
+                                round.getSelections().entrySet().stream()
                                         .filter(entry -> entry.getValue().equals(proposition.getId()))
                                         .map(entry -> game.getPlayerNameFromId(entry.getKey()))
-                                        .toList()
+                                        .toList(),
+                                proposition.getPlayerIds().stream().anyMatch(round::isSphinx)
                         )
                 )
                 .toList();

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Data object representing the round
@@ -19,6 +20,8 @@ public class RoundDto {
     private final String id;
     @NotNull
     private final String prompt;
+    @NotNull
+    private final List<String> walters;
     @NotNull
     private final long numberOfPlaceholders;
     @Nullable

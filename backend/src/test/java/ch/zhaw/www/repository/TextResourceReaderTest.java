@@ -38,8 +38,9 @@ class TextResourceReaderTest {
         
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
-        assertEquals("WALTER WALTERN WALTER", prompts.get(3).getStatement());
+        assertEquals("<<walter>> <<walter>> <<walter>>", prompts.get(3).getStatement());
         assertEquals(3, prompts.get(3).getNumberOfPlaceholders());
+        assertEquals(List.of("WALTER", "WALTERN", "WALTER"), prompts.get(3).getWalters());
     }
     
     @Test

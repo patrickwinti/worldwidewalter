@@ -4,17 +4,18 @@ import ch.zhaw.www.model.*;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class TestHelper {
-    private static final Prompt PROMPT = new Prompt("I am WALTER", 1);
+    private static final Prompt PROMPT = new Prompt("I am <<walter>>", 1, Collections.singletonList("WALTER"));
     public static final Duration DEFAULT_PROPOSITION_DURATION = Duration.of(5, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_PROPOSITION_END_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
-    public static final List<Prompt> PROMPTS = List.of(new Prompt("WALTER ist cool", 1));
+    public static final List<Prompt> PROMPTS = List.of(new Prompt("<<walter>> ist cool", 1, Collections.singletonList("WALTER")));
 
 
     public static Player addWaitingRoomPlayer(Game game) {

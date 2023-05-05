@@ -77,7 +77,7 @@ class GameTest {
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
+        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "<<walter>> " + player.getId())));
         assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
         
         enableFixedClocked();
@@ -176,9 +176,9 @@ class GameTest {
     
     @Test
     void consumePrompts() {
-        List<Prompt> originalList = List.of(new Prompt("WALTER WALTER WALTEROO", 2),
-                new Prompt("WALTER WALTER hello", 1),
-                new Prompt("WALTER says hi", 1));
+        List<Prompt> originalList = List.of(new Prompt("<<walter>> <<walter>> WALTEROO", 2, List.of("WALTER", "WALTER")),
+                new Prompt("<<walter>> <<walter>> hello", 2, List.of("WALTER", "WALTER")),
+                new Prompt("<<walter>> says hi", 1, List.of("WALTER")));
         
         Game game = new Game("12345", 4, 10, 1, originalList);
         

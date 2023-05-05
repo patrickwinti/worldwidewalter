@@ -11,7 +11,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class PromptRepositoryTest {
@@ -27,9 +28,9 @@ class PromptRepositoryTest {
 
     @Test
     void getPrompts() {
-        List<Prompt> originalList = List.of(new Prompt("WALTER WALTER WALTEROO", 2),
-                                            new Prompt("WALTER WALTER hello", 1),
-                                            new Prompt("WALTER says hi", 1));
+        List<Prompt> originalList = List.of(new Prompt("<<walter>> <<walter>> WALTEROO", 2, List.of("WALTER, WALTER")),
+                                            new Prompt("<<walter>> <<walter>> hello", 1, List.of("WALTER, WALTER")),
+                                            new Prompt("<<walter>> says hi", 1, List.of("WALTER")));
 
         when(resourceReader.readResource(any())).thenReturn(originalList);
 

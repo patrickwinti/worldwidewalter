@@ -20,6 +20,7 @@ export class JoinComponent implements OnInit {
   joinGameId: string;
   error = false;
   errorText = '';
+  isCopyButtonVisible: boolean;
 
   constructor(private gameService: GameService,
               private stateService: StateService,
@@ -38,9 +39,12 @@ export class JoinComponent implements OnInit {
     if (this.gameId !== '') {
       this.gameIdIsReadOnly = true;
       this.joinGameId = this.gameId;
+      this.isCopyButtonVisible = true;
+
     } else {
       this.gameIdIsReadOnly = false;
       this.joinGameId = '';
+      this.isCopyButtonVisible = false;
     }
   }
 
@@ -74,5 +78,9 @@ export class JoinComponent implements OnInit {
           }
         );
     }
+  }
+
+  getTextToBeCopied(): string {
+    return window.location.origin + '?gameId=' + this.gameId;
   }
 }

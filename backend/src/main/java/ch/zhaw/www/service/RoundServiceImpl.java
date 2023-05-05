@@ -66,7 +66,7 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public void submitProposition(String roundId, String playerId, List<String> gaps) {
+    public void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
             round.getPropositions()
@@ -85,7 +85,7 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) {
+    public void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
             if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
@@ -100,7 +100,7 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public Round getRoundReadyForSelections(final String roundId, final String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
+    public Round getRoundReadyForSelections(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);
         var game = entityService.getGameForRound(roundId);
         var round = game.getCurrentRound();

@@ -51,7 +51,7 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Game getGame(String gameId) throws GameError.NotFoundException {
+    public Game getGame(@NotNull String gameId) throws GameError.NotFoundException {
         return entityService.getGame(gameId);
     }
     
@@ -74,7 +74,7 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
+    public void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException {
         entityService.editGame(gameId, game -> {
             checkPlayerInGame(game, playerId);
             game.removePlayer(playerId);
@@ -82,7 +82,7 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public void enterRound(String gameId, String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+    public void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         entityService.editGame(gameId, game -> {
             Player playerEnteringRound = checkPlayerInGame(game, playerId);
             if (game.needsNewRound()) {
@@ -105,12 +105,12 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Round getRoundOpenForPropositions(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+    public Round getRoundOpenForPropositions(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         return getCurrentRoundForDesiredState(gameId, playerId, Game::canAcceptPropositions);
     }
     
     @Override
-    public Round getRoundClosedForSelections(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+    public Round getRoundClosedForSelections(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         return getCurrentRoundForDesiredState(gameId, playerId, Game::needsNewRound);
     }
     
@@ -122,25 +122,6 @@ class GameServiceImpl implements GameService {
             throw new RoundError.IllegalStateException();
         }
         return game.getCurrentRound();
-    }
-    
-    /**
-     * Moves the specified player to the active player list of the game if there is capacity for a new active player,
-     * otherwise throws a {@link ch.zhaw.www.service.GameError.FullCapacityException}. If the player is not found in the
-     * game, a {@link ch.zhaw.www.service.PlayerError.NotFoundException} is thrown.
-     *
-     * @param game   The game object.
-     * @param player The player object to move to the active player list.
-     * @throws ch.zhaw.www.service.PlayerError.NotFoundException   If the player is not found in the game.
-     * @throws ch.zhaw.www.service.GameError.FullCapacityException If there is no capacity for a new active player in
-     *                                                             the game.
-     */
-    private static void movePlayerToActive(final Game game, final Player player) {
-        if (game.hasCapacityForNewActivePlayer()) {
-            game.moveToActivePlayers(player);
-        } else {
-            throw new GameError.FullCapacityException();
-        }
     }
     
     private static Player checkPlayerInGame(final Game game, final String playerId) {

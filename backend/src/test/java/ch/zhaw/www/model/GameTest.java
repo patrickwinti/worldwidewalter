@@ -176,9 +176,9 @@ class GameTest {
     
     @Test
     void consumePrompts() {
-        List<Prompt> originalList = List.of(new Prompt("<<walter>> <<walter>> WALTEROO", 2, List.of("WALTER", "WALTER")),
-                new Prompt("<<walter>> <<walter>> hello", 2, List.of("WALTER", "WALTER")),
-                new Prompt("<<walter>> says hi", 1, List.of("WALTER")));
+        List<Prompt> originalList = List.of(new Prompt("<<walter>> <<walter>> WALTEROO", List.of("WALTER", "WALTER")),
+                new Prompt("<<walter>> <<walter>> hello", List.of("WALTER", "WALTER")),
+                new Prompt("<<walter>> says hi", List.of("WALTER")));
         
         Game game = new Game("12345", 4, 10, 1, originalList);
         

@@ -16,7 +16,7 @@ class PromptTest {
     void testNotNullViolation() {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         
-        Prompt prompt = new Prompt(null, 0, List.of());
+        Prompt prompt = new Prompt(null, List.of());
         Set<ConstraintViolation<Prompt>> violations = validator.validate(prompt);
         
         assertEquals(1, violations.size());
@@ -26,7 +26,7 @@ class PromptTest {
     void testNoViolation() {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
         
-        Prompt prompt = new Prompt("Mein Name ist <<walter>>", 1, List.of("WALTER"));
+        Prompt prompt = new Prompt("Mein Name ist <<walter>>", List.of("WALTER"));
         Set<ConstraintViolation<Prompt>> violations = validator.validate(prompt);
         
         assertEquals(0, violations.size());

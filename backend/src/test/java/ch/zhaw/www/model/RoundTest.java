@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class RoundTest {
     private static final String ID = "ROUND_ID";
-    private static final Prompt PROMPT = new Prompt("<<walter>>", 1, List.of("WALTER"));
+    private static final Prompt PROMPT = new Prompt("<<walter>>", List.of("WALTER"));
     private static final Duration PROPOSITION_DURATION = Duration.ofMinutes(40);
     private static final Duration PROPOSITION_ENTER_LIMIT = Duration.ofMinutes(10);
     private static final Duration SUBMISSION_DURATION = Duration.ofMinutes(10);

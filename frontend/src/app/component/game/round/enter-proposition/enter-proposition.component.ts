@@ -14,8 +14,8 @@ export class EnterPropositionComponent implements OnInit {
 
   proposition: Array<WalterReplacement>;
 
-  get numberOfPlaceholders(): number {
-    return this.round.numberOfPlaceholders;
+  get numberOfWalters(): number {
+    return this.round.walters.length;
   }
 
   get canEmitProposition(): boolean {
@@ -24,7 +24,7 @@ export class EnterPropositionComponent implements OnInit {
 
   ngOnInit(): void {
     this.proposition = new Array<WalterReplacement>();
-    for (let i = 0; i < this.numberOfPlaceholders; i++) {
+    for (let i = 0; i < this.numberOfWalters; i++) {
       this.proposition.push({text: ''} as WalterReplacement);
     }
   }

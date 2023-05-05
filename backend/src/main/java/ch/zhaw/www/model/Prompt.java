@@ -15,7 +15,6 @@ import java.util.List;
 public class Prompt {
     @NotNull
     private final String statement;
-    private final long numberOfPlaceholders;
     private final List<String> walters;
     private boolean hasBeenUsed = false;
 }

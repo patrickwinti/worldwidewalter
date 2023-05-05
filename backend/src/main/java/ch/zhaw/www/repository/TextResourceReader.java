@@ -36,7 +36,6 @@ class TextResourceReader implements ResourceReader {
                         if (totalPlaceholders > 0) {
                             return new Prompt(
                                     replaceWaltersWithMarker(sentence),
-                                    totalPlaceholders,
                                     getWalters(sentence));
                         } else {
                             return null;

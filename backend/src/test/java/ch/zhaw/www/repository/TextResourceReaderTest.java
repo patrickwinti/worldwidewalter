@@ -39,7 +39,6 @@ class TextResourceReaderTest {
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
         assertEquals("<<walter>> <<walter>> <<walter>>", prompts.get(3).getStatement());
-        assertEquals(3, prompts.get(3).getNumberOfPlaceholders());
         assertEquals(List.of("WALTER", "WALTERN", "WALTER"), prompts.get(3).getWalters());
     }
     
@@ -68,7 +67,7 @@ class TextResourceReaderTest {
         List<Prompt> prompts = txtFileReader.readResource(getResourceFromFile(file.toFile()));
         
         assertEquals(1, prompts.size());
-        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getNumberOfPlaceholders());
+        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getWalters().size());
     }
     
     private static Stream<Arguments> provideWalterStatements() {

@@ -28,9 +28,9 @@ class PromptRepositoryTest {
 
     @Test
     void getPrompts() {
-        List<Prompt> originalList = List.of(new Prompt("<<walter>> <<walter>> WALTEROO", 2, List.of("WALTER, WALTER")),
-                                            new Prompt("<<walter>> <<walter>> hello", 1, List.of("WALTER, WALTER")),
-                                            new Prompt("<<walter>> says hi", 1, List.of("WALTER")));
+        List<Prompt> originalList = List.of(new Prompt("<<walter>> <<walter>> WALTEROO", List.of("WALTER, WALTER")),
+                                            new Prompt("<<walter>> <<walter>> hello", List.of("WALTER, WALTER")),
+                                            new Prompt("<<walter>> says hi", List.of("WALTER")));
 
         when(resourceReader.readResource(any())).thenReturn(originalList);
 

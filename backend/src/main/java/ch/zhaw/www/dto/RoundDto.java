@@ -22,8 +22,6 @@ public class RoundDto {
     private final String prompt;
     @NotNull
     private final List<String> walters;
-    @NotNull
-    private final long numberOfPlaceholders;
     @Nullable
     private final PlayerDto sphinx;
     @Nullable

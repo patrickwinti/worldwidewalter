@@ -138,7 +138,6 @@ public class GameController {
                 round.getId(),
                 round.getPrompt().getStatement(),
                 round.getPrompt().getWalters(),
-                round.getPrompt().getNumberOfPlaceholders(),
                 sphinx,
                 round.getPropositionSubmissionEnd()));
     }

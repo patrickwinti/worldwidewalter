@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { RoundDto } from "../../../../dto/round-dto";
 import { WalterReplacement } from "../../../../model/walterReplacement";
+import { containsNonEmptyString } from "../../../../shared/util";
 
 @Component({
   selector: 'www-enter-proposition',
@@ -15,6 +16,10 @@ export class EnterPropositionComponent implements OnInit {
 
   get numberOfPlaceholders(): number {
     return this.round.numberOfPlaceholders;
+  }
+
+  get canEmitProposition(): boolean {
+    return containsNonEmptyString(this.proposition.map(value => value.text));
   }
 
   ngOnInit(): void {

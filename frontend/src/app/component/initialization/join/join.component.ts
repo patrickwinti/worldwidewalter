@@ -6,6 +6,7 @@ import { firstValueFrom } from "rxjs";
 import { StateService } from "../../../service/state.service";
 import { PlayerDto } from "../../../dto/player-dto";
 import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
+import { isNonEmptyString } from "../../../shared/util";
 
 @Component({
   selector: 'www-join',
@@ -19,6 +20,7 @@ export class JoinComponent implements OnInit {
   joinGameId: string;
   error = false;
   errorText = '';
+  isCopyButtonVisible: boolean;
 
   constructor(private gameService: GameService,
               private stateService: StateService,
@@ -29,18 +31,28 @@ export class JoinComponent implements OnInit {
     return this.stateService.getGameId();
   }
 
+  get canJoinGame(): boolean {
+    return isNonEmptyString(this.playerName) && isNonEmptyString(this.joinGameId);
+  }
+
   ngOnInit(): void {
     if (this.gameId !== '') {
       this.gameIdIsReadOnly = true;
       this.joinGameId = this.gameId;
+      this.isCopyButtonVisible = true;
+
     } else {
       this.gameIdIsReadOnly = false;
       this.joinGameId = '';
+      this.isCopyButtonVisible = false;
     }
   }
 
   async joinGame() {
-    if (this.playerName != undefined && this.playerName != '') {
+    this.playerName = this.playerName.trim();
+    this.joinGameId = this.joinGameId.trim();
+
+    if (isNonEmptyString(this.playerName)) {
       await firstValueFrom(this.gameService.joinGame({
           playerName: this.playerName
         } as PlayerJoinRequestDto,
@@ -66,5 +78,9 @@ export class JoinComponent implements OnInit {
           }
         );
     }
+  }
+
+  getTextToBeCopied(): string {
+    return window.location.origin + '?gameId=' + this.gameId;
   }
 }

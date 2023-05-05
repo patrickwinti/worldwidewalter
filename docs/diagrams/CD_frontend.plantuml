@@ -1,0 +1,90 @@
+@startuml
+!include globals/stylesheets.iuml
+'skinparam linetype ortho
+'top to bottom direction
+package components {
+    class AppComponent {}
+    class InitializationContainerComponent {}
+    class WelcomeComponent{}
+    class JoinComponent{}
+    class GameContainerComponent{}
+    class RoundComponent{}
+    class ErrorComponent{}
+    class ResultContainerComponent{}
+    class CurrentGameInfo{}
+    class SphinxDisplayComponent{}
+    class PromptDisplayComponent{}
+    class EnterPropositionComponent{}
+    class SelectPropositionComponent{}
+    class CountDownComponent{}
+    class SelectionDisclosureComponent{}
+    class RankingDisplayComponent{}
+    class InfoComponent{}
+    class OverlaySpinnerComponent{}
+}
+together {
+package services {
+    class appConfigService
+    class gameService
+    class httpCancelService
+    class httpPollingInterceptor
+    class loadingService
+    class stateService
+}
+
+package dtos{
+'    class gameDto
+'    class playerDto
+'    class playerJoinRequestDto
+'    class propositionDto
+'    class propositionSelectionDto
+'    class propositionSubmissionDto
+'    class resultDto
+'    class roundDto
+}
+
+package models {
+'    class appState
+'    class gameState
+'    class initializationState
+'    class walterStatement
+}
+}
+
+AppComponent -down-> InitializationContainerComponent
+AppComponent -down-> GameContainerComponent
+AppComponent -down-> InfoComponent
+AppComponent -down-> OverlaySpinnerComponent
+InitializationContainerComponent -down-> WelcomeComponent
+InitializationContainerComponent -down-> JoinComponent
+GameContainerComponent -down-> RoundComponent
+GameContainerComponent -down-> ErrorComponent
+GameContainerComponent -down-> ResultContainerComponent
+GameContainerComponent -down-> CurrentGameInfo
+RoundComponent -down-> SphinxDisplayComponent
+RoundComponent -down-> PromptDisplayComponent
+RoundComponent -down-> EnterPropositionComponent
+RoundComponent -down-> SelectPropositionComponent
+EnterPropositionComponent -down-> CountDownComponent
+SelectPropositionComponent -down-> CountDownComponent
+ResultContainerComponent -down-> PromptDisplayComponent
+ResultContainerComponent -down-> SelectionDisclosureComponent
+ResultContainerComponent -down-> RankingDisplayComponent
+
+'components -[hidden]-> dtos
+'components -[hidden]-> models
+
+components -[hidden]down------> services
+
+GameContainerComponent -down-> stateService
+GameContainerComponent -down-> gameService
+
+InitializationContainerComponent -down-> stateService
+
+RoundComponent -down-> stateService
+RoundComponent -down-> gameService
+
+gameService --> appConfigService
+
+'components -down[hidden]-----------> services
+@enduml

@@ -1,9 +1,11 @@
+<www-sphinx-display [sphinx]="round.sphinx"
+                    [currentPlayerId]="getCurrentPlayerId()">
+</www-sphinx-display>
+
+<www-prompt-display [prompt]="round.prompt">
+</www-prompt-display>
+
 <ng-container [ngSwitch]="stateObservable$ | async">
-
-  <www-sphinx-display [sphinx]="round.sphinx"
-                      [currentPlayerId]="getCurrentPlayerId()">
-  </www-sphinx-display>
-
   <www-enter-proposition *ngSwitchCase="GameState.ENTER_PROPOSITION"
                          [round]=round
                          (propositionEmitter)="sendProposition($event)">
@@ -14,10 +16,8 @@
                             [round]=round
                             [propositionSelectionDto]="propositionSelectionDto"
                             [currentPlayerId]="getCurrentPlayerId()"
-                            (selectedPropositionEmitter)="submitSelection($event)"
-                            (goToResultsPageEmitter)="goToResults()">
+                            (selectedPropositionEmitter)="submitSelection($event)">
     </www-select-proposition>
-
   </ng-container>
 
 </ng-container>

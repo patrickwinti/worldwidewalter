@@ -7,6 +7,7 @@ import { SelectionDto } from "../../../../dto/result-dto";
 })
 export class SelectionDisclosureComponent {
   @Input() selections: SelectionDto[];
+  @Input() prompt: String;
 
   concatStrings(strings: String[]) {
     return strings.join(', ');

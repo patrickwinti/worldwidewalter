@@ -57,10 +57,13 @@ package backend{
     }
     package model {
         class Game {
-            id: String
-            waitingRoom: Map<Player>
-            activePlayers: Map<Player>
-            getState(): Game.State
+            -id: String
+            -waitingRoom: Map<Player>
+            -activePlayers: Map<Player>
+            +needsNewRound(): boolean
+            +canRoundBeEntered(): boolean
+            +canAcceptPropositions(): boolean
+            +canAcceptSelections(): boolean
         }
         class Prompt{
             -statement: String
@@ -82,7 +85,14 @@ package backend{
              -prompt: Prompt
              -propositions: Map<Proposition>
              -selections: Map<Selection>
-             +getState(): Round.State
+             -propositionDuration: Duration
+             -enterLimitDuration: Duration
+             -selectionDuration: Duration
+             #acceptsPropositions(): boolean
+             #acceptsSelections(): boolean
+             #isFinished(): boolean
+             #getNumberOfSelectionsSubmitted(): int
+             #getNumberOfSelectionsSubmitted(): int
              +addSelection(playerId: String, propositionId: String): void
              +addProposition(proposition: Proposition): void
         }
@@ -119,6 +129,9 @@ package backend{
             isPlayerActiveInRound(roundId: String, playerId: String): boolean
             editRound(roundId: String, editor: Consumer<Round>)
             saveNewGame(game: Game)
+        }
+        interface EvaluationService{
+            evaluateSelection(round: Round, propositionId: String, selectorId: String) : Map<String, Integer>
         }
     }
     package repository {
@@ -164,4 +177,5 @@ ResourceReader "1"..>"*" Prompt
 EntityService "1"-->"1" GameRepository
 
 Game "1"->"*" Round
+Round "1"-->"1" EvaluationService
 @enduml

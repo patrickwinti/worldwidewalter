@@ -1,65 +1,46 @@
 @startuml
 !include globals/stylesheets.iuml
 
-
-footer Page %page% of %lastpage%
-
-actor     player1
-actor     player2
+actor     sphinx
 actor     playerN
 
- player1 -> system: enterRound(gameId, playerId)
- player2 -> system: enterRound(gameId, playerId)
- playerN -> system: enterRound(gameId, playerId)
- system --> player1
- system --> player2
- system --> playerN
-
-loop wait for round start conditions met
-    player1 -> system : getRound(roundId, gameId)
-    player2 -> system : getRound(roundId, gameId)
-    playerN -> system : getRound(roundId, gameId)
-end
-
- system --> player1: new round
- system --> player2: new round, sphinx
- system --> playerN: new round
-
- player1 -> system: submitProposition(roundId, playerId, proposition)
- player2 -> system: submitProposition(roundId, playerId, proposition)
- playerN -> system: submitProposition(roundId, playerId, proposition)
-
-system --> player1
-system --> player2
+sphinx -> system: enter round
+playerN -> system: enter round
+system --> sphinx
 system --> playerN
-newpage
+|||
+sphinx -> system : get open round
+playerN -> system : get open round
 
-loop wait all player to send proposition or timeout
-    player1 -> system : getAllPropositionForRound(roundId, gameId)
-    player2 -> system : getAllPropositionForRound(roundId, gameId)
-    playerN -> system : getAllPropositionForRound(roundId, gameId)
-end
+system --> sphinx: new round, sphinx
+system --> playerN: new round
+|||
 
- system --> player1: list of propositions
- system --> player2: list of propositions
- system --> playerN: list of propositions
+sphinx -> system: submit proposition
+playerN -> system: submit proposition
 
- player1 -> system: selectProposition(roundId, propositionId, playerId)
- playerN -> system: selectProposition(roundId, propositionId, playerId)
- note left
+system --> sphinx
+system --> playerN
+|||
+
+sphinx -> system : get all proposition for round
+playerN -> system : get all proposition for round
+
+system --> sphinx: list of propositions
+system --> playerN: list of propositions
+
+playerN -> system: select proposition
+note left
    Player 2 is the sphinx.
    A sphinx cannot send selections
- end note
-system --> player1
+end note
 system --> playerN
-loop wait all player to select proposition or timeout
-    player1 -> system : fetchResultsForRound(gameId, playerId)
-    player2 -> system : fetchResultsForRound(gameId, playerId)
-    playerN -> system : fetchResultsForRound(gameId, playerId)
-end
+|||
 
- system --> player1: ranking
- system --> player2: ranking
- system --> playerN: ranking
+sphinx -> system : fetch results and ranking
+playerN -> system : fetch results and ranking
+
+system --> sphinx: ranking
+system --> playerN: ranking
 
 @enduml

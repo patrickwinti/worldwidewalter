@@ -23,30 +23,30 @@ class GameTest {
     @Test
     void testGameState_WaitingForPlayers() {
         var game = createGame();
-        assertEquals(Game.State.NO_VALID_ROUND, game.getState());
+        assertTrue(game.needsNewRound());
         
         game.addRound(createRound());
         
         var player1 = addWaitingRoomPlayer(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         var player2 = addWaitingRoomPlayer(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         var player3 = addWaitingRoomPlayer(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         var player4 = addWaitingRoomPlayer(game);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         game.moveToActivePlayers(player1);
         game.moveToActivePlayers(player2);
         game.moveToActivePlayers(player3);
         game.moveToActivePlayers(player4);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         
         Round round = createRound();
         game.addRound(round);
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         
         round.setSphinx(getRandomPlayer(game));
-        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
+        assertTrue(game.canAcceptPropositions());
     }
     
     @Test
@@ -56,13 +56,13 @@ class GameTest {
         
         int numberOfPlayersToAdd = 10;
         IntStream.range(0, numberOfPlayersToAdd).forEach(value -> addWaitingRoomPlayer(game));
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         
         addRoundOpenForPropositionSubmission(game); //Round with Sphinx but not enough active players
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         
         game.getAllPlayers().forEach(game::moveToActivePlayers);
-        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
+        assertTrue(game.canAcceptPropositions());
     }
     
     @Test
@@ -77,15 +77,15 @@ class GameTest {
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "<<walter>> " + player.getId())));
-        assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
+        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
+        assertTrue(game.canAcceptSelections());
         
         enableFixedClocked();
         addRoundOpenForPropositionSubmission(game);
         var player = getRandomPlayer(game);
         game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
         offsetFixedClockBy(DEFAULT_PROPOSITION_DURATION);
-        assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
+        assertTrue(game.canAcceptSelections());
     }
     
     @Test
@@ -94,18 +94,13 @@ class GameTest {
         assertNull(game.getCurrentRound());
         
         Round round = mock(Round.class);
-        when(round.getState()).thenReturn(Round.State.CREATED);
         game.addRound(round);
         assertSame(round, game.getCurrentRound());
         
-        when(round.getState()).thenReturn(Round.State.OPEN_FOR_SUBMISSIONS);
+        when(round.acceptsPropositions()).thenReturn(true);
         Player sphinx = createPlayer();
         round.setSphinx(sphinx);
         assertSame(round, game.getCurrentRound());
-        
-        when(round.getState()).thenReturn(Round.State.FINISHED);
-        assertNull(game.getCurrentRound());
-        
     }
     
     @Test
@@ -139,13 +134,26 @@ class GameTest {
     @Test
     void testMarkPlayerAsActive_AlreadyInActive() {
         var game = createGame();
-        var player = createPlayer();
-        game.addPlayerToWaitingRoom(player);
-        game.moveToActivePlayers(player);
+        var player1 = createPlayer();
+        game.addPlayerToWaitingRoom(player1);
+        game.moveToActivePlayers(player1);
         
-        assertTrue(game.hasActivePlayer(player.getId()));
-        game.moveToActivePlayers(player);
-        assertTrue(game.hasActivePlayer(player.getId()));
+        assertTrue(game.hasActivePlayer(player1.getId()));
+        var player2 = createPlayer();
+        game.addPlayerToWaitingRoom(player2);
+        game.moveToActivePlayers(player2);
+        
+        var candidates = game.getSphinxCandidates();
+        assertEquals(2, candidates.size());
+        
+        candidates.remove(game.getSphinxCandidates().stream().findFirst().get());
+        game.setSphinxCandidates(candidates);
+        
+        game.moveToActivePlayers(player1);
+        game.moveToActivePlayers(player2);
+        assertTrue(game.hasActivePlayer(player1.getId()));
+        assertTrue(game.hasActivePlayer(player2.getId()));
+        assertEquals(1, game.getSphinxCandidates().size());
     }
     
     @Test

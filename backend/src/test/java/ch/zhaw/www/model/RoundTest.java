@@ -54,12 +54,12 @@ class RoundTest {
         Round round = getRound();
         round.setSphinx(createPlayer());
         
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         offsetFixedClockBy(PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT).minus(1, ChronoUnit.MINUTES));
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         assertTrue(round.canEnterRound());
         offsetFixedClockBy(PROPOSITION_DURATION.minus(PROPOSITION_ENTER_LIMIT));
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         assertFalse(round.canEnterRound());
     }
     
@@ -68,35 +68,33 @@ class RoundTest {
         Round round = getRound();
         round.setSphinx(createPlayer());
         
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         
         offsetFixedClockBy(PROPOSITION_DURATION.minus(1, ChronoUnit.MINUTES));
         
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         round.addProposition(createProposition("1", "Fish "));
         
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         offsetFixedClockBy(PROPOSITION_DURATION);
-        assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
+        assertTrue(round.acceptsSelections());
     }
     
     @Test
     void selectionsCanBeSubmitted() {
         Round round = getRound();
         
-        assertEquals(Round.State.CREATED, round.getState());
-        
         round.setSphinx(createPlayer());
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         
         round.addProposition(createProposition("1", "Joseph"));
         
-        assertEquals(Round.State.OPEN_FOR_SUBMISSIONS, round.getState());
+        assertTrue(round.acceptsPropositions());
         offsetFixedClockBy(PROPOSITION_DURATION);
         
         round.addProposition(createProposition("2", "Joseph"));
         
-        assertEquals(Round.State.OPEN_FOR_SELECTIONS, round.getState());
+        assertTrue(round.acceptsSelections());
     }
     
     @Test

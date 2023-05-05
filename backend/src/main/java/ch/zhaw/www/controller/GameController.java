@@ -46,7 +46,7 @@ public class GameController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<GameDto> createGame() {
         Game newGame = gameService.createGame();
-        logger.log(Level.INFO, "created game {0}", newGame);
+        logger.log(Level.INFO, "created game {0}", newGame.getId());
         return ResponseEntity.ok(new GameDto(newGame.getId()));
     }
     
@@ -109,7 +109,7 @@ public class GameController {
                         .toList(),
                 selectionDtos);
         
-        logger.log(Level.INFO, "game results returned {0}", game);
+        logger.log(Level.INFO, "game results returned {0}", game.getId());
         return ResponseEntity.ok(resultDto);
     }
     

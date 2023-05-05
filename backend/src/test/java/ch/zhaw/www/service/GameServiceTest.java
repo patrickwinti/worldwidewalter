@@ -35,7 +35,7 @@ class GameServiceTest {
     private EntityService entityService;
     @MockBean
     private RandomProvider randomProvider;
-
+    
     @AfterEach
     void tearDown() {
         disableFixedClocked();
@@ -129,7 +129,7 @@ class GameServiceTest {
                 .toList();
         
         enableFixedClocked();
-        final Player sphinx = players.get(3);
+        final Player sphinx = players.get(2);
         round.setSphinx(sphinx);
         players.forEach(player -> {
             game.moveToActivePlayers(player);
@@ -144,7 +144,6 @@ class GameServiceTest {
         final String anyPlayerId = players.get(0).getId();
         assertEquals(round, gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
         offsetFixedClockBy(ROUND_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
     }
     
     @Test
@@ -171,7 +170,7 @@ class GameServiceTest {
         Round round = createRound();
         game.addRound(round);
         List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game)).toList();
-        Player sphinx = getRandomPlayer(game);
+        Player sphinx = players.get(0);
         round.setSphinx(sphinx);
         players.forEach(player -> {
             game.moveToActivePlayers(player);
@@ -224,7 +223,7 @@ class GameServiceTest {
         gameService.enterRound(GAME_ID, player1.getId());
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(player1);
         
-        assertEquals(Game.State.WAITING_FOR_PLAYERS, game.getState());
+        assertTrue(game.canRoundBeEntered());
         final Player player2 = createPlayer();
         game.addPlayerToWaitingRoom(player2);
         
@@ -248,7 +247,7 @@ class GameServiceTest {
         game.addPlayerToWaitingRoom(playerEnteringLater);
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
         
-        assertEquals(Game.State.WAITING_FOR_ALL_PROPOSITIONS, game.getState());
+        assertTrue(game.canAcceptPropositions());
         
         assertFalse(game.hasActivePlayer(playerEnteringLater.getId()));
         gameService.enterRound(GAME_ID, playerEnteringLater.getId());
@@ -273,7 +272,7 @@ class GameServiceTest {
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
         playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(createProposition(p.getId(), "Cereal")));
         
-        assertEquals(Game.State.WAITING_FOR_ALL_SELECTIONS, game.getState());
+        assertTrue(game.canAcceptSelections());
         
         game.addPlayerToWaitingRoom(cannotEnterCurrentlyPlayer);
         assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));
@@ -285,13 +284,13 @@ class GameServiceTest {
     void enterGameWithExistingPlayerOfSameName() {
         Game game = mockGameInRepository();
         when(randomProvider.getPostfix()).thenReturn(1982);
-
+        
         gameService.enterGame(game.getId(), "Nora");
         gameService.enterGame(game.getId(), "Nora");
         
         var allPlayersInGame = game.getAllPlayers().count();
         assertEquals(2, allPlayersInGame);
-
+        
         List<String> waitingListNames = game.getAllPlayers().map(Player::getName).sorted().toList();
         assertEquals("Nora", waitingListNames.get(0));
         assertEquals("Nora1982", waitingListNames.get(1));

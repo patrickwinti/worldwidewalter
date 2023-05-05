@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ch.zhaw.www.utils.InstantWrapper.isInFuture;
+
 /**
  * Model class with round information
  */
@@ -75,7 +77,7 @@ public class Round {
      * @return true if the round can be entered; false otherwise
      */
     public boolean canEnterRound() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd.minus(enterLimitDuration));
+        return propositionSubmissionEnd == null || isInFuture(propositionSubmissionEnd.minus(enterLimitDuration));
     }
     
     /**
@@ -85,39 +87,6 @@ public class Round {
      */
     public void addProposition(Proposition proposition) {
         propositions.add(proposition);
-    }
-    
-    /**
-     * Gets the state of the round.
-     *
-     * @return the state of the round
-     */
-    State getState() {
-        if (sphinx == null) {
-            return State.CREATED;
-        } else if (canSendPropositions()) {
-            return State.OPEN_FOR_SUBMISSIONS;
-        } else if (canSendSelections()) {
-            return State.OPEN_FOR_SELECTIONS;
-        } else {
-            return State.FINISHED;
-        }
-    }
-    
-    /*
-     * Checks whether player can send a proposition
-     */
-    private boolean canSendPropositions() {
-        return propositionSubmissionEnd != null && InstantWrapper.isAfterNow(propositionSubmissionEnd);
-    }
-    
-    /*
-     * Checks whether players can still make their selections.
-     *
-     * @return true if players can still make their selections; false otherwise
-     */
-    private boolean canSendSelections() {
-        return selectionSubmissionEnd != null && InstantWrapper.isAfterNow(selectionSubmissionEnd);
     }
     
     /*
@@ -141,6 +110,33 @@ public class Round {
     }
     
     /**
+     * Checks whether player can send a proposition
+     *
+     * @return true if player can still submit propositions
+     */
+    boolean acceptsPropositions() {
+        return sphinx != null && propositionSubmissionEnd != null && isInFuture(propositionSubmissionEnd);
+    }
+    
+    /*
+     * Checks whether players can still make their selections.
+     *
+     * @return true if players can still make their selections; false otherwise
+     */
+    boolean acceptsSelections() {
+        return !acceptsPropositions() && selectionSubmissionEnd != null && isInFuture(selectionSubmissionEnd);
+    }
+    
+    /**
+     * Checks if round has timed out and no proposition or selections are possible
+     *
+     * @return true if round is finished
+     */
+    boolean isFinished() {
+        return sphinx != null && !acceptsSelections() && !acceptsPropositions();
+    }
+    
+    /**
      * Checks if player with given playerId is sphinx in this round
      *
      * @param playerId the playerId to be checked
@@ -151,19 +147,12 @@ public class Round {
     }
     
     /**
-     * Checks if proposition with given propositionId exisits in round
+     * Checks if proposition with given propositionId exists in round
      *
      * @param propositionId the propositionId to be checked
      * @return boolean if proposition exists in round
      */
     public boolean hasProposition(String propositionId) {
         return propositions.stream().anyMatch(proposition -> proposition.getId().equals(propositionId));
-    }
-    
-    /**
-     * Enum representing the possible states of a round.
-     */
-    enum State {
-        CREATED, OPEN_FOR_SUBMISSIONS, OPEN_FOR_SELECTIONS, FINISHED
     }
 }

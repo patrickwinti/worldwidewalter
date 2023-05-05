@@ -88,22 +88,18 @@ class GameServiceImpl implements GameService {
             if (game.needsNewRound()) {
                 var round = roundService.createNewRound(game);
                 game.addRound(round);
-                movePlayerToActive(game, playerEnteringRound);
-                game.getAllPlayers()
-                        .filter(player -> !game.hasActivePlayer(player.getId()))
-                        .takeWhile(player -> game.hasCapacityForNewActivePlayer())
-                        .forEach(game::moveToActivePlayers);
-                //handle the case that no other play may enter the game
-                if (!game.hasCapacityForNewActivePlayer()) {
-                    roundService.selectSphinx(game);
-                }
+                game.moveToActivePlayers(playerEnteringRound);
                 LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
             } else if (game.canRoundBeEntered()) {
-                movePlayerToActive(game, playerEnteringRound);
+                game.moveToActivePlayers(playerEnteringRound);
                 roundService.selectSphinx(game);
                 LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
+            } else if (!game.hasCapacityForNewActivePlayer()) {
+                LOGGER.info("Round is full, player cannot join");
+                throw new GameError.FullCapacityException();
             } else {
                 LOGGER.info("Player cannot join current session");
+                throw new RoundError.IllegalOperationException();
             }
         });
     }

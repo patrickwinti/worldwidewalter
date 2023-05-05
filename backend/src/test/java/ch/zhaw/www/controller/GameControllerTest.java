@@ -20,7 +20,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,10 +48,10 @@ class GameControllerTest {
     @MockBean
     private GameService gameService;
     
-    private static String getExpectedDateInTheFuture(Duration duration) {
+    private static String getExpectedDateInTheFuture() {
         enableFixedClocked();
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(duration));
+                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(ch.zhaw.www.TestHelper.DEFAULT_PROPOSITION_DURATION));
     }
     
     @AfterEach
@@ -173,7 +172,7 @@ class GameControllerTest {
     
     @Test
     void testGetRound_200_withDate() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
+        String expectedDate = getExpectedDateInTheFuture();
         var round = createRound();
         round.setSphinx(createPlayer("Sphinx"));
         when(gameService.getRoundOpenForPropositions(any(), any())).thenReturn(round);
@@ -211,6 +210,15 @@ class GameControllerTest {
                 .andExpect(status().isNotFound());
         verify(gameService).enterRound(GAME_ID, PLAYER_ID);
         
+    }
+    
+    @Test
+    void enterRound_403_game() throws Exception {
+        doThrow(new RoundError.IllegalOperationException()).when(gameService).enterRound(any(), any());
+        mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isForbidden());
+        verify(gameService).enterRound(GAME_ID, PLAYER_ID);
     }
     
     @Test

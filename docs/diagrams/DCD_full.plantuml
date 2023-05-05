@@ -54,10 +54,13 @@ package backend{
     }
     package model {
         class Game {
-            id: String
-            waitingRoom: Map<Player>
-            activePlayers: Map<Player>
-            getState(): Game.State
+            -id: String
+            -waitingRoom: Map<Player>
+            -activePlayers: Map<Player>
+            +needsNewRound(): boolean
+            +canRoundBeEntered(): boolean
+            +canAcceptPropositions(): boolean
+            +canAcceptSelections(): boolean
         }
         class Prompt{
             -statement: String
@@ -78,7 +81,14 @@ package backend{
              -prompt: Prompt
              -propositions: Map<Proposition>
              -selections: Map<Selection>
-             +getState(): Round.State
+             -propositionDuration: Duration
+             -enterLimitDuration: Duration
+             -selectionDuration: Duration
+             #acceptsPropositions(): boolean
+             #acceptsSelections(): boolean
+             #isFinished(): boolean
+             #getNumberOfSelectionsSubmitted(): int
+             #getNumberOfSelectionsSubmitted(): int
              +addSelection(playerId: String, propositionId: String): void
              +addProposition(proposition: Proposition): void
         }

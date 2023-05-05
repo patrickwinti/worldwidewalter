@@ -56,21 +56,17 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        String uuid = UUID.randomUUID().toString();
-        var wrapper = new Object() {
-            Player player;
-        };
-        entityService.editGame(gameId, game -> {
-            StringBuilder name = new StringBuilder(playerName);
+    public Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+        return entityService.editGame(gameId, game -> {
+            String uuid = UUID.randomUUID().toString();
+            StringBuilder name = new StringBuilder(playerName.trim());
             while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
                 name.append(randomProvider.getPostfix());
             }
             Player tempPlayer = new Player(uuid, name.toString());
-            game.addPlayerToWaitingRoom(tempPlayer);
-            wrapper.player = tempPlayer;
+            game.registerPlayer(tempPlayer);
+            return tempPlayer;
         });
-        return wrapper.player;
     }
     
     @Override
@@ -78,6 +74,7 @@ class GameServiceImpl implements GameService {
         entityService.editGame(gameId, game -> {
             checkPlayerInGame(game, playerId);
             game.removePlayer(playerId);
+            return game;
         });
     }
     
@@ -101,6 +98,7 @@ class GameServiceImpl implements GameService {
                 LOGGER.info("Player cannot join current session");
                 throw new RoundError.IllegalOperationException();
             }
+            return game;
         });
     }
     

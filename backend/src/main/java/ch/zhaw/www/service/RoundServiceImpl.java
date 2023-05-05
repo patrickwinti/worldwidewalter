@@ -5,6 +5,7 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -81,6 +82,7 @@ class RoundServiceImpl implements RoundService {
             if (round.getSphinx() == null) {
                 throw new RoundError.IllegalStateException();
             }
+            return round;
         });
     }
     
@@ -93,6 +95,7 @@ class RoundServiceImpl implements RoundService {
                 var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
                 var game = entityService.getGameForRound(roundId);
                 game.addPoints(evaluation);
+                return game;
             } else {
                 throw new RoundError.IllegalOperationException();
             }

@@ -3,9 +3,10 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -33,8 +34,9 @@ class EntityServiceImpl implements EntityService {
     public <T> T editGame(@NotNull String gameId, Function<Game, T> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
-            editor.accept(game);
+            T result = editor.apply(game);
             gamesRepository.save(game);
+            return result;
         }
     }
     
@@ -56,8 +58,9 @@ class EntityServiceImpl implements EntityService {
     public <T> T editRound(@NotNull String roundId, Function<Round, T> editor) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGameForRound(roundId);
-            editor.accept(game.getCurrentRound());
+            T result = editor.apply(game.getCurrentRound());
             gamesRepository.save(game);
+            return result;
         }
     }
     

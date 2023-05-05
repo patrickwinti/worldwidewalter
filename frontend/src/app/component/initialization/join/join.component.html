@@ -1,16 +1,25 @@
 <div class="content">
 
+  <div>
+    <div class="container">
+
+      <input type="text" name="gameId" placeholder="Spiel Id eingeben" class="input_cont"
+             [readOnly]="gameIdIsReadOnly"
+             [(ngModel)]="joinGameId"/>
+
+      <ng-container *ngIf="isCopyButtonVisible">
+        <button class="btn" type="button" ngxClipboard [cbContent]="getTextToBeCopied()" title="Link kopieren"><img
+          ngSrc="assets/link.png" height="15" width="15" alt="Link kopieren"></button>
+      </ng-container>
+    </div>
+  </div>
+
   <input type="text" name="playerName" placeholder="Name eingeben" autofocus [(ngModel)]="playerName"/>
 
-  <input type="text" name="gameId" placeholder="Spiel Id eingeben"
-         [readOnly]="gameIdIsReadOnly"
-         [(ngModel)]="joinGameId"/>
-  <ng-container *ngIf="isCopyButtonVisible">
-    <button class="btn" type="button" ngxClipboard [cbContent]="getTextToBeCopied()">kopiere Link</button>
-  </ng-container>
-
-  <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
   <button [disabled]="!canJoinGame" (click)="joinGame()" formtarget="_blank">Beitreten</button>
+
+  <button (click)="returnToStart()">Zurück zur Startseite</button>
+
 </div>
 <ng-container *ngIf="error">
   <p style="color: orangered">

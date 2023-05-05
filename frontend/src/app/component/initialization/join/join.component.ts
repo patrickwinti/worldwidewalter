@@ -80,6 +80,10 @@ export class JoinComponent implements OnInit {
     }
   }
 
+  returnToStart() {
+    this.initializationStateEmitter.emit(InitializationState.WELCOME_PAGE);
+  }
+
   getTextToBeCopied(): string {
     return window.location.origin + '?gameId=' + this.gameId;
   }

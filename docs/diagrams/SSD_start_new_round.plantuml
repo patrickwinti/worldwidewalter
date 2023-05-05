@@ -2,6 +2,7 @@
 !include globals/stylesheets.iuml
 
 
+actor "Player" as p
 participant ":GameController" as gc
 participant ":GameService" as gs
 participant ":RoundService" as rs
@@ -11,18 +12,19 @@ participant "round:Round" as round
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
+p -> gc : request enter round
 gc -> gs: enterRound(gameId, playerId)
 gs -> ges: editGame(gameId)
 activate ges
 ges -> gr : findById(gameId)
 gr  --> ges: Game
 ges --> gs
-gs -> game: getState()
-game -> round: getState()
-round --> game: Round state FINISHED
-game --> gs: Game state NO_VALID_ROUND
+gs -> game: needsNewRound()
+game -> round: isFinished()
+round --> game: true if round\ntimers rund out
+game --> gs: true round is finished or all players submitted their selections
 gs -> game: hasCapacityForNewActivePlayer()
-game --> gs: true or false depending on nr of players
+game --> gs: true if less than maximum active players
 gs -> game: hasPlayer(playerId)
 game --> gs: true if player is in the game
 gs -> rs :createNewRound(game)
@@ -42,4 +44,7 @@ ges -> gr : save(game)
 gr --> ges
 ges --> gs
 gs --> gc
+
+gc --> p : enter round response
+
 @enduml

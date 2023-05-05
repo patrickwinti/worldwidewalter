@@ -16,7 +16,7 @@ public class InstantWrapper {
     
     private InstantWrapper() {
     }
-
+    
     /**
      * Offsets now by given minutes.
      *
@@ -26,17 +26,17 @@ public class InstantWrapper {
     public static Instant offsetNow(@NotNull Duration duration) {
         return getNow().plus(duration);
     }
-
+    
     /**
      * Checks if given instant is after now
      *
      * @param instant instant to check in timeline
      * @return true if instant is in the future
      */
-    public static boolean isAfterNow(@NotNull Instant instant) {
+    public static boolean isInFuture(@NotNull Instant instant) {
         return instant.isAfter(getNow());
     }
-
+    
     private static Instant getNow() {
         return Instant.now(clock);
     }

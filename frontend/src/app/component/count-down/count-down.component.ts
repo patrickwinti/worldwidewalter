@@ -28,6 +28,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
   private readonly milliSecondsInASecond = 1000;
   private readonly secondsInAMinute = 60;
   private readonly minutesInAnHour = 60;
+  private readonly TIMEOUT_REDUCTION = 2 * this.milliSecondsInASecond;
 
   private readonly destroy$ = new Subject<boolean>();
 
@@ -51,7 +52,7 @@ export class CountDownComponent implements OnInit, OnDestroy {
           this.destroy$.complete();
         }
       });
-    this.timeout = this.getUTCMilliseconds(this.timeoutString);
+    this.timeout = this.getUTCMilliseconds(this.timeoutString) - this.TIMEOUT_REDUCTION;
   }
 
   ngOnDestroy(): void {

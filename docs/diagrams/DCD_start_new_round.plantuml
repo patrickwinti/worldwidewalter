@@ -7,14 +7,16 @@ class GameController {
 }
 class Game {
    -id: String
-   +getState(): Game.State
+   +needsNewRound(): boolean
    +addRound(round:Round)
    +hasCapacityForNewActivePlayer(): boolean
    +hasPlayer(playerId: String): boolean
    +moveToActivePlayers(playerId: String)
 }
 class Round {
-   #getState(): Round.State
+  -propositionDuration: Duration
+  -selectionDuration: Duration
+  #isFinished(): boolean
 }
 interface EntityService {
    -gameRepository: GameRepository

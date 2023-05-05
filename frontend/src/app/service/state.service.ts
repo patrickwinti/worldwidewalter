@@ -10,6 +10,7 @@ export class StateService {
   private gameId: string = '';
   private playerId: string = '';
   private playerName: string = '';
+  private prompt: string = '';
 
   getGameId(): string {
     return this.gameId ?? '';
@@ -66,5 +67,13 @@ export class StateService {
 
   setPlayerName(playerName: string): void {
     this.playerName = playerName;
+  }
+
+  setPrompt(prompt: string): void {
+    this.prompt = prompt;
+  }
+
+  getPrompt(): string {
+    return this.prompt;
   }
 }

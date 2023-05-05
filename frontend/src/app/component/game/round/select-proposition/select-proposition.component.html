@@ -10,7 +10,7 @@
   </div>
 </div>
 <div *ngIf="isSphinx()">
-  <button class="center" (click)="goToResultsPageEmitter.emit()">weiter</button>
+  <button class="center" (click)="selectProposition(undefined)">weiter</button>
 </div>
 
 <www-count-down [timeoutString]="propositionSelectionDto.selectionSubmissionEndInUtc"

@@ -2,9 +2,12 @@
   <input type="text" name="gameId" placeholder="Spiel Id"
          [readOnly]="gameIdIsReadOnly"
          [(ngModel)]="joinGameId"/>
+  <ng-container *ngIf="isCopyButtonVisible">
+    <button class="btn" type="button" ngxClipboard [cbContent]="getTextToBeCopied()">kopiere Link</button>
+  </ng-container>
 
   <input type="text" name="playerName" placeholder="Name eingeben" [(ngModel)]="playerName"/>
-  <button (click)="joinGame()" formtarget="_blank">beitreten</button>
+  <button [disabled]="!canJoinGame" (click)="joinGame()" formtarget="_blank">beitreten</button>
 </div>
 <ng-container *ngIf="error">
   <p style="color: orangered">

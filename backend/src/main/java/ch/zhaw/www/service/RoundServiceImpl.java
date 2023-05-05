@@ -33,25 +33,26 @@ class RoundServiceImpl implements RoundService {
     
     @Override
     public void selectSphinx(Game game) {
-        var round = game.getCurrentRound();
-        if (round != null && round.getSphinx() == null) {
-            var entries = game.getSphinxCandidates();
-            if (entries.isEmpty()) return;
-            var player = Collections.min(entries, Comparator.comparingInt(Map.Entry::getValue));
-            
-            entries.remove(player);
-            
+        var round = game.getCurrentRoundOptional();
+        var sphinxCandidates = game.getSphinxCandidates();
+        if (!sphinxCandidates.isEmpty() && round.isPresent() && round.get().getSphinx() == null) {
+            var temp = new HashSet<>(sphinxCandidates);
+            if (temp.isEmpty()) return;
             Player sphinx = null;
-            if (game.hasActivePlayer(player.getKey().getId())) {
-                if (player.getValue() > ONE_ROUND_LEFT) {
-                    entries.add(Map.entry(player.getKey(), player.getValue() - 1));
+            do {
+                var player = Collections.min(temp, Comparator.comparingInt(Map.Entry::getValue));
+                temp.remove(player);
+                if (game.hasActivePlayer(player.getKey().getId())) {
+                    sphinxCandidates.remove(player);
+                    if (player.getValue() > ONE_ROUND_LEFT) {
+                        sphinxCandidates.add(Map.entry(player.getKey(), player.getValue() - 1));
+                    }
+                    sphinx = player.getKey();
                 }
-                game.setSphinxCandidates(entries);
-                sphinx = player.getKey();
-            } else {
-                selectSphinx(game);
-            }
-            round.setSphinx(sphinx);
+                
+            } while (!temp.isEmpty() && sphinx == null);
+            game.setSphinxCandidates(sphinxCandidates);
+            round.get().setSphinx(sphinx);
         }
     }
     

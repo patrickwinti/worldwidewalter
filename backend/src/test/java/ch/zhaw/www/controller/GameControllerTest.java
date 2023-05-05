@@ -22,9 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -245,37 +244,31 @@ class GameControllerTest {
     void testFetchResults_200() throws Exception {
         var round = mock(Round.class);
         var game = mock(Game.class);
-        var points = new HashMap<String, Integer>();
-        var p1Id = "p1Id";
-        var p2Id = "p2Id";
         var p1Name = "player1";
         var p2Name = "player2";
+        var p1 = createPlayer(p1Name);
+        var p2 = createPlayer(p2Name);
         
         var p1prop = "prop1";
         var p2prop = "prop2";
         var p1propId = "p1propId";
         var p2propId = "p2propId";
-        var propositions = new ArrayList<Proposition>();
-        var prop1 = new Proposition(p1propId, Collections.singletonList(p1prop));
-        prop1.submittedBy(p1Id);
-        var prop2 = new Proposition(p2propId, Collections.singletonList(p2prop));
-        prop2.submittedBy(p2Id);
-        propositions.add(prop1);
-        propositions.add(prop2);
+        var prop1 = new Proposition(p1propId, List.of(p1prop));
+        prop1.submittedBy(p1.getId());
+        var prop2 = new Proposition(p2propId, List.of(p2prop));
+        prop2.submittedBy(p2.getId());
+        var propositions = List.of(prop1, prop2);
         
-        points.put(p1Id, 3);
-        points.put(p2Id, 1);
-        
-        var selections = new HashMap<String, String>();
-        selections.put(p2Id, p1propId);
+        var points = Map.of(p1, 3, p2, 1);
+        var selections = Map.of(p2.getId(), p1propId);
         
         when(gameService.getRoundClosedForSelections(any(), any())).thenReturn(round);
         when(gameService.getGame(any())).thenReturn(game);
         when(game.getPoints()).thenReturn(points);
         when(round.getSelections()).thenReturn(selections);
         when(round.getPropositions()).thenReturn(propositions);
-        when(game.getPlayerNameFromId(p1Id)).thenReturn(p1Name);
-        when(game.getPlayerNameFromId(p2Id)).thenReturn(p2Name);
+        when(game.getPlayerNameFromId(p1.getId())).thenReturn(p1Name);
+        when(game.getPlayerNameFromId(p2.getId())).thenReturn(p2Name);
         
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/results", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))

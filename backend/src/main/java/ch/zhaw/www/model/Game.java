@@ -30,11 +30,12 @@ public class Game {
     private final int numberOfRoundsInTurn;
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
+    private final List<Player> players = new ArrayList<>();
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts;
     @Getter
-    private final Map<Player, Integer> points = new HashMap<>();
+    private final Map<String, Integer> points = new HashMap<>();
     
     /**
      * Gets current round, when the SphinxElector has been selected
@@ -143,7 +144,7 @@ public class Game {
      * @return a stream of all players in the game
      */
     public Stream<Player> getAllPlayers() {
-        return points.keySet().stream();
+        return players.stream();
     }
     
     public String getPlayerNameFromId(String id) {
@@ -178,6 +179,7 @@ public class Game {
      * @param playerId player identifier
      */
     public void removePlayer(@NotNull String playerId) {
+        players.removeIf(player -> player.getId().equals(playerId));
         sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);
     }
@@ -198,7 +200,7 @@ public class Game {
      */
     public Set<Map.Entry<Player, Integer>> getSphinxCandidates() {
         if (sphinxCandidates.isEmpty()) {
-            sphinxCandidates = activePlayers.values().stream()
+            sphinxCandidates = players.stream()
                     .map(player -> Map.entry(player, numberOfRoundsInTurn))
                     .collect(Collectors.toSet());
         }
@@ -211,13 +213,7 @@ public class Game {
      * @param evaluation a map containing the playerId as key and points as value
      */
     public void addPoints(Map<String, Integer> evaluation) {
-        points.entrySet()
-                .stream()
-                .filter(entry -> evaluation.containsKey(entry.getKey().getId()))
-                .forEach(entry -> {
-                    int pointsToAdd = evaluation.getOrDefault(entry.getKey().getId(), 0);
-                    points.put(entry.getKey(), entry.getValue() + pointsToAdd);
-                });
+        evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
     }
     
     /**
@@ -226,7 +222,8 @@ public class Game {
      * @param player new player entering
      */
     public void registerPlayer(Player player) {
-        points.put(player, 0);
+        points.put(player.getId(), 0);
+        players.add(player);
         sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn));
     }
 }

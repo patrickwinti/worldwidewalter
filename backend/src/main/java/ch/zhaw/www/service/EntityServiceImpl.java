@@ -3,10 +3,10 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
+import ch.zhaw.www.utils.Transaction;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -31,10 +31,10 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public <T> T editGame(@NotNull String gameId, Function<Game, T> editor) throws GameError.NotFoundException {
+    public <T> T editGame(@NotNull String gameId, Transaction<Game, T> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
-            T result = editor.apply(game);
+            T result = editor.transactionalChange(game);
             gamesRepository.save(game);
             return result;
         }
@@ -55,10 +55,10 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public <T> T editRound(@NotNull String roundId, Function<Round, T> editor) throws RoundError.NotFoundException {
+    public <T> T editRound(@NotNull String roundId, Transaction<Round, T> editor) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGameForRound(roundId);
-            T result = editor.apply(game.getCurrentRound());
+            T result = editor.transactionalChange(game.getCurrentRound());
             gamesRepository.save(game);
             return result;
         }
@@ -70,7 +70,7 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public void saveNewGame(Game game) {
+    public void saveNewGame(@NotNull Game game) {
         synchronized (gamesRepository) {
             if (!gamesRepository.existsById(game.getId())) {
                 gamesRepository.save(game);

@@ -105,7 +105,7 @@ public class GameController {
                 game.getPoints()
                         .entrySet()
                         .stream()
-                        .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue()))
+                        .map(entry -> new RankingDto(entry.getKey().getName(), entry.getValue()))
                         .toList(),
                 selectionDtos);
         

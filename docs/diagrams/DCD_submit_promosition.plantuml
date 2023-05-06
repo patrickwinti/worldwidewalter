@@ -28,7 +28,7 @@ interface RoundService{
 interface EntityService{
    -gameRepository: GameRepository
     isPlayerActiveInRound(roundId: String, playerId: String): boolean
-    editRound(roundId: String, editor: Function<Round>)
+    editRound(roundId: String, editor: Transaction<Round>)
 }
 interface GameRepository {
     +findAll(): List<Game>

@@ -14,7 +14,7 @@ class Game {
 }
 interface EntityService {
     -gameRepository:GameRepository
-    editGame(gameId: String, editor: Function)
+    editGame(gameId: String, editor: Transaction)
 }
 interface GameService{
     -entityService: EntityService

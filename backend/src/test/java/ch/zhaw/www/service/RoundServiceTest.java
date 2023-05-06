@@ -101,6 +101,32 @@ class RoundServiceTest {
     }
     
     @Test
+    void testSelectSphinx_NotEnoughPlayers() {
+        int roundsInTurn = 3;
+        Game game = createGame(roundsInTurn);
+        var alice = createPlayer("Alice");
+        var bob = createPlayer("Bob");
+        game.addRound(createRound());
+        
+        game.setSphinxCandidates(Stream.of(alice, bob)
+                .peek(game::registerPlayer)
+                .peek(game::moveToActivePlayers)
+                .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
+                .collect(Collectors.toSet()));
+        
+        roundService.selectSphinx(game);
+        assertNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
+        var charlie = createPlayer("Charlie");
+        var dave = createPlayer("Dave");
+        game.registerPlayer(charlie);
+        game.moveToActivePlayers(charlie);
+        game.registerPlayer(dave);
+        game.moveToActivePlayers(dave);
+        roundService.selectSphinx(game);
+        assertEquals(bob, Objects.requireNonNull(game.getCurrentRound()).getSphinx());
+    }
+    
+    @Test
     void testSelectSphinx_notActiveAnymore() {
         int roundsInTurn = 3;
         Game game = createGame(roundsInTurn);
@@ -157,8 +183,7 @@ class RoundServiceTest {
         Player selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
         assertNull(selected);
         
-        game.moveToActivePlayers(alice);
-        game.moveToActivePlayers(charlie);
+        Stream.of(alice, bob, charlie, dave).forEach(game::moveToActivePlayers);
         
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();

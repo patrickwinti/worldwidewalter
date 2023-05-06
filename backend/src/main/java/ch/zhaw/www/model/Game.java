@@ -113,7 +113,12 @@ public class Game {
         return round.getNumberOfPropositionsSubmitted() < max(activePlayers.size(), minimumAmountOfPlayers);
     }
     
-    private boolean hasEnoughPlayers() {
+    /**
+     * Has more or equal amount of players as the minimum amount of players
+     *
+     * @return true if active players >= minimum amount (default 4)
+     */
+    public boolean hasEnoughPlayers() {
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
     

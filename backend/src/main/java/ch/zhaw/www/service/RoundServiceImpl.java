@@ -36,7 +36,7 @@ class RoundServiceImpl implements RoundService {
     public void selectSphinx(Game game) {
         var round = game.getCurrentRoundOptional();
         var sphinxCandidates = game.getSphinxCandidates();
-        if (!sphinxCandidates.isEmpty() && round.isPresent() && round.get().getSphinx() == null) {
+        if (game.hasEnoughPlayers() && !sphinxCandidates.isEmpty() && round.isPresent() && round.get().getSphinx() == null) {
             var temp = new HashSet<>(sphinxCandidates);
             if (temp.isEmpty()) return;
             Player sphinx = null;

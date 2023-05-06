@@ -2,6 +2,7 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.utils.Transaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,7 +36,7 @@ class RoundServiceTest {
         var players = List.of(createPlayer(), createPlayer(), createPlayer());
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         players.forEach(player -> {
-            game.addPlayerToWaitingRoom(player);
+            game.registerPlayer(player);
             game.moveToActivePlayers(player);
         });
         var round = Objects.requireNonNull(game.getCurrentRound());
@@ -59,13 +59,14 @@ class RoundServiceTest {
         var bob = createPlayer("Bob");
         var charlie = createPlayer("Charlie");
         var dave = createPlayer("Dave");
+        game.addRound(createRound());
+        
         game.setSphinxCandidates(Stream.of(alice, bob, charlie, dave)
-                .peek(game::addPlayerToWaitingRoom)
+                .peek(game::registerPlayer)
                 .peek(game::moveToActivePlayers)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
                 .collect(Collectors.toSet()));
         
-        game.addRound(createRound());
         roundService.selectSphinx(game);
         Player selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
         Map<Player, Integer> candidates = game.getSphinxCandidates().stream()
@@ -77,6 +78,7 @@ class RoundServiceTest {
         assertEquals(roundsInTurn, candidates.get(dave));
         
         game.addRound(createRound());
+        Stream.of(alice, bob, charlie, dave).forEach(game::moveToActivePlayers);
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
         candidates = game.getSphinxCandidates().stream()
@@ -88,6 +90,7 @@ class RoundServiceTest {
         assertEquals(roundsInTurn, candidates.get(dave));
         
         game.addRound(createRound());
+        Stream.of(alice, bob, charlie, dave).forEach(game::moveToActivePlayers);
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
         candidates = game.getSphinxCandidates().stream()
@@ -105,13 +108,14 @@ class RoundServiceTest {
         var bob = createPlayer("Bob");
         var charlie = createPlayer("Charlie");
         var dave = createPlayer("Dave");
+        game.addRound(createRound());
+        
         game.setSphinxCandidates(Stream.of(alice, bob, charlie, dave)
-                .peek(game::addPlayerToWaitingRoom)
+                .peek(game::registerPlayer)
                 .peek(game::moveToActivePlayers)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
                 .collect(Collectors.toSet()));
         
-        game.addRound(createRound());
         roundService.selectSphinx(game);
         Player selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
         Map<Player, Integer> candidates = game.getSphinxCandidates().stream()
@@ -144,7 +148,7 @@ class RoundServiceTest {
         var dave = createPlayer("Dave");
         
         game.setSphinxCandidates(Stream.of(alice, bob, charlie, dave)
-                .peek(game::addPlayerToWaitingRoom)
+                .peek(game::registerPlayer)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
                 .collect(Collectors.toSet()));
         
@@ -171,7 +175,7 @@ class RoundServiceTest {
         when(entityService.isPlayerActiveInRound(eq(round.getId()), any())).thenReturn(true);
         
         allPlayers.forEach(player -> {
-            game.addPlayerToWaitingRoom(player);
+            game.registerPlayer(player);
             game.moveToActivePlayers(player);
         });
         
@@ -237,7 +241,7 @@ class RoundServiceTest {
         var players = List.of(createPlayer(), createPlayer(), createPlayer());
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         players.forEach(player -> {
-            game.addPlayerToWaitingRoom(player);
+            game.registerPlayer(player);
             game.moveToActivePlayers(player);
         });
         var round = Objects.requireNonNull(game.getCurrentRound());
@@ -256,7 +260,7 @@ class RoundServiceTest {
         var players = List.of(createPlayer(), createPlayer(), createPlayer());
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         players.forEach(player -> {
-            game.addPlayerToWaitingRoom(player);
+            game.registerPlayer(player);
             game.moveToActivePlayers(player);
         });
         var round = Objects.requireNonNull(game.getCurrentRound());
@@ -273,7 +277,7 @@ class RoundServiceTest {
         var players = List.of(createPlayer(), createPlayer(), createPlayer());
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         players.forEach(player -> {
-            game.addPlayerToWaitingRoom(player);
+            game.registerPlayer(player);
             game.moveToActivePlayers(player);
         });
         var round = Objects.requireNonNull(game.getCurrentRound());
@@ -289,11 +293,10 @@ class RoundServiceTest {
         var round = createRound();
         round.setSphinx(createPlayer());
         game.addRound(round);
-        doAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, Consumer.class);
-            lambda.accept(round);
-            return null;
-        }).when(entityService).editRound(eq(round.getId()), any());
+        when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, Transaction.class);
+            return lambda.transactionalChange(round);
+        });
         when(entityService.getRound(round.getId())).thenReturn(round);
         when(entityService.getGameForRound(round.getId())).thenReturn(game);
         return game;

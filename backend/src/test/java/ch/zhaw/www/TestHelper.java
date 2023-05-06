@@ -15,11 +15,10 @@ public class TestHelper {
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
     public static final List<Prompt> PROMPTS = List.of(new Prompt("WALTER ist cool", 1));
-
-
-    public static Player addWaitingRoomPlayer(Game game) {
+    
+    public static Player registerPlayer(Game game) {
         Player player = createPlayer();
-        game.addPlayerToWaitingRoom(player);
+        game.registerPlayer(player);
         return player;
     }
     
@@ -43,7 +42,7 @@ public class TestHelper {
     
     public static void addActivePlayer(Game game) {
         Player player = createPlayer();
-        game.addPlayerToWaitingRoom(player);
+        game.registerPlayer(player);
         game.moveToActivePlayers(player);
     }
     
@@ -52,8 +51,8 @@ public class TestHelper {
         proposition.submittedBy(playerId);
         return proposition;
     }
-
-    public static Proposition createDoubleSubmissionProposition(String playerId, String secondPlayerId, String gap){
+    
+    public static Proposition createDoubleSubmissionProposition(String playerId, String secondPlayerId, String gap) {
         var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap));
         proposition.submittedBy(playerId);
         proposition.submittedBy(secondPlayerId);

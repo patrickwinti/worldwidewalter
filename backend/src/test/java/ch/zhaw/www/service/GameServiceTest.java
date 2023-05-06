@@ -4,6 +4,7 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.RandomProvider;
+import ch.zhaw.www.utils.Transaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -69,7 +69,7 @@ class GameServiceTest {
         
         Round round = createRound();
         game.addRound(round);
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game))
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game))
                 .peek(player -> assertThrows(RoundError.IllegalStateException.class,
                         () -> gameService.getRoundOpenForPropositions(GAME_ID, player.getId())))
                 .toList();
@@ -91,7 +91,7 @@ class GameServiceTest {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        IntStream.range(0, 4).forEach(i -> addWaitingRoomPlayer(game));
+        IntStream.range(0, 4).forEach(i -> registerPlayer(game));
         round.setSphinx(getRandomPlayer(game));
         
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.getRoundOpenForPropositions(GAME_ID, UNKNOWN_PLAYER_ID));
@@ -109,7 +109,7 @@ class GameServiceTest {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game))
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game))
                 .peek(game::moveToActivePlayers)
                 .toList();
         round.setSphinx(getRandomPlayer(game));
@@ -123,7 +123,7 @@ class GameServiceTest {
         
         Round round = createRound();
         game.addRound(round);
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game))
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game))
                 .peek(player -> assertThrows(RoundError.IllegalStateException.class,
                         () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId())))
                 .toList();
@@ -151,7 +151,7 @@ class GameServiceTest {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        IntStream.range(0, 4).forEach(i -> addWaitingRoomPlayer(game));
+        IntStream.range(0, 4).forEach(i -> registerPlayer(game));
         round.setSphinx(getRandomPlayer(game));
         
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, UNKNOWN_PLAYER_ID));
@@ -169,7 +169,7 @@ class GameServiceTest {
         var game = mockGameInRepository();
         Round round = createRound();
         game.addRound(round);
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> addWaitingRoomPlayer(game)).toList();
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game)).toList();
         Player sphinx = players.get(0);
         round.setSphinx(sphinx);
         players.forEach(player -> {
@@ -195,17 +195,17 @@ class GameServiceTest {
     @Test
     void testEnterGame_PlayerNotFound() {
         var game = mockGameInRepository();
-        game.addPlayerToWaitingRoom(createPlayer());
-        game.addPlayerToWaitingRoom(createPlayer());
+        game.registerPlayer(createPlayer());
+        game.registerPlayer(createPlayer());
         assertThrows(PlayerError.NotFoundException.class, () -> gameService.enterRound(GAME_ID, UNKNOWN_PLAYER_ID));
     }
     
     @Test
     void testEnterGame_NoValidRound() {
         var game = mockGameInRepository();
-        game.addPlayerToWaitingRoom(createPlayer());
+        game.registerPlayer(createPlayer());
         final Player playerEnteringRound = createPlayer();
-        game.addPlayerToWaitingRoom(playerEnteringRound);
+        game.registerPlayer(playerEnteringRound);
         
         assertFalse(game.hasActivePlayer(playerEnteringRound.getId()));
         assertNull(game.getCurrentRound());
@@ -218,14 +218,14 @@ class GameServiceTest {
     void testEnterGame_WaitingForPlayers() {
         var game = mockGameInRepository();
         final Player player1 = createPlayer();
-        game.addPlayerToWaitingRoom(player1);
+        game.registerPlayer(player1);
         
         gameService.enterRound(GAME_ID, player1.getId());
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(player1);
         
         assertTrue(game.canRoundBeEntered());
         final Player player2 = createPlayer();
-        game.addPlayerToWaitingRoom(player2);
+        game.registerPlayer(player2);
         
         assertFalse(game.hasActivePlayer(player2.getId()));
         gameService.enterRound(GAME_ID, player2.getId());
@@ -241,10 +241,10 @@ class GameServiceTest {
         Player anotherPlayer = createPlayer();
         Player playerEnteringLater = createPlayer();
         List.of(sphinx, player, otherPlayer, anotherPlayer).forEach(p -> {
-            game.addPlayerToWaitingRoom(p);
+            game.registerPlayer(p);
             gameService.enterRound(GAME_ID, p.getId());
         });
-        game.addPlayerToWaitingRoom(playerEnteringLater);
+        game.registerPlayer(playerEnteringLater);
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
         
         assertTrue(game.canAcceptPropositions());
@@ -264,7 +264,7 @@ class GameServiceTest {
         Player cannotEnterCurrentlyPlayer = createPlayer();
         var playersInCurrentRound = List.of(sphinx, player, otherPlayer, anotherPlayer);
         playersInCurrentRound.forEach(p -> {
-            game.addPlayerToWaitingRoom(p);
+            game.registerPlayer(p);
             gameService.enterRound(GAME_ID, p.getId());
         });
         
@@ -274,9 +274,9 @@ class GameServiceTest {
         
         assertTrue(game.canAcceptSelections());
         
-        game.addPlayerToWaitingRoom(cannotEnterCurrentlyPlayer);
+        game.registerPlayer(cannotEnterCurrentlyPlayer);
         assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));
-        gameService.enterRound(GAME_ID, cannotEnterCurrentlyPlayer.getId());
+        assertThrows(RoundError.IllegalOperationException.class, () -> gameService.enterRound(GAME_ID, cannotEnterCurrentlyPlayer.getId()));
         assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));
     }
     
@@ -300,7 +300,7 @@ class GameServiceTest {
     void leaveGame() {
         Game game = mockGameInRepository();
         addActivePlayer(game);
-        addWaitingRoomPlayer(game);
+        registerPlayer(game);
         List<String> playerIDs = game.getAllPlayers().map(Player::getId).toList();
         
         gameService.leaveGame(game.getId(), playerIDs.get(0));
@@ -314,40 +314,53 @@ class GameServiceTest {
     @Test
     void createNewRound_AtCapacity() {
         var game = mockGameInRepository();
-        IntStream.range(0, MAX_NUMBER_OF_PLAYERS + MAX_NUMBER_OF_PLAYERS / 2).forEach(value -> addWaitingRoomPlayer(game));
+        int nrOfPlayer = MAX_NUMBER_OF_PLAYERS + MAX_NUMBER_OF_PLAYERS / 2;
+        IntStream.range(0, nrOfPlayer).forEach(value -> registerPlayer(game));
         
-        gameService.enterRound(game.getId(), getRandomPlayer(game).getId());
+        String firstPlayer = getRandomPlayer(game).getId();
+        gameService.enterRound(game.getId(), firstPlayer);
         var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
-        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
-        assertEquals(MAX_NUMBER_OF_PLAYERS, activePlayers);
-        assertEquals(MAX_NUMBER_OF_PLAYERS / 2, waitingRoomPlayers);
+        assertEquals(1, activePlayers);
+        assertEquals(nrOfPlayer - 1, game.getAllPlayers().count() - activePlayers);
+        assertNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
         
+        game.getAllPlayers()
+                .filter(player -> !player.getId().equals(firstPlayer))
+                .forEach(player -> {
+                    try {
+                        gameService.enterRound(game.getId(), player.getId());
+                    } catch (Exception ignored) {
+                    }
+                });
+        
+        activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
+        assertEquals(MAX_NUMBER_OF_PLAYERS, activePlayers);
+        assertEquals(MAX_NUMBER_OF_PLAYERS / 2, game.getAllPlayers().count() - activePlayers);
         assertNotNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
     }
     
     @Test
     void createNewRound_NotAtCapacity() {
         var game = mockGameInRepository();
-        IntStream.range(0, MAX_NUMBER_OF_PLAYERS - 1).forEach(value -> addWaitingRoomPlayer(game));
-        
-        gameService.enterRound(game.getId(), getRandomPlayer(game).getId());
+        IntStream.range(0, MAX_NUMBER_OF_PLAYERS - 1)
+                .mapToObj(i -> registerPlayer(game))
+                .forEach(player -> gameService.enterRound(game.getId(), player.getId()));
         var activePlayers = game.getAllPlayers().filter(player -> game.hasActivePlayer(player.getId())).count();
-        var waitingRoomPlayers = game.getAllPlayers().count() - activePlayers;
+        var registeredPlayers = game.getAllPlayers().count() - activePlayers;
         assertEquals(MAX_NUMBER_OF_PLAYERS - 1, activePlayers);
-        assertEquals(0, waitingRoomPlayers);
+        assertEquals(0, registeredPlayers);
         
-        assertNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
+        assertNotNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
     }
     
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
         
-        doAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, Consumer.class);
+        when(entityService.editGame(eq(game.getId()), any())).thenAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, Transaction.class);
             //noinspection unchecked
-            lambda.accept(game);
-            return null;
-        }).when(entityService).editGame(eq(game.getId()), any());
+            return lambda.transactionalChange(game);
+        });
         when(entityService.getGame(game.getId())).thenReturn(game);
         
         return game;

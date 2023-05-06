@@ -29,12 +29,12 @@ input {
 
 .textbox {
   font-size: 20px;
-  color: black;
+  color: white;
   position: relative;
-  background: linear-gradient(#fcc650, #fcc603);
+  background: darkslategray;
   padding: 2px;
   text-align: center;
-  width: 150px;
+  width: auto;
   margin: 1px 0 2px 10px;
   border-radius: 10px;
 }

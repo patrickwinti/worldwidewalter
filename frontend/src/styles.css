@@ -330,3 +330,34 @@ th {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: auto;
+  background-color: #7f7f7f;
+  color: #ffffff;
+  font-size: 12px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}

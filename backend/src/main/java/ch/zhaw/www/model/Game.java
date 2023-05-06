@@ -29,13 +29,12 @@ public class Game {
     private final int maximumAmountOfPlayers;
     private final int numberOfRoundsInTurn;
     private final List<Round> rounds = new ArrayList<>();
-    private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     @Setter
     private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
     private final List<Prompt> prompts;
     @Getter
-    private final Map<String, Integer> points = new HashMap<>();
+    private final Map<Player, Integer> points = new HashMap<>();
     
     /**
      * Gets current round, when the SphinxElector has been selected
@@ -51,7 +50,12 @@ public class Game {
         }
     }
     
-    private Optional<Round> getCurrentRoundOptional() {
+    /**
+     * Gets current round
+     *
+     * @return Optional {@link Round}
+     */
+    public Optional<Round> getCurrentRoundOptional() {
         return Optional.ofNullable(getCurrentRound());
     }
     
@@ -129,6 +133,7 @@ public class Game {
      * @param round the round to add
      */
     public void addRound(Round round) {
+        activePlayers.clear();
         rounds.add(round);
     }
     
@@ -138,9 +143,7 @@ public class Game {
      * @return a stream of all players in the game
      */
     public Stream<Player> getAllPlayers() {
-        List<Player> players = new ArrayList<>(waitingRoom.values());
-        players.addAll(activePlayers.values());
-        return players.stream();
+        return points.keySet().stream();
     }
     
     public String getPlayerNameFromId(String id) {
@@ -156,18 +159,7 @@ public class Game {
      * @param player player that will be marked as active
      */
     public void moveToActivePlayers(Player player) {
-        if (waitingRoom.containsKey(player.getId())) {
-            waitingRoom.remove(player.getId());
-            activePlayers.put(player.getId(), player);
-            sphinxCandidates.stream()
-                    .filter(entry -> entry.getKey().equals(player))
-                    .findFirst()
-                    .ifPresentOrElse(entry -> {
-                    }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
-            if (!points.containsKey(player.getId())) {
-                points.put(player.getId(), 0);
-            }
-        }
+        activePlayers.put(player.getId(), player);
     }
     
     /**
@@ -181,22 +173,11 @@ public class Game {
     }
     
     /**
-     * Adds player to waiting room if not already active
-     *
-     * @param player player that shall be added
-     */
-    public void addPlayerToWaitingRoom(@NotNull Player player) {
-        waitingRoom.put(player.getId(), player);
-    }
-    
-    /**
      * Removes player from waiting room or active players
      *
      * @param playerId player identifier
      */
     public void removePlayer(@NotNull String playerId) {
-        waitingRoom.remove(playerId);
-        activePlayers.remove(playerId);
         sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);
     }
@@ -230,7 +211,22 @@ public class Game {
      * @param evaluation a map containing the playerId as key and points as value
      */
     public void addPoints(Map<String, Integer> evaluation) {
-        evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
+        points.entrySet()
+                .stream()
+                .filter(entry -> evaluation.containsKey(entry.getKey().getId()))
+                .forEach(entry -> {
+                    int pointsToAdd = evaluation.getOrDefault(entry.getKey().getId(), 0);
+                    points.put(entry.getKey(), entry.getValue() + pointsToAdd);
+                });
     }
     
+    /**
+     * Adds player to game and as a sphinx candidate
+     *
+     * @param player new player entering
+     */
+    public void registerPlayer(Player player) {
+        points.put(player, 0);
+        sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn));
+    }
 }

@@ -164,6 +164,9 @@ public class Game {
                     .findFirst()
                     .ifPresentOrElse(entry -> {
                     }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
+            if (!points.containsKey(player.getId())) {
+                points.put(player.getId(), 0);
+            }
         }
     }
     

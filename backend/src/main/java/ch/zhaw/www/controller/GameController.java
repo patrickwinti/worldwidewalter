@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 @RestController
 @Validated
-@CrossOrigin({"http://localhost:4200", "http://worldwidewalter.ch", "https://160.85.253.247"})
+@CrossOrigin({"http://localhost:4200", "http://worldwidewalter.ch", "https://160.85.253.247", "http://160.85.253.247:8080"})
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;

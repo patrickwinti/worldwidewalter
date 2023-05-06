@@ -152,6 +152,13 @@ public class Game {
         return players.stream();
     }
     
+    /**
+     * Fetches the name of a player
+     *
+     * @param id player id
+     * @return name for given player id or null if not found
+     */
+    @Nullable
     public String getPlayerNameFromId(String id) {
         return getAllPlayers()
                 .filter(player -> player.getId().equals(id))

@@ -23,7 +23,7 @@ class EntityServiceTest {
     private EntityService entityService;
     
     @Test
-    void findGameByRoundIfExits() {
+    void findRoundIfExits() {
         var roundToBeFound = createRound();
         var game1 = createGame();
         game1.addRound(createRound());
@@ -38,7 +38,7 @@ class EntityServiceTest {
     }
     
     @Test
-    void findGameByRoundIfItDoesNotExits() {
+    void findRoundIfItDoesNotExits() {
         var game1 = createGame();
         game1.addRound(createRound());
         var game2 = createGame();
@@ -48,5 +48,36 @@ class EntityServiceTest {
         
         final String roundToBeFound = "round does not exist";
         assertThrows(RoundError.NotFoundException.class, () -> entityService.getRound(roundToBeFound));
+    }
+    
+    @Test
+    void findGameByRound() {
+        var game1 = createGame();
+        Round roundToBeFound = createRound();
+        game1.addRound(roundToBeFound);
+        var game2 = createGame();
+        game2.addRound(createRound());
+        when(gameRepository.findAll()).thenReturn(List.of(game1, game2));
+        
+        assertEquals(game1, entityService.getGameForRound(roundToBeFound.getId()));
+    }
+    
+    @Test
+    void findGameByRound_doesNotExist() {
+        var game1 = createGame();
+        game1.addRound(createRound());
+        var game2 = createGame();
+        game2.addRound(createRound());
+        when(gameRepository.findAll()).thenReturn(List.of(game1, game2));
+        
+        final String roundToBeFound = "round does not exist";
+        assertThrows(RoundError.NotFoundException.class, () -> entityService.getGameForRound(roundToBeFound));
+    }
+    
+    @Test
+    void saveGame_ExistsAlready() {
+        var game = createGame();
+        when(gameRepository.existsById(game.getId())).thenReturn(true);
+        assertThrows(GameError.ExistAlready.class, () -> entityService.saveNewGame(game));
     }
 }

@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 @SpringBootTest
 class RoundServiceTest {
     private static final String GAME_ID = "GAME ID";
@@ -49,6 +50,23 @@ class RoundServiceTest {
         assertEquals(players.get(0).getId(), round.getPropositions().get(0).getPlayerIds().get(0));
         assertEquals(players.get(1).getId(), round.getPropositions().get(0).getPlayerIds().get(1));
         assertEquals(players.get(2).getId(), round.getPropositions().get(0).getPlayerIds().get(2));
+    }
+    
+    @Test
+    void testSubmitProposition_NoSphinx() {
+        var game = createGame(GAME_ID);
+        var round = createRound();
+        game.addRound(round);
+        when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, Transaction.class);
+            return lambda.transactionalChange(round);
+        });
+        when(entityService.getRound(round.getId())).thenReturn(round);
+        when(entityService.getGameForRound(round.getId())).thenReturn(game);
+        var players = List.of(createPlayer(), createPlayer(), createPlayer());
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        
+        assertThrows(RoundError.IllegalStateException.class, () -> roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser")));
     }
     
     @Test
@@ -312,7 +330,6 @@ class RoundServiceTest {
         assertThrows(RoundError.IllegalOperationException.class, () -> roundService.selectProposition(round.getId(), players.get(0).getId(), propId));
     }
     
-    @SuppressWarnings("unchecked")
     private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);
         var round = createRound();

@@ -238,4 +238,15 @@ class GameTest {
         assertEquals(1, game.getPoints().get(player3));
     }
     
+    @Test
+    void findGameForPlayer() {
+        Game game = createGame();
+        Player manta = createPlayer("Manta");
+        Player hai = createPlayer("Hai");
+        game.registerPlayer(manta);
+        game.registerPlayer(hai);
+        assertEquals("Manta", game.getPlayerNameFromId(manta.getId()));
+        assertEquals("Hai", game.getPlayerNameFromId(hai.getId()));
+        assertNull(game.getPlayerNameFromId("does not exist"));
+    }
 }

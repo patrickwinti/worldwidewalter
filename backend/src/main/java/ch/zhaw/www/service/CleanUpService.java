@@ -17,19 +17,19 @@ public class CleanUpService {
     private final Logger logger = Logger.getLogger(CleanUpService.class.getSimpleName());
     
     @Value("${game.idle-time-before-removal}")
-    private Duration cleanUpTimeDurationInMinutes;
+    private Duration gameIdleTimeBeforeRemoval;
     private final GameRepository repository;
     
     public CleanUpService(GameRepository repository) {
         this.repository = repository;
     }
     
-    @Scheduled(fixedRateString = "${clean-up-service.game-cleanup.interval-in-min}", timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedRateString = "${clean-up-service.game-cleanup.interval}", timeUnit = TimeUnit.MINUTES)
     protected void runGameCleanUp() {
         logger.info("running game cleanup");
         synchronized (repository) {
             StreamSupport.stream(this.repository.findAll().spliterator(), false)
-                    .filter(game -> !isInFuture(game.getLastEdit().plus(cleanUpTimeDurationInMinutes)))
+                    .filter(game -> !isInFuture(game.getLastEdit().plus(gameIdleTimeBeforeRemoval)))
                     .forEach(game -> {
                         this.repository.delete(game);
                         logger.info("deleted game: " + game.getId());

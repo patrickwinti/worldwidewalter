@@ -325,6 +325,69 @@ class RoundServiceTest {
         assertThrows(RoundError.IllegalOperationException.class, () -> roundService.selectProposition(round.getId(), players.get(0).getId(), propId));
     }
     
+    @Test
+    void selectProposition_propositionInactivePlayer() {
+        var game = mockRoundInRepository();
+        var players = List.of(createPlayer(), createPlayer());
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        players.forEach(player -> {
+            game.registerPlayer(player);
+            game.moveToActivePlayers(player);
+        });
+        var round = Objects.requireNonNull(game.getCurrentRound());
+        // Sphinx, submits proposition
+        assert round.getSphinx() != null;
+        roundService.submitProposition(round.getId(), round.getSphinx().getId(), List.of("Wasser", "Gummi"));
+        var propositions = round.getPropositions();
+        var propositionId = propositions.get(0).getId();
+        
+        assertEquals(0, game.getPoints().get(players.get(0).getId()));
+        assertEquals(0, game.getPoints().get(players.get(1).getId()));
+        
+        when(game.hasActivePlayer(players.get(0).getId())).thenReturn(false);
+//        when(game.hasActivePlayer(players.get(1).getId())).thenReturn(false);
+        
+        // player 0 selects this proposition
+        roundService.selectProposition(round.getId(), players.get(0).getId(), propositionId);
+        roundService.selectProposition(round.getId(), players.get(1).getId(), propositionId);
+        assertEquals(0, game.getPoints().get(players.get(0).getId()));
+        assertEquals(1, game.getPoints().get(players.get(1).getId()));
+    }
+    
+//    @Test
+//    void selectProposition_propositionInactivePlayer() {
+//        var game = mock(Game.class);
+//        var pId1 = "pid1";
+//        var pId2 = "pid2";
+//        var sphinx = "sphinx";
+//        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+//
+//
+//        var players = List.of(createPlayer(), createPlayer());
+//        players.forEach(player -> {
+//            game.registerPlayer(player);
+//            game.moveToActivePlayers(player);
+//        });
+//        var round = Objects.requireNonNull(game.getCurrentRound());
+//        // player 0, Sphinx, submits proposition
+//        roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
+//        var propositions = round.getPropositions();
+//        var propositionId = propositions.get(0).getId();
+//
+//        assertEquals(0, game.getPoints().get(players.get(0).getId()));
+//        assertEquals(0, game.getPoints().get(players.get(1).getId()));
+//
+//        when(game.hasActivePlayer(players.get(0).getId())).thenReturn(true);
+//        when(game.hasActivePlayer(players.get(1).getId())).thenReturn(false);
+//
+//        // player 0 selects this proposition
+//        roundService.selectProposition(round.getId(), players.get(0).getId(), propositionId);
+//        roundService.selectProposition(round.getId(), players.get(1).getId(), propositionId);
+//        var points = game.getPoints();
+//        assertEquals(0, game.getPoints().get(players.get(0).getId()));
+//        assertEquals(1, game.getPoints().get(players.get(1).getId()));
+//    }
+    
     private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);
         var round = createRound();

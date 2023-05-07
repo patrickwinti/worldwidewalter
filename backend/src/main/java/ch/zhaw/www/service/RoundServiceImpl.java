@@ -72,7 +72,7 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
-        entityService.editRound(roundId, round -> {
+        entityService.editRound(roundId, (game, round) -> {
             round.getPropositions()
                     .stream()
                     .filter(proposition -> proposition.hasSameGaps(gaps))
@@ -92,11 +92,10 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
-        entityService.editRound(roundId, round -> {
+        entityService.editRound(roundId, (game, round) -> {
             if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
                 round.addSelection(playerId, propositionId);
                 var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
-                var game = entityService.getGameForRound(roundId);
                 game.addPoints(evaluation);
                 return game;
             } else {
@@ -108,12 +107,26 @@ class RoundServiceImpl implements RoundService {
     @Override
     public Round getRoundReadyForSelections(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);
-        var game = entityService.getGameForRound(roundId);
-        var round = game.getCurrentRound();
-        if (!game.canAcceptSelections()) {
+        var gameRoundPair = entityService.getGameForRound(roundId);
+        if (!gameRoundPair.getFirst().canAcceptSelectionForRound(gameRoundPair.getSecond())) {
             throw new RoundError.IllegalStateException();
         }
-        return round;
+        return gameRoundPair.getSecond();
+    }
+    
+    @Override
+    public Round getRoundClosedForSelections(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        verifyPlayerIsActive(roundId, playerId);
+        var gameRoundPair = entityService.getGameForRound(roundId);
+        if (!gameRoundPair.getFirst().isRoundFinished(gameRoundPair.getSecond())) {
+            throw new RoundError.IllegalStateException();
+        }
+        return gameRoundPair.getSecond();
+    }
+    
+    @Override
+    public Game getGameForRound(String roundId) throws GameError.NotFoundException {
+        return entityService.getGameForRound(roundId).getFirst();
     }
     
     /**

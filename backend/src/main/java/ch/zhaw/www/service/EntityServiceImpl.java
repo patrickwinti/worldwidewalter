@@ -114,7 +114,7 @@ class EntityServiceImpl implements EntityService {
                 .map(game -> Pair.of(game, game.getRoundHistory()
                         .filter(matchesRound)
                         .findFirst()
-                        .orElseThrow(() -> new GameError.NotFoundException(roundId))))
-                .orElseThrow(() -> new GameError.NotFoundException(roundId));
+                        .orElseThrow(() -> new RoundError.NotFoundException(roundId))))
+                .orElseThrow(() -> new RoundError.NotFoundException(roundId));
     }
 }

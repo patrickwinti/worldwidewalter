@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -104,18 +103,9 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Round getRoundOpenForPropositions(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        return getCurrentRoundForDesiredState(gameId, playerId, Game::canAcceptPropositions);
-    }
-    
-    @Override
-    public Round getRoundClosedForSelections(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        return getCurrentRoundForDesiredState(gameId, playerId, Game::needsNewRound);
-    }
-    
-    private Round getCurrentRoundForDesiredState(final String gameId, final String playerId, Predicate<Game> predicate) {
         Game game = entityService.getGame(gameId);
         checkPlayerInGame(game, playerId);
-        if (!game.hasActivePlayer(playerId) || !predicate.test(game)) {
+        if (!game.hasActivePlayer(playerId) || !game.canAcceptPropositionsForCurrentRound()) {
             LOGGER.info(() -> "Game not in desired state");
             throw new RoundError.IllegalStateException();
         }

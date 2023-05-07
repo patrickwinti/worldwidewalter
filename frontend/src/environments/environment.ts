@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://myfilebox.synology.me:8080/api'
+  apiUrl: 'https://160.85.253.247/api'
 };

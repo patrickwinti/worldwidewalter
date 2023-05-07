@@ -1,6 +1,6 @@
 <ng-container *ngIf="isVisible()">
   <div class="content">
-    <p>etwas ist schiefgelaufen</p>
+    <p>{{getErrorMessage()}}</p>
     <div class="button-container">
       <button (click)="tryAgain()">Versuchs nochmals</button>
       <button (click)="leaveGame()">Zurück zur Startseite</button>

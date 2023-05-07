@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { GameState } from "../../model/game-state";
 import { StateService } from "../../service/state.service";
-import { Observable, switchMap } from "rxjs";
+import { catchError, Observable, switchMap, throwError } from "rxjs";
 import { RoundDto } from "../../dto/round-dto";
 import { GameService } from "../../service/game.service";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: 'www-game-container',
@@ -13,6 +14,7 @@ export class GameContainerComponent implements OnInit {
   gameState: GameState;
   GameState = GameState;
   round$: Observable<RoundDto>;
+  httpErr: HttpErrorResponse | null = null;
 
   constructor(private stateService: StateService,
               private gameService: GameService) {
@@ -34,6 +36,10 @@ export class GameContainerComponent implements OnInit {
     this.round$ = this.gameService.enterRound(this.stateService.getGameId()).pipe(
       switchMap(() => {
         return this.gameService.getRound(this.stateService.getGameId());
+      }),
+      catchError((err: HttpErrorResponse) => {
+        this.httpErr = err;
+        return throwError(() => new Error(err.message));
       })
     )
   }

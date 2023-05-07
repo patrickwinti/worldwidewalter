@@ -3,8 +3,9 @@
              [round]="round">
   </www-round>
 
-  <ng-template hidden="" #entering>
-    <www-error (retryEmitter)="tryAgain()">
+  <ng-template #entering>
+    <www-error (retryEmitter)="tryAgain()"
+               [httpError] = httpErr>
     </www-error>
   </ng-template>
 </div>

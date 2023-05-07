@@ -5,6 +5,7 @@ import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -35,6 +36,7 @@ class EntityServiceImpl implements EntityService {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
             editor.accept(game);
+            game.setLastEdit(Instant.now());
             gamesRepository.save(game);
         }
     }
@@ -58,6 +60,7 @@ class EntityServiceImpl implements EntityService {
         synchronized (gamesRepository) {
             var game = findGameForRound(roundId);
             editor.accept(game.getCurrentRound());
+            game.setLastEdit(Instant.now());
             gamesRepository.save(game);
         }
     }
@@ -71,6 +74,7 @@ class EntityServiceImpl implements EntityService {
     public void saveNewGame(Game game) {
         synchronized (gamesRepository) {
             if (!gamesRepository.existsById(game.getId())) {
+                game.setLastEdit(Instant.now());
                 gamesRepository.save(game);
             } else {
                 throw new GameError.ExistAlready();

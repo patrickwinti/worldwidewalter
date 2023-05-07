@@ -73,6 +73,9 @@ class RoundServiceImpl implements RoundService {
     public void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, (game, round) -> {
+            if (round.getSphinx() == null) {
+                throw new RoundError.IllegalStateException();
+            }
             round.getPropositions()
                     .stream()
                     .filter(proposition -> proposition.hasSameGaps(gaps))
@@ -82,9 +85,6 @@ class RoundServiceImpl implements RoundService {
                         proposition.submittedBy(playerId);
                         round.addProposition(proposition);
                     });
-            if (round.getSphinx() == null) {
-                throw new RoundError.IllegalStateException();
-            }
             return round;
         });
     }

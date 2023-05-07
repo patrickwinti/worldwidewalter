@@ -24,7 +24,7 @@ class CleanUpServiceTest {
     private GameRepository gameRepository;
     
     @Value("${game.idle-time-before-removal}")
-    private Duration cleanUpTimeDurationInMinutes;
+    private Duration gameIdleTimeBeforeRemoval;
     
     private final Duration ONE_MINUTE = Duration.ofMinutes(1);
     
@@ -39,7 +39,7 @@ class CleanUpServiceTest {
         
         when(gameRepository.findAll()).thenReturn(List.of(activeGame, inactiveGame));
         
-        TimeHelper.offsetFixedClockBy(cleanUpTimeDurationInMinutes);
+        TimeHelper.offsetFixedClockBy(gameIdleTimeBeforeRemoval);
         
         cleanUpService.runGameCleanUp();
         

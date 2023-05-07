@@ -145,6 +145,7 @@ public class GameController {
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
+            @ApiResponse(responseCode = "403", description = "Player cannot enter this round because it's either already running"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game is at capacity"),
             @ApiResponse(responseCode = "500", description = "Unknown error")

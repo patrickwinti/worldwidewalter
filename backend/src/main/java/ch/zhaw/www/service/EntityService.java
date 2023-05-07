@@ -2,9 +2,8 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.utils.Transaction;
 import jakarta.validation.constraints.NotNull;
-
-import java.util.function.Consumer;
 
 /**
  * Game repository with protected access to game instances
@@ -27,7 +26,7 @@ public interface EntityService {
      * @param editor the changes on the game
      * @throws GameError.NotFoundException if game does not exist
      */
-    void editGame(@NotNull String gameId, Consumer<Game> editor) throws GameError.NotFoundException;
+    <T> T editGame(@NotNull String gameId, Transaction<Game, T> editor) throws GameError.NotFoundException;
     
     /**
      * Fetches game for given round ID
@@ -63,7 +62,7 @@ public interface EntityService {
      * @param editor  for changes in round
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
-    void editRound(@NotNull String roundId, Consumer<Round> editor) throws RoundError.NotFoundException;
+    <T> T editRound(@NotNull String roundId, Transaction<Round, T> editor) throws RoundError.NotFoundException;
     
     /**
      * Saves a new game. If game is already saved it will throw an exception.

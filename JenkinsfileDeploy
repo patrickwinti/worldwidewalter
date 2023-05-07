@@ -16,7 +16,8 @@ pipeline {
             post {
                 success {
                     archiveArtifacts '**/target/*.jar'
-                    sh 'docker-compose --build -d'
+                    sh 'sudo /usr/bin/docker-compose down'
+                    sh 'sudo /usr/bin/docker-compose --build -d'
                 }
             }
         }

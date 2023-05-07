@@ -9,9 +9,11 @@ import org.springframework.core.io.Resource;
 
 import java.util.List;
 
+import static ch.zhaw.www.TestHelper.WALTER_MARKER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class PromptRepositoryTest {
@@ -27,9 +29,9 @@ class PromptRepositoryTest {
 
     @Test
     void getPrompts() {
-        List<Prompt> originalList = List.of(new Prompt("WALTER WALTER WALTEROO", 2),
-                                            new Prompt("WALTER WALTER hello", 1),
-                                            new Prompt("WALTER says hi", 1));
+        List<Prompt> originalList = List.of(new Prompt(WALTER_MARKER + " " + WALTER_MARKER + "WALTEROO", List.of("WALTER, WALTER")),
+                                            new Prompt(WALTER_MARKER + " " + WALTER_MARKER + " hello", List.of("WALTER, WALTER")),
+                                            new Prompt(WALTER_MARKER + " says hi", List.of("WALTER")));
 
         when(resourceReader.readResource(any())).thenReturn(originalList);
 

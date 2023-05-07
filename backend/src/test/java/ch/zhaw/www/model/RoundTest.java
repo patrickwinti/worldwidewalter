@@ -11,8 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
-import static ch.zhaw.www.TestHelper.createPlayer;
-import static ch.zhaw.www.TestHelper.createProposition;
+import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -22,7 +21,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class RoundTest {
     private static final String ID = "ROUND_ID";
-    private static final Prompt PROMPT = new Prompt("WALTER", 1);
+    private static final Prompt PROMPT = new Prompt(WALTER_MARKER, List.of("WALTER"));
     private static final Duration PROPOSITION_DURATION = Duration.ofMinutes(40);
     private static final Duration PROPOSITION_ENTER_LIMIT = Duration.ofMinutes(10);
     private static final Duration SUBMISSION_DURATION = Duration.ofMinutes(10);

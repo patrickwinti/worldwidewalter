@@ -2,8 +2,10 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
-import ch.zhaw.www.utils.Transaction;
+import ch.zhaw.www.utils.GameTransaction;
+import ch.zhaw.www.utils.RoundTransaction;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.util.Pair;
 
 /**
  * Game repository with protected access to game instances
@@ -26,7 +28,7 @@ public interface EntityService {
      * @param editor the changes on the game
      * @throws GameError.NotFoundException if game does not exist
      */
-    <T> T editGame(@NotNull String gameId, Transaction<Game, T> editor) throws GameError.NotFoundException;
+    <T> T editGame(@NotNull String gameId, GameTransaction<T> editor) throws GameError.NotFoundException;
     
     /**
      * Fetches game for given round ID
@@ -35,7 +37,7 @@ public interface EntityService {
      * @return game with round given identifier
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
-    Game getGameForRound(String roundId);
+    Pair<Game, Round> getGameForRound(String roundId);
     
     /**
      * Fetches the round for given round ID
@@ -62,7 +64,7 @@ public interface EntityService {
      * @param editor  for changes in round
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
-    <T> T editRound(@NotNull String roundId, Transaction<Round, T> editor) throws RoundError.NotFoundException;
+    <T> T editRound(@NotNull String roundId, RoundTransaction<T> editor) throws RoundError.NotFoundException;
     
     /**
      * Saves a new game. If game is already saved it will throw an exception.

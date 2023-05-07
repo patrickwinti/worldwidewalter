@@ -239,7 +239,7 @@ class GameTest {
     }
     
     @Test
-    void findGameForPlayer() {
+    void testGetPlayerNameFromId() {
         Game game = createGame();
         Player manta = createPlayer("Manta");
         Player hai = createPlayer("Hai");
@@ -248,5 +248,18 @@ class GameTest {
         assertEquals("Manta", game.getPlayerNameFromId(manta.getId()));
         assertEquals("Hai", game.getPlayerNameFromId(hai.getId()));
         assertNull(game.getPlayerNameFromId("does not exist"));
+    }
+    
+    @Test
+    void testSphinxCandidates() {
+        Game game = createGame();
+        Player flower = createPlayer("Flower");
+        Player power = createPlayer("Power");
+        game.registerPlayer(flower);
+        game.registerPlayer(power);
+        game.setSphinxCandidates(Map.of());
+        assertEquals(2, game.getSphinxCandidates().size());
+        assertEquals(game.getSphinxCandidates().get(flower), game.getSphinxCandidates().get(power));
+        assertEquals(NUMBER_OF_ROUNDS_PER_TURN, game.getSphinxCandidates().get(power));
     }
 }

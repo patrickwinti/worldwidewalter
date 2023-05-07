@@ -14,6 +14,7 @@ public class TestHelper {
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
+    public static final int NUMBER_OF_ROUNDS_PER_TURN = 1;
     public static final List<Prompt> PROMPTS = List.of(new Prompt("WALTER ist cool", 1));
     
     public static Player registerPlayer(Game game) {
@@ -78,7 +79,7 @@ public class TestHelper {
     }
     
     public static Game createGame(String id) {
-        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1, PROMPTS);
+        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, NUMBER_OF_ROUNDS_PER_TURN, PROMPTS);
     }
     
     public static Game createGame(int roundsPerTurn) {

@@ -1,5 +1,6 @@
 package ch.zhaw.www.controller;
 
+import ch.zhaw.www.TestHelper;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
@@ -51,7 +52,7 @@ class GameControllerTest {
     private static String getExpectedDateInTheFuture() {
         enableFixedClocked();
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(ch.zhaw.www.TestHelper.DEFAULT_PROPOSITION_DURATION));
+                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(TestHelper.DEFAULT_PROPOSITION_DURATION));
     }
     
     @AfterEach

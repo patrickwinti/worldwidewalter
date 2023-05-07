@@ -3,17 +3,17 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
+import ch.zhaw.www.utils.InstantWrapper;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 @Service
 class EntityServiceImpl implements EntityService {
-
+    
     private final GameRepository gamesRepository;
-
+    
     /**
      * Constructor that injects the GameRepository.
      *
@@ -22,21 +22,20 @@ class EntityServiceImpl implements EntityService {
     EntityServiceImpl(GameRepository gamesRepository) {
         this.gamesRepository = gamesRepository;
     }
-
-
+    
     @Override
     public Game getGame(String gameId) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             return findGame(gameId);
         }
     }
-
+    
     @Override
     public void editGame(String gameId, Consumer<Game> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
             editor.accept(game);
-            game.setLastEdit(Instant.now());
+            game.setLastEdit(InstantWrapper.getNow());
             gamesRepository.save(game);
         }
     }
@@ -54,34 +53,34 @@ class EntityServiceImpl implements EntityService {
             return findGameForRound(roundId).getCurrentRound();
         }
     }
-
+    
     @Override
     public void editRound(String roundId, Consumer<Round> editor) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGameForRound(roundId);
             editor.accept(game.getCurrentRound());
-            game.setLastEdit(Instant.now());
+            game.setLastEdit(InstantWrapper.getNow());
             gamesRepository.save(game);
         }
     }
-
+    
     @Override
     public boolean isPlayerActiveInRound(final String roundId, final String playerId) throws RoundError.NotFoundException {
         return findGameForRound(roundId).hasActivePlayer(playerId);
     }
-
+    
     @Override
     public void saveNewGame(Game game) {
         synchronized (gamesRepository) {
             if (!gamesRepository.existsById(game.getId())) {
-                game.setLastEdit(Instant.now());
+                game.setLastEdit(InstantWrapper.getNow());
                 gamesRepository.save(game);
             } else {
                 throw new GameError.ExistAlready();
             }
         }
     }
-
+    
     /**
      * Finds a game in the repository by ID.
      *
@@ -89,11 +88,11 @@ class EntityServiceImpl implements EntityService {
      * @return The game with the specified ID
      * @throws GameError.NotFoundException if no game with the specified ID is found
      */
-
+    
     private Game findGame(String gameId) {
         return gamesRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
     }
-
+    
     /*
      * Finds the game that contains a round with the specified ID.
      *

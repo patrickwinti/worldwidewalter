@@ -3,7 +3,7 @@ import { PlayerDto } from "./player-dto";
 export interface RoundDto {
   id: string;
   prompt: string;
-  numberOfPlaceholders: number;
+  walters: string[];
   sphinx: PlayerDto;
   endOfSubmissionsInUtc: string;
 }

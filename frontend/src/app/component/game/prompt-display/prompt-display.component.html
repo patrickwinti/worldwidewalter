@@ -1,1 +1,6 @@
-<h3>{{prompt}}</h3>
+<h3>
+  <ng-container *ngFor="let promptFragment of splitPrompt; index as i">
+    <span>{{promptFragment}}</span>
+    <span *ngIf="proposition[i]" style="background: #fcc603">{{proposition[i]}}</span>
+  </ng-container>
+</h3>

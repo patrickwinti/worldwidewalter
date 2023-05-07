@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk17'
+        maven "M3"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'java -version'
+                sh "mvn -P prod clean package"
+            }
+
+            post {
+                success {
+                    archiveArtifacts '**/target/*.jar'
+                }
+            }
+        }
+        stage('Deploy'){
+            steps{
+                sh 'sudo /usr/bin/docker-compose down'
+                sh 'sudo /usr/bin/docker-compose up --build -d'
+            }
+        }
+    }
+}

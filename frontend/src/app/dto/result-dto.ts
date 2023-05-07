@@ -7,6 +7,7 @@ export interface SelectionDto {
   authors: string[];
   gaps: string[];
   selectors: string[];
+  sphinxResponse: boolean;
 }
 
 export interface RankingDto {

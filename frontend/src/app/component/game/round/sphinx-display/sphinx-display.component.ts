@@ -8,9 +8,9 @@ import { PlayerDto } from "../../../../dto/player-dto";
 })
 export class SphinxDisplayComponent {
   @Input() sphinx: PlayerDto;
-  @Input() currentPlayerId: String;
+  @Input() currentPlayerId: string;
 
-  getDisplayText(): String {
+  getDisplayText(): string {
     if (this.sphinx.id === this.currentPlayerId) {
       return 'Du bist die Sphinx!';
     } else {

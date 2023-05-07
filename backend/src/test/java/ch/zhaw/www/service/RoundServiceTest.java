@@ -2,12 +2,14 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.Transaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,6 +32,8 @@ class RoundServiceTest {
     private RoundService roundService;
     @MockBean
     private EntityService entityService;
+    @MockBean
+    private EvaluationService evaluationService;
     
     @Test
     void addPropositionThatAlreadyExists() {
@@ -326,67 +330,35 @@ class RoundServiceTest {
     }
     
     @Test
-    void selectProposition_propositionInactivePlayer() {
-        var game = mockRoundInRepository();
-        var players = List.of(createPlayer(), createPlayer());
-        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
-        players.forEach(player -> {
-            game.registerPlayer(player);
-            game.moveToActivePlayers(player);
+    void selectProposition_propositionOfInactivePlayer() {
+        var game = mock(Game.class);
+        var round = mock(Round.class);
+        var roundId = "roundId";
+        var pId1 = "pid1";
+        var pId2 = "pid2";
+        
+        when(round.getId()).thenReturn(roundId);
+        when(entityService.isPlayerActiveInRound(any(), eq(pId1))).thenReturn(true);
+        when(round.isSphinx(pId1)).thenReturn(false);
+        when(round.hasProposition(any())).thenReturn(true);
+        when(entityService.getGameForRound(any())).thenReturn(game);
+        when(evaluationService.evaluateSelection(any(), any(), any())).thenReturn(new HashMap<>(Map.of(pId1, 0, pId2, 1)));
+        when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, Transaction.class);
+            return lambda.transactionalChange(round);
         });
-        var round = Objects.requireNonNull(game.getCurrentRound());
-        // Sphinx, submits proposition
-        assert round.getSphinx() != null;
-        roundService.submitProposition(round.getId(), round.getSphinx().getId(), List.of("Wasser", "Gummi"));
-        var propositions = round.getPropositions();
-        var propositionId = propositions.get(0).getId();
         
-        assertEquals(0, game.getPoints().get(players.get(0).getId()));
-        assertEquals(0, game.getPoints().get(players.get(1).getId()));
+        when(game.hasActivePlayer(pId1)).thenReturn(true);
+        when(game.hasActivePlayer(pId2)).thenReturn(true);
+        roundService.selectProposition(roundId, pId1, "1");
+        verify(game).addPoints(Map.of(pId1, 0, pId2, 1));
         
-        when(game.hasActivePlayer(players.get(0).getId())).thenReturn(false);
-//        when(game.hasActivePlayer(players.get(1).getId())).thenReturn(false);
-        
-        // player 0 selects this proposition
-        roundService.selectProposition(round.getId(), players.get(0).getId(), propositionId);
-        roundService.selectProposition(round.getId(), players.get(1).getId(), propositionId);
-        assertEquals(0, game.getPoints().get(players.get(0).getId()));
-        assertEquals(1, game.getPoints().get(players.get(1).getId()));
+        reset(game);
+        when(game.hasActivePlayer(pId1)).thenReturn(true);
+        when(game.hasActivePlayer(pId2)).thenReturn(false);
+        roundService.selectProposition(roundId, pId1, "1");
+        verify(game).addPoints(Map.of(pId1, 0));
     }
-    
-//    @Test
-//    void selectProposition_propositionInactivePlayer() {
-//        var game = mock(Game.class);
-//        var pId1 = "pid1";
-//        var pId2 = "pid2";
-//        var sphinx = "sphinx";
-//        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
-//
-//
-//        var players = List.of(createPlayer(), createPlayer());
-//        players.forEach(player -> {
-//            game.registerPlayer(player);
-//            game.moveToActivePlayers(player);
-//        });
-//        var round = Objects.requireNonNull(game.getCurrentRound());
-//        // player 0, Sphinx, submits proposition
-//        roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
-//        var propositions = round.getPropositions();
-//        var propositionId = propositions.get(0).getId();
-//
-//        assertEquals(0, game.getPoints().get(players.get(0).getId()));
-//        assertEquals(0, game.getPoints().get(players.get(1).getId()));
-//
-//        when(game.hasActivePlayer(players.get(0).getId())).thenReturn(true);
-//        when(game.hasActivePlayer(players.get(1).getId())).thenReturn(false);
-//
-//        // player 0 selects this proposition
-//        roundService.selectProposition(round.getId(), players.get(0).getId(), propositionId);
-//        roundService.selectProposition(round.getId(), players.get(1).getId(), propositionId);
-//        var points = game.getPoints();
-//        assertEquals(0, game.getPoints().get(players.get(0).getId()));
-//        assertEquals(1, game.getPoints().get(players.get(1).getId()));
-//    }
     
     private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);

@@ -12,9 +12,12 @@ export class SphinxDisplayComponent {
 
   getDisplayText(): string {
     if (this.sphinx.id === this.currentPlayerId) {
-      return 'Du bist die Sphinx!';
+      return 'Du bist die Sphinx!\n' +
+        'Mit was würdest du WALTER ersetzen' ;
     } else {
-      return 'Die Sphinx ist: ' + this.sphinx.playerName;
+      return 'Die Sphinx ist: ' + this.sphinx.playerName + '.\n' +
+        'Mit was würde ' + this.sphinx.playerName + ' WALTER ersetzen' ;
     }
   }
 }
+

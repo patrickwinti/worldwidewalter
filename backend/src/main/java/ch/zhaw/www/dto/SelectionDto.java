@@ -11,4 +11,5 @@ public class SelectionDto {
     List<String> authors;
     List<String> gaps;
     List<String> selectors;
+    boolean sphinxResponse;
 }

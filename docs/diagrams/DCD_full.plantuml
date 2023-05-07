@@ -37,6 +37,9 @@ package backend{
         class RoundDto {
             -id: String
             -prompt: String
+            -walters: List<String>
+            -sphinx: PlayerDto
+            -endOfSubmissionsInUtc: string
         }
         class RankingDto {
             -playerName: String
@@ -64,6 +67,7 @@ package backend{
         }
         class Prompt{
             -statement: String
+            -walters: List<String>
             -totalPlaceholders: int
             -hasBeenUsed: boolean
         }

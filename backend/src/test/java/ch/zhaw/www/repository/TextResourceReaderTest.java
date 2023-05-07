@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static ch.zhaw.www.TestHelper.WALTER_MARKER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @SpringBootTest
@@ -38,8 +39,8 @@ class TextResourceReaderTest {
         
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
-        assertEquals("WALTER WALTERN WALTER", prompts.get(3).getStatement());
-        assertEquals(3, prompts.get(3).getNumberOfPlaceholders());
+        assertEquals(WALTER_MARKER + " " + WALTER_MARKER + " " + WALTER_MARKER, prompts.get(3).getStatement());
+        assertEquals(List.of("WALTER", "WALTERN", "WALTER"), prompts.get(3).getWalters());
     }
     
     @Test
@@ -67,7 +68,7 @@ class TextResourceReaderTest {
         List<Prompt> prompts = txtFileReader.readResource(getResourceFromFile(file.toFile()));
         
         assertEquals(1, prompts.size());
-        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getNumberOfPlaceholders());
+        assertEquals(expectedNumberOfPlaceholders, prompts.get(0).getWalters().size());
     }
     
     private static Stream<Arguments> provideWalterStatements() {

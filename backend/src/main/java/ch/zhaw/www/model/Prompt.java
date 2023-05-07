@@ -3,6 +3,7 @@ package ch.zhaw.www.model;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
 
 /**
  * Prompt Class stores a statement that has one or more "placeholder" words. These placeholders are to be completed
@@ -14,6 +15,6 @@ import lombok.Data;
 public class Prompt {
     @NotNull
     private final String statement;
-    private final long numberOfPlaceholders;
+    private final List<String> walters;
     private boolean hasBeenUsed = false;
 }

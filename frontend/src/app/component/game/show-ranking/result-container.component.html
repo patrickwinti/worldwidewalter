@@ -1,7 +1,8 @@
-<www-prompt-display [prompt]="prompt">
-</www-prompt-display>
-
 <ng-container *ngIf="result$ | async as result">
+  <www-prompt-display [prompt]="prompt"
+                      [proposition]="getSphinxProposition(result)">
+  </www-prompt-display>
+
   <h2>Übersicht Vorschläge</h2>
   <www-selection-disclosure [selections]="result.selections">
   </www-selection-disclosure>

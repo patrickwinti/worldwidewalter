@@ -116,7 +116,6 @@ class RoundServiceImpl implements RoundService {
     
     @Override
     public Round getRoundClosedForSelections(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        verifyPlayerIsActive(roundId, playerId);
         var gameRoundPair = entityService.getGameForRound(roundId);
         if (!gameRoundPair.getFirst().isRoundFinished(gameRoundPair.getSecond())) {
             throw new RoundError.IllegalStateException();

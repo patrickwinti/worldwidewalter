@@ -6,20 +6,18 @@ import {
   HttpResponse,
   HttpStatusCode
 } from '@angular/common/http';
-import { finalize, Observable, retry, takeUntil, timer } from 'rxjs';
+import { finalize, Observable, retry, timer } from 'rxjs';
 import { StateService } from "./state.service";
 import { Injectable } from "@angular/core";
 import { LoadingService } from "./loading.service";
-import { HttpCancelService } from "./http-cancel.service";
 
 @Injectable()
 export class HttpPollingInterceptor implements HttpInterceptor {
-  private readonly RETRIES: number = 100;
+  private readonly RETRIES: number = 120;
   private activeRequests: number = 0;
 
   constructor(private stateService: StateService,
-              private loadingService: LoadingService,
-              private httpCancelService: HttpCancelService) {
+              private loadingService: LoadingService) {
   }
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -34,10 +32,9 @@ export class HttpPollingInterceptor implements HttpInterceptor {
     return next.handle(requestWithHeader)
       .pipe(
         retry({count: this.RETRIES, delay: this.shouldRetry}),
-        takeUntil(this.httpCancelService.onCancelPendingRequests()),
         finalize(() => {
           this.activeRequests--;
-          if(this.activeRequests === 0) {
+          if (this.activeRequests === 0) {
             this.loadingService.stopLoading();
           }
         })
@@ -46,7 +43,7 @@ export class HttpPollingInterceptor implements HttpInterceptor {
 
   private shouldRetry(response: HttpResponse<unknown>) {
     if (response.status === HttpStatusCode.TooEarly) {
-      return timer(4000);
+      return timer(1000);
     }
     throw response;
   }

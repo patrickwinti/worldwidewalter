@@ -44,11 +44,16 @@ export class ErrorComponent implements OnInit, OnDestroy {
   }
 
   getErrorMessage(): string {
-    if(this.httpError !== null) {
+    if (this.httpError !== null) {
       switch (this.httpError.status) {
-        case HttpStatusCode.Forbidden: return 'Das Spiel läuft bereits. Bitte zu einem anderen Zeitpunkt nochmals versuchen.';
-        case HttpStatusCode.NotFound: return 'Das Spiel wurde nicht gefunden.' ;
-        case HttpStatusCode.Conflict: return 'Das Spiel ist bereits voll. Bitte zu einem anderen Zeitpunkt nochmals versuchen.' ;
+        case HttpStatusCode.Forbidden:
+          return 'Das Spiel läuft bereits. Bitte zu einem anderen Zeitpunkt nochmals versuchen.';
+        case HttpStatusCode.NotFound:
+          return 'Das Spiel wurde nicht gefunden.';
+        case HttpStatusCode.Conflict:
+          return 'Das Spiel ist bereits voll. Bitte zu einem anderen Zeitpunkt nochmals versuchen.';
+        case HttpStatusCode.TooEarly:
+          return 'Es haben sich nicht genügend Spieler in dem gegebenen Zeitfenster angemeldet. Versuch es noch einmal.';
       }
     }
     return 'Unbekannter Fehler';

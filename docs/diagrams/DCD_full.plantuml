@@ -20,6 +20,9 @@ package backend{
             +selectProposition(roundId: String, propositionId: String, playerId: String)
             +getAllPropositionForRound(roundId: String, playerId: String): PropositionSelectionDto
         }
+        class CleanUpService {
+            +runGameCleanUp
+        }
     }
     package dto {
         class GameDto {
@@ -174,4 +177,6 @@ EntityService "1"-->"1" GameRepository
 
 Game "1"->"*" Round
 Round "1"-->"1" EvaluationService
+
+CleanUpService "1"->"1" GameRepository
 @enduml

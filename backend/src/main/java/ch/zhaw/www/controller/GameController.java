@@ -61,7 +61,7 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
+        Player player = gameService.enterGame(gameId, playerDto.getPlayerName().trim());
         logger.log(Level.INFO, () -> String.format("%s entered game %s", player, gameId));
         return ResponseEntity.ok(new PlayerDto(player.getId(), player.getName()));
     }

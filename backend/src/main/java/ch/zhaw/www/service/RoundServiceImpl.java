@@ -95,8 +95,9 @@ class RoundServiceImpl implements RoundService {
         entityService.editRound(roundId, round -> {
             if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
                 round.addSelection(playerId, propositionId);
-                var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
                 var game = entityService.getGameForRound(roundId);
+                var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
+                evaluation.entrySet().removeIf((entry) -> !game.hasActivePlayer(entry.getKey()));
                 game.addPoints(evaluation);
                 return game;
             } else {

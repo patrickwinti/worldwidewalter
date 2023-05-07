@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static ch.zhaw.www.TestHelper.WALTER_MARKER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @SpringBootTest
@@ -38,7 +39,7 @@ class TextResourceReaderTest {
         
         assertEquals(4, prompts.size());
         assertNotEquals(10, prompts.size());
-        assertEquals("<<walter>> <<walter>> <<walter>>", prompts.get(3).getStatement());
+        assertEquals(WALTER_MARKER + " " + WALTER_MARKER + " " + WALTER_MARKER, prompts.get(3).getStatement());
         assertEquals(List.of("WALTER", "WALTERN", "WALTER"), prompts.get(3).getWalters());
     }
     

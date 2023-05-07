@@ -141,7 +141,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am <<walter>>\"}"));
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am " + WALTER_MARKER + "\"}"));
         verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     
@@ -154,7 +154,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, sphinx.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am <<walter>>\",\"sphinx\":{\"id\":\"" + sphinx.getId() + "\",\"playerName\":\"Sphinx\"}}"));
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am " + WALTER_MARKER + "\",\"sphinx\":{\"id\":\"" + sphinx.getId() + "\",\"playerName\":\"Sphinx\"}}"));
         verify(gameService).getRoundOpenForPropositions(GAME_ID, sphinx.getId());
     }
     
@@ -167,7 +167,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am <<walter>>\",\"sphinx\":{\"playerName\":\"Sphinx\"}}"));
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am " + WALTER_MARKER + "\",\"sphinx\":{\"playerName\":\"Sphinx\"}}"));
         verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     
@@ -180,7 +180,7 @@ class GameControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/rounds", GAME_ID)
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am <<walter>>\",\"endOfSubmissionsInUtc\":\"" + expectedDate + "\"}"));
+                .andExpect(content().json("{\"id\":\"" + round.getId() + "\",\"prompt\":\"I am " + WALTER_MARKER + "\",\"endOfSubmissionsInUtc\":\"" + expectedDate + "\"}"));
         verify(gameService).getRoundOpenForPropositions(GAME_ID, PLAYER_ID);
     }
     

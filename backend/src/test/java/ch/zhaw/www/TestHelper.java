@@ -9,14 +9,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class TestHelper {
-    private static final Prompt PROMPT = new Prompt("I am <<walter>>", Collections.singletonList("WALTER"));
+    public static final String WALTER_MARKER = "<<walter>>";
+    private static final Prompt PROMPT = new Prompt("I am " + WALTER_MARKER, Collections.singletonList("WALTER"));
     public static final Duration DEFAULT_PROPOSITION_DURATION = Duration.of(5, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_PROPOSITION_END_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
-    public static final List<Prompt> PROMPTS = List.of(new Prompt("<<walter>> ist cool", Collections.singletonList("WALTER")));
-
+    public static final List<Prompt> PROMPTS = List.of(new Prompt(WALTER_MARKER + " ist cool", Collections.singletonList("WALTER")));
 
     public static Player addWaitingRoomPlayer(Game game) {
         Player player = createPlayer();

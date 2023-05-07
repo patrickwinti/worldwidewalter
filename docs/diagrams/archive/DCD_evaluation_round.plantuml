@@ -7,7 +7,7 @@ interface GameService {
 }
 
 interface EntityService {
-    +editRound(roundId: String, editor: Function)
+    +editRound(roundId: String, editor: Transaction)
 }
 
 interface EvaluationService {

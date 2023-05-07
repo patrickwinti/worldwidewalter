@@ -56,6 +56,15 @@ public class Game {
     }
     
     /**
+     * Existing rounds in current game
+     *
+     * @return stream of all rounds
+     */
+    public Stream<Round> getRoundHistory() {
+        return rounds.stream();
+    }
+    
+    /**
      * Gets current round
      *
      * @return Optional {@link Round}

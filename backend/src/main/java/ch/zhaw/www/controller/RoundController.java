@@ -47,7 +47,8 @@ public class RoundController {
     @PostMapping(value = "/rounds/{roundId}/propositions", consumes = "application/json")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void submitProposition(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId, @Valid @RequestBody PropositionSubmissionDto proposition) {
-        roundService.submitProposition(roundId, playerId, proposition.getGaps());
+        List<String> trimmedGaps = proposition.getGaps().stream().map(String::trim).toList();
+        roundService.submitProposition(roundId, playerId, trimmedGaps);
         logger.log(Level.INFO, "proposition submitted successfully");
     }
     

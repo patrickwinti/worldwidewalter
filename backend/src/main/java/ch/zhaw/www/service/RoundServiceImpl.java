@@ -34,27 +34,30 @@ class RoundServiceImpl implements RoundService {
     
     @Override
     public void selectSphinx(Game game) {
-        var round = game.getCurrentRoundOptional();
+        if (!game.hasEnoughPlayers()) return;
+        
         var sphinxCandidates = game.getSphinxCandidates();
-        if (game.hasEnoughPlayers() && !sphinxCandidates.isEmpty() && round.isPresent() && round.get().getSphinx() == null) {
-            var temp = new HashSet<>(sphinxCandidates);
-            if (temp.isEmpty()) return;
-            Player sphinx = null;
-            do {
-                var player = Collections.min(temp, Comparator.comparingInt(Map.Entry::getValue));
-                temp.remove(player);
-                if (game.hasActivePlayer(player.getKey().getId())) {
-                    sphinxCandidates.remove(player);
-                    if (player.getValue() > ONE_ROUND_LEFT) {
-                        sphinxCandidates.add(Map.entry(player.getKey(), player.getValue() - 1));
-                    }
-                    sphinx = player.getKey();
+        if (sphinxCandidates.isEmpty()) return;
+        
+        var round = game.getCurrentRoundOptional();
+        if (round.isEmpty() || round.get().getSphinx() != null) return;
+        
+        var temp = new HashMap<>(sphinxCandidates);
+        Player sphinx = null;
+        do {
+            var player = Collections.min(temp.entrySet(), Map.Entry.comparingByValue());
+            temp.remove(player.getKey());
+            if (game.hasActivePlayer(player.getKey().getId())) {
+                if (player.getValue() > ONE_ROUND_LEFT) {
+                    sphinxCandidates.put(player.getKey(), player.getValue() - 1);
+                } else {
+                    sphinxCandidates.remove(player.getKey());
                 }
-                
-            } while (!temp.isEmpty() && sphinx == null);
-            game.setSphinxCandidates(sphinxCandidates);
-            round.get().setSphinx(sphinx);
-        }
+                sphinx = player.getKey();
+            }
+        } while (!temp.isEmpty() && sphinx == null);
+        game.setSphinxCandidates(sphinxCandidates);
+        round.get().setSphinx(sphinx);
     }
     
     @Override

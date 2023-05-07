@@ -83,12 +83,11 @@ class RoundServiceTest {
                 .peek(game::registerPlayer)
                 .peek(game::moveToActivePlayers)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         
         roundService.selectSphinx(game);
         Player selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
-        Map<Player, Integer> candidates = game.getSphinxCandidates().stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        Map<Player, Integer> candidates = game.getSphinxCandidates();
         assertEquals("Bob", Objects.requireNonNull(selected).getName());
         assertEquals(roundsInTurn, candidates.get(alice));
         assertEquals(1, candidates.get(bob));
@@ -99,8 +98,7 @@ class RoundServiceTest {
         Stream.of(alice, bob, charlie, dave).forEach(game::moveToActivePlayers);
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
-        candidates = game.getSphinxCandidates().stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        candidates = game.getSphinxCandidates();
         assertEquals("Bob", Objects.requireNonNull(selected).getName());
         assertEquals(roundsInTurn, candidates.get(alice));
         assertFalse(candidates.containsKey(bob));
@@ -111,8 +109,7 @@ class RoundServiceTest {
         Stream.of(alice, bob, charlie, dave).forEach(game::moveToActivePlayers);
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
-        candidates = game.getSphinxCandidates().stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        candidates = game.getSphinxCandidates();
         assertNotEquals("Bob", Objects.requireNonNull(selected).getName());
         assertTrue(candidates.containsValue(roundsInTurn - 1));
         assertFalse(candidates.containsKey(bob));
@@ -130,7 +127,7 @@ class RoundServiceTest {
                 .peek(game::registerPlayer)
                 .peek(game::moveToActivePlayers)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         
         roundService.selectSphinx(game);
         assertNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
@@ -158,12 +155,11 @@ class RoundServiceTest {
                 .peek(game::registerPlayer)
                 .peek(game::moveToActivePlayers)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         
         roundService.selectSphinx(game);
         Player selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
-        Map<Player, Integer> candidates = game.getSphinxCandidates().stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        Map<Player, Integer> candidates = game.getSphinxCandidates();
         assertEquals("Bob", Objects.requireNonNull(selected).getName());
         assertEquals(roundsInTurn, candidates.get(alice));
         assertEquals(1, candidates.get(bob));
@@ -172,8 +168,7 @@ class RoundServiceTest {
         
         roundService.selectSphinx(game);
         selected = Objects.requireNonNull(game.getCurrentRound()).getSphinx();
-        candidates = game.getSphinxCandidates().stream()
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+        candidates = game.getSphinxCandidates();
         assertEquals("Bob", Objects.requireNonNull(selected).getName());
         assertEquals(roundsInTurn, candidates.get(alice));
         assertEquals(1, candidates.get(bob));
@@ -194,7 +189,7 @@ class RoundServiceTest {
         game.setSphinxCandidates(Stream.of(alice, bob, charlie, dave)
                 .peek(game::registerPlayer)
                 .map(player -> Map.entry(player, player == bob ? roundsInTurn - 1 : roundsInTurn))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
         
         game.addRound(createRound());
         roundService.selectSphinx(game);

@@ -32,7 +32,7 @@ public class Game {
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final List<Player> players = new ArrayList<>();
     @Setter
-    private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
+    private Map<Player, Integer> sphinxCandidates = new HashMap<>();
     private final List<Prompt> prompts;
     @Getter
     private final Map<String, Integer> points = new HashMap<>();
@@ -192,7 +192,8 @@ public class Game {
      */
     public void removePlayer(@NotNull String playerId) {
         players.removeIf(player -> player.getId().equals(playerId));
-        sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
+        sphinxCandidates.keySet().stream()
+                .filter(integer -> integer.getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);
     }
     
@@ -208,15 +209,15 @@ public class Game {
     /**
      * Fetches sphinx candidates. If there are no candidates, then it returns a set of entries.
      *
-     * @return set of every map entry
+     * @return map of players and rounds per player
      */
-    public Set<Map.Entry<Player, Integer>> getSphinxCandidates() {
+    public Map<Player, Integer> getSphinxCandidates() {
         if (sphinxCandidates.isEmpty()) {
             sphinxCandidates = players.stream()
                     .map(player -> Map.entry(player, numberOfRoundsInTurn))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
-        return sphinxCandidates;
+        return new HashMap<>(sphinxCandidates);
     }
     
     /**
@@ -236,6 +237,6 @@ public class Game {
     public void registerPlayer(Player player) {
         points.put(player.getId(), 0);
         players.add(player);
-        sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn));
+        sphinxCandidates.put(player, numberOfRoundsInTurn);
     }
 }

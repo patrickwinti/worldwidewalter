@@ -145,7 +145,7 @@ class GameTest {
         var candidates = game.getSphinxCandidates();
         assertEquals(2, candidates.size());
         
-        candidates.remove(game.getSphinxCandidates().stream().findFirst().get());
+        candidates.remove(game.getSphinxCandidates().keySet().stream().findFirst().get());
         game.setSphinxCandidates(candidates);
         
         game.moveToActivePlayers(player1);

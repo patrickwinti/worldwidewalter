@@ -26,7 +26,6 @@ together {
 package services {
     class appConfigService
     class gameService
-    class httpCancelService
     class httpPollingInterceptor
     class loadingService
     class stateService

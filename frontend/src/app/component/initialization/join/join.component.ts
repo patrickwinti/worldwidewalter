@@ -71,9 +71,9 @@ export class JoinComponent implements OnInit {
             if (error.status === HttpStatusCode.NotFound) {
               this.joinGameId = '';
               this.gameIdIsReadOnly = false;
-              this.errorText = 'game not found';
+              this.errorText = 'Spiel nicht gefunden.';
             } else {
-              this.errorText = 'unknown error. Try again';
+              this.errorText = 'Unbekannter Fehler';
             }
             this.cd.markForCheck();
           }

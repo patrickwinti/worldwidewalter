@@ -7,19 +7,18 @@ pipeline {
     }
 
     stages {
-        withCredentials([sshUserPrivateKey(credentialsId: 'walter-cluster')]) {
-            stage('Build') {
-                steps {
-                    // sh "mvn -Dmaven.test.failure.ignore=true clean package"
-                    writeFile file: 'abc.sh', text: 'ls'
-                    sshCommand remote: remote, command: 'for i in {1..5}; do echo -n \"Loop \$i \"; date ; sleep 1; done'
-                    sshPut remote: remote, from: 'abc.sh', into: '.'
-                    sshGet remote: remote, from: 'abc.sh', into: 'bac.sh', override: true
-                    sshScript remote: remote, script: 'abc.sh'
-                    sshRemove remote: remote, path: 'abc.sh'
-                    }
-                }
+        stage('Build') {
+            steps {
+                sh 'java -version'
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
 
+            post {
+                success {
+                    archiveArtifacts '**/target/*.jar'
+                    sh 'docker-compose --build -d'
+                }
             }
         }
     }
+}

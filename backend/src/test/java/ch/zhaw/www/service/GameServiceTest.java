@@ -3,8 +3,8 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Round;
+import ch.zhaw.www.utils.GameTransaction;
 import ch.zhaw.www.utils.RandomProvider;
-import ch.zhaw.www.utils.Transaction;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static ch.zhaw.www.TestHelper.*;
@@ -118,74 +117,6 @@ class GameServiceTest {
     }
     
     @Test
-    void testGetRoundClosedForSelections_IllegalState() {
-        var game = mockGameInRepository();
-        
-        Round round = createRound();
-        game.addRound(round);
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game))
-                .peek(player -> assertThrows(RoundError.IllegalStateException.class,
-                        () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId())))
-                .toList();
-        
-        enableFixedClocked();
-        final Player sphinx = players.get(2);
-        round.setSphinx(sphinx);
-        players.forEach(player -> {
-            game.moveToActivePlayers(player);
-            assertThrows(RoundError.IllegalStateException.class,
-                    () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId()));
-            round.addProposition(createProposition(player.getId(), "Test"));
-            if (!player.equals(sphinx)) {
-                round.addSelection(player.getId(), UUID.randomUUID().toString());
-            }
-        });
-        
-        final String anyPlayerId = players.get(0).getId();
-        assertEquals(round, gameService.getRoundClosedForSelections(GAME_ID, anyPlayerId));
-        offsetFixedClockBy(ROUND_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
-    }
-    
-    @Test
-    void testGetRoundClosedForSelections_UnknownPlayer() {
-        var game = mockGameInRepository();
-        Round round = createRound();
-        game.addRound(round);
-        IntStream.range(0, 4).forEach(i -> registerPlayer(game));
-        round.setSphinx(getRandomPlayer(game));
-        
-        assertThrows(PlayerError.NotFoundException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, UNKNOWN_PLAYER_ID));
-    }
-    
-    @Test
-    void testGetRoundClosedForSelections_GameNotFound() {
-        mockGameNotFoundInRepository(GAME_ID);
-        
-        assertThrows(GameError.NotFoundException.class, () -> gameService.getRoundClosedForSelections(GAME_ID, UNKNOWN_PLAYER_ID));
-    }
-    
-    @Test
-    void testGetRoundClosedForSelections_ValidRound() {
-        var game = mockGameInRepository();
-        Round round = createRound();
-        game.addRound(round);
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game)).toList();
-        Player sphinx = players.get(0);
-        round.setSphinx(sphinx);
-        players.forEach(player -> {
-            game.moveToActivePlayers(player);
-            assertThrows(RoundError.IllegalStateException.class,
-                    () -> gameService.getRoundClosedForSelections(GAME_ID, player.getId()));
-            round.addProposition(createProposition(player.getId(), "Test"));
-            if (!player.equals(sphinx)) {
-                round.addSelection(player.getId(), UUID.randomUUID().toString());
-            }
-        });
-        
-        players.forEach(player -> assertEquals(round, gameService.getRoundClosedForSelections(GAME_ID, player.getId())));
-    }
-    
-    @Test
     void testEnterGame_GameNotFound() {
         mockGameNotFoundInRepository(GAME_ID);
         
@@ -247,7 +178,7 @@ class GameServiceTest {
         game.registerPlayer(playerEnteringLater);
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
         
-        assertTrue(game.canAcceptPropositions());
+        assertTrue(game.canAcceptPropositionsForCurrentRound());
         
         assertFalse(game.hasActivePlayer(playerEnteringLater.getId()));
         gameService.enterRound(GAME_ID, playerEnteringLater.getId());
@@ -272,7 +203,7 @@ class GameServiceTest {
         Objects.requireNonNull(game.getCurrentRound()).setSphinx(sphinx);
         playersInCurrentRound.forEach(p -> game.getCurrentRound().addProposition(createProposition(p.getId(), "Cereal")));
         
-        assertTrue(game.canAcceptSelections());
+        assertFalse(game.canAcceptPropositionsForCurrentRound());
         
         game.registerPlayer(cannotEnterCurrentlyPlayer);
         assertFalse(game.hasActivePlayer(cannotEnterCurrentlyPlayer.getId()));
@@ -357,7 +288,7 @@ class GameServiceTest {
         var game = createGame(GAME_ID);
         
         when(entityService.editGame(eq(game.getId()), any())).thenAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, Transaction.class);
+            var lambda = invocationOnMock.getArgument(1, GameTransaction.class);
             //noinspection unchecked
             return lambda.transactionalChange(game);
         });

@@ -2,24 +2,31 @@ package ch.zhaw.www.service;
 
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.utils.Transaction;
+import ch.zhaw.www.model.Round;
+import ch.zhaw.www.utils.RoundTransaction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.util.Pair;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static ch.zhaw.www.TestHelper.*;
+import static ch.zhaw.www.TimeHelper.enableFixedClocked;
+import static ch.zhaw.www.TimeHelper.offsetFixedClockBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
 @SpringBootTest
@@ -58,11 +65,11 @@ class RoundServiceTest {
         var round = createRound();
         game.addRound(round);
         when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, Transaction.class);
-            return lambda.transactionalChange(round);
+            var lambda = invocationOnMock.getArgument(1, RoundTransaction.class);
+            return lambda.transactionalChange(game, round);
         });
         when(entityService.getRound(round.getId())).thenReturn(round);
-        when(entityService.getGameForRound(round.getId())).thenReturn(game);
+        when(entityService.getGameForRound(round.getId())).thenReturn(Pair.of(game, round));
         var players = List.of(createPlayer(), createPlayer(), createPlayer());
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         
@@ -207,7 +214,7 @@ class RoundServiceTest {
     void testPropositionsRequestedTooEarly() {
         var game = mockRoundInRepository();
         var round = Objects.requireNonNull(game.getCurrentRound());
-        final Player sphinx = createPlayer("Sphinx");
+        final Player sphinx = round.getSphinx();
         var allPlayers = List.of(createPlayer("Buffy"), createPlayer("Angel"), createPlayer("Spike"), sphinx);
         var propositions = List.of("Holy Water", "Scowl", "Hydrogen Peroxide", "Beer");
         when(entityService.isPlayerActiveInRound(eq(round.getId()), any())).thenReturn(true);
@@ -240,20 +247,8 @@ class RoundServiceTest {
         var roundId = "round-1";
         var playerId = "Watermelon";
         when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
-        var game = createGame();
-        when(entityService.getGameForRound(roundId)).thenReturn(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
-    }
-    
-    @Test
-    void testPropositionsRequested_WrongRound() {
-        var roundId = "round-1";
-        var playerId = "Faberge";
-        when(entityService.isPlayerActiveInRound(roundId, playerId)).thenReturn(true);
-        var game = mock(Game.class);
-        when(game.getCurrentRound()).thenReturn(createRound());
-        when(entityService.getGameForRound(roundId)).thenReturn(game);
-        assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
+        doThrow(RoundError.NotFoundException.class).when(entityService).getGameForRound(roundId);
+        assertThrows(RoundError.NotFoundException.class, () -> roundService.getRoundReadyForSelections(roundId, playerId));
     }
     
     @Test
@@ -325,17 +320,74 @@ class RoundServiceTest {
         assertThrows(RoundError.IllegalOperationException.class, () -> roundService.selectProposition(round.getId(), players.get(0).getId(), propId));
     }
     
+    @Test
+    void testGetRoundClosedForSelections_IllegalState() {
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        var game = mockRoundInRepository();
+        Round round = Objects.requireNonNull(game.getCurrentRound());
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game)).peek(player -> assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundClosedForSelections(round.getId(), player.getId()))).toList();
+        
+        enableFixedClocked();
+        players.forEach(player -> {
+            game.moveToActivePlayers(player);
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundClosedForSelections(round.getId(), player.getId()));
+            round.addProposition(createProposition(player.getId(), "Test"));
+            round.addSelection(player.getId(), UUID.randomUUID().toString());
+        });
+        
+        final String anyPlayerId = players.get(0).getId();
+        assertEquals(round, roundService.getRoundClosedForSelections(round.getId(), anyPlayerId));
+        offsetFixedClockBy(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_UnknownPlayer() {
+        var game = mockRoundInRepository();
+        Round round = Objects.requireNonNull(game.getCurrentRound());
+        IntStream.range(0, 4).forEach(i -> registerPlayer(game));
+        round.setSphinx(getRandomPlayer(game));
+        
+        assertThrows(PlayerError.NotFoundException.class, () -> roundService.getRoundClosedForSelections(round.getId(), "player"));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_GameNotFound() {
+        String id = "any";
+        doThrow(GameError.NotFoundException.class).when(entityService).getGameForRound(id);
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        
+        assertThrows(GameError.NotFoundException.class, () -> roundService.getRoundClosedForSelections(id, "player"));
+    }
+    
+    @Test
+    void testGetRoundClosedForSelections_ValidRound() {
+        when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
+        var game = mockRoundInRepository();
+        Round round = Objects.requireNonNull(game.getCurrentRound());
+        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game)).toList();
+        players.forEach(player -> {
+            game.moveToActivePlayers(player);
+            assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundClosedForSelections(round.getId(), player.getId()));
+            round.addProposition(createProposition(player.getId(), "Test"));
+            round.addSelection(player.getId(), UUID.randomUUID().toString());
+        });
+        
+        players.forEach(player -> assertEquals(round, roundService.getRoundClosedForSelections(round.getId(), player.getId())));
+    }
+    
     private Game mockRoundInRepository() {
         var game = createGame(GAME_ID);
         var round = createRound();
-        round.setSphinx(createPlayer());
+        var sphinx = createPlayer();
         game.addRound(round);
+        game.moveToActivePlayers(sphinx);
+        round.setSphinx(sphinx);
         when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, Transaction.class);
-            return lambda.transactionalChange(round);
+            var lambda = invocationOnMock.getArgument(1, RoundTransaction.class);
+            return lambda.transactionalChange(game, round);
         });
         when(entityService.getRound(round.getId())).thenReturn(round);
-        when(entityService.getGameForRound(round.getId())).thenReturn(game);
+        when(entityService.getGameForRound(round.getId())).thenReturn(Pair.of(game, round));
         return game;
     }
     

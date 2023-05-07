@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.util.Pair;
 
 import java.util.List;
 
@@ -54,12 +55,14 @@ class EntityServiceTest {
     void findGameByRound() {
         var game1 = createGame();
         Round roundToBeFound = createRound();
+        game1.addRound(createRound());
         game1.addRound(roundToBeFound);
+        game1.addRound(createRound());
         var game2 = createGame();
         game2.addRound(createRound());
         when(gameRepository.findAll()).thenReturn(List.of(game1, game2));
         
-        assertEquals(game1, entityService.getGameForRound(roundToBeFound.getId()));
+        assertEquals(Pair.of(game1, roundToBeFound), entityService.getGameForRound(roundToBeFound.getId()));
     }
     
     @Test

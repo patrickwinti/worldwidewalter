@@ -16,11 +16,12 @@ public class TestHelper {
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
+    public static final int NUMBER_OF_ROUNDS_PER_TURN = 1;
     public static final List<Prompt> PROMPTS = List.of(new Prompt(WALTER_MARKER + " ist cool", Collections.singletonList("WALTER")));
-
-    public static Player addWaitingRoomPlayer(Game game) {
+    
+    public static Player registerPlayer(Game game) {
         Player player = createPlayer();
-        game.addPlayerToWaitingRoom(player);
+        game.registerPlayer(player);
         return player;
     }
     
@@ -44,7 +45,7 @@ public class TestHelper {
     
     public static void addActivePlayer(Game game) {
         Player player = createPlayer();
-        game.addPlayerToWaitingRoom(player);
+        game.registerPlayer(player);
         game.moveToActivePlayers(player);
     }
     
@@ -53,8 +54,8 @@ public class TestHelper {
         proposition.submittedBy(playerId);
         return proposition;
     }
-
-    public static Proposition createDoubleSubmissionProposition(String playerId, String secondPlayerId, String gap){
+    
+    public static Proposition createDoubleSubmissionProposition(String playerId, String secondPlayerId, String gap) {
         var proposition = new Proposition(UUID.randomUUID().toString(), List.of(gap));
         proposition.submittedBy(playerId);
         proposition.submittedBy(secondPlayerId);
@@ -80,7 +81,7 @@ public class TestHelper {
     }
     
     public static Game createGame(String id) {
-        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, 1, PROMPTS);
+        return new Game(id, MIN_NUMBER_OF_PLAYERS, MAX_NUMBER_OF_PLAYERS, NUMBER_OF_ROUNDS_PER_TURN, PROMPTS);
     }
     
     public static Game createGame(int roundsPerTurn) {

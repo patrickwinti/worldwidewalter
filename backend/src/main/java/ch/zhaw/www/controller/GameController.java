@@ -61,7 +61,7 @@ public class GameController {
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PlayerDto> enterGame(@PathVariable String gameId, @Valid @RequestBody PlayerJoinRequestDto playerDto) {
-        Player player = gameService.enterGame(gameId, playerDto.getPlayerName());
+        Player player = gameService.enterGame(gameId, playerDto.getPlayerName().trim());
         logger.log(Level.INFO, () -> String.format("%s entered game %s", player, gameId));
         return ResponseEntity.ok(new PlayerDto(player.getId(), player.getName()));
     }
@@ -145,6 +145,7 @@ public class GameController {
     @Operation(summary = "Player requested to enter round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "New round started, added to round or acknowledge as part of game"),
+            @ApiResponse(responseCode = "403", description = "Player cannot enter this round because it's either already running"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game is at capacity"),
             @ApiResponse(responseCode = "500", description = "Unknown error")

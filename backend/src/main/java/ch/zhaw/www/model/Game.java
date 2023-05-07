@@ -30,10 +30,10 @@ public class Game {
     private final int maximumAmountOfPlayers;
     private final int numberOfRoundsInTurn;
     private final List<Round> rounds = new ArrayList<>();
-    private final Map<String, Player> waitingRoom = new HashMap<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
+    private final List<Player> players = new ArrayList<>();
     @Setter
-    private Set<Map.Entry<Player, Integer>> sphinxCandidates = new HashSet<>();
+    private Map<Player, Integer> sphinxCandidates = new HashMap<>();
     private final List<Prompt> prompts;
     @Getter
     private final Map<String, Integer> points = new HashMap<>();
@@ -55,7 +55,12 @@ public class Game {
         }
     }
     
-    private Optional<Round> getCurrentRoundOptional() {
+    /**
+     * Gets current round
+     *
+     * @return Optional {@link Round}
+     */
+    public Optional<Round> getCurrentRoundOptional() {
         return Optional.ofNullable(getCurrentRound());
     }
     
@@ -112,7 +117,12 @@ public class Game {
         return round.getNumberOfPropositionsSubmitted() < max(activePlayers.size(), minimumAmountOfPlayers);
     }
     
-    private boolean hasEnoughPlayers() {
+    /**
+     * Has more or equal amount of players as the minimum amount of players
+     *
+     * @return true if active players >= minimum amount (default 4)
+     */
+    public boolean hasEnoughPlayers() {
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
     
@@ -133,6 +143,7 @@ public class Game {
      * @param round the round to add
      */
     public void addRound(Round round) {
+        activePlayers.clear();
         rounds.add(round);
     }
     
@@ -142,11 +153,16 @@ public class Game {
      * @return a stream of all players in the game
      */
     public Stream<Player> getAllPlayers() {
-        List<Player> players = new ArrayList<>(waitingRoom.values());
-        players.addAll(activePlayers.values());
         return players.stream();
     }
     
+    /**
+     * Fetches the name of a player
+     *
+     * @param id player id
+     * @return name for given player id or null if not found
+     */
+    @Nullable
     public String getPlayerNameFromId(String id) {
         return getAllPlayers()
                 .filter(player -> player.getId().equals(id))
@@ -160,18 +176,7 @@ public class Game {
      * @param player player that will be marked as active
      */
     public void moveToActivePlayers(Player player) {
-        if (waitingRoom.containsKey(player.getId())) {
-            waitingRoom.remove(player.getId());
-            activePlayers.put(player.getId(), player);
-            sphinxCandidates.stream()
-                    .filter(entry -> entry.getKey().equals(player))
-                    .findFirst()
-                    .ifPresentOrElse(entry -> {
-                    }, () -> sphinxCandidates.add(Map.entry(player, numberOfRoundsInTurn)));
-            if (!points.containsKey(player.getId())) {
-                points.put(player.getId(), 0);
-            }
-        }
+        activePlayers.put(player.getId(), player);
     }
     
     /**
@@ -185,23 +190,14 @@ public class Game {
     }
     
     /**
-     * Adds player to waiting room if not already active
-     *
-     * @param player player that shall be added
-     */
-    public void addPlayerToWaitingRoom(@NotNull Player player) {
-        waitingRoom.put(player.getId(), player);
-    }
-    
-    /**
      * Removes player from waiting room or active players
      *
      * @param playerId player identifier
      */
     public void removePlayer(@NotNull String playerId) {
-        waitingRoom.remove(playerId);
-        activePlayers.remove(playerId);
-        sphinxCandidates.stream().filter(entry -> entry.getKey().getId().equals(playerId))
+        players.removeIf(player -> player.getId().equals(playerId));
+        sphinxCandidates.keySet().stream()
+                .filter(integer -> integer.getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);
     }
     
@@ -217,15 +213,15 @@ public class Game {
     /**
      * Fetches sphinx candidates. If there are no candidates, then it returns a set of entries.
      *
-     * @return set of every map entry
+     * @return map of players and rounds per player
      */
-    public Set<Map.Entry<Player, Integer>> getSphinxCandidates() {
+    public Map<Player, Integer> getSphinxCandidates() {
         if (sphinxCandidates.isEmpty()) {
-            sphinxCandidates = activePlayers.values().stream()
+            sphinxCandidates = players.stream()
                     .map(player -> Map.entry(player, numberOfRoundsInTurn))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         }
-        return sphinxCandidates;
+        return new HashMap<>(sphinxCandidates);
     }
     
     /**
@@ -237,4 +233,14 @@ public class Game {
         evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
     }
     
+    /**
+     * Adds player to game and as a sphinx candidate
+     *
+     * @param player new player entering
+     */
+    public void registerPlayer(Player player) {
+        points.put(player.getId(), 0);
+        players.add(player);
+        sphinxCandidates.put(player, numberOfRoundsInTurn);
+    }
 }

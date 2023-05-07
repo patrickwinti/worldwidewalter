@@ -5,6 +5,7 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,26 +34,30 @@ class RoundServiceImpl implements RoundService {
     
     @Override
     public void selectSphinx(Game game) {
-        var round = game.getCurrentRound();
-        if (round != null && round.getSphinx() == null) {
-            var entries = game.getSphinxCandidates();
-            if (entries.isEmpty()) return;
-            var player = Collections.min(entries, Comparator.comparingInt(Map.Entry::getValue));
-            
-            entries.remove(player);
-            
-            Player sphinx = null;
+        if (!game.hasEnoughPlayers()) return;
+        
+        var sphinxCandidates = game.getSphinxCandidates();
+        if (sphinxCandidates.isEmpty()) return;
+        
+        var round = game.getCurrentRoundOptional();
+        if (round.isEmpty() || round.get().getSphinx() != null) return;
+        
+        var temp = new HashMap<>(sphinxCandidates);
+        Player sphinx = null;
+        do {
+            var player = Collections.min(temp.entrySet(), Map.Entry.comparingByValue());
+            temp.remove(player.getKey());
             if (game.hasActivePlayer(player.getKey().getId())) {
                 if (player.getValue() > ONE_ROUND_LEFT) {
-                    entries.add(Map.entry(player.getKey(), player.getValue() - 1));
+                    sphinxCandidates.put(player.getKey(), player.getValue() - 1);
+                } else {
+                    sphinxCandidates.remove(player.getKey());
                 }
-                game.setSphinxCandidates(entries);
                 sphinx = player.getKey();
-            } else {
-                selectSphinx(game);
             }
-            round.setSphinx(sphinx);
-        }
+        } while (!temp.isEmpty() && sphinx == null);
+        game.setSphinxCandidates(sphinxCandidates);
+        round.get().setSphinx(sphinx);
     }
     
     @Override
@@ -65,7 +70,7 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public void submitProposition(String roundId, String playerId, List<String> gaps) {
+    public void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
             round.getPropositions()
@@ -80,11 +85,12 @@ class RoundServiceImpl implements RoundService {
             if (round.getSphinx() == null) {
                 throw new RoundError.IllegalStateException();
             }
+            return round;
         });
     }
     
     @Override
-    public void selectProposition(String roundId, String playerId, String propositionId) {
+    public void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
         entityService.editRound(roundId, round -> {
             if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
@@ -92,6 +98,7 @@ class RoundServiceImpl implements RoundService {
                 var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
                 var game = entityService.getGameForRound(roundId);
                 game.addPoints(evaluation);
+                return game;
             } else {
                 throw new RoundError.IllegalOperationException();
             }
@@ -99,7 +106,7 @@ class RoundServiceImpl implements RoundService {
     }
     
     @Override
-    public Round getRoundReadyForSelections(final String roundId, final String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
+    public Round getRoundReadyForSelections(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);
         var game = entityService.getGameForRound(roundId);
         var round = game.getCurrentRound();

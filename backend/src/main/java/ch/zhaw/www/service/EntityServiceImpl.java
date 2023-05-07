@@ -4,9 +4,10 @@ import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
 import ch.zhaw.www.utils.InstantWrapper;
+import ch.zhaw.www.utils.Transaction;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -24,19 +25,20 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public Game getGame(String gameId) throws GameError.NotFoundException {
+    public Game getGame(@NotNull String gameId) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             return findGame(gameId);
         }
     }
     
     @Override
-    public void editGame(String gameId, Consumer<Game> editor) throws GameError.NotFoundException {
+    public <T> T editGame(@NotNull String gameId, Transaction<Game, T> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
-            editor.accept(game);
+            T result = editor.transactionalChange(game);
             game.setLastEdit(InstantWrapper.getNow());
             gamesRepository.save(game);
+            return result;
         }
     }
     
@@ -48,29 +50,30 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public Round getRound(String roundId) throws RoundError.NotFoundException {
+    public Round getRound(@NotNull String roundId) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             return findGameForRound(roundId).getCurrentRound();
         }
     }
     
     @Override
-    public void editRound(String roundId, Consumer<Round> editor) throws RoundError.NotFoundException {
+    public <T> T editRound(@NotNull String roundId, Transaction<Round, T> editor) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGameForRound(roundId);
-            editor.accept(game.getCurrentRound());
+            T result = editor.transactionalChange(game.getCurrentRound());
             game.setLastEdit(InstantWrapper.getNow());
             gamesRepository.save(game);
+            return result;
         }
     }
     
     @Override
-    public boolean isPlayerActiveInRound(final String roundId, final String playerId) throws RoundError.NotFoundException {
+    public boolean isPlayerActiveInRound(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException {
         return findGameForRound(roundId).hasActivePlayer(playerId);
     }
     
     @Override
-    public void saveNewGame(Game game) {
+    public void saveNewGame(@NotNull Game game) {
         synchronized (gamesRepository) {
             if (!gamesRepository.existsById(game.getId())) {
                 game.setLastEdit(InstantWrapper.getNow());

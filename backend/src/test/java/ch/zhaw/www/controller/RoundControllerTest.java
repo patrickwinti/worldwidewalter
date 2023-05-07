@@ -1,5 +1,6 @@
 package ch.zhaw.www.controller;
 
+import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.PlayerError;
@@ -129,6 +130,28 @@ class RoundControllerTest {
                                 "\"selectionSubmissionEndInUtc\":\"%s\"}",
                         ROUND_ID, propositions.get(0).getId(), propositions.get(1).getId(), expectedDate)));
         verify(roundService).getRoundReadyForSelections(ROUND_ID, PLAYER_ID);
+    }
+    
+    @Test
+    void testGetAllPropositionForRound_200_sphinx() throws Exception {
+        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION.plus(DEFAULT_SUBMISSION_DURATION));
+        var round = createRound();
+        Player sphinx = createPlayer();
+        round.setSphinx(sphinx);
+        
+        round.addProposition(createProposition("1", "prop 1"));
+        round.addProposition(createProposition(PLAYER_ID, "prop 2", "prop 3"));
+        List<Proposition> propositions = round.getPropositions();
+        when(roundService.getRoundReadyForSelections(any(), any())).thenReturn(round);
+        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/propositions", ROUND_ID)
+                        .header(HEADER_PLAYER, sphinx.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().json(String.format("{\"roundId\":\"%s\",\"propositions\":" +
+                                "[{\"id\":\"%s\",\"gaps\":[\"prop 1\"],\"readOnly\":true},{\"id\":\"%s\"," +
+                                "\"gaps\":[\"prop 2\",\"prop 3\"],\"readOnly\":true}]," +
+                                "\"selectionSubmissionEndInUtc\":\"%s\"}",
+                        ROUND_ID, propositions.get(0).getId(), propositions.get(1).getId(), expectedDate)));
+        verify(roundService).getRoundReadyForSelections(ROUND_ID, sphinx.getId());
     }
     
     @Test

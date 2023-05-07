@@ -1,5 +1,6 @@
 package ch.zhaw.www.controller;
 
+import ch.zhaw.www.TestHelper;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
@@ -20,12 +21,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Map;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -49,10 +49,10 @@ class GameControllerTest {
     @MockBean
     private GameService gameService;
     
-    private static String getExpectedDateInTheFuture(Duration duration) {
+    private static String getExpectedDateInTheFuture() {
         enableFixedClocked();
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(duration));
+                .withZone(ZoneId.of("UTC")).format(getFixedClockInstant().plus(TestHelper.DEFAULT_PROPOSITION_DURATION));
     }
     
     @AfterEach
@@ -173,7 +173,7 @@ class GameControllerTest {
     
     @Test
     void testGetRound_200_withDate() throws Exception {
-        String expectedDate = getExpectedDateInTheFuture(DEFAULT_PROPOSITION_DURATION);
+        String expectedDate = getExpectedDateInTheFuture();
         var round = createRound();
         round.setSphinx(createPlayer("Sphinx"));
         when(gameService.getRoundOpenForPropositions(any(), any())).thenReturn(round);
@@ -214,6 +214,15 @@ class GameControllerTest {
     }
     
     @Test
+    void enterRound_403_game() throws Exception {
+        doThrow(new RoundError.IllegalOperationException()).when(gameService).enterRound(any(), any());
+        mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isForbidden());
+        verify(gameService).enterRound(GAME_ID, PLAYER_ID);
+    }
+    
+    @Test
     void enterRound_404_player() throws Exception {
         doThrow(new PlayerError.NotFoundException(GAME_ID)).when(gameService).enterRound(any(), any());
         mvc.perform(MockMvcRequestBuilders.put("/api/games/{gameId}/rounds", GAME_ID)
@@ -237,7 +246,6 @@ class GameControllerTest {
     void testFetchResults_200() throws Exception {
         var round = mock(Round.class);
         var game = mock(Game.class);
-        var points = new HashMap<String, Integer>();
         var p1Id = "p1Id";
         var p2Id = "p2Id";
         var p1Name = "player1";
@@ -255,11 +263,8 @@ class GameControllerTest {
         propositions.add(prop1);
         propositions.add(prop2);
         
-        points.put(p1Id, 3);
-        points.put(p2Id, 1);
-        
-        var selections = new HashMap<String, String>();
-        selections.put(p2Id, p1propId);
+        var points = Map.of(p1Id, 3, p2Id, 1);
+        var selections = Map.of(p2Id, p1propId);
         
         when(gameService.getRoundClosedForSelections(any(), any())).thenReturn(round);
         when(gameService.getGame(any())).thenReturn(game);

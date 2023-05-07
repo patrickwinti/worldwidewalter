@@ -126,11 +126,11 @@ package backend{
         interface EntityService{
            -gameRepository: GameRepository
             getGame(gameId: String): Game
-            editGame(gameId: String, editor: Consumer<Game>)
+            editGame(gameId: String, editor: Transaction<Game>)
             getGameForRound(roundId: String): Game
             getRound(roundId: String): Round
             isPlayerActiveInRound(roundId: String, playerId: String): boolean
-            editRound(roundId: String, editor: Consumer<Round>)
+            editRound(roundId: String, editor: Transaction<Round>)
             saveNewGame(game: Game)
         }
         interface EvaluationService{

@@ -51,70 +51,64 @@ class GameServiceImpl implements GameService {
     }
     
     @Override
-    public Game getGame(String gameId) throws GameError.NotFoundException {
+    public Game getGame(@NotNull String gameId) throws GameError.NotFoundException {
         return entityService.getGame(gameId);
     }
     
     @Override
-    public Player enterGame(String gameId, String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
-        String uuid = UUID.randomUUID().toString();
-        var wrapper = new Object() {
-            Player player;
-        };
-        entityService.editGame(gameId, game -> {
-            StringBuilder name = new StringBuilder(playerName);
+    public Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
+        return entityService.editGame(gameId, game -> {
+            String uuid = UUID.randomUUID().toString();
+            StringBuilder name = new StringBuilder(playerName.trim());
             while (game.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
                 name.append(randomProvider.getPostfix());
             }
             Player tempPlayer = new Player(uuid, name.toString());
-            game.addPlayerToWaitingRoom(tempPlayer);
-            wrapper.player = tempPlayer;
+            game.registerPlayer(tempPlayer);
+            return tempPlayer;
         });
-        return wrapper.player;
     }
     
     @Override
-    public void leaveGame(String gameId, String playerId) throws GameError.NotFoundException {
+    public void leaveGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException {
         entityService.editGame(gameId, game -> {
             checkPlayerInGame(game, playerId);
             game.removePlayer(playerId);
+            return game;
         });
     }
     
     @Override
-    public void enterRound(String gameId, String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+    public void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
         entityService.editGame(gameId, game -> {
             Player playerEnteringRound = checkPlayerInGame(game, playerId);
             if (game.needsNewRound()) {
                 var round = roundService.createNewRound(game);
                 game.addRound(round);
-                movePlayerToActive(game, playerEnteringRound);
-                game.getAllPlayers()
-                        .filter(player -> !game.hasActivePlayer(player.getId()))
-                        .takeWhile(player -> game.hasCapacityForNewActivePlayer())
-                        .forEach(game::moveToActivePlayers);
-                //handle the case that no other play may enter the game
-                if (!game.hasCapacityForNewActivePlayer()) {
-                    roundService.selectSphinx(game);
-                }
+                game.moveToActivePlayers(playerEnteringRound);
                 LOGGER.log(Level.INFO, "Creating a new round for game {0}", gameId);
             } else if (game.canRoundBeEntered()) {
-                movePlayerToActive(game, playerEnteringRound);
+                game.moveToActivePlayers(playerEnteringRound);
                 roundService.selectSphinx(game);
                 LOGGER.log(Level.INFO, "Adding player to round {0}", gameId);
+            } else if (!game.hasCapacityForNewActivePlayer()) {
+                LOGGER.info("Round is full, player cannot join");
+                throw new GameError.FullCapacityException();
             } else {
                 LOGGER.info("Player cannot join current session");
+                throw new RoundError.IllegalOperationException();
             }
+            return game;
         });
     }
     
     @Override
-    public Round getRoundOpenForPropositions(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+    public Round getRoundOpenForPropositions(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         return getCurrentRoundForDesiredState(gameId, playerId, Game::canAcceptPropositions);
     }
     
     @Override
-    public Round getRoundClosedForSelections(String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+    public Round getRoundClosedForSelections(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
         return getCurrentRoundForDesiredState(gameId, playerId, Game::needsNewRound);
     }
     
@@ -126,25 +120,6 @@ class GameServiceImpl implements GameService {
             throw new RoundError.IllegalStateException();
         }
         return game.getCurrentRound();
-    }
-    
-    /**
-     * Moves the specified player to the active player list of the game if there is capacity for a new active player,
-     * otherwise throws a {@link ch.zhaw.www.service.GameError.FullCapacityException}. If the player is not found in the
-     * game, a {@link ch.zhaw.www.service.PlayerError.NotFoundException} is thrown.
-     *
-     * @param game   The game object.
-     * @param player The player object to move to the active player list.
-     * @throws ch.zhaw.www.service.PlayerError.NotFoundException   If the player is not found in the game.
-     * @throws ch.zhaw.www.service.GameError.FullCapacityException If there is no capacity for a new active player in
-     *                                                             the game.
-     */
-    private static void movePlayerToActive(final Game game, final Player player) {
-        if (game.hasCapacityForNewActivePlayer()) {
-            game.moveToActivePlayers(player);
-        } else {
-            throw new GameError.FullCapacityException();
-        }
     }
     
     private static Player checkPlayerInGame(final Game game, final String playerId) {

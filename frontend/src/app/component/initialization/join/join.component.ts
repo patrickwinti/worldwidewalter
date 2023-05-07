@@ -7,6 +7,7 @@ import { StateService } from "../../../service/state.service";
 import { PlayerDto } from "../../../dto/player-dto";
 import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 import { isNonEmptyString } from "../../../shared/util";
+import { GAME_ID_LENGTH, MAX_INPUT_LENGTH } from "../../../shared/settings";
 
 @Component({
   selector: 'www-join',
@@ -32,7 +33,7 @@ export class JoinComponent implements OnInit {
   }
 
   get canJoinGame(): boolean {
-    return isNonEmptyString(this.playerName) && isNonEmptyString(this.joinGameId);
+    return isNonEmptyString(this.playerName) && isNonEmptyString(this.joinGameId) && this.joinGameId.length === GAME_ID_LENGTH;
   }
 
   ngOnInit(): void {
@@ -87,4 +88,7 @@ export class JoinComponent implements OnInit {
   getTextToBeCopied(): string {
     return window.location.origin + '?gameId=' + this.gameId;
   }
+
+  protected readonly MAX_INPUT_LENGTH = MAX_INPUT_LENGTH;
+  protected readonly GAME_ID_LENGTH = GAME_ID_LENGTH;
 }

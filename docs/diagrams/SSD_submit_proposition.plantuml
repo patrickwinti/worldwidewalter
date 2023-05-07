@@ -1,7 +1,7 @@
 @startuml
 !include globals/stylesheets.iuml
 
-
+actor "Player" as p
 participant ":RoundContoller" as rc
 participant ":RoundService" as rs
 participant "game:Game" as game
@@ -9,6 +9,7 @@ participant "round:Round" as round
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
+p ->rc: request submit proposition
 rc -> rs: submitProposition(roundId, playerId, gaps)
 rs->ges: isPlayerActiveInRound(roundId, playerId)
 ges-->rs: true if player active for game
@@ -28,6 +29,6 @@ ges -> gr : save(game)
 gr --> ges
 ges --> rs
 rs --> rc
-
+rc --> p : submit proposition response
 
 @enduml

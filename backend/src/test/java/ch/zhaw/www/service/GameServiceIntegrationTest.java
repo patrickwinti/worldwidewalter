@@ -75,12 +75,9 @@ class GameServiceIntegrationTest {
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayer.getId()));
         var jesusPlayerId = gameService.enterGame(game.getId(), "Jesus");
         gameService.enterRound(game.getId(), jesusPlayerId.getId());
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayer.getId()));
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), jesusPlayerId.getId()));
         var rockyPlayerId = gameService.enterGame(game.getId(), "Rocky");
         gameService.enterRound(game.getId(), rockyPlayerId.getId());
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayer.getId()));
-        assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), jesusPlayerId.getId()));
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), rockyPlayerId.getId()));
         var bellaPlayer = gameService.enterGame(game.getId(), "Bella");
         gameService.enterRound(game.getId(), bellaPlayer.getId());
@@ -96,7 +93,6 @@ class GameServiceIntegrationTest {
         var cardeaPlayer = gameService.enterGame(gameId, "Cardea");
         var grifudPlayer = gameService.enterGame(gameId, "Grifud");
         var shulamitPlayer = gameService.enterGame(gameId, "Shulamit");
-        var neusPlayer = gameService.enterGame(gameId, "Neus ");
         
         gameService.enterRound(gameId, caelanPlayer.getId());
         gameService.enterRound(gameId, cardeaPlayer.getId());
@@ -109,6 +105,7 @@ class GameServiceIntegrationTest {
         
         // can't participate in round anymore
         offsetFixedClockBy(gameProperties.getPropositionSubmissionDuration().minus(gameProperties.getRoundEnterLimitDuration()).plus(1, ChronoUnit.SECONDS));
+        var neusPlayer = gameService.enterGame(gameId, "Neus ");
         gameService.enterRound(gameId, neusPlayer.getId());
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(gameId, neusPlayer.getId()));
         

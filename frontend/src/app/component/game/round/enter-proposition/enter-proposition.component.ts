@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
 import { RoundDto } from "../../../../dto/round-dto";
 import { WalterReplacement } from "../../../../model/walterReplacement";
 import { containsNonEmptyString } from "../../../../shared/util";
+import { MAX_INPUT_LENGTH } from "../../../../shared/settings";
 
 @Component({
   selector: 'www-enter-proposition',
@@ -34,4 +35,6 @@ export class EnterPropositionComponent implements OnInit {
       this.proposition.map(value => value.text)
     )
   }
+
+  protected readonly MAX_INPUT_LENGTH = MAX_INPUT_LENGTH;
 }

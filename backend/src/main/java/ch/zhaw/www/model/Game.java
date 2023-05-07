@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,6 +37,9 @@ public class Game {
     private final List<Prompt> prompts;
     @Getter
     private final Map<String, Integer> points = new HashMap<>();
+    @Setter
+    @Getter
+    private Instant lastEdit;
     
     /**
      * Gets current round, when the SphinxElector has been selected

@@ -3,6 +3,7 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
+import ch.zhaw.www.utils.InstantWrapper;
 import ch.zhaw.www.utils.Transaction;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ class EntityServiceImpl implements EntityService {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
             T result = editor.transactionalChange(game);
+            game.setLastEdit(InstantWrapper.getNow());
             gamesRepository.save(game);
             return result;
         }
@@ -59,6 +61,7 @@ class EntityServiceImpl implements EntityService {
         synchronized (gamesRepository) {
             var game = findGameForRound(roundId);
             T result = editor.transactionalChange(game.getCurrentRound());
+            game.setLastEdit(InstantWrapper.getNow());
             gamesRepository.save(game);
             return result;
         }
@@ -73,6 +76,7 @@ class EntityServiceImpl implements EntityService {
     public void saveNewGame(@NotNull Game game) {
         synchronized (gamesRepository) {
             if (!gamesRepository.existsById(game.getId())) {
+                game.setLastEdit(InstantWrapper.getNow());
                 gamesRepository.save(game);
             } else {
                 throw new GameError.ExistAlready();

@@ -37,7 +37,12 @@ public class InstantWrapper {
         return instant.isAfter(getNow());
     }
     
-    private static Instant getNow() {
+    /**
+     * Returns the current Instant
+     *
+     * @return now
+     */
+    public static Instant getNow() {
         return Instant.now(clock);
     }
 }

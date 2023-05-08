@@ -58,6 +58,15 @@ public interface EntityService {
     boolean isPlayerActiveInRound(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException;
     
     /**
+     * Checks if player is registered in the game for given round id
+     *
+     * @param roundId round id that needs to be found
+     * @return if player is registered otherwise false
+     * @throws RoundError.NotFoundException if no round is found matching the ID
+     */
+    boolean isPlayerRegisteredInGameOfRound(@NotNull String roundId, @NotNull String playerId) throws RoundError.NotFoundException;
+    
+    /**
      * Edits round with given round ID
      *
      * @param roundId round id that needs to be found

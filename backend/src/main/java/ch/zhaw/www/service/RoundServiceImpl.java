@@ -6,6 +6,7 @@ import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -116,7 +117,8 @@ class RoundServiceImpl implements RoundService {
     
     @Override
     public Round getRoundClosedForSelections(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        var gameRoundPair = entityService.getGameForRound(roundId);
+        Pair<Game, Round> gameRoundPair = entityService.getGameForRound(roundId);
+        verifyPlayerInGameOfRound(gameRoundPair.getSecond().getId(), playerId);
         if (!gameRoundPair.getFirst().isRoundFinished(gameRoundPair.getSecond())) {
             throw new RoundError.IllegalStateException();
         }
@@ -136,6 +138,18 @@ class RoundServiceImpl implements RoundService {
      */
     private void verifyPlayerIsActive(String roundId, String playerId) {
         if (!entityService.isPlayerActiveInRound(roundId, playerId)) {
+            throw new PlayerError.NotFoundException(playerId);
+        }
+    }
+    
+    /**
+     * Verifies that the player with the specified ID is registered in the game with the specified ID.
+     *
+     * @param roundId  the ID of the round to verify the player for
+     * @param playerId the ID of the player to verify
+     */
+    private void verifyPlayerInGameOfRound(String roundId, String playerId) {
+        if (!entityService.isPlayerRegisteredInGameOfRound(roundId, playerId)) {
             throw new PlayerError.NotFoundException(playerId);
         }
     }

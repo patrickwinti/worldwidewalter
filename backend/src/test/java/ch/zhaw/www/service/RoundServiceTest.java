@@ -325,7 +325,13 @@ class RoundServiceTest {
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         var game = mockRoundInRepository();
         Round round = Objects.requireNonNull(game.getCurrentRound());
-        List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game)).peek(player -> assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundClosedForSelections(round.getId(), player.getId()))).toList();
+        List<Player> players = IntStream
+                .range(0, 4)
+                .mapToObj(i -> {
+                    var player = registerPlayer(game);
+                    when(entityService.isPlayerRegisteredInGameOfRound(round.getId(), player.getId())).thenReturn(true);
+                    return player;
+                }).peek(player -> assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundClosedForSelections(round.getId(), player.getId()))).toList();
         
         enableFixedClocked();
         players.forEach(player -> {
@@ -367,6 +373,7 @@ class RoundServiceTest {
         List<Player> players = IntStream.range(0, 4).mapToObj(i -> registerPlayer(game)).toList();
         players.forEach(player -> {
             game.moveToActivePlayers(player);
+            when(entityService.isPlayerRegisteredInGameOfRound(round.getId(), player.getId())).thenReturn(true);
             assertThrows(RoundError.IllegalStateException.class, () -> roundService.getRoundClosedForSelections(round.getId(), player.getId()));
             round.addProposition(createProposition(player.getId(), "Test"));
             round.addSelection(player.getId(), UUID.randomUUID().toString());

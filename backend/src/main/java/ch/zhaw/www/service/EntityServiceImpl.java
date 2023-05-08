@@ -76,6 +76,11 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
+    public boolean isPlayerRegisteredInGameOfRound(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException {
+        return findGameForRound(roundId).getFirst().getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
+    }
+    
+    @Override
     public void saveNewGame(@NotNull Game game) {
         synchronized (gamesRepository) {
             if (!gamesRepository.existsById(game.getId())) {

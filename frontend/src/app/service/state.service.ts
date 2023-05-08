@@ -45,7 +45,7 @@ export class StateService {
   }
 
   isEnteringRound(): boolean {
-    return GameState.ENTERING_ROUND === this.getCurrentState();
+    return GameState.REQUEST_NEW_ROUND === this.getCurrentState();
   }
 
   isInRound(): boolean {

@@ -1,17 +1,18 @@
-<div *ngIf="isEnteringOrEnteredRound()">
-  <www-round *ngIf="round$ | async as round; else entering"
+<div *ngIf="round$ | async as round; else entering">
+  <www-round *ngIf="showRoundComponent()"
              [round]="round">
   </www-round>
 
-  <ng-template #entering>
-    <www-error (retryEmitter)="tryAgain()"
-               [httpError] = httpErr>
-    </www-error>
-  </ng-template>
+  <www-result-container *ngIf="gameState == GameState.SHOW_RESULTS_AND_RANKING"
+                        [round]="round">
+  </www-result-container>
 </div>
 
-<www-result-container *ngIf="gameState == GameState.SHOW_RESULTS_AND_RANKING">
-</www-result-container>
+<ng-template #entering>
+  <www-error (retryEmitter)="getRound()"
+             [httpError]=httpErr>
+  </www-error>
+</ng-template>
 
 <www-current-game-info *ngIf="gameInfoAvailable()"
                        [playerName]="playerName"

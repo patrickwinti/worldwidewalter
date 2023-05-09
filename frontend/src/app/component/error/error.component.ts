@@ -53,7 +53,7 @@ export class ErrorComponent implements OnInit, OnDestroy {
         case HttpStatusCode.Conflict:
           return 'Das Spiel ist bereits voll. Bitte zu einem anderen Zeitpunkt nochmals versuchen.';
         case HttpStatusCode.TooEarly:
-          return 'Es haben sich nicht genügend Spieler in dem gegebenen Zeitfenster angemeldet. Versuch es noch einmal.';
+          return 'Es haben sich nicht genügend Spieler:innen in dem gegebenen Zeitfenster angemeldet. Versuch es noch einmal.';
       }
     }
     return 'Unbekannter Fehler';

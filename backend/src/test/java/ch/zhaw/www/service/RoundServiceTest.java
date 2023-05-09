@@ -9,12 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -25,10 +21,8 @@ import static ch.zhaw.www.TimeHelper.offsetFixedClockBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@SuppressWarnings("unchecked")
 @SpringBootTest
 class RoundServiceTest {
     private static final String GAME_ID = "GAME ID";
@@ -399,8 +393,8 @@ class RoundServiceTest {
         when(entityService.getGameForRound(any())).thenReturn(game);
         when(evaluationService.evaluateSelection(any(), any(), any())).thenReturn(new HashMap<>(Map.of(pId1, 0, pId2, 1)));
         when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
-            var lambda = invocationOnMock.getArgument(1, Transaction.class);
-            return lambda.transactionalChange(round);
+            var lambda = invocationOnMock.getArgument(1, RoundTransaction.class);
+            return lambda.transactionalChange(game, round);
         });
         
         when(game.hasActivePlayer(pId1)).thenReturn(true);

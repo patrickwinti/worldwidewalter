@@ -55,6 +55,10 @@ export class GameService {
     return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions/' + id, null);
   }
 
+  getResultsForRound(roundId: string): Observable<ResultDto> {
+    return this.http.get<ResultDto>(this.BASE_URL + '/rounds/' + roundId + '/results')
+  }
+
   getResults(gameId: string): Observable<ResultDto> {
     return this.http.get<ResultDto>(this.BASE_URL + '/games/' + gameId + '/results')
   }

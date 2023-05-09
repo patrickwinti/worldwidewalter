@@ -6,7 +6,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
@@ -24,7 +23,7 @@ public class CleanUpService {
         this.repository = repository;
     }
     
-    @Scheduled(fixedRateString = "${clean-up-service.game-cleanup.interval}", timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedRateString = "${clean-up-service.game-cleanup.interval}", initialDelayString = "${clean-up-service.game-cleanup.interval}")
     protected void runGameCleanUp() {
         logger.info("running game cleanup");
         synchronized (repository) {

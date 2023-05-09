@@ -223,6 +223,7 @@ public class Game {
      */
     public void removePlayer(@NotNull String playerId) {
         players.removeIf(player -> player.getId().equals(playerId));
+        points.remove(playerId);
         sphinxCandidates.keySet().stream()
                 .filter(integer -> integer.getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);

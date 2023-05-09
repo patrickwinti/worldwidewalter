@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +37,8 @@ class RoundServiceTest {
     private RoundService roundService;
     @MockBean
     private EntityService entityService;
+    @MockBean
+    private EvaluationService evaluationService;
     
     @Test
     void addPropositionThatAlreadyExists() {
@@ -379,6 +382,37 @@ class RoundServiceTest {
         });
         
         players.forEach(player -> assertEquals(round, roundService.getRoundClosedForSelections(round.getId(), player.getId())));
+    }
+    
+    @Test
+    void selectProposition_propositionOfInactivePlayer() {
+        var game = mock(Game.class);
+        var round = mock(Round.class);
+        var roundId = "roundId";
+        var pId1 = "pid1";
+        var pId2 = "pid2";
+        
+        when(round.getId()).thenReturn(roundId);
+        when(entityService.isPlayerActiveInRound(any(), eq(pId1))).thenReturn(true);
+        when(round.isSphinx(pId1)).thenReturn(false);
+        when(round.hasProposition(any())).thenReturn(true);
+        when(entityService.getGameForRound(any())).thenReturn(game);
+        when(evaluationService.evaluateSelection(any(), any(), any())).thenReturn(new HashMap<>(Map.of(pId1, 0, pId2, 1)));
+        when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, Transaction.class);
+            return lambda.transactionalChange(round);
+        });
+        
+        when(game.hasActivePlayer(pId1)).thenReturn(true);
+        when(game.hasActivePlayer(pId2)).thenReturn(true);
+        roundService.selectProposition(roundId, pId1, "1");
+        verify(game).addPoints(Map.of(pId1, 0, pId2, 1));
+        
+        reset(game);
+        when(game.hasActivePlayer(pId1)).thenReturn(true);
+        when(game.hasActivePlayer(pId2)).thenReturn(false);
+        roundService.selectProposition(roundId, pId1, "1");
+        verify(game).addPoints(Map.of(pId1, 0));
     }
     
     private Game mockRoundInRepository() {

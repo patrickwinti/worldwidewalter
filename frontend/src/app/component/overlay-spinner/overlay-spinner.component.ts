@@ -22,6 +22,6 @@ export class OverlaySpinnerComponent {
   }
 
   isJoiningGame(): boolean {
-    return this.stateService.getCurrentState() == GameState.ENTERING_ROUND;
+    return this.stateService.getCurrentState() == GameState.REQUEST_NEW_ROUND;
   }
 }

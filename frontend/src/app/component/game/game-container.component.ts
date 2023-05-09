@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { GameState } from "../../model/game-state";
 import { StateService } from "../../service/state.service";
-import { catchError, Observable, switchMap, throwError } from "rxjs";
+import { catchError, Observable, switchMap, tap, throwError } from "rxjs";
 import { RoundDto } from "../../dto/round-dto";
 import { GameService } from "../../service/game.service";
 import { HttpErrorResponse } from "@angular/common/http";
@@ -28,6 +28,9 @@ export class GameContainerComponent implements OnInit {
   private subscribeToGameState() {
     this.stateService.getStateObservable()
       .subscribe(next => {
+        if(next == GameState.REQUEST_NEW_ROUND) {
+          this.getRound();
+        }
         this.gameState = next;
       });
   }
@@ -35,7 +38,9 @@ export class GameContainerComponent implements OnInit {
   private getRoundObservable(): void {
     this.round$ = this.gameService.enterRound(this.stateService.getGameId()).pipe(
       switchMap(() => {
-        return this.gameService.getRound(this.stateService.getGameId());
+        return this.gameService.getRound(this.stateService.getGameId()).pipe(
+          tap(() => this.stateService.setState(GameState.ENTER_PROPOSITION))
+        );
       }),
       catchError((err: HttpErrorResponse) => {
         this.httpErr = err;
@@ -44,11 +49,11 @@ export class GameContainerComponent implements OnInit {
     )
   }
 
-  isEnteringOrEnteredRound(): boolean {
-    return this.stateService.isInRound() || this.stateService.isEnteringRound();
+  showRoundComponent(): boolean {
+    return this.stateService.isInRound();
   }
 
-  tryAgain() {
+  getRound() {
     this.getRoundObservable();
   }
 

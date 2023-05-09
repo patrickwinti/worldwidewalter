@@ -25,12 +25,6 @@ public class TestHelper {
         return player;
     }
     
-    public static void addRoundOpenForPropositionSubmission(Game game) {
-        Round round = createRound();
-        round.setSphinx(getRandomPlayer(game));
-        game.addRound(round);
-    }
-    
     public static Player createPlayer() {
         return new Player(getId(), "Chris");
     }

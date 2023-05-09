@@ -1,8 +1,9 @@
 package ch.zhaw.www.controller;
 
-import ch.zhaw.www.dto.PropositionSelectionDto;
-import ch.zhaw.www.dto.PropositionSubmissionDto;
+import ch.zhaw.www.dto.*;
+import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Proposition;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.RoundService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -92,6 +93,47 @@ public class RoundController {
                 roundId,
                 propositions,
                 round.getSelectionSubmissionEnd()));
+    }
+    
+    @Operation(summary = "Retrieves the points for each player in a round")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
+            @ApiResponse(responseCode = "404", description = "Round has not been found"),
+            @ApiResponse(responseCode = "405", description = "Not all selections have been submitted yet"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/rounds/{roundId}/results", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ResultDto> fetchResultsForRound(@PathVariable String roundId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        var round = roundService.getRoundClosedForSelections(roundId, playerId);
+        var game = roundService.getGameForRound(roundId);
+        
+        var resultDto = new ResultDto(
+                game.getPoints()
+                        .entrySet()
+                        .stream()
+                        .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue()))
+                        .toList(),
+                createSelectionDtos(game, round));
+        
+        logger.log(Level.INFO, "game results returned {0}", game.getId());
+        return ResponseEntity.ok(resultDto);
+    }
+    
+    private static List<SelectionDto> createSelectionDtos(Game game, Round round) {
+        return round.getPropositions().stream()
+                .map(proposition ->
+                        new SelectionDto(
+                                proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
+                                proposition.getGaps(),
+                                round.getSelections().entrySet().stream()
+                                        .filter(entry -> entry.getValue().equals(proposition.getId()))
+                                        .map(entry -> game.getPlayerNameFromId(entry.getKey()))
+                                        .toList(),
+                                proposition.getPlayerIds().stream().anyMatch(round::isSphinx)
+                        )
+                )
+                .toList();
     }
     
     private static boolean isPropositionReadOnly(Proposition proposition, String playerId, boolean isSphinx) {

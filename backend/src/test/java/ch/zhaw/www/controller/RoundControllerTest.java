@@ -1,7 +1,9 @@
 package ch.zhaw.www.controller;
 
+import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
+import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameError;
 import ch.zhaw.www.service.PlayerError;
 import ch.zhaw.www.service.RoundError;
@@ -21,7 +23,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static ch.zhaw.www.TestHelper.*;
 import static ch.zhaw.www.TimeHelper.*;
@@ -179,6 +184,66 @@ class RoundControllerTest {
                         .header(HEADER_PLAYER, PLAYER_ID))
                 .andExpect(status().isTooEarly());
         verify(roundService).getRoundReadyForSelections(ROUND_ID, PLAYER_ID);
+    }
+    
+    @Test
+    void testFetchResults_200() throws Exception {
+        var round = mock(Round.class);
+        var game = mock(Game.class);
+        var p1Id = "p1Id";
+        var p2Id = "p2Id";
+        var p1Name = "player1";
+        var p2Name = "player2";
+        
+        var p1prop = "prop1";
+        var p2prop = "prop2";
+        var p1propId = "p1propId";
+        var p2propId = "p2propId";
+        var propositions = new ArrayList<Proposition>();
+        var prop1 = new Proposition(p1propId, Collections.singletonList(p1prop));
+        prop1.submittedBy(p1Id);
+        var prop2 = new Proposition(p2propId, Collections.singletonList(p2prop));
+        prop2.submittedBy(p2Id);
+        propositions.add(prop1);
+        propositions.add(prop2);
+        
+        var points = Map.of(p1Id, 3, p2Id, 1);
+        var selections = Map.of(p2Id, p1propId);
+        
+        when(roundService.getRoundClosedForSelections(any(), any())).thenReturn(round);
+        when(roundService.getGameForRound(any())).thenReturn(game);
+        when(game.getPoints()).thenReturn(points);
+        when(round.getSelections()).thenReturn(selections);
+        when(round.getPropositions()).thenReturn(propositions);
+        when(game.getPlayerNameFromId(p1Id)).thenReturn(p1Name);
+        when(game.getPlayerNameFromId(p2Id)).thenReturn(p2Name);
+        
+        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/results", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json(
+                        "{\"ranking\":[{\"playerName\":\"player1\",\"points\":3},{\"playerName\":\"player2\",\"points\":1}]," +
+                                "\"selections\":[{\"authors\":[\"player1\"],\"gaps\":[\"prop1\"],\"selectors\":[\"player2\"]},{\"authors\":[\"player2\"],\"gaps\":[\"prop2\"],\"selectors\":[]}]}"));
+        
+        verify(roundService).getRoundClosedForSelections(GAME_ID, PLAYER_ID);
+    }
+    
+    @Test
+    void testFetchResults_404_game() throws Exception {
+        doThrow(new GameError.NotFoundException(ROUND_ID)).when(roundService).getRoundClosedForSelections(any(), any());
+        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/results", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isNotFound());
+        verify(roundService).getRoundClosedForSelections(GAME_ID, PLAYER_ID);
+    }
+    
+    @Test
+    void testFetchResults_425() throws Exception {
+        doThrow(new RoundError.IllegalStateException()).when(roundService).getRoundClosedForSelections(any(), any());
+        mvc.perform(MockMvcRequestBuilders.get("/api/rounds/{roundId}/results", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isTooEarly());
+        verify(roundService).getRoundClosedForSelections(GAME_ID, PLAYER_ID);
     }
     
     private static String getExpectedDateInTheFuture(Duration duration) {

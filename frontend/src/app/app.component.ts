@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
   }
 
   startGame() {
-    this.stateService.setState(GameState.ENTERING_ROUND);
+    this.stateService.setState(GameState.REQUEST_NEW_ROUND);
   }
 
   gameIsInitializing(): boolean {

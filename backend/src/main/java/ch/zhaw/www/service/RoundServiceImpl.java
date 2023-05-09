@@ -72,7 +72,10 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void submitProposition(@NotNull String roundId, @NotNull String playerId, @NotNull List<String> gaps) {
         verifyPlayerIsActive(roundId, playerId);
-        entityService.editRound(roundId, round -> {
+        entityService.editRound(roundId, (game, round) -> {
+            if (round.getSphinx() == null) {
+                throw new RoundError.IllegalStateException();
+            }
             round.getPropositions()
                     .stream()
                     .filter(proposition -> proposition.hasSameGaps(gaps))
@@ -82,9 +85,6 @@ class RoundServiceImpl implements RoundService {
                         proposition.submittedBy(playerId);
                         round.addProposition(proposition);
                     });
-            if (round.getSphinx() == null) {
-                throw new RoundError.IllegalStateException();
-            }
             return round;
         });
     }
@@ -92,10 +92,9 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
-        entityService.editRound(roundId, round -> {
+        entityService.editRound(roundId, (game, round) -> {
             if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
                 round.addSelection(playerId, propositionId);
-                var game = entityService.getGameForRound(roundId);
                 var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
                 evaluation.entrySet().removeIf((entry) -> !game.hasActivePlayer(entry.getKey()));
                 game.addPoints(evaluation);
@@ -110,11 +109,27 @@ class RoundServiceImpl implements RoundService {
     public Round getRoundReadyForSelections(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);
         var game = entityService.getGameForRound(roundId);
-        var round = game.getCurrentRound();
-        if (!game.canAcceptSelections()) {
+        var round = entityService.getRound(roundId);
+        if (!game.canAcceptSelectionForRound(round)) {
             throw new RoundError.IllegalStateException();
         }
         return round;
+    }
+    
+    @Override
+    public Round getRoundClosedForSelections(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
+        var game = entityService.getGameForRound(roundId);
+        var round = entityService.getRound(roundId);
+        verifyPlayerInGameOfRound(roundId, playerId);
+        if (!game.isRoundFinished(round)) {
+            throw new RoundError.IllegalStateException();
+        }
+        return round;
+    }
+    
+    @Override
+    public Game getGameForRound(String roundId) throws GameError.NotFoundException {
+        return entityService.getGameForRound(roundId);
     }
     
     /**
@@ -125,6 +140,18 @@ class RoundServiceImpl implements RoundService {
      */
     private void verifyPlayerIsActive(String roundId, String playerId) {
         if (!entityService.isPlayerActiveInRound(roundId, playerId)) {
+            throw new PlayerError.NotFoundException(playerId);
+        }
+    }
+    
+    /**
+     * Verifies that the player with the specified ID is registered in the game with the specified ID.
+     *
+     * @param roundId  the ID of the round to verify the player for
+     * @param playerId the ID of the player to verify
+     */
+    private void verifyPlayerInGameOfRound(String roundId, String playerId) {
+        if (!entityService.isPlayerRegisteredInGameOfRound(roundId, playerId)) {
             throw new PlayerError.NotFoundException(playerId);
         }
     }

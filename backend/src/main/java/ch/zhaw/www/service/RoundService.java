@@ -62,4 +62,22 @@ public interface RoundService {
      */
     void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) throws RoundError.NotFoundException, PlayerError.NotFoundException, PropositionError.NotFoundException;
     
+    /**
+     * Player requested round that has all selections already submitted
+     *
+     * @param round    round requested to enter
+     * @param playerId player requesting round
+     * @return new or existing round
+     * @throws GameError.NotFoundException      if game is not found
+     * @throws RoundError.IllegalStateException if there are not enough players anymore
+     */
+    Round getRoundClosedForSelections(@NotNull String round, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException;
+    
+    /**
+     * Returns a game for given round id
+     *
+     * @param roundId round indentifier
+     * @return game for given round
+     */
+    Game getGameForRound(String roundId) throws GameError.NotFoundException;
 }

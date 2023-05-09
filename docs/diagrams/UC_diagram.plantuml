@@ -11,9 +11,9 @@ actor Sphinx as s
 p<|-right-- s
 
 package WorldwideWalter {
-  usecase "Start game" as UC1
-  usecase "Join game" as UC2
-  usecase "Play round" as UC3
+  usecase "start game" as UC1
+  usecase "join game" as UC2
+  usecase "play round" as UC3
 }
 
 'Relationships

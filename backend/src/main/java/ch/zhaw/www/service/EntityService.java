@@ -5,7 +5,6 @@ import ch.zhaw.www.model.Round;
 import ch.zhaw.www.utils.GameTransaction;
 import ch.zhaw.www.utils.RoundTransaction;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.util.Pair;
 
 /**
  * Game repository with protected access to game instances
@@ -37,7 +36,7 @@ public interface EntityService {
      * @return game and round with round given identifier
      * @throws RoundError.NotFoundException if no round is found matching the ID
      */
-    Pair<Game, Round> getGameForRound(String roundId);
+    Game getGameForRound(String roundId);
     
     /**
      * Fetches the round for given round ID

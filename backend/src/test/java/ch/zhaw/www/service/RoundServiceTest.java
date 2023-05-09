@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.util.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -69,7 +68,7 @@ class RoundServiceTest {
             return lambda.transactionalChange(game, round);
         });
         when(entityService.getRound(round.getId())).thenReturn(round);
-        when(entityService.getGameForRound(round.getId())).thenReturn(Pair.of(game, round));
+        when(entityService.getGameForRound(round.getId())).thenReturn(game);
         var players = List.of(createPlayer(), createPlayer(), createPlayer());
         when(entityService.isPlayerActiveInRound(any(), any())).thenReturn(true);
         
@@ -394,7 +393,7 @@ class RoundServiceTest {
             return lambda.transactionalChange(game, round);
         });
         when(entityService.getRound(round.getId())).thenReturn(round);
-        when(entityService.getGameForRound(round.getId())).thenReturn(Pair.of(game, round));
+        when(entityService.getGameForRound(round.getId())).thenReturn(game);
         return game;
     }
     

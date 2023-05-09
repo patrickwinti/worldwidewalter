@@ -46,9 +46,9 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public Pair<Game, Round> getGameForRound(final String roundId) {
+    public Game getGameForRound(final String roundId) {
         synchronized (gamesRepository) {
-            return findGameForRound(roundId);
+            return findGameForRound(roundId).getFirst();
         }
     }
     

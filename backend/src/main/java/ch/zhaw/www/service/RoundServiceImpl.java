@@ -6,7 +6,6 @@ import ch.zhaw.www.model.Player;
 import ch.zhaw.www.model.Proposition;
 import ch.zhaw.www.model.Round;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -108,26 +107,28 @@ class RoundServiceImpl implements RoundService {
     @Override
     public Round getRoundReadyForSelections(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException, RoundError.IllegalStateException, PlayerError.NotFoundException {
         verifyPlayerIsActive(roundId, playerId);
-        var gameRoundPair = entityService.getGameForRound(roundId);
-        if (!gameRoundPair.getFirst().canAcceptSelectionForRound(gameRoundPair.getSecond())) {
+        var game = entityService.getGameForRound(roundId);
+        var round = entityService.getRound(roundId);
+        if (!game.canAcceptSelectionForRound(round)) {
             throw new RoundError.IllegalStateException();
         }
-        return gameRoundPair.getSecond();
+        return round;
     }
     
     @Override
     public Round getRoundClosedForSelections(@NotNull String roundId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        Pair<Game, Round> gameRoundPair = entityService.getGameForRound(roundId);
-        verifyPlayerInGameOfRound(gameRoundPair.getSecond().getId(), playerId);
-        if (!gameRoundPair.getFirst().isRoundFinished(gameRoundPair.getSecond())) {
+        var game = entityService.getGameForRound(roundId);
+        var round = entityService.getRound(roundId);
+        verifyPlayerInGameOfRound(roundId, playerId);
+        if (!game.isRoundFinished(round)) {
             throw new RoundError.IllegalStateException();
         }
-        return gameRoundPair.getSecond();
+        return round;
     }
     
     @Override
     public Game getGameForRound(String roundId) throws GameError.NotFoundException {
-        return entityService.getGameForRound(roundId).getFirst();
+        return entityService.getGameForRound(roundId);
     }
     
     /**

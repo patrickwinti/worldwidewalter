@@ -82,6 +82,7 @@ export class JoinComponent implements OnInit {
   }
 
   returnToStart() {
+    this.stateService.setGameId('');
     this.initializationStateEmitter.emit(InitializationState.WELCOME_PAGE);
   }
 

@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-public class RandomProviderImplementationTest {
-
+class RandomProviderImplementationTest {
+    
     @Autowired
     private RandomProvider randomProvider;
-
+    
     @Test
     void testUniqueness() {
         final int generatedIds = 10_000_000;
@@ -23,15 +23,15 @@ public class RandomProviderImplementationTest {
                 .distinct()
                 .count();
         double expectedUniquenessPercent = 99.9975 / 100;
-
+        
         assertTrue(distinctIds >= expectedUniquenessPercent * generatedIds);
     }
-
+    
     @Test
     void testPostfixGeneration() {
         var postfix1 = randomProvider.getPostfix();
         var postfix2 = randomProvider.getPostfix();
-
+        
         assertNotEquals(postfix1, postfix2);
         assertTrue(postfix1 >= 0);
         assertTrue(postfix2 >= 0);

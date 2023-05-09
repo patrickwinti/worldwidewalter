@@ -92,8 +92,9 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectProposition(@NotNull String roundId, @NotNull String playerId, @NotNull String propositionId) {
         verifyPlayerIsActive(roundId, playerId);
+        verifyPropositionExists(roundId, propositionId);
         entityService.editRound(roundId, (game, round) -> {
-            if (!round.isSphinx(playerId) && round.hasProposition(propositionId)) {
+            if (!round.isSphinx(playerId)) {
                 round.addSelection(playerId, propositionId);
                 var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
                 evaluation.entrySet().removeIf(entry -> !game.hasActivePlayer(entry.getKey()));
@@ -153,6 +154,12 @@ class RoundServiceImpl implements RoundService {
     private void verifyPlayerInGameOfRound(String roundId, String playerId) {
         if (!entityService.isPlayerRegisteredInGameOfRound(roundId, playerId)) {
             throw new PlayerError.NotFoundException(playerId);
+        }
+    }
+    
+    private void verifyPropositionExists(String roundId, String propositionId) {
+        if (!entityService.getRound(roundId).hasProposition(propositionId)) {
+            throw new PropositionError.NotFoundException(propositionId);
         }
     }
     

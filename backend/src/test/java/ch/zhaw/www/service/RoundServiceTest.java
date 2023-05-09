@@ -313,7 +313,7 @@ class RoundServiceTest {
         roundService.submitProposition(round.getId(), players.get(0).getId(), List.of("Wasser", "Gummi"));
         var propId = "notExistingPropId";
         
-        assertThrows(RoundError.IllegalOperationException.class, () -> roundService.selectProposition(round.getId(), players.get(0).getId(), propId));
+        assertThrows(PropositionError.NotFoundException.class, () -> roundService.selectProposition(round.getId(), players.get(0).getId(), propId));
     }
     
     @Test
@@ -391,6 +391,7 @@ class RoundServiceTest {
         when(round.isSphinx(pId1)).thenReturn(false);
         when(round.hasProposition(any())).thenReturn(true);
         when(entityService.getGameForRound(any())).thenReturn(game);
+        when(entityService.getRound(roundId)).thenReturn(round);
         when(evaluationService.evaluateSelection(any(), any(), any())).thenReturn(new HashMap<>(Map.of(pId1, 0, pId2, 1)));
         when(entityService.editRound(eq(round.getId()), any())).thenAnswer(invocationOnMock -> {
             var lambda = invocationOnMock.getArgument(1, RoundTransaction.class);

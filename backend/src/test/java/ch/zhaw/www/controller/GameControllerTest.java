@@ -37,7 +37,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class GameControllerTest {
     private static final String GAME_ID = "123";
     private static final String PLAYER_ID = "456";
-    private static final String ROUND_ID = "789";
     private static final String HEADER_PLAYER = "X-PLAYER-ID";
     
     @Autowired

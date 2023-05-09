@@ -27,7 +27,6 @@ export class RoundComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.stateService.setState(GameState.ENTER_PROPOSITION);
     this.stateObservable$ = this.stateService.getStateObservable();
     this.propositionSelectionDto$ = this.gameService.getAllPropositions(this.round.id);
     this.stateService.setPrompt(this.round.prompt);

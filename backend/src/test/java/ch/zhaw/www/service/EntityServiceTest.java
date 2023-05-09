@@ -29,7 +29,10 @@ class EntityServiceTest {
         game1.addRound(createRound());
         var game2 = createGame();
         var game3 = createGame();
+        game3.addRound(createRound());
+        game3.addRound(createRound());
         game3.addRound(roundToBeFound);
+        game3.addRound(createRound());
         when(gameRepository.findAll()).thenReturn(List.of(game1, game2, game3));
         
         final Round gameForRound = entityService.getRound(roundToBeFound.getId());
@@ -54,7 +57,9 @@ class EntityServiceTest {
     void findGameByRound() {
         var game1 = createGame();
         Round roundToBeFound = createRound();
+        game1.addRound(createRound());
         game1.addRound(roundToBeFound);
+        game1.addRound(createRound());
         var game2 = createGame();
         game2.addRound(createRound());
         when(gameRepository.findAll()).thenReturn(List.of(game1, game2));

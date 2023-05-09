@@ -20,11 +20,11 @@ export class ResultContainerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.result$ = this.gameService.getResults(this.stateService.getGameId());
+    this.result$ = this.gameService.getResultsForRound(this.round.id);
   }
 
   continue() {
-    this.stateService.setState(GameState.ENTERING_ROUND);
+    this.stateService.setState(GameState.REQUEST_NEW_ROUND);
   }
 
   sortRanking(ranking: RankingDto[]): RankingDto[] {

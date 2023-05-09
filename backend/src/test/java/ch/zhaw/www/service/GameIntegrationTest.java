@@ -19,7 +19,7 @@ import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(properties = {"game.maximum-players=200"})
-class GameServiceIntegrationTest {
+class GameIntegrationTest {
     
     @Autowired
     private GameService gameService;
@@ -144,4 +144,33 @@ class GameServiceIntegrationTest {
         assertEquals(round2.getId(), neusRoundResponse.getId());
     }
     
+    @Test
+    void testRacingConditionAtEndOfRound() {
+        var game = gameService.createGame();
+        var gameId = game.getId();
+        var players = IntStream.range(1, 5)
+                .mapToObj(value -> gameService.enterGame(gameId, "p" + value))
+                .peek(player -> gameService.enterRound(gameId, player.getId()))
+                .toList();
+        String round1Id = Objects.requireNonNull(game.getCurrentRound()).getId();
+        players.forEach(player -> roundService.submitProposition(round1Id, player.getId(), List.of("one")));
+        Round roundReadyForSelections = roundService.getRoundReadyForSelections(round1Id, players.get(0).getId());
+        assertEquals(round1Id, roundReadyForSelections.getId());
+        
+        players.forEach(player -> {
+            if (!player.equals(roundReadyForSelections.getSphinx())) {
+                roundService.selectProposition(round1Id, player.getId(), roundReadyForSelections.getPropositions().get(0).getId());
+            }
+        });
+        
+        var player1 = players.get(0).getId();
+        var roundCloseForSelection1 = roundService.getRoundClosedForSelections(round1Id, player1);
+        assertEquals(round1Id, roundCloseForSelection1.getId());
+        
+        gameService.enterRound(gameId, player1);
+        var player2 = players.get(1).getId();
+        
+        var roundCloseForSelection2 = roundService.getRoundClosedForSelections(round1Id, player2);
+        assertEquals(round1Id, roundCloseForSelection2.getId());
+    }
 }

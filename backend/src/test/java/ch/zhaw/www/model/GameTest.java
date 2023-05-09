@@ -45,7 +45,7 @@ class GameTest {
         game.addRound(round);
         assertTrue(game.canRoundBeEntered());
         
-        assertFalse(game.canAcceptPropositions());
+        assertFalse(game.canAcceptPropositionsForCurrentRound());
     }
     
     @Test
@@ -57,34 +57,33 @@ class GameTest {
         IntStream.range(0, numberOfPlayersToAdd).forEach(value -> registerPlayer(game));
         assertTrue(game.canRoundBeEntered());
         
-        addRoundOpenForPropositionSubmission(game); //Round with Sphinx but not enough active players
+        addRoundOpenForPropositionSubmission(game, numberOfPlayersToAdd); //Round with Sphinx but not enough active players
         assertTrue(game.canRoundBeEntered());
         
         game.getAllPlayers().forEach(game::moveToActivePlayers);
-        assertTrue(game.canAcceptPropositions());
+        assertTrue(game.canAcceptPropositionsForCurrentRound());
     }
     
     @Test
     void testGameState_WaitingForSelections() {
         var game = createGame();
         int numberOfPlayersToAdd = 10;
-        for (int i = 0; i < numberOfPlayersToAdd; i++) {
-            addActivePlayer(game);
-        }
-        
-        addRoundOpenForPropositionSubmission(game);
+        addRoundOpenForPropositionSubmission(game, numberOfPlayersToAdd);
         var round = game.getCurrentRound();
         assertNotNull(round);
         
-        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), "Walter " + player.getId())));
-        assertTrue(game.canAcceptSelections());
+        game.getAllPlayers().forEach(player -> round.addProposition(createProposition(player.getId(), player.getId())));
+        assertFalse(game.canAcceptPropositionsForCurrentRound());
+        assertTrue(game.canAcceptSelectionForRound(round));
         
         enableFixedClocked();
-        addRoundOpenForPropositionSubmission(game);
+        addRoundOpenForPropositionSubmission(game, numberOfPlayersToAdd);
         var player = getRandomPlayer(game);
         game.getCurrentRound().addProposition(createProposition(player.getId(), "Walter " + player.getId()));
         offsetFixedClockBy(DEFAULT_PROPOSITION_DURATION);
-        assertTrue(game.canAcceptSelections());
+        assertFalse(game.canAcceptPropositionsForCurrentRound());
+        assertTrue(game.canAcceptSelectionForRound(game.getCurrentRound()
+        ));
     }
     
     @Test
@@ -262,4 +261,14 @@ class GameTest {
         assertEquals(game.getSphinxCandidates().get(flower), game.getSphinxCandidates().get(power));
         assertEquals(NUMBER_OF_ROUNDS_PER_TURN, game.getSphinxCandidates().get(power));
     }
+    
+    private void addRoundOpenForPropositionSubmission(Game game, int numberOfPlayersToAdd) {
+        Round round = createRound();
+        game.addRound(round);
+        for (int i = 0; i < numberOfPlayersToAdd; i++) {
+            addActivePlayer(game);
+        }
+        round.setSphinx(getRandomPlayer(game));
+    }
+    
 }

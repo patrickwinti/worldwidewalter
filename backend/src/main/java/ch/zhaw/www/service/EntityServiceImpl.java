@@ -3,11 +3,14 @@ package ch.zhaw.www.service;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Round;
 import ch.zhaw.www.repository.GameRepository;
+import ch.zhaw.www.utils.GameTransaction;
 import ch.zhaw.www.utils.InstantWrapper;
-import ch.zhaw.www.utils.Transaction;
+import ch.zhaw.www.utils.RoundTransaction;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 @Service
@@ -32,7 +35,7 @@ class EntityServiceImpl implements EntityService {
     }
     
     @Override
-    public <T> T editGame(@NotNull String gameId, Transaction<Game, T> editor) throws GameError.NotFoundException {
+    public <T> T editGame(@NotNull String gameId, GameTransaction<T> editor) throws GameError.NotFoundException {
         synchronized (gamesRepository) {
             var game = findGame(gameId);
             T result = editor.transactionalChange(game);
@@ -45,31 +48,36 @@ class EntityServiceImpl implements EntityService {
     @Override
     public Game getGameForRound(final String roundId) {
         synchronized (gamesRepository) {
-            return findGameForRound(roundId);
+            return findGameForRound(roundId).getFirst();
         }
     }
     
     @Override
     public Round getRound(@NotNull String roundId) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
-            return findGameForRound(roundId).getCurrentRound();
+            return findGameForRound(roundId).getSecond();
         }
     }
     
     @Override
-    public <T> T editRound(@NotNull String roundId, Transaction<Round, T> editor) throws RoundError.NotFoundException {
+    public <T> T editRound(@NotNull String roundId, RoundTransaction<T> editor) throws RoundError.NotFoundException {
         synchronized (gamesRepository) {
-            var game = findGameForRound(roundId);
-            T result = editor.transactionalChange(game.getCurrentRound());
-            game.setLastEdit(InstantWrapper.getNow());
-            gamesRepository.save(game);
+            var gameRoundPair = findGameForRound(roundId);
+            T result = editor.transactionalChange(gameRoundPair.getFirst(), gameRoundPair.getSecond());
+            gameRoundPair.getFirst().setLastEdit(InstantWrapper.getNow());
+            gamesRepository.save(gameRoundPair.getFirst());
             return result;
         }
     }
     
     @Override
     public boolean isPlayerActiveInRound(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException {
-        return findGameForRound(roundId).hasActivePlayer(playerId);
+        return findGameForRound(roundId).getFirst().hasActivePlayer(playerId);
+    }
+    
+    @Override
+    public boolean isPlayerRegisteredInGameOfRound(final @NotNull String roundId, final @NotNull String playerId) throws RoundError.NotFoundException {
+        return findGameForRound(roundId).getFirst().getAllPlayers().anyMatch(player -> player.getId().equals(playerId));
     }
     
     @Override
@@ -103,12 +111,15 @@ class EntityServiceImpl implements EntityService {
      * @return The game that contains the round with the specified ID
      * @throws RoundError.NotFoundException if no round with the specified ID is found
      */
-    private Game findGameForRound(String roundId) {
+    private Pair<Game, Round> findGameForRound(String roundId) {
+        Predicate<Round> matchesRound = round -> round.getId().equals(roundId);
         return StreamSupport.stream(gamesRepository.findAll().spliterator(), true)
-                .filter(game -> {
-                    var round = game.getCurrentRound();
-                    return round != null && round.getId().equals(roundId);
-                })
-                .findFirst().orElseThrow(() -> new RoundError.NotFoundException(roundId));
+                .filter(game -> game.getRoundHistory().anyMatch(matchesRound))
+                .findFirst()
+                .map(game -> Pair.of(game, game.getRoundHistory()
+                        .filter(matchesRound)
+                        .findFirst()
+                        .orElseThrow(() -> new RoundError.NotFoundException(roundId))))
+                .orElseThrow(() -> new RoundError.NotFoundException(roundId));
     }
 }

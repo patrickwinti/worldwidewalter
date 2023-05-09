@@ -3,9 +3,7 @@ package ch.zhaw.www.controller;
 import ch.zhaw.www.dto.*;
 import ch.zhaw.www.model.Game;
 import ch.zhaw.www.model.Player;
-import ch.zhaw.www.model.Round;
 import ch.zhaw.www.service.GameService;
-import ch.zhaw.www.service.RoundError;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -15,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,22 +87,14 @@ public class GameController {
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ResultDto> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
-        var round = gameService.getRoundClosedForSelections(gameId, playerId);
         var game = gameService.getGame(gameId);
-        
-        if (round == null) {
-            throw new RoundError.NotFoundException("not current round for game " + gameId);
-        }
-        
-        List<SelectionDto> selectionDtos = createSelectionDtos(game, round);
-        
         var resultDto = new ResultDto(
                 game.getPoints()
                         .entrySet()
                         .stream()
                         .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue()))
                         .toList(),
-                selectionDtos);
+                Collections.emptyList());
         
         logger.log(Level.INFO, "game results returned {0}", game.getId());
         return ResponseEntity.ok(resultDto);
@@ -162,21 +152,5 @@ public class GameController {
     public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game ungracefully by destroying webapp");
-    }
-    
-    private static List<SelectionDto> createSelectionDtos(Game game, Round round) {
-        return round.getPropositions().stream()
-                .map(proposition ->
-                        new SelectionDto(
-                                proposition.getPlayerIds().stream().map(game::getPlayerNameFromId).toList(),
-                                proposition.getGaps(),
-                                round.getSelections().entrySet().stream()
-                                        .filter(entry -> entry.getValue().equals(proposition.getId()))
-                                        .map(entry -> game.getPlayerNameFromId(entry.getKey()))
-                                        .toList(),
-                                proposition.getPlayerIds().stream().anyMatch(round::isSphinx)
-                        )
-                )
-                .toList();
     }
 }

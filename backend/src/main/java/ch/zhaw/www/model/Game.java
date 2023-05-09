@@ -56,6 +56,15 @@ public class Game {
     }
     
     /**
+     * Existing rounds in current game
+     *
+     * @return stream of all rounds
+     */
+    public Stream<Round> getRoundHistory() {
+        return rounds.stream();
+    }
+    
+    /**
      * Gets current round
      *
      * @return Optional {@link Round}
@@ -71,8 +80,18 @@ public class Game {
      */
     public boolean needsNewRound() {
         return getCurrentRoundOptional()
-                .map(round -> round.isFinished() || !isMissingPlayerSelections(round))
+                .map(this::isRoundFinished)
                 .orElse(true);
+    }
+    
+    /**
+     * Check if there is an open round that is finished or if there is no round at all
+     *
+     * @param round round to check
+     * @return true if there is no round or it is finished
+     */
+    public boolean isRoundFinished(Round round) {
+        return round.isFinished() || !isMissingPlayerSelections(round);
     }
     
     /**
@@ -91,22 +110,30 @@ public class Game {
      *
      * @return true if round has not yet receive a proposition submission from each active player
      */
-    public boolean canAcceptPropositions() {
+    public boolean canAcceptPropositionsForCurrentRound() {
         return getCurrentRoundOptional()
-                .map(round -> hasEnoughPlayers() && round.acceptsPropositions() && isMissingPlayerProposition(round))
+                .map(this::canAcceptPropositionsForRound)
                 .orElse(false);
+    }
+    
+    /**
+     * Verifies game can accept any proposition sent
+     *
+     * @return true if round has not yet receive a proposition submission from each active player
+     */
+    public boolean canAcceptPropositionsForRound(Round round) {
+        return hasEnoughPlayers() && round.acceptsPropositions() && isMissingPlayerProposition(round);
     }
     
     /**
      * Verifies game can accept send selections
      *
+     * @param round round to check status on
      * @return true if round has not yet receive a selections submission from each active player but the sphinx
      */
-    public boolean canAcceptSelections() {
-        return getCurrentRoundOptional()
-                .map(round -> isMissingPlayerSelections(round) &&
-                        ((round.acceptsPropositions() && !isMissingPlayerProposition(round)) || round.acceptsSelections()))
-                .orElse(false);
+    public boolean canAcceptSelectionForRound(Round round) {
+        return isMissingPlayerSelections(round) &&
+                ((round.acceptsPropositions() && !isMissingPlayerProposition(round)) || round.acceptsSelections());
     }
     
     private boolean isMissingPlayerSelections(final Round round) {
@@ -196,6 +223,7 @@ public class Game {
      */
     public void removePlayer(@NotNull String playerId) {
         players.removeIf(player -> player.getId().equals(playerId));
+        points.remove(playerId);
         sphinxCandidates.keySet().stream()
                 .filter(integer -> integer.getId().equals(playerId))
                 .findFirst().ifPresent(sphinxCandidates::remove);

@@ -13,7 +13,6 @@ import { LoadingService } from "./loading.service";
 
 @Injectable()
 export class HttpPollingInterceptor implements HttpInterceptor {
-  private readonly RETRIES: number = 120;
   private activeRequests: number = 0;
 
   constructor(private stateService: StateService,
@@ -31,7 +30,7 @@ export class HttpPollingInterceptor implements HttpInterceptor {
 
     return next.handle(requestWithHeader)
       .pipe(
-        retry({count: this.RETRIES, delay: this.shouldRetry}),
+        retry({delay: this.shouldRetry}),
         finalize(() => {
           this.activeRequests--;
           if (this.activeRequests === 0) {

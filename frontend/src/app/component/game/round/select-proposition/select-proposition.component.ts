@@ -27,11 +27,15 @@ export class SelectPropositionComponent {
     return displayText;
   }
 
-  isSphinx(): boolean {
-    return this.round.sphinx.id === this.currentPlayerId;
+  showContinueButton(): boolean {
+    return this.round.sphinx.id === this.currentPlayerId || this.allPropositionsReadOnly();
   }
 
   continue() {
     this.selectedPropositionEmitter.emit(undefined);
+  }
+
+  private allPropositionsReadOnly(): boolean {
+    return this.propositionSelectionDto.propositions.every(proposition => proposition.readOnly);
   }
 }

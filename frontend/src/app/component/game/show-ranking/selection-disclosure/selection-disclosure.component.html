@@ -1,12 +1,12 @@
 <table class="center">
   <tr>
-    <th>Autor:innen</th>
     <th>Vorschlag</th>
+    <th>Autor:innen</th>
     <th>Selektiert von</th>
   </tr>
   <tr *ngFor="let selection of selections">
-    <td>{{concatStrings(selection.authors)}}</td>
     <td>{{concatStrings(selection.gaps)}}</td>
+    <td>{{concatStrings(selection.authors)}}</td>
     <td>{{concatStrings(selection.selectors)}}</td>
   </tr>
 </table>

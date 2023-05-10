@@ -4,7 +4,7 @@
     <br>
 
     <div *ngFor="let walter of proposition; let i = index">
-      <input class="special-margin2" type="text" placeholder="{{i+1}}. Walterersatz" maxlength="{{MAX_INPUT_LENGTH}}"
+      <input class="special-margin2" type="text" placeholder="{{i+1}}. Walterersatz (max 42 Zeichen)" maxlength="{{MAX_INPUT_LENGTH}}"
              [(ngModel)]="walter.text">
     </div>
 

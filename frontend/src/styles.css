@@ -1,9 +1,11 @@
 body {
-  background-color: #333333;
+  background: #333333 url("assets/background.svg");
   color: #FFFFFF;
   font-family: Arial, sans-serif;
   font-size: 14px;
   margin: 0;
+  max-height: 25vh;
+  max-width: 25vh;
 }
 
 p {
@@ -109,14 +111,14 @@ button:disabled {
   box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
 }
 
-input:read-only{
+input:read-only {
   opacity: 55%;
   color: #ffffff;
 }
 
 
 .header {
-  background: linear-gradient(#000000, #333333);
+  background: linear-gradient(#000000, transparent);
   padding-top: 10px;
   padding-bottom: 10px;
   align-items: center;
@@ -154,7 +156,7 @@ div {
   flex-wrap: wrap;
 }
 
-.container{
+.container {
   display: flex;
   width: auto;
   flex-wrap: wrap;
@@ -203,53 +205,32 @@ div {
 .content_collapsed {
   justify-content: space-evenly;
   flex-wrap: wrap;
-  background: #333333;
+  background: transparent;
   padding-top: 3em;
+  padding-left: 3em;
 }
 
 .spinner {
   width: 100px;
   height: 85px;
   margin: 100px auto;
-  background: #058785;
-  border: #0587 solid 1px;
+  background: transparent;
+  border: 16px solid #333333;
+  border-top: 16px solid #058785;
   text-align: center;
   padding-top: 18px;
   font-size: large;
-  border-radius: 25px;
-  animation: pulse 2s ease-in-out infinite;
+  border-radius: 50%;
+  animation: spin 4s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .sphinx {
   animation: pulse 10s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-
-  25% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.4);
-    opacity: 0.7;
-  }
-
-  75% {
-    transform: scale(1.2);
-    opacity: 0.4;
-  }
-
-  100% {
-    transform: scale(0);
-    opacity: 0;
-  }
-
 }
 
 .loading {

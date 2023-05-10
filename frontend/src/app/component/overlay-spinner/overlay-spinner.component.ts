@@ -11,7 +11,7 @@ import { GameState } from "../../model/game-state";
 
 export class OverlaySpinnerComponent {
   isLoading$ = this.loadingService.getIsLoadingObservable();
-  displayText = 'Warten auf andere Spieler';
+  displayText = 'Warten auf andere Spieler:innen';
 
   get gameId(): string {
     return this.stateService.getGameId();

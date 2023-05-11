@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Represents a selection object containing lists of authors, gaps, and selectors.
+ */
 @Data
 @AllArgsConstructor
 public class SelectionDto {

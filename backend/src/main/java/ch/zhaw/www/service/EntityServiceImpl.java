@@ -96,7 +96,7 @@ class EntityServiceImpl implements EntityService {
         return gamesRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
     }
     
-    /*
+    /**
      * Finds the game that contains a round with the specified ID.
      *
      * @param roundId The ID of the round to find

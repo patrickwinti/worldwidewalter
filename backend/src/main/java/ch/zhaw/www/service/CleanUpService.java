@@ -23,9 +23,6 @@ public class CleanUpService {
     private Duration gameIdleTimeBeforeRemoval;
     private final GameRepository repository;
     
-    /**
-     * Service responsible for cleaning up idle games.
-     */
     public CleanUpService(GameRepository repository) {
         this.repository = repository;
     }

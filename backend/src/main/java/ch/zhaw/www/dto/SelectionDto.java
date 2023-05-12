@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Represents a selection object containing lists of authors, gaps, and selectors.
+ * The object contains a proposition, its authors and selectors
  */
 @Data
 @AllArgsConstructor

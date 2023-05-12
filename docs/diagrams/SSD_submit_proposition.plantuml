@@ -1,34 +1,47 @@
 @startuml
 !include globals/stylesheets.iuml
 
-actor "Player" as p
 participant ":RoundContoller" as rc
 participant ":RoundService" as rs
 participant "game:Game" as game
 participant "round:Round" as round
+participant "proposition:Proposition" as proposition
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-p ->rc: request submit proposition
+[->rc: request submit proposition
 rc -> rs: submitProposition(roundId, playerId, gaps)
 rs->ges: isPlayerActiveInRound(roundId, playerId)
 ges-->rs: true if player active for game
 rs -> ges: editRound(roundId)
+
 activate ges
 ges -> gr : findAll()
 gr  --> ges: List<Game>
+ges -> game: getRoundHistory()
+game --> ges: all rounds in game
 ges --> rs: editable round
-rs->rs: check is duplicate
+
+rs -> round: getSphinx()
+round--> rs: current sphinx
+rs -> round: getPropositions()
+round --> rs: list of all propositions
+round -> proposition: hasSameGaps(gaps)
+proposition --> round: true if text is the same
+
+proposition->proposition: submittedBy(playerId)
+
 rs -> round: addProposition(proposition)
 note left
 Only if proposition
 is not a duplicate
 end note
 round-->rs
+
 ges -> gr : save(game)
 gr --> ges
 ges --> rs
 rs --> rc
-rc --> p : submit proposition response
+[<-- rc: submit proposition response
 
 @enduml

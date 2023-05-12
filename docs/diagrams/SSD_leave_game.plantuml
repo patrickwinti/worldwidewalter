@@ -1,14 +1,13 @@
 @startuml
 !include globals/stylesheets.iuml
 
-actor "Player" as p
 participant ":GameController" as gc
 participant ":GameService" as gs
 participant "game:Game" as game
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-p-> gc : request leave game
+[-> gc : request leave game
 gc -> gs: leaveGame(gameId, playerId)
 gs -> ges: editGame(gameId)
 activate ges
@@ -24,7 +23,7 @@ ges -> gr : save(game)
 gr --> ges
 ges --> gs
 gs --> gc
-gc --> p: game left
+[<--gc: game leave response
 
 
 @enduml

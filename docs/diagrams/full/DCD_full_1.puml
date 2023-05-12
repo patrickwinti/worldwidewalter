@@ -1,6 +1,6 @@
 @startuml
 !include ../globals/stylesheets.iuml
-skinparam linetype ortho
+'skinparam linetype ortho
 left to right direction
 
 package controller {
@@ -100,5 +100,11 @@ GameService <|.. GameServiceImpl
 RoundService <|.. RoundServiceImpl
 
 CleanUpService "1"-->"1" GameRepository :<<use>>
+
+note "The arrows marked\n with <<use>> represent\n dependency injection" as N2
+note "Controller" as N1
+N1 .. RoundController
+N1 .. GameController
+
 
 @enduml

@@ -45,8 +45,8 @@ package model {
 
 }
 
-Game "1"-d->"*" Round
-Game "1"-d->"*" Prompt
-Game "1"->"*" Player
-Round "1"->"*" Proposition
+Game -d-o Round
+Game -d-o Prompt
+Game -o Player
+Round --o Proposition
 @enduml

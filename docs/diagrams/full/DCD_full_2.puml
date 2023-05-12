@@ -1,7 +1,7 @@
 @startuml
 !include ../globals/stylesheets.iuml
 skinparam linetype ortho
-left to right direction
+'left to right direction
 
 package model {
     class Game
@@ -86,6 +86,7 @@ GameServiceImpl "1"->"1" RandomProvider :<<use>>
 GameServiceImpl "1"->"1" RoundService :<<use>>
 GameServiceImpl "1"->"1" PromptRepository :<<use>>
 RoundServiceImpl "1"->"1" EntityService :<<use>>
+RoundServiceImpl "1"->"1" EvaluationService :<<use>>
 PromptRepositoryImpl "1"->"1" ResourceReader :<<use>>
 EntityServiceImpl "1"->"1" GameRepository :<<use>>
 
@@ -96,4 +97,21 @@ EvaluationService <|.. EvaluationServiceImpl
 ResourceReader <|.. TextResourceReader
 PromptRepository <|.. PromptRepositoryImpl
 RandomProvider <|.. RandomProviderImpl
+
+note "Indirection pattern" as N1
+note "The arrows marked\n with <<use>> represent\n dependency injection" as N2
+note "Visitor pattern" as N3
+note "All injected classes \nare singletons" as N4
+note "Creator pattern for game" as N5
+note "Creator pattern for round" as N6
+
+
+N1 .. EntityServiceImpl
+N1 .. GameRepository
+N3 .. EvaluationService
+N3 .. RoundServiceImpl
+N5 .. Game
+N5 .. GameServiceImpl
+N6 .. Round
+N6 .. RoundServiceImpl
 @enduml

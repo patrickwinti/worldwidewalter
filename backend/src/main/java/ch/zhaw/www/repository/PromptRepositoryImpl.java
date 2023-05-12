@@ -2,13 +2,13 @@ package ch.zhaw.www.repository;
 
 import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Prompt;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Service
+@Repository
 class PromptRepositoryImpl implements PromptRepository {
     
     private final List<Prompt> defaultDeck;

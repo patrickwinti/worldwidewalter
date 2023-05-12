@@ -1,0 +1,104 @@
+@startuml
+!include ../globals/stylesheets.iuml
+skinparam linetype ortho
+left to right direction
+
+package controller {
+    class GameController {
+        -gameService: GameService
+        +createGame(): GameDto
+        +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+        +leaveGame(gameId: String, playerId: String)
+        +fetchResultsForRound(gameId: String, playerId: String)
+        +getRound(gameId: String, playerId: String) : RoundDto
+        +enterRound(gameId: String, playerId: String) : RoundDto
+        +leaveGameAfterDestruction(gameId: String, playerId: String)
+    }
+    class RoundController {
+        -roundService: RoundService
+        +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+        +selectProposition(roundId: String, propositionId: String, playerId: String)
+        +getAllPropositionForRound(roundId: String, playerId: String): PropositionSelectionDto
+    }
+    class CleanUpService {
+        +runGameCleanUp()
+    }
+}
+package service {
+    class GameServiceImpl
+    interface GameService {
+        -entityService: EntityService
+        -gameProperties: GameProperties
+        -roundService: RoundService
+        -randomProvider: RandomProvider
+        createGame(): Game
+        leaveGame(gameId: String, playerId: String)
+        getGame(gameId: String): Game
+        enterGame(gameId: String, playerName: String): Player
+        enterRound(gameId: String, playerId: String): Round
+        getRoundOpenForPropositions(gameId: String, playerId: String): Round
+    }
+    class RoundServiceImpl
+    interface RoundService{
+        -entityService: EntityService
+        -gameProperties: GameProperties
+        selectSphinx(game: Game)
+        createNewRound(game: Game): Round
+        submitProposition(roundId: String, playerId: String, gaps: List<String>)
+        selectProposition(roundId: String, playerId: String, propositionId: String)
+        getRoundReadyForSelections(roundId: String, playerId: String):Round
+        getRoundClosedForSelections(gameId: String, playerId: String): Round
+    }
+}
+package dto {
+    class GameDto {
+       -id: String
+    }
+    class PlayerDto {
+       -id: String
+    }
+    class PlayerJoinRequestDto {
+        -playerName:String
+    }
+    class PropositionSubmissionDto {
+        -gaps: List<String>
+    }
+    class RoundDto {
+        -id: String
+        -prompt: String
+        -walters: List<String>
+        -sphinx: PlayerDto
+        -endOfSubmissionsInUtc: string
+    }
+    class RankingDto {
+        -playerName: String
+        -points: int
+    }
+    class SelectionDto {
+        -authors: List<string>
+        -gaps: List<String>
+        -selectors: List<string>
+    }
+    class ResultDto {
+        -ranking: RankingDto
+        -selections: SelectionDto
+    }
+}
+package repository {
+     interface GameRepository
+}
+package model{
+}
+
+controller --> dto
+controller --> model
+
+RoundController "1"->"1" RoundService
+GameController "1"->"1" GameService
+
+GameService <|.. GameServiceImpl
+RoundService <|.. RoundServiceImpl
+
+CleanUpService "1"-->"1" GameRepository
+
+@enduml

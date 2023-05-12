@@ -93,12 +93,12 @@ package model{
 controller --> dto
 controller --> model
 
-RoundController "1"->"1" RoundService
-GameController "1"->"1" GameService
+RoundController "1"->"1" RoundService :<<use>>
+GameController "1"->"1" GameService :<<use>>
 
 GameService <|.. GameServiceImpl
 RoundService <|.. RoundServiceImpl
 
-CleanUpService "1"-->"1" GameRepository
+CleanUpService "1"-->"1" GameRepository :<<use>>
 
 @enduml

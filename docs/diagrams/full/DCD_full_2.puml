@@ -73,24 +73,21 @@ package utils{
     }
 }
 
-GameService "1"...>"*" Game
-GameService "1"...>"*" Player
-RoundService "1"...>"*" Game
-RoundService "1"...>"*" Round
-ResourceReader "1"...>"*" Prompt
-EvaluationService "1"...>"*" Round
-RoundService "1"...>"*"  Proposition
+GameService "1".>"*" Game
+GameService "1".>"*" Player
+RoundService "1".>"*" Game
+RoundService "1".>"*" Round
+ResourceReader "1".>"*" Prompt
+EvaluationService "1".>"*" Round
+RoundService "1".>"*"  Proposition
 
-GameService "1"->"1" EntityService
-GameService "1"->"1" RandomProvider
-GameService "1"->"1" RoundService
-GameService "1"->"1" PromptRepository
-
-RoundService "1"->"1" EntityService
-
-PromptRepository "1"->"1" ResourceReader
-
-EntityService "1"->"1" GameRepository
+GameServiceImpl "1"->"1" EntityService :<<use>>
+GameServiceImpl "1"->"1" RandomProvider :<<use>>
+GameServiceImpl "1"->"1" RoundService :<<use>>
+GameServiceImpl "1"->"1" PromptRepository :<<use>>
+RoundServiceImpl "1"->"1" EntityService :<<use>>
+PromptRepositoryImpl "1"->"1" ResourceReader :<<use>>
+EntityServiceImpl "1"->"1" GameRepository :<<use>>
 
 GameService <|.. GameServiceImpl
 RoundService <|.. RoundServiceImpl

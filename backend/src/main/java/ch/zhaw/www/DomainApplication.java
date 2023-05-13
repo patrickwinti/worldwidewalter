@@ -8,6 +8,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableMapRepositories
 @EnableScheduling
+
+/**
+ * The main class for the domain application.
+ * Responsible for starting the Spring Boot application.
+ */
 public class DomainApplication {
 
     /**

@@ -89,7 +89,7 @@ public class Round {
         propositions.add(proposition);
     }
     
-    /*
+    /**
      * Gets the number of selections submitted by players.
      *
      * @return the number of selections submitted
@@ -98,7 +98,7 @@ public class Round {
         return selections.size();
     }
     
-    /*
+    /**
      * Gets the number of propositions submitted by players.
      *
      * @return the number of propositions submitted
@@ -118,7 +118,7 @@ public class Round {
         return sphinx != null && propositionSubmissionEnd != null && isInFuture(propositionSubmissionEnd);
     }
     
-    /*
+    /**
      * Checks whether players can still make their selections.
      *
      * @return true if players can still make their selections; false otherwise

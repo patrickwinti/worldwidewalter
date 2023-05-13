@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 /**
  * Controller for "rounds" resource.
  **/
-
 @RequestMapping("/api")
 @RestController
 @Validated

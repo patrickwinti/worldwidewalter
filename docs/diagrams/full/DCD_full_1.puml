@@ -2,6 +2,7 @@
 !include ../globals/stylesheets.iuml
 'skinparam linetype ortho
 left to right direction
+footer "1/3"
 
 package controller {
     class GameController {

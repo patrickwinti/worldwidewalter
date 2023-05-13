@@ -1,52 +1,118 @@
 @startuml
 !include ../globals/stylesheets.iuml
 skinparam linetype ortho
+left to right direction
+footer "3/3"
 
 package model {
-    class Game {
-        -id: String
-        -activePlayers: Map<Player>
-        +needsNewRound(): boolean
-        +canRoundBeEntered(): boolean
-        +canAcceptPropositionsForCurrentRound(): boolean
-        +canAcceptPropositionsForRound(round: Round): boolean
-        +canAcceptSelections(): boolean
+    class Game
+    class Prompt
+    class Proposition
+    class Player
+    class Round
+}
+package service {
+    class GameServiceImpl
+    interface GameService {
+        -entityService: EntityService
+        -gameProperties: GameProperties
+        -roundService: RoundService
+        -randomProvider: RandomProvider
+        createGame(): Game
+        leaveGame(gameId: String, playerId: String)
+        getGame(gameId: String): Game
+        enterGame(gameId: String, playerName: String): Player
+        enterRound(gameId: String, playerId: String): Round
+        getRoundOpenForPropositions(gameId: String, playerId: String): Round
     }
-    class Prompt{
-        -statement: String
-        -walters: List<String>
-        -hasBeenUsed: boolean
+    class RoundServiceImpl
+    interface RoundService{
+        -entityService: EntityService
+        -gameProperties: GameProperties
+        selectSphinx(game: Game)
+        createNewRound(game: Game): Round
+        submitProposition(roundId: String, playerId: String, gaps: List<String>)
+        selectProposition(roundId: String, playerId: String, propositionId: String)
+        getRoundReadyForSelections(roundId: String, playerId: String):Round
+        getRoundClosedForSelections(gameId: String, playerId: String): Round
     }
-    class Proposition{
-        -id: String
-        -playerIds: List<String>
-        -gaps: List<String>
+    class EntityServiceImpl
+    interface EntityService{
+       -gameRepository: GameRepository
+        getGame(gameId: String): Game
+        editGame(gameId: String, editor: GameTransaction)
+        getGameForRound(roundId: String): Pair<Game>
+        getRound(roundId: String): Round
+        isPlayerActiveInRound(roundId: String, playerId: String): boolean
+        editRound(roundId: String, editor: RoundTransaction)
+        saveNewGame(game: Game)
     }
-    class Player {
-        -id: String
-        -name: String
+    class EvaluationServiceImpl
+    interface EvaluationService{
+        evaluateSelection(round: Round, propositionId: String, selectorId: String) : Map<String, Integer>
     }
-    class Round {
-        -id: String
-        -prompt: Prompt
-        -propositions: Map<Proposition>
-        -selections: Map<Selection>
-        -propositionDuration: Duration
-        -enterLimitDuration: Duration
-        -selectionDuration: Duration
-        #acceptsPropositions(): boolean
-        #acceptsSelections(): boolean
-        #isFinished(): boolean
-        #getNumberOfSelectionsSubmitted(): int
-        #getNumberOfSelectionsSubmitted(): int
-        +addSelection(playerId: String, propositionId: String): void
-        +addProposition(proposition: Proposition): void
-    }
+}
+package repository {
+     interface GameRepository
+     class TextResourceReader
+     interface ResourceReader{
+          readResource(resource: Resource): List<Prompt>
+     }
+     class PromptRepositoryImpl
+     interface PromptRepository{
+          -defaultDeck: List<Prompt>
+          getPrompts():List<Prompt>
+     }
 
 }
 
-Game -d-o Round
-Game -d-o Prompt
-Game -o Player
-Round --o Proposition
+package utils{
+    class RandomProviderImpl
+    interface RandomProvider {
+        +getPostfix(): Integer
+        +getEightCharacterId(): String
+    }
+}
+
+GameService "1"...>"*" Game
+GameService "1"...>"*" Player
+RoundService "1"...>"*" Game
+RoundService "1"...>"*" Round
+ResourceReader "1"...>"*" Prompt
+EvaluationService "1"...>"*" Round
+RoundService "1"...>"*"  Proposition
+
+GameServiceImpl "1"->"1" EntityService :<<use>>
+GameServiceImpl "1"->"1" RandomProvider :<<use>>
+GameServiceImpl "1"->"1" RoundService :<<use>>
+GameServiceImpl "1"->"1" PromptRepository :<<use>>
+RoundServiceImpl "1"->"1" EntityService :<<use>>
+RoundServiceImpl "1"->"1" EvaluationService :<<use>>
+PromptRepositoryImpl "1"->"1" ResourceReader :<<use>>
+EntityServiceImpl "1"->"1" GameRepository :<<use>>
+
+GameService <|. GameServiceImpl
+RoundService <|. RoundServiceImpl
+EntityService <|. EntityServiceImpl
+EvaluationService <|. EvaluationServiceImpl
+ResourceReader <|. TextResourceReader
+PromptRepository <|. PromptRepositoryImpl
+RandomProvider <|. RandomProviderImpl
+
+note "Indirection pattern" as N1
+note "The arrows marked\n with <<use>> represent\n dependency injection" as N2
+note "Visitor pattern" as N3
+note "All injected classes \nare singletons" as N4
+note "Creator pattern for game" as N5
+note "Creator pattern for round" as N6
+
+
+N1 .. EntityServiceImpl
+N1 .. GameRepository
+N3 .. EvaluationService
+N3 .. RoundServiceImpl
+N5 .. Game
+N5 .. GameServiceImpl
+N6 .. Round
+N6 .. RoundServiceImpl
 @enduml

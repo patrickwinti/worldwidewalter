@@ -22,7 +22,6 @@ playerN -> system: submit proposition
 system --> sphinx
 system --> playerN
 |||
-
 sphinx -> system : get all proposition for round
 playerN -> system : get all proposition for round
 
@@ -31,8 +30,7 @@ system --> playerN: list of propositions
 
 playerN -> system: select proposition
 note left
-   Player 2 is the sphinx.
-   A sphinx cannot send selections
+   Sphinx cannot send selections
 end note
 system --> playerN
 |||

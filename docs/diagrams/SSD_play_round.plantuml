@@ -1,5 +1,6 @@
 @startuml
 !include globals/stylesheets.iuml
+footer %page%/ %lastpage%
 
 actor     sphinx
 actor     playerN
@@ -21,7 +22,11 @@ playerN -> system: submit proposition
 
 system --> sphinx
 system --> playerN
-|||
+
+
+newpage
+footer %page%/ %lastpage%
+
 sphinx -> system : get all proposition for round
 playerN -> system : get all proposition for round
 

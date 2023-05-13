@@ -1,7 +1,11 @@
 @startuml
 !include ../globals/stylesheets.iuml
-'skinparam linetype ortho
-left to right direction
+skinparam linetype ortho
+'left to right direction
+skinparam ranksep 30
+skinparam nodesep 20
+
+
 footer "1/3"
 
 package controller {
@@ -26,30 +30,8 @@ package controller {
     }
 }
 package service {
-    class GameServiceImpl
-    interface GameService {
-        -entityService: EntityService
-        -gameProperties: GameProperties
-        -roundService: RoundService
-        -randomProvider: RandomProvider
-        createGame(): Game
-        leaveGame(gameId: String, playerId: String)
-        getGame(gameId: String): Game
-        enterGame(gameId: String, playerName: String): Player
-        enterRound(gameId: String, playerId: String): Round
-        getRoundOpenForPropositions(gameId: String, playerId: String): Round
-    }
-    class RoundServiceImpl
-    interface RoundService{
-        -entityService: EntityService
-        -gameProperties: GameProperties
-        selectSphinx(game: Game)
-        createNewRound(game: Game): Round
-        submitProposition(roundId: String, playerId: String, gaps: List<String>)
-        selectProposition(roundId: String, playerId: String, propositionId: String)
-        getRoundReadyForSelections(roundId: String, playerId: String):Round
-        getRoundClosedForSelections(gameId: String, playerId: String): Round
-    }
+    interface GameService
+    interface RoundService
 }
 package dto {
     class GameDto {
@@ -88,19 +70,15 @@ package dto {
 package repository {
      interface GameRepository
 }
-package model{
-}
+package model{}
 
-controller --> dto
-controller --> model
-
-RoundController "1"->"1" RoundService :<<use>>
-GameController "1"->"1" GameService :<<use>>
-
-GameService <|.. GameServiceImpl
-RoundService <|.. RoundServiceImpl
-
-CleanUpService "1"-->"1" GameRepository :<<use>>
+GameController -[hidden]d-RoundController
+CleanUpService "1"-d-->"1" GameRepository :<<use>>
+controller -d-> model
+RoundController "1"-d->"1" RoundService :<<use>>
+GameController "1"-d->"1" GameService :<<use>>
+controller ---d->dto
+RoundController -[hidden]d-ResultDto
 
 note "The arrows marked\n with <<use>> represent\n dependency injection" as N2
 note "Controller" as N1

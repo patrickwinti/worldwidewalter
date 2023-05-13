@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 /**
  * Controller for "games" resource.
  **/
-
 @RequestMapping("/api")
 @RestController
 @Validated

@@ -5,6 +5,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * The object contains a proposition, its authors and selectors
+ */
 @Data
 @AllArgsConstructor
 public class SelectionDto {

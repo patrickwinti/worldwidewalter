@@ -11,6 +11,9 @@ import java.util.stream.StreamSupport;
 
 import static ch.zhaw.www.utils.InstantWrapper.isInFuture;
 
+/**
+ * Service responsible for cleaning up idle games.
+ */
 @Service
 public class CleanUpService {
     private final Logger logger = Logger.getLogger(CleanUpService.class.getSimpleName());

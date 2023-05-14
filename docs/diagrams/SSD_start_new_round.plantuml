@@ -29,7 +29,6 @@ note right
  true if timer for selection and
  proposition submission expired
 end note
-game -> game: can accept \nnew propositions
 game --> gs: true if round is finished or all players submitted their selections
 
 gs -> rs :createNewRound(game)

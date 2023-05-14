@@ -26,10 +26,11 @@ rs -> round: getSphinx()
 round--> rs: current sphinx
 rs -> round: getPropositions()
 round --> rs: list of all propositions
-round -> proposition: hasSameGaps(gaps)
-proposition --> round: true if text is the same
+rs -> proposition: hasSameGaps(gaps)
+proposition --> rs: true if text is the same
 
-proposition->proposition: submittedBy(playerId)
+rs->proposition: submittedBy(playerId)
+proposition-->rs
 
 rs -> round: addProposition(proposition)
 note left

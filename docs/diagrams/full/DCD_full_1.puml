@@ -1,0 +1,89 @@
+@startuml
+!include ../globals/stylesheets.iuml
+skinparam linetype ortho
+'left to right direction
+skinparam ranksep 30
+skinparam nodesep 20
+
+
+footer "1/3"
+
+package controller {
+    class GameController {
+        -gameService: GameService
+        +createGame(): GameDto
+        +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+        +leaveGame(gameId: String, playerId: String)
+        +fetchResultsForRound(gameId: String, playerId: String)
+        +getRound(gameId: String, playerId: String) : RoundDto
+        +enterRound(gameId: String, playerId: String) : RoundDto
+        +leaveGameAfterDestruction(gameId: String, playerId: String)
+    }
+    class RoundController {
+        -roundService: RoundService
+        +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+        +selectProposition(roundId: String, propositionId: String, playerId: String)
+        +getAllPropositionForRound(roundId: String, playerId: String): PropositionSelectionDto
+    }
+    class CleanUpService {
+        +runGameCleanUp()
+    }
+}
+package service {
+    interface GameService
+    interface RoundService
+}
+package dto {
+    class GameDto {
+       -id: String
+    }
+    class PlayerDto {
+       -id: String
+    }
+    class PlayerJoinRequestDto {
+        -playerName:String
+    }
+    class PropositionSubmissionDto {
+        -gaps: List<String>
+    }
+    class RoundDto {
+        -id: String
+        -prompt: String
+        -walters: List<String>
+        -sphinx: PlayerDto
+        -endOfSubmissionsInUtc: string
+    }
+    class RankingDto {
+        -playerName: String
+        -points: int
+    }
+    class SelectionDto {
+        -authors: List<string>
+        -gaps: List<String>
+        -selectors: List<string>
+    }
+    class ResultDto {
+        -ranking: RankingDto
+        -selections: SelectionDto
+    }
+}
+package repository {
+     interface GameRepository
+}
+package model{}
+
+GameController -[hidden]d-RoundController
+CleanUpService "1"-d-->"1" GameRepository :<<use>>
+controller -d-> model
+RoundController "1"-d->"1" RoundService :<<use>>
+GameController "1"-d->"1" GameService :<<use>>
+controller ---d->dto
+RoundController -[hidden]d-ResultDto
+
+note "The arrows marked\n with <<use>> represent\n dependency injection" as N2
+note "Controller" as N1
+N1 .. RoundController
+N1 .. GameController
+
+
+@enduml

@@ -21,7 +21,7 @@
 skinparam {
 
     ' Global Options
-    DPI 200
+    DPI 400
     Shadowing false
     DefaultFontName Roboto Condensed
     DefaultMonospacedFontName Inconsolata

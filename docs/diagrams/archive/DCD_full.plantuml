@@ -1,0 +1,200 @@
+@startuml
+!include globals/stylesheets.iuml
+skinparam linetype ortho
+left to right direction
+
+package controller {
+    class GameController {
+        -gameService: GameService
+        +createGame(): GameDto
+        +enterGame(gameId: String, playerDto: PlayerJoinRequestDto) : PlayerDto
+        +leaveGame(gameId: String, playerId: String)
+        +fetchResultsForRound(gameId: String, playerId: String)
+        +getRound(gameId: String, playerId: String) : RoundDto
+        +enterRound(gameId: String, playerId: String) : RoundDto
+        +leaveGameAfterDestruction(gameId: String, playerId: String)
+    }
+    class RoundController {
+        -roundService: RoundService
+        +submitProposition(roundId: String, playerId: String, proposition: PropositionSubmissionDto)
+        +selectProposition(roundId: String, propositionId: String, playerId: String)
+        +getAllPropositionForRound(roundId: String, playerId: String): PropositionSelectionDto
+    }
+    class CleanUpService {
+        +runGameCleanUp()
+    }
+}
+package dto {
+    class GameDto {
+       -id: String
+    }
+    class PlayerDto {
+       -id: String
+    }
+    class PlayerJoinRequestDto {
+        -playerName:String
+    }
+    class PropositionSubmissionDto {
+        -gaps: List<String>
+    }
+    class RoundDto {
+        -id: String
+        -prompt: String
+        -walters: List<String>
+        -sphinx: PlayerDto
+        -endOfSubmissionsInUtc: string
+    }
+    class RankingDto {
+        -playerName: String
+        -points: int
+    }
+    class SelectionDto {
+        -authors: List<string>
+        -gaps: List<String>
+        -selectors: List<string>
+    }
+    class ResultDto {
+        -ranking: RankingDto
+        -selections: SelectionDto
+    }
+}
+package model {
+    class Game {
+        -id: String
+        -activePlayers: Map<Player>
+        +needsNewRound(): boolean
+        +canRoundBeEntered(): boolean
+        +canAcceptPropositionsForCurrentRound(): boolean
+        +canAcceptPropositionsForRound(round: Round): boolean
+        +canAcceptSelections(): boolean
+    }
+    class Prompt{
+        -statement: String
+        -walters: List<String>
+        -hasBeenUsed: boolean
+    }
+    class Proposition{
+        -id: String
+        -playerIds: List<String>
+        -gaps: List<String>
+    }
+    class Player {
+        -id: String
+        -name: String
+    }
+    class Round {
+        -id: String
+        -prompt: Prompt
+        -propositions: Map<Proposition>
+        -selections: Map<Selection>
+        -propositionDuration: Duration
+        -enterLimitDuration: Duration
+        -selectionDuration: Duration
+        #acceptsPropositions(): boolean
+        #acceptsSelections(): boolean
+        #isFinished(): boolean
+        #getNumberOfSelectionsSubmitted(): int
+        #getNumberOfSelectionsSubmitted(): int
+        +addSelection(playerId: String, propositionId: String): void
+        +addProposition(proposition: Proposition): void
+    }
+}
+package service {
+    class GameServiceImpl
+    interface GameService {
+        -entityService: EntityService
+        -gameProperties: GameProperties
+        -roundService: RoundService
+        -randomProvider: RandomProvider
+        createGame(): Game
+        leaveGame(gameId: String, playerId: String)
+        getGame(gameId: String): Game
+        enterGame(gameId: String, playerName: String): Player
+        enterRound(gameId: String, playerId: String): Round
+        getRoundOpenForPropositions(gameId: String, playerId: String): Round
+    }
+    class RoundServiceImpl
+    interface RoundService{
+        -entityService: EntityService
+        -gameProperties: GameProperties
+        selectSphinx(game: Game)
+        createNewRound(game: Game): Round
+        submitProposition(roundId: String, playerId: String, gaps: List<String>)
+        selectProposition(roundId: String, playerId: String, propositionId: String)
+        getRoundReadyForSelections(roundId: String, playerId: String):Round
+        getRoundClosedForSelections(gameId: String, playerId: String): Round
+    }
+    class EntityServiceImpl
+    interface EntityService{
+       -gameRepository: GameRepository
+        getGame(gameId: String): Game
+        editGame(gameId: String, editor: GameTransaction)
+        getGameForRound(roundId: String): Pair<Game>
+        getRound(roundId: String): Round
+        isPlayerActiveInRound(roundId: String, playerId: String): boolean
+        editRound(roundId: String, editor: RoundTransaction)
+        saveNewGame(game: Game)
+    }
+    class EvaluationServiceImpl
+    interface EvaluationService{
+        evaluateSelection(round: Round, propositionId: String, selectorId: String) : Map<String, Integer>
+    }
+}
+package repository {
+     interface GameRepository
+     class TextResourceReader
+     interface ResourceReader{
+          readResource(resource: Resource): List<Prompt>
+     }
+     class PromptRepositoryImpl
+     interface PromptRepository{
+          -defaultDeck: List<Prompt>
+          getPrompts():List<Prompt>
+     }
+
+}
+
+package utils{
+    class RandomProviderImpl
+    interface RandomProvider {
+        +getPostfix(): Integer
+        +getEightCharacterId(): String
+    }
+}
+
+
+controller -> dto
+
+RoundController "1"->"1" RoundService
+GameController "1"->"1" GameService
+
+GameService "1"..>"*" Game
+GameService "1"..>"*" Player
+GameService "1"->"1" EntityService
+GameService "1"->"1" RandomProvider
+GameService "1"->"1" RoundService
+GameService "1"->"1" PromptRepository
+
+RoundService "1"->"*" Game
+RoundService "1"->"*" Round
+RoundService "1"->"*"  Proposition
+RoundService "1"->"1" EntityService
+
+PromptRepository "1"->"1" ResourceReader
+ResourceReader "1"..>"*" Prompt
+
+EntityService "1"->"1" GameRepository
+
+Game "1"->"*" Round
+Round "1"->"1" EvaluationService
+
+CleanUpService "1"->"1" GameRepository
+
+GameService <|.. GameServiceImpl
+RoundService <|.. RoundServiceImpl
+EntityService <|.. EntityServiceImpl
+EvaluationService <|.. EvaluationServiceImpl
+ResourceReader <|.. TextResourceReader
+PromptRepository <|.. PromptRepositoryImpl
+RandomProvider <|.. RandomProviderImpl
+@enduml

@@ -1,16 +1,20 @@
 @startuml
 !include globals/stylesheets.iuml
+skinparam linetype polyline
+skinparam ranksep 80
+skinparam nodesep 50
 
-
-object GameState
 object Game
-object Player
+object GameState
 object Round
+object RoundState
+object Player
 object Turn
 object Prompt
 object Proposition
 
 Game "1" -- "1" GameState : > is in
+Round "1" -- "1" RoundState : > is in
 
 Game "1" -- "*" Player : < participates
 Round  "*" -- "1" Game : updates points >
@@ -20,15 +24,5 @@ Turn "1" -- "*" Round
 Player "1" -- "1" Turn : < has Sphinx
 Player "1" -- "1" Proposition : submits >
 Player "1" -- "1" Proposition : selects (if not Sphinx) >
-
-together{
-    object WaitingForPlayers
-    object WaitingForPropositions
-    object WaitingForSelections
-}
-
-WaitingForPlayers -up-|> GameState
-WaitingForPropositions -up-|> GameState
-WaitingForSelections -up-|> GameState
 
 @enduml

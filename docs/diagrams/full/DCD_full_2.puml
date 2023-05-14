@@ -1,0 +1,53 @@
+@startuml
+!include ../globals/stylesheets.iuml
+skinparam linetype ortho
+footer "2/3"
+
+package model {
+    class Game {
+        -id: String
+        -activePlayers: Map<Player>
+        +needsNewRound(): boolean
+        +canRoundBeEntered(): boolean
+        +canAcceptPropositionsForCurrentRound(): boolean
+        +canAcceptPropositionsForRound(round: Round): boolean
+        +canAcceptSelections(): boolean
+    }
+    class Prompt{
+        -statement: String
+        -walters: List<String>
+        -hasBeenUsed: boolean
+    }
+    class Proposition{
+        -id: String
+        -playerIds: List<String>
+        -gaps: List<String>
+    }
+    class Player {
+        -id: String
+        -name: String
+    }
+    class Round {
+        -id: String
+        -prompt: Prompt
+        -propositions: Map<Proposition>
+        -selections: Map<Selection>
+        -propositionDuration: Duration
+        -enterLimitDuration: Duration
+        -selectionDuration: Duration
+        #acceptsPropositions(): boolean
+        #acceptsSelections(): boolean
+        #isFinished(): boolean
+        #getNumberOfSelectionsSubmitted(): int
+        #getNumberOfSelectionsSubmitted(): int
+        +addSelection(playerId: String, propositionId: String): void
+        +addProposition(proposition: Proposition): void
+    }
+
+}
+
+Game -d-o Round
+Game -d-o Prompt
+Game -o Player
+Round --o Proposition
+@enduml

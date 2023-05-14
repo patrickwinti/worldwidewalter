@@ -1,7 +1,6 @@
 @startuml
 !include globals/stylesheets.iuml
 
-actor "Player" as p
 participant ":GameController" as gc
 participant ":GameService" as gs
 participant ":RandomProvider" as rp
@@ -10,7 +9,7 @@ participant ":PromptRepository" as pr
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-p -> gc: request new game
+[-> gc: request new game
 gc -> gs: createGame()
 gs -> rp: getEightCharacterId()
 rp --> gs: random alphanumeric id
@@ -27,5 +26,5 @@ ges -> gr : save(game)
 gr --> ges
 ges --> gs
 gs --> gc: created game
-gc --> p : new game response
+[<-- gc : new game response
 @enduml

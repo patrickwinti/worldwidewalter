@@ -2,7 +2,6 @@
 !include globals/stylesheets.iuml
 
 
-actor "Player" as p
 participant ":GameController" as gc
 participant ":GameService" as gs
 participant ":RoundService" as rs
@@ -12,21 +11,26 @@ participant "round:Round" as round
 participant ":EntityService" as ges
 participant ":GameRepository" as gr
 
-p -> gc : request enter round
+[-> gc : request enter round
 gc -> gs: enterRound(gameId, playerId)
 gs -> ges: editGame(gameId)
 activate ges
 ges -> gr : findById(gameId)
 gr  --> ges: Game
 ges --> gs
+gs -> game: getAllPlayers()
+game --> gs: list of all players
+
 gs -> game: needsNewRound()
+game -> game: get latest round
 game -> round: isFinished()
-round --> game: true if round\ntimers rund out
-game --> gs: true round is finished or all players submitted their selections
-gs -> game: hasCapacityForNewActivePlayer()
-game --> gs: true if less than maximum active players
-gs -> game: hasPlayer(playerId)
-game --> gs: true if player is in the game
+round --> game:
+note right
+ true if timer for selection and
+ proposition submission expired
+end note
+game --> gs: true if round is finished or all players submitted their selections
+
 gs -> rs :createNewRound(game)
 rs -> gp : getPropositionSubmissionDuration
 gp --> rs: proposition submission duration
@@ -45,6 +49,6 @@ gr --> ges
 ges --> gs
 gs --> gc
 
-gc --> p : enter round response
+[<--gc  : enter round response
 
 @enduml

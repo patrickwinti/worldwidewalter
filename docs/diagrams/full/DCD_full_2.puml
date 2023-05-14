@@ -6,7 +6,8 @@ footer "2/3"
 package model {
     class Game {
         -id: String
-        -activePlayers: Map<Player>
+        -activePlayers: Map<String, Player>
+        -points: Map<String, Integer>
         +needsNewRound(): boolean
         +canRoundBeEntered(): boolean
         +canAcceptPropositionsForCurrentRound(): boolean
@@ -35,10 +36,11 @@ package model {
         -propositionDuration: Duration
         -enterLimitDuration: Duration
         -selectionDuration: Duration
+        -sphinx: Player
         #acceptsPropositions(): boolean
         #acceptsSelections(): boolean
         #isFinished(): boolean
-        #getNumberOfSelectionsSubmitted(): int
+        #getNumberOfPropositionsSubmitted(): int
         #getNumberOfSelectionsSubmitted(): int
         +addSelection(playerId: String, propositionId: String): void
         +addProposition(proposition: Proposition): void

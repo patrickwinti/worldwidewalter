@@ -9,7 +9,8 @@ import { GameState } from "../../../model/game-state";
 @Component({
   selector: 'www-result-container',
   templateUrl: './result-container.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ResultContainerComponent implements OnInit {
   @Input() round: RoundDto;

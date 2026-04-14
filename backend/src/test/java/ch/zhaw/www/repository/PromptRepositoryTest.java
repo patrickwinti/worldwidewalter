@@ -4,7 +4,7 @@ import ch.zhaw.www.GameProperties;
 import ch.zhaw.www.model.Prompt;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.io.Resource;
 
 import java.util.List;
@@ -18,13 +18,13 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class PromptRepositoryTest {
 
-    @MockBean
+    @MockitoBean
     GameProperties gameProperties;
 
-    @MockBean
+    @MockitoBean
     ResourceReader resourceReader;
 
-    @MockBean
+    @MockitoBean
     Resource resource;
 
     @Test

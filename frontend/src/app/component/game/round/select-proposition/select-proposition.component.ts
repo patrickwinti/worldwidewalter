@@ -7,7 +7,8 @@ import { RoundDto } from "../../../../dto/round-dto";
 @Component({
   selector: 'www-select-proposition',
   templateUrl: './select-proposition.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SelectPropositionComponent {
   @Input() round: RoundDto;

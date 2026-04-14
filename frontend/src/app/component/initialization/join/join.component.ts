@@ -12,7 +12,8 @@ import { GAME_ID_LENGTH, MAX_INPUT_LENGTH } from "../../../shared/settings";
 @Component({
   selector: 'www-join',
   templateUrl: './join.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class JoinComponent implements OnInit {
   @Output() initializationStateEmitter = new EventEmitter<InitializationState>();
@@ -88,6 +89,10 @@ export class JoinComponent implements OnInit {
 
   getTextToBeCopied(): string {
     return window.location.origin + '?gameId=' + this.gameId;
+  }
+
+  copyLink(): void {
+    navigator.clipboard.writeText(this.getTextToBeCopied());
   }
 
   protected readonly MAX_INPUT_LENGTH = MAX_INPUT_LENGTH;

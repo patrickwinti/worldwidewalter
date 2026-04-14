@@ -7,7 +7,8 @@ import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 
 @Component({
   selector: 'www-error',
-  templateUrl: './error.component.html'
+  templateUrl: './error.component.html',
+  standalone: false,
 })
 export class ErrorComponent implements OnInit, OnDestroy {
   @Input() httpError: HttpErrorResponse | null;

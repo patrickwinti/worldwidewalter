@@ -9,7 +9,7 @@
              [(ngModel)]="joinGameId"/>
 
       <ng-container *ngIf="isCopyButtonVisible">
-        <button class="btn" type="button" ngxClipboard [cbContent]="getTextToBeCopied()" title="Link kopieren"><img
+        <button class="btn" type="button" (click)="copyLink()" title="Link kopieren"><img
           ngSrc="assets/link.png" height="15" width="15" alt="Link kopieren"></button>
       </ng-container>
     </div>

@@ -12,7 +12,8 @@ import { containsNonEmptyString, isNonEmptyString } from "../../../shared/util";
 @Component({
   selector: 'www-round',
   templateUrl: './round.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class RoundComponent implements OnInit {
 

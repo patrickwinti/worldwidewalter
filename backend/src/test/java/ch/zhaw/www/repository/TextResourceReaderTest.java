@@ -7,7 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.core.io.Resource;
 
 import java.io.File;
@@ -28,8 +28,8 @@ class TextResourceReaderTest {
     @TempDir
     private Path tempDir;
 
-    @MockBean
-    private static Resource resource;
+    @MockitoBean
+    private Resource resource;
 
     @Test
     void readResource() throws IOException {
@@ -93,7 +93,7 @@ class TextResourceReaderTest {
         assertThrows(ResourceReaderError.WrongResourceFormatException.class, () -> txtFileReader.readResource(resource));
     }
     
-    private static Resource getResourceFromFile(File file) throws IOException {
+    private Resource getResourceFromFile(File file) throws IOException {
         when(resource.getInputStream()).thenReturn(new FileInputStream(file));
         return resource;
     }

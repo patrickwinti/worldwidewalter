@@ -6,7 +6,8 @@ import { StateService } from "../../service/state.service";
 @Component({
   selector: 'www-initialization-container',
   templateUrl: './initialization-container.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class InitializationContainerComponent implements OnInit {
   @Output() startGameEmitter = new EventEmitter<GameDto>();

@@ -4,7 +4,8 @@ import { PlayerDto } from "../../../../dto/player-dto";
 @Component({
   selector: 'www-sphinx-display',
   templateUrl: './sphinx-display.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class SphinxDisplayComponent {
   @Input() sphinx: PlayerDto;

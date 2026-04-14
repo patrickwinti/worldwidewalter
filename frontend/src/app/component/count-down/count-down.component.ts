@@ -13,7 +13,8 @@ import { Subject, takeUntil, timer } from "rxjs";
 @Component({
   selector: 'www-count-down',
   templateUrl: './count-down.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class CountDownComponent implements OnInit, OnDestroy {
   @Input() timeoutString: string;

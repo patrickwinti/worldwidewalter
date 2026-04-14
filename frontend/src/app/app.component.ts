@@ -7,17 +7,18 @@ import { isNonEmptyString } from "./shared/util";
 @Component({
   selector: 'www-root',
   templateUrl: './app.component.html',
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   title = 'www-ui';
   joinWithId: boolean;
 
-  @HostListener('window:beforeunload', ['event'])
+  @HostListener('window:beforeunload')
   beforeUnloadHandler() {
     return false;
   }
 
-  @HostListener('window:unload', ['event'])
+  @HostListener('window:unload')
   unloadHandler() {
     this.leaveGame();
   }

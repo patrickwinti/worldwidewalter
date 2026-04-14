@@ -3,7 +3,8 @@ import { SelectionDto } from "../../../../dto/result-dto";
 
 @Component({
   selector: 'www-selection-disclosure',
-  templateUrl: './selection-disclosure.component.html'
+  templateUrl: './selection-disclosure.component.html',
+  standalone: false,
 })
 export class SelectionDisclosureComponent {
   @Input() selections: SelectionDto[];

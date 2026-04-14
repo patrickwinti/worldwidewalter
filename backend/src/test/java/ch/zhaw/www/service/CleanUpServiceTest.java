@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.Duration;
 import java.util.List;
@@ -20,7 +20,7 @@ class CleanUpServiceTest {
     @Autowired
     private CleanUpService cleanUpService;
     
-    @MockBean
+    @MockitoBean
     private GameRepository gameRepository;
     
     @Value("${game.idle-time-before-removal}")

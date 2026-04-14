@@ -1,0 +1,103 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Rules
+
+- Never run `git commit`, `git push`, or `git commit --amend` (or any variant). Do not stage and commit changes under any circumstances.
+
+## Project Overview
+
+**Worldwide Walter** is a multiplayer web-based party game where players submit answers to prompts and try to deceive others into selecting their answer as coming from the "Sphinx" (a rotating role). Built as a monorepo with a Spring Boot 3 backend and Angular 16 frontend.
+
+## Commands
+
+### Full Build (Backend + Frontend)
+```bash
+mvn clean install              # Dev build (default profile)
+mvn -P prod clean package      # Production build
+mvn clean test package         # Run tests then package (CI default)
+```
+
+### Backend Only
+```bash
+cd backend && mvn clean test   # Run backend tests
+cd backend && mvn clean package -DskipTests  # Package without tests
+```
+
+### Frontend Only
+```bash
+cd frontend && npm run start        # Dev server on localhost:4200
+cd frontend && npm run test         # Run Karma tests (interactive)
+cd frontend && npm run test-headless  # Run tests once (headless Chrome)
+cd frontend && npm run build-dev    # Dev build
+cd frontend && npm run build        # Production build
+```
+
+### Docker
+```bash
+docker-compose up --build -d   # Start app (port 8080)
+docker-compose down            # Stop app
+```
+
+### API Documentation
+Swagger UI is available at `http://localhost:8080/swagger-ui.html` when the backend is running.
+
+## Architecture
+
+### Backend (Spring Boot 3, Java 17)
+
+Layered MVC: **Controller → Service → Repository → Model**
+
+```
+ch.zhaw.www/
+  controller/   GameController, RoundController (REST endpoints, CORS configured)
+  service/      GameService, RoundService, EntityService, EvaluationService, CleanUpService
+  model/        Game, Round, Player, Proposition, Prompt
+  repository/   GameRepository (Spring Data KeyValue, in-memory), PromptRepository
+  dto/          API request/response contracts
+  utils/        RandomProvider, InstantWrapper, GameTransaction, RoundTransaction
+  exception/    GameError, RoundError, PlayerError, PropositionError hierarchy
+```
+
+**Key behaviors:**
+- All state is held **in-memory** (Spring Data KeyValue — no database)
+- `CleanUpService` removes games idle > 30 min (runs every 30 min via `@EnableScheduling`)
+- Player identity is passed via `X-PLAYER-ID` request header
+- `EntityService` coordinates transactional updates across `GameService` and `RoundService`
+- `EvaluationService` computes points after each round's selection phase
+
+**Game flow:**
+1. Create game → join game → poll for round open → submit proposition → select proposition → view results → repeat
+
+**Configuration** (`backend/src/main/resources/application.properties`):
+- `round.proposition-submission-duration=5m`
+- `round.selection-submission-duration=1m`
+- `game.minimum-players=4`, `game.maximum-players=12`
+
+### Frontend (Angular 16, TypeScript)
+
+```
+src/app/
+  components/
+    initialization-container/   WelcomeComponent, JoinComponent
+    game-container/             RoundComponent, ResultContainerComponent,
+                                CurrentGameInfoComponent, CountDownComponent, etc.
+  service/    GameService (HTTP), StateService (app state), LoadingService, AppConfigService
+  model/      GameState enum (drives UI routing), AppState, InitializationState
+  dto/        Mirrors backend DTOs
+  interceptor/ HttpPollingInterceptor
+```
+
+**Key behaviors:**
+- No Angular Router — `GameState` enum drives which container is shown
+- Frontend **polls** the backend for state changes (no WebSockets)
+- `StateService` is the single source of truth for player ID, game ID, and current state
+- On page unload, Beacon API is used to gracefully leave the game
+- URL param `?gameId=xyz` enables direct game joining
+
+### Testing
+
+- **Backend**: JUnit + Mockito, Jacoco enforces **50% minimum coverage**. Test helpers in `TestHelper` and `TimeHelper`.
+- **Frontend**: Jasmine + Karma. Run headless for CI.
+- Two-reviewer PRs required (one junior, one senior). All public methods need Javadoc (except getters/setters).

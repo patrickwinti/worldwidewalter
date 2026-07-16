@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 @RestController
 @Validated
-@CrossOrigin({"http://localhost:4200", "http://worldwidewalter.ch", "https://160.85.253.247", "http://160.85.253.247:8080"})
+@CrossOrigin({"http://localhost:4200", "http://worldwidewalter.ch", "https://worldwidewalter.ch", "https://www.worldwidewalter.ch", "https://160.85.253.247", "http://160.85.253.247:8080"})
 public class GameController {
     private final Logger logger = Logger.getLogger(GameController.class.getSimpleName());
     private final GameService gameService;
@@ -85,7 +85,7 @@ public class GameController {
     })
     @GetMapping(value = "/games/{gameId}/results", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<ResultDto> fetchResultsForRound(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+    public ResponseEntity<ResultDto> fetchResultsForRound(@PathVariable String gameId) {
         var game = gameService.getGame(gameId);
         var resultDto = new ResultDto(
                 game.getPoints()
@@ -151,5 +151,19 @@ public class GameController {
     public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {
         gameService.leaveGame(gameId, playerId);
         logger.log(Level.INFO, "left game ungracefully by destroying webapp");
+    }
+
+    @Operation(summary = "Player rejoins a game after disconnection")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Player rejoined the game"),
+            @ApiResponse(responseCode = "404", description = "Game or player not found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games/{gameId}/players/{playerId}/rejoin", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PlayerDto> rejoinGame(@PathVariable String gameId, @PathVariable String playerId) {
+        Player player = gameService.rejoinGame(gameId, playerId);
+        logger.log(Level.INFO, "Player {0} rejoined game {1}", new Object[]{playerId, gameId});
+        return ResponseEntity.ok(new PlayerDto(player.getId(), player.getName()));
     }
 }

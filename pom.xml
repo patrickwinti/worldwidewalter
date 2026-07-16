@@ -12,15 +12,15 @@
 
     <profiles>
         <profile>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <id>dev</id>
             <properties>
                 <npm-build-command>run build-dev</npm-build-command>
             </properties>
         </profile>
         <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <id>prod</id>
             <properties>
                 <npm-build-command>run build</npm-build-command>

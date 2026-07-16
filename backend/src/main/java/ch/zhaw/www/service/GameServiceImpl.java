@@ -112,6 +112,28 @@ class GameServiceImpl implements GameService {
         return game.getCurrentRound();
     }
     
+    @Override
+    public void disconnectPlayer(@NotNull String gameId, @NotNull String playerId) {
+        try {
+            entityService.editGame(gameId, game -> {
+                game.markPlayerDisconnected(playerId);
+                return game;
+            });
+        } catch (GameError.NotFoundException e) {
+            LOGGER.log(Level.WARNING, "Game {0} not found on player disconnect", gameId);
+        }
+    }
+
+    @Override
+    public Player rejoinGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException {
+        return entityService.editGame(gameId, game -> {
+            Player player = checkPlayerInGame(game, playerId);
+            game.markPlayerConnected(playerId);
+            LOGGER.log(Level.INFO, "Player {0} rejoined game {1}", new Object[]{playerId, gameId});
+            return player;
+        });
+    }
+
     private static Player checkPlayerInGame(final Game game, final String playerId) {
         return game.getAllPlayers()
                 .filter(p -> Objects.equals(p.getId(), playerId)).findFirst()

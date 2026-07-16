@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Rules
 
+- Use Context7 MCP (`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`) to fetch current documentation for any library or package used in this project (Spring Boot, Angular, etc.) before answering questions or making changes involving them.
+
 - Never run `git commit`, `git push`, or `git commit --amend` (or any variant). Do not stage and commit changes under any circumstances.
 
 ## Project Overview
@@ -14,8 +16,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Full Build (Backend + Frontend)
 ```bash
-mvn clean install              # Dev build (default profile)
-mvn -P prod clean package      # Production build
+mvn clean install              # Prod build (default profile)
+mvn -P dev clean package       # Dev build (frontend points at localhost:8080)
 mvn clean test package         # Run tests then package (CI default)
 ```
 

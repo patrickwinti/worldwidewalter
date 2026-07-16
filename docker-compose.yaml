@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   worldwide-walter:
-    container_name: worldwide-walter
+    container_name: worldwidewalter
     build:
       context: .
       dockerfile: Dockerfile

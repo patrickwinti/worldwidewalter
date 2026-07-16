@@ -70,4 +70,8 @@ export class GameService {
   leaveGameAfterDestruction(playerId: string, gameId: string): boolean {
     return navigator.sendBeacon(this.BASE_URL + '/games/' + gameId + '/players/' + playerId)
   }
+
+  rejoinGame(gameId: string, playerId: string): Observable<PlayerDto> {
+    return this.http.post<PlayerDto>(this.BASE_URL + '/games/' + gameId + '/players/' + playerId + '/rejoin', null);
+  }
 }

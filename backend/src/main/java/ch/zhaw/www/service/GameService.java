@@ -66,5 +66,24 @@ public interface GameService {
      * @throws PlayerError.NotFoundException if player is not found
      */
     void enterRound(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
-    
+
+    /**
+     * Marks a player as disconnected. The player remains in the game and can rejoin.
+     *
+     * @param gameId   game identifier
+     * @param playerId player identifier
+     */
+    void disconnectPlayer(@NotNull String gameId, @NotNull String playerId);
+
+    /**
+     * Rejoins an existing player to a game after disconnection
+     *
+     * @param gameId   game identifier
+     * @param playerId player identifier
+     * @return the rejoining player
+     * @throws GameError.NotFoundException   if game is not found
+     * @throws PlayerError.NotFoundException if player is not found in the game
+     */
+    Player rejoinGame(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, PlayerError.NotFoundException;
+
 }

@@ -8,7 +8,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: 'www-game-container',
-  templateUrl: './game-container.component.html'
+  templateUrl: './game-container.component.html',
+  standalone: false,
 })
 export class GameContainerComponent implements OnInit {
   gameState: GameState;

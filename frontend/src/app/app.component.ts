@@ -2,28 +2,34 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { StateService } from "./service/state.service";
 import { GameState } from "./model/game-state";
 import { GameService } from "./service/game.service";
+import { CookieService } from "./service/cookie.service";
+import { WsService } from "./service/ws.service";
 import { isNonEmptyString } from "./shared/util";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: 'www-root',
   templateUrl: './app.component.html',
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   title = 'www-ui';
   joinWithId: boolean;
 
-  @HostListener('window:beforeunload', ['event'])
+  @HostListener('window:beforeunload')
   beforeUnloadHandler() {
     return false;
   }
 
-  @HostListener('window:unload', ['event'])
+  @HostListener('window:unload')
   unloadHandler() {
     this.leaveGame();
   }
 
   constructor(private stateService: StateService,
-              private gameService: GameService) {
+              private gameService: GameService,
+              private cookieService: CookieService,
+              private wsService: WsService) {
   }
 
   startGame() {
@@ -40,12 +46,31 @@ export class AppComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    let gameId = this.getParameterByName('gameId') ?? '';
-    if (gameId !== '') {
-      const id = gameId ?? '';
+  async ngOnInit(): Promise<void> {
+    const urlGameId = this.getParameterByName('gameId') ?? '';
+    if (urlGameId !== '') {
       this.joinWithId = true;
-      this.stateService.setGameId(id);
+      this.stateService.setGameId(urlGameId);
+      return;
+    }
+
+    const savedGameId = this.cookieService.get('gameId');
+    const savedPlayerId = this.cookieService.get('playerId');
+    const savedPlayerName = this.cookieService.get('playerName');
+
+    if (isNonEmptyString(savedGameId) && isNonEmptyString(savedPlayerId)) {
+      try {
+        const player = await firstValueFrom(this.gameService.rejoinGame(savedGameId, savedPlayerId));
+        this.stateService.setGameId(savedGameId);
+        this.stateService.setPlayerId(player.id);
+        this.stateService.setPlayerName(player.playerName ?? savedPlayerName);
+        this.wsService.connect(savedGameId, player.id);
+        this.stateService.setState(GameState.REQUEST_NEW_ROUND);
+      } catch {
+        this.cookieService.delete('gameId');
+        this.cookieService.delete('playerId');
+        this.cookieService.delete('playerName');
+      }
     }
   }
 

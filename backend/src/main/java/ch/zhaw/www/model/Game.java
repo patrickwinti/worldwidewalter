@@ -22,6 +22,7 @@ import static java.lang.Math.max;
 @RequiredArgsConstructor
 @KeySpace("running_games")
 public class Game {
+    private static final int MIN_PLAYERS_TO_CONTINUE = 3;
     @Id
     @Getter
     @NotNull
@@ -32,6 +33,7 @@ public class Game {
     private final List<Round> rounds = new ArrayList<>();
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final List<Player> players = new ArrayList<>();
+    private boolean roundReachedMinimumPlayers = false;
     @Setter
     private Map<Player, Integer> sphinxCandidates = new HashMap<>();
     private final List<Prompt> prompts;
@@ -51,7 +53,7 @@ public class Game {
         if (rounds.isEmpty()) {
             return null;
         } else {
-            return rounds.get(rounds.size() - 1);
+            return rounds.getLast();
         }
     }
     
@@ -137,19 +139,28 @@ public class Game {
     }
     
     private boolean isMissingPlayerSelections(final Round round) {
-        return round.getNumberOfSelectionsSubmitted() < max(activePlayers.size(), minimumAmountOfPlayers) - 1;
+        return round.getNumberOfSelectionsSubmitted() < max(getConnectedActivePlayersCount(), MIN_PLAYERS_TO_CONTINUE) - 1;
     }
-    
+
     private boolean isMissingPlayerProposition(final Round round) {
-        return round.getNumberOfPropositionsSubmitted() < max(activePlayers.size(), minimumAmountOfPlayers);
+        return round.getNumberOfPropositionsSubmitted() < max(getConnectedActivePlayersCount(), MIN_PLAYERS_TO_CONTINUE);
     }
-    
+
+    private long getConnectedActivePlayersCount() {
+        return activePlayers.values().stream().filter(Player::isConnected).count();
+    }
+
     /**
-     * Has more or equal amount of players as the minimum amount of players
+     * Has enough players to continue with the current round.
+     * Once a round has reached the minimum number of players, it can continue as long as
+     * at least MIN_PLAYERS_TO_CONTINUE (3) connected active players remain.
      *
-     * @return true if active players >= minimum amount (default 4)
+     * @return true if there are enough players to proceed
      */
     public boolean hasEnoughPlayers() {
+        if (roundReachedMinimumPlayers) {
+            return getConnectedActivePlayersCount() >= MIN_PLAYERS_TO_CONTINUE;
+        }
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
     
@@ -171,6 +182,7 @@ public class Game {
      */
     public void addRound(Round round) {
         activePlayers.clear();
+        roundReachedMinimumPlayers = false;
         rounds.add(round);
     }
     
@@ -204,6 +216,9 @@ public class Game {
      */
     public void moveToActivePlayers(Player player) {
         activePlayers.put(player.getId(), player);
+        if (activePlayers.size() >= minimumAmountOfPlayers) {
+            roundReachedMinimumPlayers = true;
+        }
     }
     
     /**
@@ -261,6 +276,45 @@ public class Game {
         evaluation.forEach((k, v) -> points.merge(k, v, Integer::sum));
     }
     
+    /**
+     * Marks a player as disconnected without removing them from the game
+     *
+     * @param playerId player identifier
+     */
+    public void markPlayerDisconnected(@NotNull String playerId) {
+        players.stream().filter(p -> p.getId().equals(playerId)).findFirst()
+                .ifPresent(p -> p.setConnected(false));
+        Player activePlayer = activePlayers.get(playerId);
+        if (activePlayer != null) {
+            activePlayer.setConnected(false);
+        }
+    }
+
+    /**
+     * Marks a player as connected again (rejoining)
+     *
+     * @param playerId player identifier
+     */
+    public void markPlayerConnected(@NotNull String playerId) {
+        players.stream().filter(p -> p.getId().equals(playerId)).findFirst()
+                .ifPresent(p -> p.setConnected(true));
+        Player activePlayer = activePlayers.get(playerId);
+        if (activePlayer != null) {
+            activePlayer.setConnected(true);
+        }
+    }
+
+    /**
+     * Checks if a player is registered and currently connected
+     *
+     * @param playerId player identifier
+     * @return true if the player is registered and connected
+     */
+    public boolean isPlayerConnected(@NotNull String playerId) {
+        return players.stream()
+                .anyMatch(p -> p.getId().equals(playerId) && p.isConnected());
+    }
+
     /**
      * Adds player to game and as a sphinx candidate
      *

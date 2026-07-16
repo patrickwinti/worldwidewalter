@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WelcomeComponent } from "./component/initialization/welcome/welcome.component";
-import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { InitializationContainerComponent } from './component/initialization/initialization-container.component';
 import { JoinComponent } from './component/initialization/join/join.component';
 import { FormsModule } from "@angular/forms";
@@ -26,7 +26,7 @@ import { InfoComponent } from "./component/info/info.component";
 import { NgOptimizedImage } from "@angular/common";
 import { CurrentGameInfoComponent } from './component/game/current-game-info/current-game-info.component';
 import { PromptDisplayComponent } from './component/game/prompt-display/prompt-display.component';
-import { ClipboardModule } from 'ngx-clipboard';
+import { provideZoneChangeDetection } from '@angular/core';
 
 @NgModule({
   declarations: [
@@ -52,12 +52,12 @@ import { ClipboardModule } from 'ngx-clipboard';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule,
     FormsModule,
     NgOptimizedImage,
-    ClipboardModule,
   ],
   providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideHttpClient(withInterceptorsFromDi()),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpPollingInterceptor,

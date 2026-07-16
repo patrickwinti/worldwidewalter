@@ -2,7 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'www-prompt-display',
-  templateUrl: './prompt-display.component.html'
+  templateUrl: './prompt-display.component.html',
+  standalone: false,
 })
 export class PromptDisplayComponent implements OnInit {
   @Input() prompt: string;

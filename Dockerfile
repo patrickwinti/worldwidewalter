@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:17
+FROM azul/zulu-openjdk-alpine:25
 RUN adduser app --disabled-password
 USER app
 CMD ["java","-jar", "/app/worldwidewalter.jar"]

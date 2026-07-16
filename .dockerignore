@@ -1,0 +1,10 @@
+.git
+.idea
+**/node_modules
+backend/target/classes
+backend/target/generated-sources
+backend/target/maven-status
+frontend/dist
+docs
+*.md
+.DS_Store

@@ -8,7 +8,8 @@ import { HttpErrorResponse } from "@angular/common/http";
 @Component({
   selector: 'www-welcome',
   templateUrl: './welcome.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class WelcomeComponent {
   @Output() initializationStateEmitter = new EventEmitter<InitializationState>()

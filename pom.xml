@@ -12,15 +12,15 @@
 
     <profiles>
         <profile>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <id>dev</id>
             <properties>
                 <npm-build-command>run build-dev</npm-build-command>
             </properties>
         </profile>
         <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <id>prod</id>
             <properties>
                 <npm-build-command>run build</npm-build-command>
@@ -28,12 +28,16 @@
         </profile>
     </profiles>
 
+    <properties>
+        <java.version>25</java.version>
+    </properties>
+
     <packaging>pom</packaging>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.3</version>
+        <version>4.0.5</version>
     </parent>
 
     <modules>

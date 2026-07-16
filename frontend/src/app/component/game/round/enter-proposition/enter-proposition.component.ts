@@ -7,7 +7,8 @@ import { MAX_INPUT_LENGTH } from "../../../../shared/settings";
 @Component({
   selector: 'www-enter-proposition',
   templateUrl: './enter-proposition.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class EnterPropositionComponent implements OnInit {
   @Input() round: RoundDto;

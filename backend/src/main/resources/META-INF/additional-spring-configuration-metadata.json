@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "app.https-redirect.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to redirect insecure HTTP requests to their HTTPS equivalent. Enabled in production (behind a TLS-terminating proxy) and disabled for local development.",
+      "defaultValue": false
+    }
+  ]
+}

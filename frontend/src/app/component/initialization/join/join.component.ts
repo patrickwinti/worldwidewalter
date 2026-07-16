@@ -8,11 +8,14 @@ import { PlayerDto } from "../../../dto/player-dto";
 import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 import { isNonEmptyString } from "../../../shared/util";
 import { GAME_ID_LENGTH, MAX_INPUT_LENGTH } from "../../../shared/settings";
+import { CookieService } from "../../../service/cookie.service";
+import { WsService } from "../../../service/ws.service";
 
 @Component({
   selector: 'www-join',
   templateUrl: './join.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class JoinComponent implements OnInit {
   @Output() initializationStateEmitter = new EventEmitter<InitializationState>();
@@ -25,7 +28,9 @@ export class JoinComponent implements OnInit {
 
   constructor(private gameService: GameService,
               private stateService: StateService,
-              private cd: ChangeDetectorRef) {
+              private cd: ChangeDetectorRef,
+              private cookieService: CookieService,
+              private wsService: WsService) {
   }
 
   get gameId(): string {
@@ -62,7 +67,11 @@ export class JoinComponent implements OnInit {
           (player: PlayerDto) => {
             this.stateService.setPlayerId(player.id);
             this.stateService.setGameId(this.joinGameId);
-            this.stateService.setPlayerName(player.playerName)
+            this.stateService.setPlayerName(player.playerName);
+            this.cookieService.set('playerId', player.id);
+            this.cookieService.set('gameId', this.joinGameId);
+            this.cookieService.set('playerName', player.playerName);
+            this.wsService.connect(this.joinGameId, player.id);
             this.initializationStateEmitter.emit(InitializationState.DONE);
             console.log('joining game: ' + this.joinGameId + 'with username: ' + this.playerName);
           },
@@ -88,6 +97,10 @@ export class JoinComponent implements OnInit {
 
   getTextToBeCopied(): string {
     return window.location.origin + '?gameId=' + this.gameId;
+  }
+
+  copyLink(): void {
+    navigator.clipboard.writeText(this.getTextToBeCopied());
   }
 
   protected readonly MAX_INPUT_LENGTH = MAX_INPUT_LENGTH;

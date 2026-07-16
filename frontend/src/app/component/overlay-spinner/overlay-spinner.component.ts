@@ -6,7 +6,8 @@ import { GameState } from "../../model/game-state";
 @Component({
   selector: 'www-overlay-spinner',
   templateUrl: './overlay-spinner.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 
 export class OverlaySpinnerComponent {

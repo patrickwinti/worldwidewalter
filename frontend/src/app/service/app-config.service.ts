@@ -6,8 +6,13 @@ import { environment } from "../../environments/environment";
 })
 export class AppConfigService {
   private baseUrl: string = environment.apiUrl;
+  private wsUrl: string = environment.wsUrl;
 
   getBaseUrl(): string {
     return this.baseUrl;
+  }
+
+  getWsUrl(): string {
+    return this.wsUrl;
   }
 }

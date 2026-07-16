@@ -1,11 +1,13 @@
 package ch.zhaw.www.model;
 
+import ch.zhaw.www.utils.InstantWrapper;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.keyvalue.annotation.KeySpace;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +25,12 @@ import static java.lang.Math.max;
 @KeySpace("running_games")
 public class Game {
     private static final int MIN_PLAYERS_TO_CONTINUE = 3;
+    /**
+     * How long a disconnected player is still counted as present. A shorter connection hiccup
+     * does not drop them from the round wait or the minimum-player check; only once they have
+     * been gone for longer than this are they ignored.
+     */
+    private static final Duration DISCONNECT_GRACE = Duration.ofSeconds(10);
     @Id
     @Getter
     @NotNull
@@ -139,15 +147,40 @@ public class Game {
     }
     
     private boolean isMissingPlayerSelections(final Round round) {
-        return round.getNumberOfSelectionsSubmitted() < max(getConnectedActivePlayersCount(), MIN_PLAYERS_TO_CONTINUE) - 1;
+        // Everyone but the sphinx selects, hence the -1.
+        return round.getNumberOfSelectionsSubmitted() < getExpectedResponderCount() - 1;
     }
 
     private boolean isMissingPlayerProposition(final Round round) {
-        return round.getNumberOfPropositionsSubmitted() < max(getConnectedActivePlayersCount(), MIN_PLAYERS_TO_CONTINUE);
+        return round.getNumberOfPropositionsSubmitted() < getExpectedResponderCount();
     }
 
-    private long getConnectedActivePlayersCount() {
-        return activePlayers.values().stream().filter(Player::isConnected).count();
+    /**
+     * Number of players the round waits for before it advances to the next phase.
+     * <p>
+     * This counts every active player still present in the game — including a player with a
+     * brief connection drop, who remains an active player until they actually leave. A player
+     * who leaves is removed from the active players and therefore no longer blocks the round;
+     * the per-phase timer remains the final backstop.
+     *
+     * @return the number of players expected to respond in the current round
+     */
+    private long getExpectedResponderCount() {
+        return max(getPresentActivePlayersCount(), MIN_PLAYERS_TO_CONTINUE);
+    }
+
+    /**
+     * Number of active players still counted as present: connected players plus those whose
+     * disconnect is still within the {@link #DISCONNECT_GRACE} window. A player gone for longer
+     * than the grace period is ignored, so a dead connection no longer blocks the round.
+     *
+     * @return the number of present active players
+     */
+    private long getPresentActivePlayersCount() {
+        Instant now = InstantWrapper.getNow();
+        return activePlayers.values().stream()
+                .filter(player -> player.isPresent(now, DISCONNECT_GRACE))
+                .count();
     }
 
     /**
@@ -159,7 +192,7 @@ public class Game {
      */
     public boolean hasEnoughPlayers() {
         if (roundReachedMinimumPlayers) {
-            return getConnectedActivePlayersCount() >= MIN_PLAYERS_TO_CONTINUE;
+            return getPresentActivePlayersCount() >= MIN_PLAYERS_TO_CONTINUE;
         }
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
@@ -238,6 +271,7 @@ public class Game {
      */
     public void removePlayer(@NotNull String playerId) {
         players.removeIf(player -> player.getId().equals(playerId));
+        activePlayers.remove(playerId);
         points.remove(playerId);
         sphinxCandidates.keySet().stream()
                 .filter(integer -> integer.getId().equals(playerId))
@@ -282,11 +316,12 @@ public class Game {
      * @param playerId player identifier
      */
     public void markPlayerDisconnected(@NotNull String playerId) {
+        Instant now = InstantWrapper.getNow();
         players.stream().filter(p -> p.getId().equals(playerId)).findFirst()
-                .ifPresent(p -> p.setConnected(false));
+                .ifPresent(p -> p.markDisconnected(now));
         Player activePlayer = activePlayers.get(playerId);
         if (activePlayer != null) {
-            activePlayer.setConnected(false);
+            activePlayer.markDisconnected(now);
         }
     }
 
@@ -297,10 +332,10 @@ public class Game {
      */
     public void markPlayerConnected(@NotNull String playerId) {
         players.stream().filter(p -> p.getId().equals(playerId)).findFirst()
-                .ifPresent(p -> p.setConnected(true));
+                .ifPresent(Player::markConnected);
         Player activePlayer = activePlayers.get(playerId);
         if (activePlayer != null) {
-            activePlayer.setConnected(true);
+            activePlayer.markConnected();
         }
     }
 

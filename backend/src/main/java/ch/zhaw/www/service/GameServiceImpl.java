@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 class GameServiceImpl implements GameService {
     private static final Logger LOGGER = Logger.getLogger(GameService.class.getSimpleName());
     private static final int DEFAULT_NUMBER_OF_ROUNDS = 1;
+    private static final int MAX_ROOM_CODE_ATTEMPTS = 20;
     
     private final EntityService entityService;
     private final GameProperties gameProperties;
@@ -40,13 +41,20 @@ class GameServiceImpl implements GameService {
     
     @Override
     public Game createGame() throws GameError.ExistAlready {
-        var game = new Game(randomProvider.getEightCharacterId(),
-                gameProperties.getMinimumAmountOfActivePlayersPerGame(),
-                gameProperties.getMaximumAmountOfActivePlayersPerGame(),
-                DEFAULT_NUMBER_OF_ROUNDS,
-                promptRepository.getPrompts());
-        entityService.saveNewGame(game);
-        return game;
+        for (int attempt = 0; attempt < MAX_ROOM_CODE_ATTEMPTS; attempt++) {
+            var game = new Game(randomProvider.getRoomCode(),
+                    gameProperties.getMinimumAmountOfActivePlayersPerGame(),
+                    gameProperties.getMaximumAmountOfActivePlayersPerGame(),
+                    DEFAULT_NUMBER_OF_ROUNDS,
+                    promptRepository.getPrompts());
+            try {
+                entityService.saveNewGame(game);
+                return game;
+            } catch (GameError.ExistAlready e) {
+                LOGGER.log(Level.INFO, "Room code {0} already in use, retrying", game.getId());
+            }
+        }
+        throw new GameError.ExistAlready();
     }
     
     @Override
@@ -121,6 +129,18 @@ class GameServiceImpl implements GameService {
             });
         } catch (GameError.NotFoundException e) {
             LOGGER.log(Level.WARNING, "Game {0} not found on player disconnect", gameId);
+        }
+    }
+
+    @Override
+    public void connectPlayer(@NotNull String gameId, @NotNull String playerId) {
+        try {
+            entityService.editGame(gameId, game -> {
+                game.markPlayerConnected(playerId);
+                return game;
+            });
+        } catch (GameError.NotFoundException e) {
+            LOGGER.log(Level.WARNING, "Game {0} not found on player connect", gameId);
         }
     }
 

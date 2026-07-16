@@ -15,9 +15,13 @@ public interface RandomProvider {
 
 
     /**
-     * Generates a unique Id of eight characters
+     * Generates a short, human-friendly game room code (e.g. {@code WXYZ}).
+     * <p>
+     * The code uses only unambiguous uppercase letters so it is easy to read aloud
+     * and type. Codes are not guaranteed to be unique on their own; callers must
+     * handle collisions (see {@code GameService#createGame}).
      *
-     * @return a string containing the Id
+     * @return a room code string
      */
-    String getEightCharacterId();
+    String getRoomCode();
 }

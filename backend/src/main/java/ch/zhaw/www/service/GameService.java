@@ -76,6 +76,15 @@ public interface GameService {
     void disconnectPlayer(@NotNull String gameId, @NotNull String playerId);
 
     /**
+     * Marks a player as connected again. Best-effort: does nothing if the game no longer exists.
+     * Used when a WebSocket (re)connects so a recovered connection clears the disconnect grace timer.
+     *
+     * @param gameId   game identifier
+     * @param playerId player identifier
+     */
+    void connectPlayer(@NotNull String gameId, @NotNull String playerId);
+
+    /**
      * Rejoins an existing player to a game after disconnection
      *
      * @param gameId   game identifier

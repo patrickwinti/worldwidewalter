@@ -13,12 +13,15 @@
   </www-enter-proposition>
 
   <ng-container *ngSwitchCase="GameState.SELECT_PROPOSITION">
-    <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto"
+    <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto; else waitingForPropositions"
                             [round]=round
                             [propositionSelectionDto]="propositionSelectionDto"
                             [currentPlayerId]="getCurrentPlayerId()"
                             (selectedPropositionEmitter)="submitSelection($event)">
     </www-select-proposition>
+    <ng-template #waitingForPropositions>
+      <p style="text-align: center; margin-top: 2rem">Warte auf die anderen Spieler…</p>
+    </ng-template>
   </ng-container>
 
 </ng-container>

@@ -2,36 +2,36 @@ package ch.zhaw.www.utils;
 
 import org.springframework.stereotype.Component;
 
-import java.util.Random;
+import java.security.SecureRandom;
+import java.util.random.RandomGenerator;
 
 @Component
 public class RandomProviderImpl implements RandomProvider {
-    private static final int SEED = 0;
-    private final Random random = new Random(SEED);
-    private static final int MIN_GAME_ID_LENGTH = 7;
+    private static final int POSTFIX_BOUND = 2000;
+    private static final int ROOM_CODE_LENGTH = 4;
 
-    private final char[] chars = new char[]{
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-    };
+    /**
+     * Uppercase letters only, excluding the vowels A/E/I/O/U so that random codes cannot
+     * spell real (potentially offensive) words, and excluding the ambiguous I/O. The
+     * remaining consonants are unambiguous when read aloud or typed.
+     */
+    private static final char[] ROOM_CODE_ALPHABET =
+            "BCDFGHJKLMNPQRSTVWXYZ".toCharArray();
+
+    private final RandomGenerator random = new SecureRandom();
 
     @Override
     public int getPostfix() {
-        return random.nextInt(2000);
+        return random.nextInt(POSTFIX_BOUND);
     }
 
     @Override
-    public String getEightCharacterId() {
-        StringBuilder id = new StringBuilder();
-        for (int i = 0; id.length() < MIN_GAME_ID_LENGTH; i++) {
-            int index = random.nextInt(chars.length - i - 1);
-            char a = chars[i + index];
-            chars[i + index] = chars[i];
-            chars[i] = a;
-            id.append(a);
+    public String getRoomCode() {
+        StringBuilder code = new StringBuilder(ROOM_CODE_LENGTH);
+        for (int i = 0; i < ROOM_CODE_LENGTH; i++) {
+            code.append(ROOM_CODE_ALPHABET[random.nextInt(ROOM_CODE_ALPHABET.length)]);
         }
-        return id.toString();
+        return code.toString();
     }
-    
+
 }

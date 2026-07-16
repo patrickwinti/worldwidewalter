@@ -3,10 +3,12 @@
   <div class="container">
     <div class="container">
 
-      <input type="text" name="gameId" placeholder="Spiel Id eingeben" class="input_cont" autocapitalize="off"
+      <input type="text" name="gameId" placeholder="Spiel Id eingeben" class="input_cont" autocapitalize="characters"
+             style="text-transform: uppercase"
              maxlength="{{GAME_ID_LENGTH}}"
              [readOnly]="gameIdIsReadOnly"
-             [(ngModel)]="joinGameId"/>
+             [ngModel]="joinGameId"
+             (ngModelChange)="joinGameId = $event.toUpperCase()"/>
 
       <ng-container *ngIf="isCopyButtonVisible">
         <button class="btn" type="button" (click)="copyLink()" title="Link kopieren"><img

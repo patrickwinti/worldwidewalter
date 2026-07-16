@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
@@ -101,7 +102,20 @@ class EntityServiceImpl implements EntityService {
      */
     
     private Game findGame(String gameId) {
-        return gamesRepository.findById(gameId).orElseThrow(() -> new GameError.NotFoundException(gameId));
+        return gamesRepository.findById(normalizeGameId(gameId))
+                .orElseThrow(() -> new GameError.NotFoundException(gameId));
+    }
+
+    /**
+     * Normalizes a game code so that lookups are case-insensitive. Codes are always stored
+     * in upper case (see {@code RandomProvider#getRoomCode}), so a player may type the code
+     * in any casing when joining.
+     *
+     * @param gameId the game code as provided by the client
+     * @return the upper-cased game code, or {@code null} if the input was {@code null}
+     */
+    private static String normalizeGameId(String gameId) {
+        return gameId == null ? null : gameId.toUpperCase(Locale.ROOT);
     }
     
     /**

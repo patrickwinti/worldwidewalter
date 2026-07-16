@@ -42,12 +42,35 @@ class GameServiceTest {
     
     @Test
     void testAddGameSavesItToRepository() {
-        when(randomProvider.getEightCharacterId()).thenReturn("randomId");
+        when(randomProvider.getRoomCode()).thenReturn("WXYZ");
         var game = gameService.createGame();
         verify(entityService).saveNewGame(game);
         assertNotNull(game.getId());
     }
-    
+
+    @Test
+    void testCreateGameRetriesOnRoomCodeCollision() {
+        when(randomProvider.getRoomCode()).thenReturn("TAKN", "TAKN", "FREE");
+        // First two attempts collide with an existing game, the third succeeds.
+        doThrow(new GameError.ExistAlready())
+                .doThrow(new GameError.ExistAlready())
+                .doNothing()
+                .when(entityService).saveNewGame(any(Game.class));
+
+        var game = gameService.createGame();
+
+        assertEquals("FREE", game.getId());
+        verify(randomProvider, times(3)).getRoomCode();
+    }
+
+    @Test
+    void testCreateGameThrowsWhenNoFreeRoomCodeFound() {
+        when(randomProvider.getRoomCode()).thenReturn("TAKN");
+        doThrow(new GameError.ExistAlready()).when(entityService).saveNewGame(any(Game.class));
+
+        assertThrows(GameError.ExistAlready.class, () -> gameService.createGame());
+    }
+
     @Test
     void testGetGameReadsFromRepository_Found() {
         var expectedGame = mockGameInRepository();

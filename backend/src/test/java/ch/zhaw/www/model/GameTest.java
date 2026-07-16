@@ -3,6 +3,7 @@ package ch.zhaw.www.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,84 @@ class GameTest {
         ));
     }
     
+    @Test
+    void testRoundWaitsForAllPresentPlayersBeforeSelection() {
+        var game = createGame();
+        addRoundOpenForPropositionSubmission(game, 4); // four active players + sphinx
+        var round = game.getCurrentRound();
+        var players = game.getAllPlayers().toList();
+
+        // Only three of the four present players have submitted a proposition.
+        players.stream().limit(3).forEach(p -> round.addProposition(createProposition(p.getId(), p.getId())));
+        assertFalse(game.canAcceptSelectionForRound(round),
+                "selection must not open until every present player has submitted");
+
+        // A brief disconnect of the missing player must NOT let the round advance without them.
+        game.markPlayerDisconnected(players.get(3).getId());
+        assertFalse(game.canAcceptSelectionForRound(round),
+                "a briefly disconnected player must still be waited for");
+
+        // Once the fourth player submits too, selection opens.
+        round.addProposition(createProposition(players.get(3).getId(), players.get(3).getId()));
+        assertTrue(game.canAcceptSelectionForRound(round));
+    }
+
+    @Test
+    void testLeavingPlayerNoLongerBlocksSelection() {
+        var game = createGame();
+        addRoundOpenForPropositionSubmission(game, 4);
+        var round = game.getCurrentRound();
+        var players = game.getAllPlayers().toList();
+
+        players.stream().limit(3).forEach(p -> round.addProposition(createProposition(p.getId(), p.getId())));
+        assertFalse(game.canAcceptSelectionForRound(round));
+
+        // The fourth player leaves the game entirely and must no longer block the round.
+        game.removePlayer(players.get(3).getId());
+        assertTrue(game.canAcceptSelectionForRound(round),
+                "a player who left must not block the round");
+    }
+
+    @Test
+    void testRoundAdvancesAfterDisconnectGraceExpires() {
+        enableFixedClocked();
+        var game = createGame();
+        addRoundOpenForPropositionSubmission(game, 4);
+        var round = game.getCurrentRound();
+        var players = game.getAllPlayers().toList();
+
+        // Three of four present players submitted; the fourth then loses connection.
+        players.stream().limit(3).forEach(p -> round.addProposition(createProposition(p.getId(), p.getId())));
+        game.markPlayerDisconnected(players.get(3).getId());
+
+        // Within the grace period the round still waits for the disconnected player.
+        assertFalse(game.canAcceptSelectionForRound(round),
+                "a briefly disconnected player must still be waited for");
+
+        // Once the disconnect exceeds the grace period, they are ignored and selection opens.
+        offsetFixedClockBy(Duration.ofSeconds(11));
+        assertTrue(game.canAcceptSelectionForRound(round),
+                "a player gone longer than the grace period must not block the round");
+    }
+
+    @Test
+    void testReconnectClearsDisconnectGrace() {
+        enableFixedClocked();
+        var game = createGame();
+        addRoundOpenForPropositionSubmission(game, 4);
+        var round = game.getCurrentRound();
+        var players = game.getAllPlayers().toList();
+        players.stream().limit(3).forEach(p -> round.addProposition(createProposition(p.getId(), p.getId())));
+
+        game.markPlayerDisconnected(players.get(3).getId());
+        game.markPlayerConnected(players.get(3).getId()); // socket recovered before the grace expired
+        offsetFixedClockBy(Duration.ofSeconds(11));        // well past the original drop
+
+        // Because they reconnected, the grace timer was cleared, so they are still waited for.
+        assertFalse(game.canAcceptSelectionForRound(round),
+                "a reconnected player must still be waited for");
+    }
+
     @Test
     void testRunningRound() {
         var game = createGame();

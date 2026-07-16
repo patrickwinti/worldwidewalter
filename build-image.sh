@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# example usage:
+# ./build-image.sh worldwidewalter:1.0.1 --push
+
 GHCR_IMAGE="ghcr.io/patrickwinti/worldwidewalter"
 
 PUSH=0

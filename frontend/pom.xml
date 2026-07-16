@@ -5,7 +5,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>frontend</artifactId>
-  <version>1.0.0</version>
 
   <name>www-frontend</name>
   <description>WorldWideWalter Frontend</description>
@@ -13,7 +12,7 @@
   <parent>
     <groupId>ch.zhaw</groupId>
     <artifactId>www</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 

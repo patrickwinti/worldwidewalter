@@ -28,8 +28,15 @@ export class SelectPropositionComponent {
     return displayText;
   }
 
+  isSphinx(): boolean {
+    return this.round.sphinx?.id === this.currentPlayerId;
+  }
+
   showContinueButton(): boolean {
-    return this.round.sphinx.id === this.currentPlayerId || this.allPropositionsReadOnly();
+    // The sphinx no longer needs a manual button — they advance automatically once everyone
+    // has selected. The button remains only for the edge case where a non-sphinx player has
+    // no selectable proposition.
+    return !this.isSphinx() && this.allPropositionsReadOnly();
   }
 
   continue() {

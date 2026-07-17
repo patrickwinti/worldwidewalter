@@ -9,6 +9,9 @@
     </p>
   </div>
 </div>
+<div *ngIf="isSphinx()">
+  <p class="center">Warte auf die anderen Spieler…</p>
+</div>
 <div *ngIf="showContinueButton()">
   <button class="center" (click)="selectProposition(undefined)">Weiter</button>
 </div>

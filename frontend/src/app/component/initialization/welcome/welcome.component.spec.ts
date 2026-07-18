@@ -4,21 +4,27 @@ import { WelcomeComponent } from './welcome.component';
 import { getGameServiceMock, getStateServiceMock } from "src/app/testing/mock-services"
 import { of } from "rxjs";
 import { GameService } from "../../../service/game.service";
-import { GameDto } from "../../../dto/game-dto";
+import { GameCreatedDto } from "../../../dto/game-created-dto";
 import { StateService } from "../../../service/state.service";
+import { CookieService } from "../../../service/cookie.service";
+import { WsService } from "../../../service/ws.service";
 
 describe('TestComponent', () => {
   let component: WelcomeComponent;
   let fixture: ComponentFixture<WelcomeComponent>;
   let gameService = getGameServiceMock();
   let stateService = getStateServiceMock();
+  let cookieService = jasmine.createSpyObj('CookieService', ['set', 'get', 'delete']);
+  let wsService = jasmine.createSpyObj('WsService', ['connect', 'subscribe', 'unsubscribe', 'disconnect']);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [WelcomeComponent],
       providers: [
         {provide: GameService, useValue: gameService},
-        {provide: StateService, useValue: stateService}
+        {provide: StateService, useValue: stateService},
+        {provide: CookieService, useValue: cookieService},
+        {provide: WsService, useValue: wsService}
       ]
     })
       .compileComponents();
@@ -31,18 +37,22 @@ describe('TestComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('createGame should call gameService and set gameId in stateService', fakeAsync(() => {
+  it('createGame should call gameService, store host identity and connect the websocket', fakeAsync(() => {
     // arrange
     gameService.requestNewGame.and.returnValue(of({
-      id: 'gameId'
-    } as GameDto));
+      gameId: 'gameId',
+      host: {id: 'hostId', playerName: 'Host'}
+    } as GameCreatedDto));
+    component.playerName = 'Host';
 
     // act
     component.requestNewGame();
     tick();
 
     // assert
-    expect(gameService.requestNewGame).toHaveBeenCalled();
+    expect(gameService.requestNewGame).toHaveBeenCalledWith('Host');
     expect(stateService.setGameId).toHaveBeenCalledOnceWith('gameId');
+    expect(stateService.setPlayerId).toHaveBeenCalledOnceWith('hostId');
+    expect(wsService.connect).toHaveBeenCalledWith('gameId', 'hostId');
   }))
 });

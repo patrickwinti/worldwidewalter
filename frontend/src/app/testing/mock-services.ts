@@ -20,6 +20,8 @@ export function getGameServiceMock(): jasmine.SpyObj<GameService> {
     'GameService',
     [
       'requestNewGame',
+      'startGame',
+      'getLobby',
       'getGame',
       'getGameAsSoonAsInGivenState',
       'submitProposition'
@@ -38,6 +40,8 @@ export function getStateServiceMock(): jasmine.SpyObj<StateService> {
       'getGameId',
       'setPlayerId',
       'getPlayerId',
+      'setPlayerName',
+      'getPlayerName',
       'setRound',
       'getRound'
     ]

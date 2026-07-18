@@ -18,7 +18,7 @@ import java.util.stream.IntStream;
 import static ch.zhaw.www.TimeHelper.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(properties = {"game.maximum-players=200"})
+@SpringBootTest(properties = {"game.maximum-players=200", "game.minimum-players=4"})
 class GameIntegrationTest {
     
     @Autowired
@@ -35,8 +35,10 @@ class GameIntegrationTest {
     
     @Test
     void enterGame_StartsNewRound() throws InterruptedException {
-        String gameId = gameService.createGame().getId();
-        
+        var game = gameService.createGame("Host");
+        game.markStarted(); // bypass the lobby; these tests exercise round mechanics
+        String gameId = game.getId();
+
         assertNull(gameService.getGame(gameId).getCurrentRound());
         
         int nrOfPlayers = Runtime.getRuntime().availableProcessors() * 2;
@@ -69,7 +71,8 @@ class GameIntegrationTest {
     
     @Test
     void testStartOfGame() {
-        var game = gameService.createGame();
+        var game = gameService.createGame("Host");
+        game.markStarted();
         var mariaPlayer = gameService.enterGame(game.getId(), "Maria");
         gameService.enterRound(game.getId(), mariaPlayer.getId());
         assertThrows(RoundError.IllegalStateException.class, () -> gameService.getRoundOpenForPropositions(game.getId(), mariaPlayer.getId()));
@@ -88,7 +91,9 @@ class GameIntegrationTest {
     @Test
     void testWaitingRoomWhileRoundRunning() {
         enableFixedClocked();
-        var gameId = gameService.createGame().getId();
+        var game = gameService.createGame("Host");
+        game.markStarted();
+        var gameId = game.getId();
         var caelanPlayer = gameService.enterGame(gameId, " Caelan");
         var cardeaPlayer = gameService.enterGame(gameId, "Cardea");
         var grifudPlayer = gameService.enterGame(gameId, "Grifud");
@@ -145,8 +150,40 @@ class GameIntegrationTest {
     }
     
     @Test
+    void testNextRoundWaitsForAllPlayersToContinue() {
+        var game = gameService.createGame("Host");
+        game.markStarted();
+        var gameId = game.getId();
+        // Five players play round one (one more than the minimum of four).
+        var players = IntStream.range(1, 6)
+                .mapToObj(value -> gameService.enterGame(gameId, "p" + value))
+                .peek(player -> gameService.enterRound(gameId, player.getId()))
+                .toList();
+        String round1Id = Objects.requireNonNull(game.getCurrentRound()).getId();
+        players.forEach(player -> roundService.submitProposition(round1Id, player.getId(), List.of("answer")));
+        var round1 = roundService.getRoundReadyForSelections(round1Id, players.get(0).getId());
+        players.forEach(player -> {
+            if (!round1.isSphinx(player.getId())) {
+                roundService.selectProposition(round1Id, player.getId(), round1.getPropositions().get(0).getId());
+            }
+        });
+        roundService.getRoundClosedForSelections(round1Id, players.get(0).getId()); // round one finished
+
+        // Four of five click "Weiter": enough for the minimum, but not everyone -> round two stays closed.
+        players.subList(0, 4).forEach(player -> gameService.enterRound(gameId, player.getId()));
+        assertThrows(RoundError.IllegalStateException.class,
+                () -> gameService.getRoundOpenForPropositions(gameId, players.get(0).getId()));
+
+        // The fifth clicks "Weiter" -> round two opens for everyone.
+        gameService.enterRound(gameId, players.get(4).getId());
+        var round2 = gameService.getRoundOpenForPropositions(gameId, players.get(0).getId());
+        assertNotEquals(round1Id, round2.getId());
+    }
+
+    @Test
     void testRacingConditionAtEndOfRound() {
-        var game = gameService.createGame();
+        var game = gameService.createGame("Host");
+        game.markStarted();
         var gameId = game.getId();
         var players = IntStream.range(1, 5)
                 .mapToObj(value -> gameService.enterGame(gameId, "p" + value))

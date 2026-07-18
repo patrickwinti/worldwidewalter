@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpContext } from "@angular/common/http";
+import { SKIP_LOADING } from "./http-polling.interceptor";
 import { Observable } from "rxjs";
 import { AppConfigService } from "./app-config.service";
 import { GameDto } from "../dto/game-dto";
@@ -9,6 +10,8 @@ import { RoundDto } from "../dto/round-dto";
 import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
 import { PropositionSelectionDto } from "../dto/proposition-selection-dto";
 import { ResultDto } from "../dto/result-dto";
+import { GameCreatedDto } from "../dto/game-created-dto";
+import { LobbyDto } from "../dto/lobby-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +24,16 @@ export class GameService {
               private appConfigService: AppConfigService) {
   }
 
-  requestNewGame(): Observable<GameDto> {
-    return this.http.post<GameDto>(this.BASE_URL + '/games', null);
+  requestNewGame(playerName: string): Observable<GameCreatedDto> {
+    return this.http.post<GameCreatedDto>(this.BASE_URL + '/games', { playerName });
+  }
+
+  startGame(gameId: string): Observable<void> {
+    return this.http.post<void>(this.BASE_URL + '/games/' + gameId + '/start', null);
+  }
+
+  getLobby(gameId: string): Observable<LobbyDto> {
+    return this.http.get<LobbyDto>(this.BASE_URL + '/games/' + gameId + '/lobby');
   }
 
   joinGame(playerJoinRequestDto: PlayerJoinRequestDto, gameId: string): Observable<PlayerDto> {
@@ -55,8 +66,9 @@ export class GameService {
     return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions/' + id, null);
   }
 
-  getResultsForRound(roundId: string): Observable<ResultDto> {
-    return this.http.get<ResultDto>(this.BASE_URL + '/rounds/' + roundId + '/results')
+  getResultsForRound(roundId: string, skipLoading = false): Observable<ResultDto> {
+    return this.http.get<ResultDto>(this.BASE_URL + '/rounds/' + roundId + '/results',
+      { context: new HttpContext().set(SKIP_LOADING, skipLoading) })
   }
 
   getResults(gameId: string): Observable<ResultDto> {

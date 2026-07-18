@@ -3,12 +3,13 @@
     <img ngSrc="assets/WWW-logo.svg" width="200" height="200" alt="WWW-logo">
   </div>
 
-  <www-initialization-container *ngIf="gameIsInitializing()"
+  <www-initialization-container *ngIf="ready && gameIsInitializing()"
                                 [joinWithId]="joinWithId"
+                                [resumeInLobby]="resumeInLobby"
                                 (startGameEmitter)="startGame()">
   </www-initialization-container>
 
-  <www-game-container *ngIf="!gameIsInitializing()">
+  <www-game-container *ngIf="ready && !gameIsInitializing()">
   </www-game-container>
 
   <www-overlay-spinner>

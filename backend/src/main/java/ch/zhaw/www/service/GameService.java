@@ -10,11 +10,35 @@ import jakarta.validation.constraints.NotNull;
  */
 public interface GameService {
     /**
-     * Creates a new game without any players
+     * Creates a new game and registers the creator as its first player and host.
      *
-     * @return new game
+     * @param hostName desired name of the host (creator)
+     * @return new game with the host registered
      */
-    Game createGame() throws GameError.ExistAlready;
+    Game createGame(@NotNull String hostName) throws GameError.ExistAlready;
+
+    /**
+     * Starts the game so the first round can begin. Only the host may start, and only once
+     * enough players are present.
+     *
+     * @param gameId   game identifier
+     * @param playerId player requesting the start (must be the host)
+     * @return the started game
+     * @throws GameError.NotFoundException         if game is not found
+     * @throws GameError.NotHostException          if the player is not the host
+     * @throws GameError.NotEnoughPlayersException if fewer than the minimum players are present
+     */
+    Game startGame(@NotNull String gameId, @NotNull String playerId)
+            throws GameError.NotFoundException, GameError.NotHostException, GameError.NotEnoughPlayersException;
+
+    /**
+     * Reassigns the host to a random present player if the current host is no longer present
+     * (left, or disconnected beyond the grace period) and the game has not started yet.
+     * Best-effort and only touches the game when a reassignment actually happens.
+     *
+     * @param gameId game identifier
+     */
+    void reassignHostIfAbsent(@NotNull String gameId);
     
     /**
      * Fetches the current state of the game for given game ID

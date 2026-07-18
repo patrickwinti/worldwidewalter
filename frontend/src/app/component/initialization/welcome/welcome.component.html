@@ -7,8 +7,13 @@
     Jede:r Spieler:in fügt heimlich etwas zum Satz hinzu und dann raten alle, welche Version die ursprüngliche ist.
   </p>
   <br>
+  <input type="text" name="playerName" placeholder="Name eingeben" autofocus maxlength="{{MAX_INPUT_LENGTH}}"
+         [(ngModel)]="playerName"/>
   <div class="button-container">
-    <button type="button" (click)="requestNewGame()">Neues Spiel</button>
+    <button type="button" [disabled]="!canCreateGame" (click)="requestNewGame()">Neues Spiel</button>
     <button type="button" (click)="goToJoinPage()">Spiel beitreten</button>
   </div>
+  <ng-container *ngIf="error">
+    <p style="color: orangered">Fehler beim Erstellen des Spiels.</p>
+  </ng-container>
 </div>

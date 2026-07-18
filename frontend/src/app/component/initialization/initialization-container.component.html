@@ -6,4 +6,8 @@
   <www-join *ngSwitchCase="InitializationState.JOIN_GAME"
             (initializationStateEmitter)="setState($event)">
   </www-join>
+
+  <www-lobby *ngSwitchCase="InitializationState.LOBBY"
+             (initializationStateEmitter)="setState($event)">
+  </www-lobby>
 </ng-container>

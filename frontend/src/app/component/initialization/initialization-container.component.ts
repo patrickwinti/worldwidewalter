@@ -12,6 +12,7 @@ import { StateService } from "../../service/state.service";
 export class InitializationContainerComponent implements OnInit {
   @Output() startGameEmitter = new EventEmitter<GameDto>();
   @Input() joinWithId: boolean;
+  @Input() resumeInLobby = false;
   state: InitializationState;
   InitializationState = InitializationState;
   id: string;
@@ -20,7 +21,9 @@ export class InitializationContainerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.joinWithId && this.stateService.getGameId() != '') {
+    if (this.resumeInLobby) {
+      this.state = InitializationState.LOBBY;
+    } else if (this.joinWithId && this.stateService.getGameId() != '') {
       this.state = InitializationState.JOIN_GAME;
     } else {
       this.state = InitializationState.WELCOME_PAGE;

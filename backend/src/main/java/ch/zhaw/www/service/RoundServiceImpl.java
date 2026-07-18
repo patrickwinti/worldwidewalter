@@ -35,7 +35,9 @@ class RoundServiceImpl implements RoundService {
     @Override
     public void selectSphinx(Game game) {
         if (!game.hasEnoughPlayers()) return;
-        
+        // Do not start the round until everyone who played the previous round has re-entered.
+        if (!game.allExpectedPlayersEntered()) return;
+
         var sphinxCandidates = game.getSphinxCandidates();
         if (sphinxCandidates.isEmpty()) return;
         

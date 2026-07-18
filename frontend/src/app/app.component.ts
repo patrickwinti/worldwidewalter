@@ -15,6 +15,8 @@ import { firstValueFrom } from "rxjs";
 export class AppComponent implements OnInit {
   title = 'www-ui';
   joinWithId: boolean;
+  resumeInLobby = false;
+  ready = false;
 
   @HostListener('window:beforeunload')
   beforeUnloadHandler() {
@@ -51,6 +53,7 @@ export class AppComponent implements OnInit {
     if (urlGameId !== '') {
       this.joinWithId = true;
       this.stateService.setGameId(urlGameId);
+      this.ready = true;
       return;
     }
 
@@ -65,13 +68,21 @@ export class AppComponent implements OnInit {
         this.stateService.setPlayerId(player.id);
         this.stateService.setPlayerName(player.playerName ?? savedPlayerName);
         this.wsService.connect(savedGameId, player.id);
-        this.stateService.setState(GameState.REQUEST_NEW_ROUND);
+
+        // If the game has not been started yet, return to the lobby instead of the game.
+        const lobby = await firstValueFrom(this.gameService.getLobby(savedGameId)).catch(() => null);
+        if (lobby && !lobby.started) {
+          this.resumeInLobby = true;
+        } else {
+          this.stateService.setState(GameState.REQUEST_NEW_ROUND);
+        }
       } catch {
         this.cookieService.delete('gameId');
         this.cookieService.delete('playerId');
         this.cookieService.delete('playerName');
       }
     }
+    this.ready = true;
   }
 
   getParameterByName(name: any) {

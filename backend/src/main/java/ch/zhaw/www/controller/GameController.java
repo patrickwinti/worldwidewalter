@@ -32,18 +32,47 @@ public class GameController {
         this.gameService = gameService;
     }
     
-    @Operation(summary = "Creates a new game")
+    @Operation(summary = "Creates a new game with the creator as host")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Game created"),
+            @ApiResponse(responseCode = "400", description = "Missing host name"),
             @ApiResponse(responseCode = "409", description = "Game exists with that ID"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
-    @PostMapping(value = "/games", produces = "application/json")
+    @PostMapping(value = "/games", produces = "application/json", consumes = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<GameDto> createGame() {
-        Game newGame = gameService.createGame();
-        logger.log(Level.INFO, "created game {0}", newGame.getId());
-        return ResponseEntity.ok(new GameDto(newGame.getId()));
+    public ResponseEntity<GameCreatedDto> createGame(@Valid @RequestBody PlayerJoinRequestDto playerDto) {
+        Game newGame = gameService.createGame(playerDto.getPlayerName().trim());
+        Player host = newGame.getHost().orElseThrow();
+        logger.log(Level.INFO, "created game {0} with host {1}", new Object[]{newGame.getId(), host.getId()});
+        return ResponseEntity.ok(new GameCreatedDto(newGame.getId(), new PlayerDto(host.getId(), host.getName())));
+    }
+
+    @Operation(summary = "Host starts the game so the first round can begin")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Game started"),
+            @ApiResponse(responseCode = "403", description = "Player is not the host"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "409", description = "Not enough players to start"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games/{gameId}/start")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void startGame(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        gameService.startGame(gameId, playerId);
+        logger.log(Level.INFO, "game {0} started by {1}", new Object[]{gameId, playerId});
+    }
+
+    @Operation(summary = "Returns the current lobby state (joined players, host, started flag)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Current lobby state"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/games/{gameId}/lobby", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<LobbyDto> getLobby(@PathVariable String gameId) {
+        return ResponseEntity.ok(LobbyDto.from(gameService.getGame(gameId)));
     }
     
     //region Game-Player endpoints

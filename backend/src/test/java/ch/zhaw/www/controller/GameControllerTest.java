@@ -114,19 +114,63 @@ class GameControllerTest {
     
     @Test
     void testCreateGame_200() throws Exception {
-        when(gameService.createGame()).thenReturn(createGame(GAME_ID));
-        mvc.perform(MockMvcRequestBuilders.post("/api/games"))
+        var game = createGame(GAME_ID);
+        var host = createPlayer("Host");
+        game.registerPlayer(host);
+        game.setHostId(host.getId());
+        when(gameService.createGame("Host")).thenReturn(game);
+        mvc.perform(MockMvcRequestBuilders.post("/api/games")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"playerName\":\"Host\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"id\":\"" + GAME_ID + "\"}"));
-        verify(gameService).createGame();
+                .andExpect(content().json("{\"gameId\":\"" + GAME_ID + "\",\"host\":{\"id\":\"" + host.getId() + "\",\"playerName\":\"Host\"}}"));
+        verify(gameService).createGame("Host");
     }
-    
+
     @Test
     void testCreateGame_409() throws Exception {
-        doThrow(new GameError.ExistAlready()).when(gameService).createGame();
-        mvc.perform(MockMvcRequestBuilders.post("/api/games"))
+        doThrow(new GameError.ExistAlready()).when(gameService).createGame(anyString());
+        mvc.perform(MockMvcRequestBuilders.post("/api/games")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"playerName\":\"Host\"}"))
                 .andExpect(status().isConflict());
-        verify(gameService).createGame();
+        verify(gameService).createGame(anyString());
+    }
+
+    @Test
+    void testStartGame_204() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/start", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isNoContent());
+        verify(gameService).startGame(GAME_ID, PLAYER_ID);
+    }
+
+    @Test
+    void testStartGame_403_notHost() throws Exception {
+        doThrow(new GameError.NotHostException()).when(gameService).startGame(GAME_ID, PLAYER_ID);
+        mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/start", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testStartGame_409_notEnoughPlayers() throws Exception {
+        doThrow(new GameError.NotEnoughPlayersException()).when(gameService).startGame(GAME_ID, PLAYER_ID);
+        mvc.perform(MockMvcRequestBuilders.post("/api/games/{gameId}/start", GAME_ID)
+                        .header(HEADER_PLAYER, PLAYER_ID))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void testGetLobby_200() throws Exception {
+        var game = createGame(GAME_ID);
+        var host = createPlayer("Host");
+        game.registerPlayer(host);
+        game.setHostId(host.getId());
+        when(gameService.getGame(GAME_ID)).thenReturn(game);
+        mvc.perform(MockMvcRequestBuilders.get("/api/games/{gameId}/lobby", GAME_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"hostId\":\"" + host.getId() + "\",\"started\":false}"));
     }
     
     @Test

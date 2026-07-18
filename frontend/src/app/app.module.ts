@@ -7,6 +7,7 @@ import { WelcomeComponent } from "./component/initialization/welcome/welcome.com
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { InitializationContainerComponent } from './component/initialization/initialization-container.component';
 import { JoinComponent } from './component/initialization/join/join.component';
+import { LobbyComponent } from './component/initialization/lobby/lobby.component';
 import { FormsModule } from "@angular/forms";
 import { GameContainerComponent } from './component/game/game-container.component';
 import { HttpPollingInterceptor } from "./service/http-polling.interceptor";
@@ -34,6 +35,7 @@ import { provideZoneChangeDetection } from '@angular/core';
     WelcomeComponent,
     InitializationContainerComponent,
     JoinComponent,
+    LobbyComponent,
     GameContainerComponent,
     EnterPropositionComponent,
     SelectPropositionComponent,

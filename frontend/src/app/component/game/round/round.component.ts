@@ -93,7 +93,8 @@ export class RoundComponent implements OnInit, OnDestroy {
    * selection timer advances the round).
    */
   private advanceSphinxWhenSelectionsComplete(): void {
-    this.gameService.getResultsForRound(this.round.id).pipe(
+    // Poll silently (no loading overlay) so the sphinx can read the answers while waiting.
+    this.gameService.getResultsForRound(this.round.id, true).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING),

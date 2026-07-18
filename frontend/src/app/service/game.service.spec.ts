@@ -33,9 +33,9 @@ describe('GameService', () => {
 
 
     // act
-    service.requestNewGame();
+    service.requestNewGame('Host');
 
     // assert
-    expect(httpMock.post).toHaveBeenCalledWith(baseUrl + '/games', null)
+    expect(httpMock.post).toHaveBeenCalledWith(baseUrl + '/games', { playerName: 'Host' })
   });
 });

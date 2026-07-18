@@ -42,6 +42,7 @@ export class JoinComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.playerName = this.stateService.getPlayerName();
     if (this.gameId !== '') {
       this.gameIdIsReadOnly = true;
       this.joinGameId = this.gameId;
@@ -72,7 +73,7 @@ export class JoinComponent implements OnInit {
             this.cookieService.set('gameId', this.joinGameId);
             this.cookieService.set('playerName', player.playerName);
             this.wsService.connect(this.joinGameId, player.id);
-            this.initializationStateEmitter.emit(InitializationState.DONE);
+            this.initializationStateEmitter.emit(InitializationState.LOBBY);
             console.log('joining game: ' + this.joinGameId + 'with username: ' + this.playerName);
           },
           (error: HttpErrorResponse) => {

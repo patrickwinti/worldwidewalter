@@ -1,0 +1,17 @@
+<div class="content">
+  <h2>Warteraum</h2>
+  <p>Spiel-Code: <strong>{{gameId}}</strong></p>
+
+  <h3>Spieler ({{players.length}})</h3>
+  <ul>
+    <li *ngFor="let player of players">{{player.playerName}}</li>
+  </ul>
+
+  <ng-container *ngIf="isHost; else waitingForHost">
+    <button [disabled]="!canStart" (click)="startGame()">Spiel starten</button>
+    <p *ngIf="!canStart">Warte auf mindestens {{lobby?.minimumPlayers}} Spieler…</p>
+  </ng-container>
+  <ng-template #waitingForHost>
+    <p>Warte darauf, dass der Host das Spiel startet…</p>
+  </ng-template>
+</div>

@@ -44,4 +44,34 @@ public abstract class GameError extends RuntimeException {
             super(String.format("Game with ID = %s could not be found", gameId));
         }
     }
+
+    /**
+     * A non-host player attempted a host-only action (e.g. starting the game).
+     */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public static class NotHostException extends GameError {
+        public NotHostException() {
+            super("Only the host can perform this action");
+        }
+    }
+
+    /**
+     * The host tried to start the game with fewer than the minimum number of players present.
+     */
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public static class NotEnoughPlayersException extends GameError {
+        public NotEnoughPlayersException() {
+            super("Not enough players to start the game");
+        }
+    }
+
+    /**
+     * A round action was attempted before the host started the game.
+     */
+    @ResponseStatus(HttpStatus.TOO_EARLY)
+    public static class NotStartedException extends GameError {
+        public NotStartedException() {
+            super("Game has not been started by the host yet");
+        }
+    }
 }

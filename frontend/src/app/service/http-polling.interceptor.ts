@@ -1,4 +1,5 @@
 import {
+  HttpContextToken,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
@@ -11,6 +12,13 @@ import { StateService } from "./state.service";
 import { Injectable } from "@angular/core";
 import { LoadingService } from "./loading.service";
 
+/**
+ * Set on a request's HttpContext to suppress the loading overlay for that request while still
+ * getting the 425 retry behaviour (used e.g. for the sphinx's background "everyone selected" poll,
+ * so the answers stay readable instead of being hidden behind the spinner).
+ */
+export const SKIP_LOADING = new HttpContextToken<boolean>(() => false);
+
 @Injectable()
 export class HttpPollingInterceptor implements HttpInterceptor {
   private activeRequests: number = 0;
@@ -22,19 +30,24 @@ export class HttpPollingInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
 
     const requestWithHeader = this.addPlayerIdToHeader(request);
+    const skipLoading = request.context.get(SKIP_LOADING);
 
-    if (this.activeRequests === 0) {
-      this.loadingService.startLoading();
+    if (!skipLoading) {
+      if (this.activeRequests === 0) {
+        this.loadingService.startLoading();
+      }
+      this.activeRequests++;
     }
-    this.activeRequests++;
 
     return next.handle(requestWithHeader)
       .pipe(
         retry({delay: this.shouldRetry}),
         finalize(() => {
-          this.activeRequests--;
-          if (this.activeRequests === 0) {
-            this.loadingService.stopLoading();
+          if (!skipLoading) {
+            this.activeRequests--;
+            if (this.activeRequests === 0) {
+              this.loadingService.stopLoading();
+            }
           }
         })
       )

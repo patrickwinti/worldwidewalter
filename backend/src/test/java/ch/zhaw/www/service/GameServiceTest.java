@@ -34,7 +34,9 @@ class GameServiceTest {
     private EntityService entityService;
     @MockitoBean
     private RandomProvider randomProvider;
-    
+    @MockitoBean
+    private LobbyNotifier lobbyNotifier;
+
     @AfterEach
     void tearDown() {
         disableFixedClocked();
@@ -43,9 +45,10 @@ class GameServiceTest {
     @Test
     void testAddGameSavesItToRepository() {
         when(randomProvider.getRoomCode()).thenReturn("WXYZ");
-        var game = gameService.createGame();
+        var game = gameService.createGame("Host");
         verify(entityService).saveNewGame(game);
         assertNotNull(game.getId());
+        assertTrue(game.isHost(game.getHostId()));
     }
 
     @Test
@@ -57,7 +60,7 @@ class GameServiceTest {
                 .doNothing()
                 .when(entityService).saveNewGame(any(Game.class));
 
-        var game = gameService.createGame();
+        var game = gameService.createGame("Host");
 
         assertEquals("FREE", game.getId());
         verify(randomProvider, times(3)).getRoomCode();
@@ -68,7 +71,7 @@ class GameServiceTest {
         when(randomProvider.getRoomCode()).thenReturn("TAKN");
         doThrow(new GameError.ExistAlready()).when(entityService).saveNewGame(any(Game.class));
 
-        assertThrows(GameError.ExistAlready.class, () -> gameService.createGame());
+        assertThrows(GameError.ExistAlready.class, () -> gameService.createGame("Host"));
     }
 
     @Test
@@ -307,9 +310,87 @@ class GameServiceTest {
         assertNotNull(Objects.requireNonNull(game.getCurrentRound()).getSphinx());
     }
     
+    @Test
+    void testStartGameSetsStartedWhenHostAndEnoughPlayers() {
+        var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
+        gameService.startGame(GAME_ID, game.getHostId());
+        assertTrue(game.isStarted());
+        verify(lobbyNotifier).notifyLobbyChanged(game);
+    }
+
+    @Test
+    void testStartGameThrowsWhenNotHost() {
+        var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
+        assertThrows(GameError.NotHostException.class, () -> gameService.startGame(GAME_ID, "not-the-host"));
+        assertFalse(game.isStarted());
+    }
+
+    @Test
+    void testStartGameThrowsWhenNotEnoughPlayers() {
+        var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS - 1);
+        assertThrows(GameError.NotEnoughPlayersException.class, () -> gameService.startGame(GAME_ID, game.getHostId()));
+        assertFalse(game.isStarted());
+    }
+
+    @Test
+    void testReassignHostIfAbsentReassignsWhenHostGoneBeyondGrace() {
+        enableFixedClocked();
+        var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
+        String originalHost = game.getHostId();
+        game.markPlayerDisconnected(originalHost);
+        offsetFixedClockBy(Duration.ofSeconds(11));
+        when(randomProvider.getRandomIndex(anyInt())).thenReturn(0);
+
+        gameService.reassignHostIfAbsent(GAME_ID);
+
+        assertNotEquals(originalHost, game.getHostId());
+        verify(lobbyNotifier).notifyLobbyChanged(game);
+    }
+
+    @Test
+    void testReassignHostIfAbsentKeepsHostWithinGrace() {
+        enableFixedClocked();
+        var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
+        String originalHost = game.getHostId();
+        game.markPlayerDisconnected(originalHost);
+        offsetFixedClockBy(Duration.ofSeconds(5)); // still within the grace period
+
+        gameService.reassignHostIfAbsent(GAME_ID);
+
+        assertEquals(originalHost, game.getHostId());
+        verify(lobbyNotifier, never()).notifyLobbyChanged(any());
+    }
+
+    @Test
+    void testReassignHostIfAbsentNoopForStartedGame() {
+        var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
+        game.markStarted();
+        String originalHost = game.getHostId();
+        game.markPlayerDisconnected(originalHost); // even a gone host is ignored once started
+
+        gameService.reassignHostIfAbsent(GAME_ID);
+
+        assertEquals(originalHost, game.getHostId());
+        verify(lobbyNotifier, never()).notifyLobbyChanged(any());
+    }
+
+    private Game mockLobbyGameInRepository(int playerCount) {
+        var game = createGame(GAME_ID);
+        var players = IntStream.range(0, playerCount).mapToObj(i -> registerPlayer(game)).toList();
+        game.setHostId(players.get(0).getId());
+        when(entityService.editGame(eq(GAME_ID), any())).thenAnswer(invocationOnMock -> {
+            var lambda = invocationOnMock.getArgument(1, GameTransaction.class);
+            //noinspection unchecked
+            return lambda.transactionalChange(game);
+        });
+        when(entityService.getGame(GAME_ID)).thenReturn(game);
+        return game;
+    }
+
     private Game mockGameInRepository() {
         var game = createGame(GAME_ID);
-        
+        game.markStarted(); // these tests exercise the running-game/round flow, past the lobby
+
         when(entityService.editGame(eq(game.getId()), any())).thenAnswer(invocationOnMock -> {
             var lambda = invocationOnMock.getArgument(1, GameTransaction.class);
             //noinspection unchecked

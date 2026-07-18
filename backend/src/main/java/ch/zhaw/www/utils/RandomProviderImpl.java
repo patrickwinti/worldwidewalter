@@ -26,6 +26,11 @@ public class RandomProviderImpl implements RandomProvider {
     }
 
     @Override
+    public int getRandomIndex(int bound) {
+        return random.nextInt(bound);
+    }
+
+    @Override
     public String getRoomCode() {
         StringBuilder code = new StringBuilder(ROOM_CODE_LENGTH);
         for (int i = 0; i < ROOM_CODE_LENGTH; i++) {

@@ -35,6 +35,7 @@ public class Game {
     @Getter
     @NotNull
     private final String id;
+    @Getter
     private final int minimumAmountOfPlayers;
     private final int maximumAmountOfPlayers;
     private final int numberOfRoundsInTurn;
@@ -42,6 +43,15 @@ public class Game {
     private final Map<String, Player> activePlayers = new HashMap<>();
     private final List<Player> players = new ArrayList<>();
     private boolean roundReachedMinimumPlayers = false;
+    // Number of players who took part in the previous round; the next round waits for this many
+    // to re-enter (click "Weiter") before it starts. Zero for the very first round.
+    private int expectedContinueCount = 0;
+    @Getter
+    @Setter
+    @Nullable
+    private String hostId;
+    @Getter
+    private boolean started = false;
     @Setter
     private Map<Player, Integer> sphinxCandidates = new HashMap<>();
     private final List<Prompt> prompts;
@@ -196,6 +206,61 @@ public class Game {
         }
         return activePlayers.size() >= minimumAmountOfPlayers;
     }
+
+    /**
+     * Marks the game as started by the host. After this the first round may be created.
+     */
+    public void markStarted() {
+        this.started = true;
+    }
+
+    /**
+     * Checks whether the given player is the host of this game.
+     *
+     * @param playerId player identifier
+     * @return true if the player is the current host
+     */
+    public boolean isHost(@NotNull String playerId) {
+        return playerId.equals(hostId);
+    }
+
+    /**
+     * @return the host player if one is set and still in the game, otherwise empty
+     */
+    public Optional<Player> getHost() {
+        if (hostId == null) {
+            return Optional.empty();
+        }
+        return players.stream().filter(player -> player.getId().equals(hostId)).findFirst();
+    }
+
+    /**
+     * @return true if the host is still present (in the game and connected, or within the disconnect grace)
+     */
+    public boolean isHostPresent() {
+        Instant now = InstantWrapper.getNow();
+        return getHost().map(host -> host.isPresent(now, DISCONNECT_GRACE)).orElse(false);
+    }
+
+    /**
+     * Players who are still present in the game (connected or within the disconnect grace). Used
+     * for the lobby: the start check and for choosing a replacement host.
+     *
+     * @return the present players
+     */
+    public List<Player> getPresentPlayers() {
+        Instant now = InstantWrapper.getNow();
+        return players.stream()
+                .filter(player -> player.isPresent(now, DISCONNECT_GRACE))
+                .toList();
+    }
+
+    /**
+     * @return true if enough players are present in the lobby for the host to start the game
+     */
+    public boolean hasEnoughPlayersToStart() {
+        return getPresentPlayers().size() >= minimumAmountOfPlayers;
+    }
     
     /**
      * Returns the first prompt in the list of prompts and removes it from the list.
@@ -214,9 +279,25 @@ public class Game {
      * @param round the round to add
      */
     public void addRound(Round round) {
+        // Remember how many players were in the round we are leaving, so the new round can wait
+        // for all of them to re-enter before it starts (0 for the first round of the game).
+        this.expectedContinueCount = (int) getPresentActivePlayersCount();
         activePlayers.clear();
         roundReachedMinimumPlayers = false;
         rounds.add(round);
+    }
+
+    /**
+     * Whether everyone who is expected to play the current round has entered it. For the first
+     * round this is always true (so the usual minimum-player check governs the start); for later
+     * rounds the round waits until all present players of the previous round have re-entered.
+     * The count is capped by the players still present, so a player who left cannot block the start.
+     *
+     * @return true if all expected players have entered the current round
+     */
+    public boolean allExpectedPlayersEntered() {
+        int expected = Math.min(expectedContinueCount, getPresentPlayers().size());
+        return getPresentActivePlayersCount() >= expected;
     }
     
     /**

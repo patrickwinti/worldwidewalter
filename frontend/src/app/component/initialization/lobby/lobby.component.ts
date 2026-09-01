@@ -3,8 +3,7 @@ import { GameService } from "../../../service/game.service";
 import { StateService } from "../../../service/state.service";
 import { WsService } from "../../../service/ws.service";
 import { InitializationState } from "../../../model/initialization-state";
-import { LobbyDto } from "../../../dto/lobby-dto";
-import { PlayerDto } from "../../../dto/player-dto";
+import { LobbyDto, PlayerDto } from "@api";
 import { firstValueFrom } from "rxjs";
 
 @Component({

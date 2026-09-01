@@ -6,7 +6,7 @@ import { of } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { StateService } from "../../../service/state.service";
 import { WsService } from "../../../service/ws.service";
-import { LobbyDto } from "../../../dto/lobby-dto";
+import { LobbyDto } from "@api";
 import { InitializationState } from "../../../model/initialization-state";
 
 describe('LobbyComponent', () => {

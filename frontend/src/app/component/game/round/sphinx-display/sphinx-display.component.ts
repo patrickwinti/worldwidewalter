@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { PlayerDto } from "../../../../dto/player-dto";
+import { PlayerDto } from "@api";
 
 @Component({
   selector: 'www-sphinx-display',
@@ -8,10 +8,13 @@ import { PlayerDto } from "../../../../dto/player-dto";
   standalone: false,
 })
 export class SphinxDisplayComponent {
-  @Input() sphinx: PlayerDto;
+  @Input() sphinx?: PlayerDto;
   @Input() currentPlayerId: string;
 
   getDisplayText(): string {
+    if (!this.sphinx) {
+      return '';
+    }
     if (this.sphinx.id === this.currentPlayerId) {
       return 'Du bist die Sphinx!\n' +
         'Mit was würdest du \"WALTER\" ersetzen?' ;

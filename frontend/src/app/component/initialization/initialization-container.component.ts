@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { GameDto } from "../../dto/game-dto";
 import { InitializationState } from "../../model/initialization-state";
 import { StateService } from "../../service/state.service";
 
@@ -10,7 +9,7 @@ import { StateService } from "../../service/state.service";
   standalone: false,
 })
 export class InitializationContainerComponent implements OnInit {
-  @Output() startGameEmitter = new EventEmitter<GameDto>();
+  @Output() startGameEmitter = new EventEmitter<void>();
   @Input() joinWithId: boolean;
   @Input() resumeInLobby = false;
   state: InitializationState;

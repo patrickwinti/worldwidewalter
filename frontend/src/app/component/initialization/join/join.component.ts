@@ -1,10 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { GameService } from "../../../service/game.service";
-import { PlayerJoinRequestDto } from "../../../dto/player-join-request-dto";
+import { PlayerDto, PlayerJoinRequestDto } from "@api";
 import { InitializationState } from "../../../model/initialization-state";
 import { firstValueFrom } from "rxjs";
 import { StateService } from "../../../service/state.service";
-import { PlayerDto } from "../../../dto/player-dto";
 import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 import { isNonEmptyString } from "../../../shared/util";
 import { GAME_ID_LENGTH, MAX_INPUT_LENGTH } from "../../../shared/settings";

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { GameState } from "../../model/game-state";
 import { StateService } from "../../service/state.service";
 import { catchError, Observable, switchMap, tap, throwError } from "rxjs";
-import { RoundDto } from "../../dto/round-dto";
+import { RoundDto } from "@api";
 import { GameService } from "../../service/game.service";
 import { HttpErrorResponse } from "@angular/common/http";
 

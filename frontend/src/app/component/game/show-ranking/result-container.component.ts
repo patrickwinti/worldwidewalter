@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 import { StateService } from "../../../service/state.service";
-import { RoundDto } from "../../../dto/round-dto";
+import { RankingDto, ResultDto, RoundDto } from "@api";
 import { firstValueFrom, Observable } from "rxjs";
 import { GameService } from "../../../service/game.service";
-import { RankingDto, ResultDto } from "../../../dto/result-dto";
 import { GameState } from "../../../model/game-state";
 
 @Component({

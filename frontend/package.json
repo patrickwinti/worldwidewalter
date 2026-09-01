@@ -3,11 +3,18 @@
   "version": "1.0.2",
   "scripts": {
     "ng": "ng",
+    "generate:api": "openapi-generator-cli generate",
+    "prestart": "npm run generate:api",
     "start": "ng serve",
+    "prebuild": "npm run generate:api",
     "build": "ng build",
+    "prebuild-dev": "npm run generate:api",
     "build-dev": "ng build --configuration=dev",
+    "prewatch": "npm run generate:api",
     "watch": "ng build --watch --configuration development",
+    "pretest": "npm run generate:api",
     "test": "ng test",
+    "pretest-headless": "npm run generate:api",
     "test-headless": "ng test --watch=false --browsers=HeadlessChrome"
   },
   "private": true,
@@ -26,6 +33,7 @@
     "zone.js": "~0.16.0"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.41.0",
     "@angular-devkit/build-angular": "^21.0.0",
     "@angular/build": "^21.0.0",
     "@angular/cli": "~21.0.0",

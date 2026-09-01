@@ -1,0 +1,912 @@
+{
+  "components" : {
+    "schemas" : {
+      "GameCreatedDto" : {
+        "properties" : {
+          "gameId" : {
+            "type" : "string"
+          },
+          "host" : {
+            "$ref" : "#/components/schemas/PlayerDto"
+          }
+        },
+        "required" : [ "gameId", "host" ],
+        "type" : "object"
+      },
+      "LobbyDto" : {
+        "properties" : {
+          "hostId" : {
+            "type" : "string"
+          },
+          "minimumPlayers" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "players" : {
+            "items" : {
+              "$ref" : "#/components/schemas/PlayerDto"
+            },
+            "type" : "array"
+          },
+          "started" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "hostId", "minimumPlayers", "players", "started" ],
+        "type" : "object"
+      },
+      "PlayerDto" : {
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "playerName" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "id", "playerName" ],
+        "type" : "object"
+      },
+      "PlayerJoinRequestDto" : {
+        "properties" : {
+          "playerName" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "playerName" ],
+        "type" : "object"
+      },
+      "PropositionDto" : {
+        "properties" : {
+          "gaps" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "numberOfAuthors" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "readOnly" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "gaps", "id", "numberOfAuthors", "readOnly" ],
+        "type" : "object"
+      },
+      "PropositionSelectionDto" : {
+        "properties" : {
+          "propositions" : {
+            "items" : {
+              "$ref" : "#/components/schemas/PropositionDto"
+            },
+            "type" : "array"
+          },
+          "roundId" : {
+            "type" : "string"
+          },
+          "selectionSubmissionEndInUtc" : {
+            "format" : "date-time",
+            "type" : [ "string", "null" ]
+          }
+        },
+        "required" : [ "propositions", "roundId" ],
+        "type" : "object"
+      },
+      "PropositionSubmissionDto" : {
+        "properties" : {
+          "gaps" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "gaps" ],
+        "type" : "object"
+      },
+      "RankingDto" : {
+        "properties" : {
+          "playerName" : {
+            "type" : "string"
+          },
+          "points" : {
+            "format" : "int32",
+            "type" : "integer"
+          }
+        },
+        "required" : [ "playerName", "points" ],
+        "type" : "object"
+      },
+      "ResultDto" : {
+        "properties" : {
+          "ranking" : {
+            "items" : {
+              "$ref" : "#/components/schemas/RankingDto"
+            },
+            "type" : "array"
+          },
+          "selections" : {
+            "items" : {
+              "$ref" : "#/components/schemas/SelectionDto"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "ranking", "selections" ],
+        "type" : "object"
+      },
+      "RoundDto" : {
+        "properties" : {
+          "endOfSubmissionsInUtc" : {
+            "format" : "date-time",
+            "type" : [ "string", "null" ]
+          },
+          "id" : {
+            "type" : "string"
+          },
+          "prompt" : {
+            "type" : "string"
+          },
+          "sphinx" : {
+            "$ref" : "#/components/schemas/PlayerDto"
+          },
+          "walters" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "id", "prompt", "walters" ],
+        "type" : "object"
+      },
+      "SelectionDto" : {
+        "properties" : {
+          "authors" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "gaps" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "selectors" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "sphinxResponse" : {
+            "type" : "boolean"
+          }
+        },
+        "required" : [ "authors", "gaps", "selectors", "sphinxResponse" ],
+        "type" : "object"
+      }
+    }
+  },
+  "info" : {
+    "title" : "OpenAPI definition",
+    "version" : "v0"
+  },
+  "openapi" : "3.1.0",
+  "paths" : {
+    "/api/games" : {
+      "post" : {
+        "operationId" : "createGame",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PlayerJoinRequestDto"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GameCreatedDto"
+                }
+              }
+            },
+            "description" : "Game created"
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GameCreatedDto"
+                }
+              }
+            },
+            "description" : "Missing host name"
+          },
+          "409" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GameCreatedDto"
+                }
+              }
+            },
+            "description" : "Game exists with that ID"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GameCreatedDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Creates a new game with the creator as host",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/lobby" : {
+      "get" : {
+        "operationId" : "getLobby",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LobbyDto"
+                }
+              }
+            },
+            "description" : "Current lobby state"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LobbyDto"
+                }
+              }
+            },
+            "description" : "Game has not been found"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LobbyDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Returns the current lobby state (joined players, host, started flag)",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/players" : {
+      "post" : {
+        "operationId" : "enterGame",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PlayerJoinRequestDto"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Player has joined the game"
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Missing player name"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Game has not been found"
+          },
+          "409" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Game has reached max capacity"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player joins an existing game",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/players/{playerId}" : {
+      "delete" : {
+        "operationId" : "leaveGame",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "playerId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Player left game"
+          },
+          "404" : {
+            "description" : "Game has not been found"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player leaves game gracefully",
+        "tags" : [ "game-controller" ]
+      },
+      "post" : {
+        "operationId" : "leaveGameAfterDestruction",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "playerId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "summary" : "Player leaves game by destroying webapp",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/players/{playerId}/rejoin" : {
+      "post" : {
+        "operationId" : "rejoinGame",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "playerId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Player rejoined the game"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Game or player not found"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player rejoins a game after disconnection",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/results" : {
+      "get" : {
+        "operationId" : "getGameResults",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Results table with player names and their point value"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Game has not been found"
+          },
+          "405" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Not all selections have been submitted yet"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Retrieves the points for each player",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/rounds" : {
+      "get" : {
+        "operationId" : "getRound",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundDto"
+                }
+              }
+            },
+            "description" : "New round started"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundDto"
+                }
+              }
+            },
+            "description" : "Game has not been found"
+          },
+          "425" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundDto"
+                }
+              }
+            },
+            "description" : "Game has not enough players to continue"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player requested current round",
+        "tags" : [ "game-controller" ]
+      },
+      "put" : {
+        "operationId" : "enterRound",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "New round started, added to round or acknowledge as part of game"
+          },
+          "403" : {
+            "description" : "Player cannot enter this round because it's either already running"
+          },
+          "404" : {
+            "description" : "Game has not been found"
+          },
+          "409" : {
+            "description" : "Game is at capacity"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player requested to enter round",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/start" : {
+      "post" : {
+        "operationId" : "startGame",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Game started"
+          },
+          "403" : {
+            "description" : "Player is not the host"
+          },
+          "404" : {
+            "description" : "Game has not been found"
+          },
+          "409" : {
+            "description" : "Not enough players to start"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Host starts the game so the first round can begin",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/rounds/{roundId}/propositions" : {
+      "get" : {
+        "operationId" : "getAllPropositionForRound",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "roundId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PropositionSelectionDto"
+                }
+              }
+            },
+            "description" : "Propositions in round to be selected by players"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PropositionSelectionDto"
+                }
+              }
+            },
+            "description" : "Either round or player has not been found"
+          },
+          "405" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PropositionSelectionDto"
+                }
+              }
+            },
+            "description" : "Not all players have sent their proposition"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PropositionSelectionDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Get all propositions sent by the players in current round",
+        "tags" : [ "round-controller" ]
+      },
+      "post" : {
+        "operationId" : "submitProposition",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "roundId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/PropositionSubmissionDto"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Proposition submitted to round"
+          },
+          "400" : {
+            "description" : "Missing proposition"
+          },
+          "404" : {
+            "description" : "Either round or player has not been found"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player submits propositions",
+        "tags" : [ "round-controller" ]
+      }
+    },
+    "/api/rounds/{roundId}/propositions/{propositionId}" : {
+      "post" : {
+        "operationId" : "selectProposition",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "roundId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "propositionId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Proposition choice saved"
+          },
+          "404" : {
+            "description" : "Either round, proposition or player has not been found"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Player selects proposition",
+        "tags" : [ "round-controller" ]
+      }
+    },
+    "/api/rounds/{roundId}/results" : {
+      "get" : {
+        "operationId" : "getRoundResults",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "roundId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Results table with player names and their point value"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Round has not been found"
+          },
+          "405" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Not all selections have been submitted yet"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ResultDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Retrieves the points for each player in a round",
+        "tags" : [ "round-controller" ]
+      }
+    }
+  },
+  "servers" : [ {
+    "description" : "Generated server url",
+    "url" : "http://localhost"
+  } ]
+}

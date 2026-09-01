@@ -4,7 +4,7 @@ import { ResultContainerComponent } from './result-container.component';
 import { NO_ERRORS_SCHEMA } from "@angular/core";
 import { getGameServiceMock } from "../../../testing/mock-services";
 import { GameService } from "../../../service/game.service";
-import { RankingDto } from "../../../dto/result-dto";
+import { RankingDto } from "@api";
 
 describe('ShowRankingComponent', () => {
   let component: ResultContainerComponent;

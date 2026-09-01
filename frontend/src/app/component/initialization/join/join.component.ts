@@ -81,6 +81,10 @@ export class JoinComponent implements OnInit {
               this.joinGameId = '';
               this.gameIdIsReadOnly = false;
               this.errorText = 'Spiel nicht gefunden.';
+            } else if (error.status === HttpStatusCode.UnprocessableEntity) {
+              this.errorText = 'Dieser Name ist im Spiel schon vergeben.';
+            } else if (error.status === HttpStatusCode.Conflict) {
+              this.errorText = 'Das Spiel ist bereits voll.';
             } else {
               this.errorText = 'Unbekannter Fehler';
             }

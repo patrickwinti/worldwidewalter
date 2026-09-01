@@ -7,7 +7,6 @@ import java.util.random.RandomGenerator;
 
 @Component
 public class RandomProviderImpl implements RandomProvider {
-    private static final int POSTFIX_BOUND = 2000;
     private static final int ROOM_CODE_LENGTH = 4;
 
     /**
@@ -19,11 +18,6 @@ public class RandomProviderImpl implements RandomProvider {
             "BCDFGHJKLMNPQRSTVWXYZ".toCharArray();
 
     private final RandomGenerator random = new SecureRandom();
-
-    @Override
-    public int getPostfix() {
-        return random.nextInt(POSTFIX_BOUND);
-    }
 
     @Override
     public int getRandomIndex(int bound) {

@@ -44,7 +44,7 @@ class GameIntegrationTest {
         int nrOfPlayers = Runtime.getRuntime().availableProcessors() * 2;
         ExecutorService service = Executors.newFixedThreadPool(nrOfPlayers);
         var callables = IntStream.range(0, nrOfPlayers)
-                .mapToObj(value -> gameService.enterGame(gameId, "Sara"))
+                .mapToObj(value -> gameService.enterGame(gameId, "Sara" + value))
                 .map(player -> (Callable<Round>) () -> {
                     gameService.enterRound(gameId, player.getId());
                     return gameService.getGame(gameId).getCurrentRound();

@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +26,7 @@ class RoundTest {
     private static final Duration PROPOSITION_DURATION = Duration.ofMinutes(40);
     private static final Duration PROPOSITION_ENTER_LIMIT = Duration.ofMinutes(10);
     private static final Duration SUBMISSION_DURATION = Duration.ofMinutes(10);
+    private static final Duration CONTINUE_WAIT_DURATION = Duration.ofSeconds(45);
     
     @BeforeEach
     void setUp() {
@@ -148,7 +150,47 @@ class RoundTest {
         assertFalse(round.hasProposition("notExistingId"));
     }
     
+    @Test
+    void closingThePropositionPhaseStartsTheSelectionWindowFromThatMoment() {
+        Round round = getRound();
+        round.setSphinx(createPlayer());
+        Duration answeredAfter = Duration.ofMinutes(3);
+        
+        offsetFixedClockBy(answeredAfter);
+        round.closePropositionPhase();
+        
+        Instant answeredAt = getFixedClockInstant().plus(answeredAfter);
+        assertEquals(answeredAt, round.getPropositionSubmissionEnd());
+        assertEquals(answeredAt.plus(SUBMISSION_DURATION), round.getSelectionSubmissionEnd());
+        assertFalse(round.acceptsPropositions());
+        assertTrue(round.acceptsSelections());
+    }
+    
+    @Test
+    void closingThePropositionPhaseTwiceKeepsTheFirstDeadline() {
+        Round round = getRound();
+        round.setSphinx(createPlayer());
+        offsetFixedClockBy(Duration.ofMinutes(3));
+        round.closePropositionPhase();
+        Instant selectionEnd = round.getSelectionSubmissionEnd();
+        
+        offsetFixedClockBy(Duration.ofMinutes(4));
+        round.closePropositionPhase();
+        
+        assertEquals(selectionEnd, round.getSelectionSubmissionEnd());
+    }
+    
+    @Test
+    void roundOnlyWaitsForRemainingPlayersForTheConfiguredTime() {
+        Round round = getRound();
+        
+        assertFalse(round.hasWaitedForRemainingPlayers());
+        offsetFixedClockBy(CONTINUE_WAIT_DURATION.plusSeconds(1));
+        assertTrue(round.hasWaitedForRemainingPlayers());
+    }
+    
     private static Round getRound() {
-        return new Round(ID, PROMPT, PROPOSITION_DURATION, PROPOSITION_ENTER_LIMIT, SUBMISSION_DURATION);
+        return new Round(ID, PROMPT, PROPOSITION_DURATION, PROPOSITION_ENTER_LIMIT, SUBMISSION_DURATION,
+                CONTINUE_WAIT_DURATION);
     }
 }

@@ -66,6 +66,29 @@ public abstract class GameError extends RuntimeException {
     }
 
     /**
+     * Another player in the game already uses the requested name.
+     */
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public static class NameTakenException extends GameError {
+        /**
+         * @param playerName the name that is already in use
+         */
+        public NameTakenException(@NotNull String playerName) {
+            super(String.format("Name %s is already taken in this game", playerName));
+        }
+    }
+
+    /**
+     * The game has been ended by the host, so no further round can be played.
+     */
+    @ResponseStatus(HttpStatus.GONE)
+    public static class EndedException extends GameError {
+        public EndedException() {
+            super("Game has been ended by the host");
+        }
+    }
+
+    /**
      * A round action was attempted before the host started the game.
      */
     @ResponseStatus(HttpStatus.TOO_EARLY)

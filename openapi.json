@@ -15,6 +15,9 @@
       },
       "LobbyDto" : {
         "properties" : {
+          "ended" : {
+            "type" : "boolean"
+          },
           "hostId" : {
             "type" : "string"
           },
@@ -117,6 +120,10 @@
           "points" : {
             "format" : "int32",
             "type" : "integer"
+          },
+          "roundPoints" : {
+            "format" : "int32",
+            "type" : "integer"
           }
         },
         "required" : [ "playerName", "points" ],
@@ -163,6 +170,32 @@
           }
         },
         "required" : [ "id", "prompt", "walters" ],
+        "type" : "object"
+      },
+      "RoundStatusDto" : {
+        "properties" : {
+          "completed" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "expected" : {
+            "format" : "int32",
+            "type" : "integer"
+          },
+          "gameEnded" : {
+            "type" : "boolean"
+          },
+          "phase" : {
+            "enum" : [ "WAITING_FOR_PLAYERS", "PROPOSITIONS", "SELECTIONS", "FINISHED" ],
+            "type" : "string"
+          },
+          "waitingFor" : {
+            "items" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
         "type" : "object"
       },
       "SelectionDto" : {
@@ -256,6 +289,42 @@
           }
         },
         "summary" : "Creates a new game with the creator as host",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/end" : {
+      "post" : {
+        "operationId" : "endGame",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Game ended"
+          },
+          "403" : {
+            "description" : "Player is not the host"
+          },
+          "404" : {
+            "description" : "Game has not been found"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Host ends the game; the final ranking stays available",
         "tags" : [ "game-controller" ]
       }
     },
@@ -368,6 +437,16 @@
             },
             "description" : "Game has reached max capacity"
           },
+          "422" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PlayerDto"
+                }
+              }
+            },
+            "description" : "Name is already taken in this game"
+          },
           "500" : {
             "content" : {
               "application/json" : {
@@ -414,9 +493,11 @@
         },
         "summary" : "Player leaves game gracefully",
         "tags" : [ "game-controller" ]
-      },
+      }
+    },
+    "/api/games/{gameId}/players/{playerId}/disconnect" : {
       "post" : {
-        "operationId" : "leaveGameAfterDestruction",
+        "operationId" : "markPlayerAbsent",
         "parameters" : [ {
           "in" : "path",
           "name" : "gameId",
@@ -433,11 +514,14 @@
           }
         } ],
         "responses" : {
-          "200" : {
-            "description" : "OK"
+          "204" : {
+            "description" : "Player marked as absent"
+          },
+          "500" : {
+            "description" : "Unknown error"
           }
         },
-        "summary" : "Player leaves game by destroying webapp",
+        "summary" : "Player's client went away (tab closed or reloaded)",
         "tags" : [ "game-controller" ]
       }
     },
@@ -492,6 +576,42 @@
           }
         },
         "summary" : "Player rejoins a game after disconnection",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/restart" : {
+      "post" : {
+        "operationId" : "restartGame",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "header",
+          "name" : "X-PLAYER-ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Game restarted"
+          },
+          "403" : {
+            "description" : "Player is not the host"
+          },
+          "404" : {
+            "description" : "Game has not been found"
+          },
+          "500" : {
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Host puts the game back into the lobby for another match, scores reset",
         "tags" : [ "game-controller" ]
       }
     },
@@ -645,11 +765,61 @@
           "409" : {
             "description" : "Game is at capacity"
           },
+          "410" : {
+            "description" : "Game has been ended by the host"
+          },
           "500" : {
             "description" : "Unknown error"
           }
         },
         "summary" : "Player requested to enter round",
+        "tags" : [ "game-controller" ]
+      }
+    },
+    "/api/games/{gameId}/rounds/status" : {
+      "get" : {
+        "operationId" : "getRoundStatus",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "gameId",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundStatusDto"
+                }
+              }
+            },
+            "description" : "Current round status"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundStatusDto"
+                }
+              }
+            },
+            "description" : "Game has not been found"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/RoundStatusDto"
+                }
+              }
+            },
+            "description" : "Unknown error"
+          }
+        },
+        "summary" : "Returns what the current round is waiting for and who is still missing",
         "tags" : [ "game-controller" ]
       }
     },

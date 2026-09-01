@@ -41,15 +41,4 @@ class RandomProviderImplementationTest {
         assertTrue(distinctCodes > 900, "Room codes should be well distributed, got " + distinctCodes);
     }
     
-    @Test
-    void testPostfixGeneration() {
-        var postfix1 = randomProvider.getPostfix();
-        var postfix2 = randomProvider.getPostfix();
-        
-        assertNotEquals(postfix1, postfix2);
-        assertTrue(postfix1 >= 0);
-        assertTrue(postfix2 >= 0);
-        assertTrue(postfix1 < 2000);
-        assertTrue(postfix2 < 2000);
-    }
 }

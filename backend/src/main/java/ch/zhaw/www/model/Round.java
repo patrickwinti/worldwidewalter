@@ -33,6 +33,18 @@ public class Round {
     private final Duration enterLimitDuration;
     @Getter(AccessLevel.NONE)
     private final Duration selectionDuration;
+    /**
+     * How long the round waits for all players of the previous round to re-enter before it
+     * starts without the ones who never continued.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Duration continueWaitDuration;
+    /**
+     * Moment the round was created, i.e. when the first player continued into it. Anchor for
+     * {@link #hasWaitedForRemainingPlayers()}.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Instant createdAt = InstantWrapper.getNow();
     @Setter
     private int tempSphinxPoints = 0;
     @Setter
@@ -40,6 +52,11 @@ public class Round {
     
     private final List<Proposition> propositions = new ArrayList<>();
     private final Map<String, String> selections = new ConcurrentHashMap<>();
+    /**
+     * Points earned in this round per player, so results can show what the round itself scored
+     * next to the running total.
+     */
+    private final Map<String, Integer> pointsAwarded = new ConcurrentHashMap<>();
     
     @Nullable
     private Player sphinx;
@@ -59,6 +76,32 @@ public class Round {
             this.propositionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration);
             this.selectionSubmissionEnd = InstantWrapper.offsetNow(propositionDuration.plus(selectionDuration));
         }
+    }
+    
+    /**
+     * Closes the proposition phase at this moment and starts the selection phase from here.
+     * <p>
+     * Called once every expected proposition has arrived. Without it the selection deadline
+     * stays anchored at the round start, so a round in which everybody answers quickly would
+     * hand players the unused rest of the proposition time on top of the selection time.
+     */
+    public void closePropositionPhase() {
+        if (!acceptsPropositions()) {
+            return;
+        }
+        this.propositionSubmissionEnd = InstantWrapper.getNow();
+        this.selectionSubmissionEnd = InstantWrapper.offsetNow(selectionDuration);
+    }
+    
+    /**
+     * Whether the round has waited long enough for the players of the previous round to
+     * re-enter. Once this is true the round starts with whoever is present, so that a single
+     * player who never continues cannot stall the game for everybody else.
+     *
+     * @return true if the wait for the remaining players has elapsed
+     */
+    public boolean hasWaitedForRemainingPlayers() {
+        return !isInFuture(createdAt.plus(continueWaitDuration));
     }
     
     /**
@@ -87,6 +130,15 @@ public class Round {
      */
     public void addProposition(Proposition proposition) {
         propositions.add(proposition);
+    }
+    
+    /**
+     * Records the points a selection earned in this round.
+     *
+     * @param evaluation points per player as awarded for a single selection
+     */
+    public void addPoints(Map<String, Integer> evaluation) {
+        evaluation.forEach((playerId, value) -> pointsAwarded.merge(playerId, value, Integer::sum));
     }
     
     /**

@@ -26,6 +26,8 @@ export class CountDownComponent implements OnInit, OnDestroy {
   private timeDifference: number;
   private timeout: number;
   private startTime: number;
+  /** The deadline is reported once; a second emission would submit the same answer twice. */
+  private hasTimedOut = false;
 
   /** Circumference of the progress ring (r = 23). */
   readonly ringCircumference = 2 * Math.PI * 23;
@@ -51,10 +53,11 @@ export class CountDownComponent implements OnInit, OnDestroy {
         this.timeDifference = this.getTimeDifference();
         this.allocateTimeUnits();
         this.cd.markForCheck();
-        if (this.timeDifference <= 1000 && this.timeDifference >= 0) {
+        if (this.timeDifference <= 1000 && !this.hasTimedOut) {
+          this.hasTimedOut = true;
           this.timeoutEmitter.emit();
-        } else if (this.timeDifference < 0) {
-          this.timeoutEmitter.emit();
+        }
+        if (this.timeDifference < 0) {
           this.secondsToTimeout = 0;
           this.minutesToTimeout = 0;
           this.destroy$.next(true);

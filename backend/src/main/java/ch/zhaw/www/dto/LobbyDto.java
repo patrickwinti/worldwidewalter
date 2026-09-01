@@ -22,6 +22,7 @@ public class LobbyDto {
     private final boolean started;
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final int minimumPlayers;
+    private final boolean ended;
 
     /**
      * Builds a lobby snapshot from the current game state.
@@ -30,9 +31,12 @@ public class LobbyDto {
      * @return the lobby snapshot
      */
     public static LobbyDto from(Game game) {
-        List<PlayerDto> players = game.getAllPlayers()
+        // Only players that are actually there: someone who closed the tab should not linger in
+        // the list as a ghost that the host waits for.
+        List<PlayerDto> players = game.getPresentPlayers().stream()
                 .map(player -> new PlayerDto(player.getId(), player.getName()))
                 .toList();
-        return new LobbyDto(players, game.getHostId(), game.isStarted(), game.getMinimumAmountOfPlayers());
+        return new LobbyDto(players, game.getHostId(), game.isStarted(), game.getMinimumAmountOfPlayers(),
+                game.isEnded());
     }
 }

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Use Context7 MCP (`mcp__context7__resolve-library-id` + `mcp__context7__query-docs`) to fetch current documentation for any library or package used in this project (Spring Boot, Angular, etc.) before answering questions or making changes involving them.
 
-- Never run `git commit`, `git push`, or `git commit --amend` (or any variant). Do not stage and commit changes under any circumstances.
+- Only stage, commit, or push when explicitly asked to (including via the "Create PR" flow). Never do so on your own initiative, and never rewrite published history (`git commit --amend`, `git rebase`, or force-push on a pushed branch) unless explicitly asked.
 
 ## Project Overview
 

@@ -26,7 +26,7 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:unload')
   unloadHandler() {
-    this.leaveGame();
+    this.markAbsent();
   }
 
   constructor(private stateService: StateService,
@@ -51,9 +51,15 @@ export class AppComponent implements OnInit {
     return this.stateService.getGameId();
   }
 
-  private leaveGame() {
+  /**
+   * Tells the backend that this client is going away. Deliberately not a "leave": leaving
+   * removes the player and their points, which would make the reload below fail and silently
+   * throw the player out of a running game. Marking them absent keeps their seat, and the
+   * disconnect grace period stops them from blocking the round in the meantime.
+   */
+  private markAbsent() {
     if (isNonEmptyString(this.stateService.getPlayerId()) && isNonEmptyString(this.stateService.getGameId())) {
-      this.gameService.leaveGameAfterDestruction(this.stateService.getPlayerId(), this.stateService.getGameId());
+      this.gameService.markAbsentAfterDestruction(this.stateService.getPlayerId(), this.stateService.getGameId());
     }
   }
 

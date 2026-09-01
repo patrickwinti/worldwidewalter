@@ -1,18 +1,9 @@
 package ch.zhaw.www.utils;
 
 /**
- * Class that generates Postfixes for a player name and Ids.
- *
+ * Class that generates random values used across the game (room codes, player picks).
  */
 public interface RandomProvider {
-
-    /**
-     * Generates a random postfix for a player name.
-     *
-     * @return random postfix
-     */
-    int getPostfix();
-
 
     /**
      * Returns a random index in the range {@code [0, bound)}. Used to pick a random player,

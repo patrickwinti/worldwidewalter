@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpContext } from "@angular/common/http";
 import { SKIP_LOADING } from "./http-polling.interceptor";
-import { Observable } from "rxjs";
+import { Observable, retry } from "rxjs";
 import { AppConfigService } from "./app-config.service";
 import { StateService } from "./state.service";
 import {
@@ -14,8 +14,13 @@ import {
   PropositionSubmissionDto,
   ResultDto,
   RoundControllerService,
-  RoundDto
+  RoundDto,
+  RoundStatusDto
 } from "@api";
+
+/** A player's answer is theirs alone, so a hiccup on the way to the server is retried. */
+const SUBMIT_RETRIES = 2;
+const SUBMIT_RETRY_DELAY_MS = 500;
 
 /**
  * Thin facade over the OpenAPI-generated {@link GameControllerService} /
@@ -27,8 +32,10 @@ import {
  * <ul>
  *   <li>the 425 "Too Early" polling retry &mdash; handled by {@code HttpPollingInterceptor}
  *       which still wraps every generated request;</li>
- *   <li>{@code leaveGameAfterDestruction} using the Beacon API on page unload, which cannot
- *       go through {@code HttpClient}.</li>
+ *   <li>{@code markAbsentAfterDestruction} using the Beacon API on page unload, which cannot
+ *       go through {@code HttpClient};</li>
+ *   <li>the retry around a player's own submission, so a single failed request does not
+ *       silently drop their answer.</li>
  * </ul>
  */
 @Injectable({
@@ -71,7 +78,8 @@ export class GameService {
   }
 
   submitProposition(roundId: string, proposition: PropositionSubmissionDto): Observable<void> {
-    return this.roundApi.submitProposition(roundId, this.playerId, proposition);
+    return this.roundApi.submitProposition(roundId, this.playerId, proposition)
+      .pipe(retry({ count: SUBMIT_RETRIES, delay: SUBMIT_RETRY_DELAY_MS }));
   }
 
   getAllPropositions(roundId: string): Observable<PropositionSelectionDto> {
@@ -79,7 +87,8 @@ export class GameService {
   }
 
   submitPropositionSelection(roundId: string, id: string): Observable<void> {
-    return this.roundApi.selectProposition(roundId, id, this.playerId);
+    return this.roundApi.selectProposition(roundId, id, this.playerId)
+      .pipe(retry({ count: SUBMIT_RETRIES, delay: SUBMIT_RETRY_DELAY_MS }));
   }
 
   getResultsForRound(roundId: string, skipLoading = false): Observable<ResultDto> {
@@ -95,9 +104,31 @@ export class GameService {
     return this.gameApi.leaveGame(gameId, playerId);
   }
 
-  leaveGameAfterDestruction(playerId: string, gameId: string): boolean {
+  /**
+   * Tells the backend that this client is going away (tab closed or reloaded). This only marks
+   * the player as absent: they keep their seat and their points, so a reload can rejoin the
+   * running game instead of losing it.
+   */
+  markAbsentAfterDestruction(playerId: string, gameId: string): boolean {
     return navigator.sendBeacon(
-      this.appConfigService.getBaseUrl() + '/games/' + gameId + '/players/' + playerId);
+      this.appConfigService.getBaseUrl() + '/games/' + gameId + '/players/' + playerId + '/disconnect');
+  }
+
+  endGame(gameId: string): Observable<void> {
+    return this.gameApi.endGame(gameId, this.playerId);
+  }
+
+  restartGame(gameId: string): Observable<void> {
+    return this.gameApi.restartGame(gameId, this.playerId);
+  }
+
+  /**
+   * What the current round is waiting for (phase, how many players are done, who is missing).
+   * The same payload is pushed on the /topic/games/{gameId}/round WebSocket topic.
+   */
+  getRoundStatus(gameId: string): Observable<RoundStatusDto> {
+    return this.gameApi.getRoundStatus(gameId, 'body', false,
+      { context: new HttpContext().set(SKIP_LOADING, true) });
   }
 
   rejoinGame(gameId: string, playerId: string): Observable<PlayerDto> {

@@ -35,7 +35,7 @@ class GameServiceTest {
     @MockitoBean
     private RandomProvider randomProvider;
     @MockitoBean
-    private LobbyNotifier lobbyNotifier;
+    private GameNotifier gameNotifier;
 
     @AfterEach
     void tearDown() {
@@ -238,19 +238,15 @@ class GameServiceTest {
     }
     
     @Test
-    void enterGameWithExistingPlayerOfSameName() {
+    void enterGameWithExistingPlayerOfSameNameIsRejected() {
         Game game = mockGameInRepository();
-        when(randomProvider.getPostfix()).thenReturn(1982);
         
         gameService.enterGame(game.getId(), "Nora");
-        gameService.enterGame(game.getId(), "Nora");
         
-        var allPlayersInGame = game.getAllPlayers().count();
-        assertEquals(2, allPlayersInGame);
-        
-        List<String> waitingListNames = game.getAllPlayers().map(Player::getName).sorted().toList();
-        assertEquals("Nora", waitingListNames.get(0));
-        assertEquals("Nora1982", waitingListNames.get(1));
+        assertThrows(GameError.NameTakenException.class, () -> gameService.enterGame(game.getId(), "Nora"));
+        assertThrows(GameError.NameTakenException.class, () -> gameService.enterGame(game.getId(), "nora"));
+        assertEquals(1, game.getAllPlayers().count());
+        assertEquals("Nora", game.getAllPlayers().findFirst().orElseThrow().getName());
     }
     
     @Test
@@ -315,7 +311,7 @@ class GameServiceTest {
         var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
         gameService.startGame(GAME_ID, game.getHostId());
         assertTrue(game.isStarted());
-        verify(lobbyNotifier).notifyLobbyChanged(game);
+        verify(gameNotifier).notifyLobbyChanged(game);
     }
 
     @Test
@@ -333,6 +329,61 @@ class GameServiceTest {
     }
 
     @Test
+    void testEndGameMarksGameEndedAndNotifies() {
+        var game = mockGameInRepository();
+        game.setHostId(registerPlayer(game).getId());
+        
+        gameService.endGame(GAME_ID, game.getHostId());
+        
+        assertTrue(game.isEnded());
+        verify(gameNotifier).notifyRoundChanged(game);
+    }
+
+    @Test
+    void testEndGameThrowsWhenNotHost() {
+        var game = mockGameInRepository();
+        game.setHostId(registerPlayer(game).getId());
+        
+        assertThrows(GameError.NotHostException.class, () -> gameService.endGame(GAME_ID, "not-the-host"));
+        assertFalse(game.isEnded());
+    }
+
+    @Test
+    void testEndedGameCannotBeEntered() {
+        var game = mockGameInRepository();
+        var player = registerPlayer(game);
+        game.setHostId(player.getId());
+        gameService.endGame(GAME_ID, player.getId());
+        
+        assertThrows(GameError.EndedException.class, () -> gameService.enterRound(GAME_ID, player.getId()));
+    }
+
+    @Test
+    void testRestartGameReturnsToLobbyWithResetScores() {
+        var game = mockGameInRepository();
+        var player = registerPlayer(game);
+        game.setHostId(player.getId());
+        game.addPoints(java.util.Map.of(player.getId(), 3));
+        gameService.endGame(GAME_ID, player.getId());
+        
+        gameService.restartGame(GAME_ID, player.getId());
+        
+        assertFalse(game.isEnded());
+        assertFalse(game.isStarted());
+        assertEquals(0, game.getPoints().get(player.getId()));
+        verify(gameNotifier).notifyLobbyChanged(game);
+    }
+
+    @Test
+    void testRestartGameThrowsWhenNotHost() {
+        var game = mockGameInRepository();
+        game.setHostId(registerPlayer(game).getId());
+        
+        assertThrows(GameError.NotHostException.class, () -> gameService.restartGame(GAME_ID, "not-the-host"));
+        assertTrue(game.isStarted());
+    }
+
+    @Test
     void testReassignHostIfAbsentReassignsWhenHostGoneBeyondGrace() {
         enableFixedClocked();
         var game = mockLobbyGameInRepository(MIN_NUMBER_OF_PLAYERS);
@@ -344,7 +395,7 @@ class GameServiceTest {
         gameService.reassignHostIfAbsent(GAME_ID);
 
         assertNotEquals(originalHost, game.getHostId());
-        verify(lobbyNotifier).notifyLobbyChanged(game);
+        verify(gameNotifier).notifyLobbyChanged(game);
     }
 
     @Test
@@ -358,7 +409,7 @@ class GameServiceTest {
         gameService.reassignHostIfAbsent(GAME_ID);
 
         assertEquals(originalHost, game.getHostId());
-        verify(lobbyNotifier, never()).notifyLobbyChanged(any());
+        verify(gameNotifier, never()).notifyLobbyChanged(any());
     }
 
     @Test
@@ -371,7 +422,7 @@ class GameServiceTest {
         gameService.reassignHostIfAbsent(GAME_ID);
 
         assertEquals(originalHost, game.getHostId());
-        verify(lobbyNotifier, never()).notifyLobbyChanged(any());
+        verify(gameNotifier, never()).notifyLobbyChanged(any());
     }
 
     private Game mockLobbyGameInRepository(int playerCount) {

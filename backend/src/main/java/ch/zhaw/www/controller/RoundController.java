@@ -111,7 +111,10 @@ public class RoundController {
                 game.getPoints()
                         .entrySet()
                         .stream()
-                        .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue()))
+                        .map(entry -> new RankingDto(
+                                game.getPlayerNameFromId(entry.getKey()),
+                                entry.getValue(),
+                                round.getPointsAwarded().getOrDefault(entry.getKey(), 0)))
                         .toList(),
                 createSelectionDtos(game, round));
         

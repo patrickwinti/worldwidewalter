@@ -1,12 +1,11 @@
-<table class="center">
-  <tr>
-    <th>Vorschlag</th>
-    <th>Autor:innen</th>
-    <th>Selektiert von</th>
-  </tr>
-  <tr *ngFor="let selection of selections">
-    <td>{{concatStrings(selection.gaps)}}</td>
-    <td>{{concatStrings(selection.authors)}}</td>
-    <td>{{concatStrings(selection.selectors)}}</td>
-  </tr>
-</table>
+<ul class="www-disclosure__list">
+  <li class="www-disclosure__item" *ngFor="let selection of selections"
+      [class.www-disclosure__item--sphinx]="selection.sphinxResponse">
+    <p class="www-disclosure__gap">
+      {{ concatStrings(selection.gaps) }}
+      <span *ngIf="selection.sphinxResponse" class="www-disclosure__tag">Sphinx</span>
+    </p>
+    <p class="www-disclosure__meta"><span>Von</span> {{ concatStrings(selection.authors) || '—' }}</p>
+    <p class="www-disclosure__meta"><span>Getippt von</span> {{ concatStrings(selection.selectors) || 'niemandem' }}</p>
+  </li>
+</ul>

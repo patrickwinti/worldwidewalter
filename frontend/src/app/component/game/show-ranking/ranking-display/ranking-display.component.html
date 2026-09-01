@@ -1,20 +1,18 @@
-<table class="center">
-  <thead>
-  <tr>
-    <th>
-      Spieler:in
-    </th>
-    <th>
-      Punkte
-    </th>
-  </tr>
-  </thead>
-  <tbody>
-  <ng-container *ngFor="let playerResult of sortedResults">
-    <tr>
-      <td>{{playerResult.playerName}}</td>
-      <td>{{playerResult.points}}</td>
-    </tr>
-  </ng-container>
-  </tbody>
-</table>
+<div class="www-podium" *ngIf="podium.length">
+  <div class="www-podium__spot" *ngFor="let entry of podium"
+       [class.www-podium__spot--first]="rankOf(entry) === 1">
+    <span class="www-podium__rank">{{ rankOf(entry) }}</span>
+    <span class="www-avatar" [style.--hue]="avatarHue(entry.playerName)">{{ initials(entry.playerName) }}</span>
+    <span class="www-podium__name">{{ entry.playerName }}</span>
+    <span class="www-podium__points">{{ entry.points }}</span>
+  </div>
+</div>
+
+<ul class="www-ranklist" *ngIf="rest.length">
+  <li class="www-ranklist__row" *ngFor="let entry of rest">
+    <span class="www-ranklist__pos">{{ rankOf(entry) }}</span>
+    <span class="www-avatar www-avatar--sm" [style.--hue]="avatarHue(entry.playerName)">{{ initials(entry.playerName) }}</span>
+    <span class="www-ranklist__name">{{ entry.playerName }}</span>
+    <span class="www-ranklist__points">{{ entry.points }}</span>
+  </li>
+</ul>

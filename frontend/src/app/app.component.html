@@ -1,20 +1,21 @@
-<div>
-  <div class="header">
-    <img ngSrc="assets/WWW-logo.svg" width="200" height="200" alt="WWW-logo">
-  </div>
+<div class="www-app">
+  <header class="www-appbar">
+    <span class="www-brand"><span class="www-brand__dot"></span>WALTER</span>
+    <span class="www-appbar__spacer"></span>
+    <span class="www-gamechip" *ngIf="showGameChip">{{ gameId }}</span>
+  </header>
 
-  <www-initialization-container *ngIf="ready && gameIsInitializing()"
-                                [joinWithId]="joinWithId"
-                                [resumeInLobby]="resumeInLobby"
-                                (startGameEmitter)="startGame()">
-  </www-initialization-container>
+  <main class="www-main">
+    <www-initialization-container *ngIf="ready && gameIsInitializing()"
+                                  [joinWithId]="joinWithId"
+                                  [resumeInLobby]="resumeInLobby"
+                                  (startGameEmitter)="startGame()">
+    </www-initialization-container>
 
-  <www-game-container *ngIf="ready && !gameIsInitializing()">
-  </www-game-container>
+    <www-game-container *ngIf="ready && !gameIsInitializing()">
+    </www-game-container>
+  </main>
 
-  <www-overlay-spinner>
-  </www-overlay-spinner>
-
-  <www-info>
-  </www-info>
+  <www-info></www-info>
+  <www-overlay-spinner></www-overlay-spinner>
 </div>

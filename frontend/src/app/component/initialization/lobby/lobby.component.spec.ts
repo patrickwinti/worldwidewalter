@@ -1,7 +1,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { LobbyComponent } from './lobby.component';
-import { getGameServiceMock, getStateServiceMock } from "src/app/testing/mock-services";
+import { getGameServiceMock, getStateServiceMock } from "../../../testing/mock-services";
 import { of } from "rxjs";
 import { GameService } from "../../../service/game.service";
 import { StateService } from "../../../service/state.service";

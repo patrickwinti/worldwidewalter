@@ -1,4 +1,4 @@
-<div *ngIf="round$ | async as round; else entering">
+<ng-container *ngIf="round$ | async as round; else entering">
   <www-round *ngIf="showRoundComponent()"
              [round]="round">
   </www-round>
@@ -6,11 +6,11 @@
   <www-result-container *ngIf="gameState == GameState.SHOW_RESULTS_AND_RANKING"
                         [round]="round">
   </www-result-container>
-</div>
+</ng-container>
 
 <ng-template #entering>
   <www-error (retryEmitter)="getRound()"
-             [httpError]=httpErr>
+             [httpError]="httpErr">
   </www-error>
 </ng-template>
 

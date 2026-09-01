@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { StateService } from "../../service/state.service";
 import { LoadingService } from "../../service/loading.service";
 import { GameService } from "../../service/game.service";
@@ -8,6 +8,7 @@ import { HttpErrorResponse, HttpStatusCode } from "@angular/common/http";
 @Component({
   selector: 'www-error',
   templateUrl: './error.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class ErrorComponent implements OnInit, OnDestroy {

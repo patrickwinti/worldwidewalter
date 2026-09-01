@@ -25,8 +25,12 @@ export class CountDownComponent implements OnInit, OnDestroy {
 
   private timeDifference: number;
   private timeout: number;
+  private startTime: number;
   /** The deadline is reported once; a second emission would submit the same answer twice. */
   private hasTimedOut = false;
+
+  /** Circumference of the progress ring (r = 23). */
+  readonly ringCircumference = 2 * Math.PI * 23;
 
   private readonly milliSecondsInASecond = 1000;
   private readonly secondsInAMinute = 60;
@@ -57,6 +61,30 @@ export class CountDownComponent implements OnInit, OnDestroy {
         }
       });
     this.timeout = this.getUTCMilliseconds(this.timeoutString) - this.TIMEOUT_REDUCTION;
+    this.startTime = new Date().getTime();
+  }
+
+  /** Fraction of time still remaining, clamped to [0, 1]. */
+  get remainingRatio(): number {
+    const total = this.timeout - this.startTime;
+    if (!total || total <= 0) {
+      return 0;
+    }
+    return Math.min(1, Math.max(0, this.timeDifference / total));
+  }
+
+  get ringDashOffset(): number {
+    return this.ringCircumference * (1 - this.remainingRatio);
+  }
+
+  get isUrgent(): boolean {
+    return this.timeDifference <= 15000;
+  }
+
+  get clock(): string {
+    const minutes = Math.max(0, this.minutesToTimeout || 0);
+    const seconds = Math.max(0, this.secondsToTimeout || 0);
+    return minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
   }
 
   ngOnDestroy(): void {

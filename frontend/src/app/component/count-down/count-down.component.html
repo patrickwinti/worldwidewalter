@@ -1,4 +1,13 @@
-<div class="timer">
-  <h3> Verbleibende Zeit</h3>
-  <span> {{minutesToTimeout}} Min, {{secondsToTimeout}} S</span>
+<div class="www-timer" [class.www-timer--urgent]="isUrgent">
+  <span class="www-timer__label">Verbleibende Zeit</span>
+  <span class="www-timer__ring">
+    <svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true">
+      <circle cx="27" cy="27" r="23" fill="none" stroke="var(--line-strong)" stroke-width="4"></circle>
+      <circle cx="27" cy="27" r="23" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+              [attr.stroke-dasharray]="ringCircumference"
+              [attr.stroke-dashoffset]="ringDashOffset"
+              transform="rotate(-90 27 27)"></circle>
+    </svg>
+    <span class="www-timer__value">{{ clock }}</span>
+  </span>
 </div>

@@ -1,21 +1,41 @@
-<div class="column">
-  <div><h3>{{ isSphinx() ? 'Das haben die anderen geraten:' : 'Bitte einen Vorschlag aussuchen:' }}</h3></div>
+<h3 class="www-select__heading">
+  {{ isSphinx() ? 'Das haben die anderen geraten' : 'Welcher Vorschlag ist von der Sphinx?' }}
+</h3>
 
-  <div *ngFor="let proposition of propositionSelectionDto.propositions">
-    <p>
-      <button [disabled]="proposition.readOnly" (click)="selectProposition(proposition.id)">
-        {{createDisplayTextForProposition(proposition)}}
-      </button>
-    </p>
-  </div>
-</div>
-<div *ngIf="isSphinx()">
-  <p class="center">Warte auf die anderen Spieler…</p>
-</div>
-<div *ngIf="showContinueButton()">
-  <button class="center" (click)="selectProposition(undefined)">Weiter</button>
+<div class="www-choices">
+  <button *ngFor="let proposition of propositionSelectionDto.propositions" type="button"
+          class="www-choice"
+          [class.www-choice--selected]="selectedId === proposition.id"
+          [class.www-choice--own]="isOwn(proposition)"
+          [disabled]="proposition.readOnly || isSphinx()"
+          (click)="pick(proposition)">
+    <span class="www-choice__tick" *ngIf="!isOwn(proposition)"></span>
+    <span class="www-choice__mark" *ngIf="isOwn(proposition)" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 14c3.3 0 6 2 6 4.5V20H6v-1.5C6 16 8.7 14 12 14Z"></path>
+        <circle cx="12" cy="8" r="3.5"></circle>
+      </svg>
+    </span>
+    <span class="www-choice__text">
+      {{ proposition.gaps.join(', ') }}
+      <span *ngIf="proposition.numberOfAuthors > 1" class="www-choice__by">· {{ proposition.numberOfAuthors }} Autor:innen</span>
+    </span>
+    <span class="www-choice__own-tag" *ngIf="isOwn(proposition)">Dein Vorschlag</span>
+  </button>
 </div>
 
-<www-count-down [timeoutString]="propositionSelectionDto.selectionSubmissionEndInUtc"
-                (timeoutEmitter)="continue()">
-</www-count-down>
+<div class="www-dock">
+  <www-count-down [timeoutString]="propositionSelectionDto.selectionSubmissionEndInUtc"
+                  (timeoutEmitter)="continue()">
+  </www-count-down>
+
+  <p *ngIf="isSphinx()" class="www-center www-muted">Warte auf die anderen Spieler…</p>
+
+  <button *ngIf="showContinueButton()" type="button"
+          class="www-btn www-btn--primary www-btn--block" (click)="selectProposition(undefined)">Weiter</button>
+
+  <button *ngIf="!isSphinx() && !showContinueButton()" type="button"
+          class="www-btn www-btn--primary www-btn--block"
+          [disabled]="selectedId === undefined" (click)="confirmSelection()">Auswahl bestätigen</button>
+</div>

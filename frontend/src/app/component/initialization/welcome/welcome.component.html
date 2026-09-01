@@ -1,19 +1,20 @@
-<div class="content">
-  <br>
-  <h2>Das Ratespiel</h2>
-  <p>"Der wahre Walter" ist ein Spiel, bei dem ein Satz vorgelesen wird, wobei ein oder mehrere Wörter durch das
-    Wort "Walter" ersetzt werden.
-    <br>
-    Jede:r Spieler:in fügt heimlich etwas zum Satz hinzu und dann raten alle, welche Version die ursprüngliche ist.
-  </p>
-  <br>
-  <input type="text" name="playerName" placeholder="Name eingeben" autofocus maxlength="{{MAX_INPUT_LENGTH}}"
-         [(ngModel)]="playerName"/>
-  <div class="button-container">
-    <button type="button" [disabled]="!canCreateGame" (click)="requestNewGame()">Neues Spiel</button>
-    <button type="button" (click)="goToJoinPage()">Spiel beitreten</button>
+<div class="www-screen">
+  <div class="www-stack-lg">
+    <p class="www-title">Der wahre <em>Walter</em></p>
+    <p class="www-lede">Ein Satz, ein fehlendes Wort. Alle bluffen — du errätst, welcher Vorschlag von der Sphinx
+      stammt.</p>
   </div>
-  <ng-container *ngIf="error">
-    <p style="color: orangered">Fehler beim Erstellen des Spiels.</p>
-  </ng-container>
+
+  <div class="www-field-group">
+    <label class="www-label" for="welcome-name">Dein Name</label>
+    <input id="welcome-name" class="www-field" type="text" name="playerName" autofocus
+           placeholder="Name eingeben" maxlength="{{MAX_INPUT_LENGTH}}" [(ngModel)]="playerName"/>
+    <p *ngIf="error" class="www-error-text">Fehler beim Erstellen des Spiels.</p>
+  </div>
+
+  <div class="www-dock">
+    <button type="button" class="www-btn www-btn--primary www-btn--block"
+            [disabled]="!canCreateGame" (click)="requestNewGame()">Neues Spiel</button>
+    <button type="button" class="www-btn www-btn--ghost www-btn--block" (click)="goToJoinPage()">Spiel beitreten</button>
+  </div>
 </div>

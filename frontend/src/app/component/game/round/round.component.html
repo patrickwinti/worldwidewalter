@@ -1,27 +1,33 @@
-<www-sphinx-display [sphinx]="round.sphinx"
-                    [currentPlayerId]="getCurrentPlayerId()">
-</www-sphinx-display>
+<div class="www-screen">
+  <www-sphinx-display [sphinx]="round.sphinx"
+                      [currentPlayerId]="getCurrentPlayerId()">
+  </www-sphinx-display>
 
-<www-prompt-display [prompt]="round.prompt"
-                    [proposition]="round.walters">
-</www-prompt-display>
+  <div class="www-card www-card--prompt">
+    <www-prompt-display [prompt]="round.prompt"
+                        [proposition]="round.walters">
+    </www-prompt-display>
+  </div>
 
-<ng-container [ngSwitch]="stateObservable$ | async">
-  <www-enter-proposition *ngSwitchCase="GameState.ENTER_PROPOSITION"
-                         [round]=round
-                         (propositionEmitter)="sendProposition($event)">
-  </www-enter-proposition>
+  <ng-container [ngSwitch]="stateObservable$ | async">
+    <www-enter-proposition *ngSwitchCase="GameState.ENTER_PROPOSITION"
+                           [round]="round"
+                           (propositionEmitter)="sendProposition($event)">
+    </www-enter-proposition>
 
-  <ng-container *ngSwitchCase="GameState.SELECT_PROPOSITION">
-    <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto; else waitingForPropositions"
-                            [round]=round
-                            [propositionSelectionDto]="propositionSelectionDto"
-                            [currentPlayerId]="getCurrentPlayerId()"
-                            (selectedPropositionEmitter)="submitSelection($event)">
-    </www-select-proposition>
-    <ng-template #waitingForPropositions>
-      <p style="text-align: center; margin-top: 2rem">Warte auf die anderen Spieler…</p>
-    </ng-template>
+    <ng-container *ngSwitchCase="GameState.SELECT_PROPOSITION">
+      <www-select-proposition *ngIf="propositionSelectionDto$ | async as propositionSelectionDto; else waitingForPropositions"
+                              [round]="round"
+                              [propositionSelectionDto]="propositionSelectionDto"
+                              [currentPlayerId]="getCurrentPlayerId()"
+                              (selectedPropositionEmitter)="submitSelection($event)">
+      </www-select-proposition>
+      <ng-template #waitingForPropositions>
+        <div class="www-wait">
+          <div class="www-wait__dots"><i></i><i></i><i></i></div>
+          <span>Warte auf die anderen Spieler…</span>
+        </div>
+      </ng-template>
+    </ng-container>
   </ng-container>
-
-</ng-container>
+</div>

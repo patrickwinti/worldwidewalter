@@ -42,6 +42,14 @@ export class AppComponent implements OnInit {
     return this.stateService.isInitializing();
   }
 
+  get showGameChip(): boolean {
+    return this.ready && !this.stateService.isInitializing() && isNonEmptyString(this.stateService.getGameId());
+  }
+
+  get gameId(): string {
+    return this.stateService.getGameId();
+  }
+
   private leaveGame() {
     if (isNonEmptyString(this.stateService.getPlayerId()) && isNonEmptyString(this.stateService.getGameId())) {
       this.gameService.leaveGameAfterDestruction(this.stateService.getPlayerId(), this.stateService.getGameId());

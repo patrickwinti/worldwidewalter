@@ -1,1 +1,4 @@
-<h2 class="h2_sphinx">{{getDisplayText()}}</h2>
+<div class="www-sphinx" [class.www-sphinx--you]="isCurrentPlayer">
+  <span class="www-sphinx__badge"><span class="www-sphinx__eye"></span>{{ badgeText }}</span>
+  <p class="www-sphinx__q">{{ questionText }}</p>
+</div>

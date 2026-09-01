@@ -1,25 +1,27 @@
-<div class="info">
-  <button (click)="collapsed=!collapsed" type="button" class="collapsible"> Info</button>
-  <div *ngIf="!collapsed" class="content_collapsed">
-    <b style="text-align: start;">Regeln:</b>
-    <ul>
-      <li>Pro Runde wird ein:e Spieler:in als Sphinx ausgewählt</li>
-      <li>Am Anfang der Runde wird ein Satz angezeigt, bei welchem mind. ein Wort mit <i>WALTER</i> ersetzt ist</li>
-      <li>Eure Aufgabe ist nun, die <i>WALTER</i> Platzhalter mit einem Vorschlag zu ersetzen, von welchem ihr meint,
-        dass er am besten zur Sphinx passt.
-      </li>
-      <li>Nachher müsst ihr versuchen, aus allen Vorschlägen den Vorschlag der Sphinx herauszufinden und auszuwählen.</li>
+<button type="button" class="www-sheet-trigger" aria-label="Spielregeln" (click)="collapsed = false">?</button>
 
-    </ul>
-  </div>
+<ng-container *ngIf="!collapsed">
+  <div class="www-sheet__scrim" (click)="collapsed = true"></div>
+  <div class="www-sheet" role="dialog" aria-label="Spielregeln">
+    <div class="www-sheet__grab"></div>
 
-  <div *ngIf="!collapsed" class="content_collapsed">
-    <b style="text-align: start;">Punkte:</b>
+    <h3>So läuft's</h3>
     <ul>
-      <li>Alle, die auf die Sphinx-Antwort getippt haben, kriegen einen Punkt.</li>
-      <li>Die Autor:innen, deren Vorschlag von jemandem ausgewählt wurde erhalten einen Punkt, dies gilt ebenfalls für die Sphinx.</li>
-      <li>Mehrfach eingereichte Vorschläge ergeben keine Punkte für die Autor:innen, dies gilt auch für die Sphinx</li>
-      <li>Tippen alle Personen korrekt auf die Sphinx, erhalten alle Spieler:innen einen Punkt, die Sphinx jedoch keinen, da der Vorschlag zu einfach war.</li>
+      <li>Pro Runde wird ein:e Spieler:in als Sphinx ausgewählt.</li>
+      <li>Ein Satz erscheint, bei dem mindestens ein Wort durch <i>Walter</i> ersetzt ist.</li>
+      <li>Alle ersetzen die <i>Walter</i>-Platzhalter heimlich mit einem Vorschlag, von dem sie meinen, dass er
+        am besten zur Sphinx passt.</li>
+      <li>Danach errätst du, welcher Vorschlag wirklich von der Sphinx stammt.</li>
     </ul>
+
+    <h3>Punkte</h3>
+    <ul>
+      <li>Alle, die auf die Sphinx-Antwort getippt haben, bekommen einen Punkt.</li>
+      <li>Autor:innen, deren Vorschlag gewählt wurde, bekommen einen Punkt — das gilt auch für die Sphinx.</li>
+      <li>Mehrfach eingereichte Vorschläge geben keine Punkte.</li>
+      <li>Tippen alle korrekt auf die Sphinx, bekommen alle einen Punkt, die Sphinx aber nicht — zu einfach.</li>
+    </ul>
+
+    <button type="button" class="www-btn www-btn--ghost www-btn--block" (click)="collapsed = true">Schliessen</button>
   </div>
-</div>
+</ng-container>

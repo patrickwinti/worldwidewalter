@@ -1,9 +1,11 @@
-<ng-container *ngIf="isVisible()">
-  <div class="content">
-    <p>{{getErrorMessage()}}</p>
-    <div class="button-container">
-      <button (click)="tryAgain()">Versuchs nochmals</button>
-      <button (click)="leaveGame()">Zurück zur Startseite</button>
-    </div>
+<div class="www-screen www-screen--center" *ngIf="isVisible()">
+  <div class="www-stack-lg">
+    <p class="www-kicker">Etwas ist schiefgelaufen</p>
+    <p class="www-lede">{{ getErrorMessage() }}</p>
   </div>
-</ng-container>
+
+  <div class="www-dock">
+    <button type="button" class="www-btn www-btn--primary www-btn--block" (click)="tryAgain()">Nochmals versuchen</button>
+    <button type="button" class="www-btn www-btn--ghost www-btn--block" (click)="leaveGame()">Zurück zur Startseite</button>
+  </div>
+</div>

@@ -1,32 +1,34 @@
-<div class="content">
+<div class="www-screen">
+  <div class="www-stack-lg">
+    <p class="www-kicker">Spiel beitreten</p>
+    <h2>Gib den Spiel-Code ein</h2>
+  </div>
 
-  <div class="container">
-    <div class="container">
-
-      <input type="text" name="gameId" placeholder="Spiel Id eingeben" class="input_cont" autocapitalize="characters"
-             style="text-transform: uppercase"
+  <div class="www-field-group">
+    <label class="www-label" for="join-code">Spiel-Code</label>
+    <div class="www-input-row">
+      <input id="join-code" class="www-field www-field--code" type="text" name="gameId"
+             placeholder="ABCD" autocapitalize="characters" inputmode="text"
              maxlength="{{GAME_ID_LENGTH}}"
              [readOnly]="gameIdIsReadOnly"
              [ngModel]="joinGameId"
              (ngModelChange)="joinGameId = $event.toUpperCase()"/>
-
-      <ng-container *ngIf="isCopyButtonVisible">
-        <button class="btn" type="button" (click)="copyLink()" title="Link kopieren"><img
-          ngSrc="assets/link.png" height="15" width="15" alt="Link kopieren"></button>
-      </ng-container>
+      <button *ngIf="isCopyButtonVisible" type="button" class="www-btn www-btn--icon"
+              title="Link kopieren" aria-label="Link kopieren" (click)="copyLink()">
+        <img ngSrc="assets/link.png" height="16" width="16" alt=""/>
+      </button>
     </div>
+
+    <label class="www-label" for="join-name">Dein Name</label>
+    <input id="join-name" class="www-field" type="text" name="playerName" autofocus
+           placeholder="Name eingeben" maxlength="{{MAX_INPUT_LENGTH}}" [(ngModel)]="playerName"/>
+
+    <p *ngIf="error" class="www-error-text">{{ errorText }}</p>
   </div>
 
-  <input type="text" name="playerName" placeholder="Name eingeben" autofocus  maxlength="{{MAX_INPUT_LENGTH}}"
-         [(ngModel)]="playerName"/>
-
-  <button [disabled]="!canJoinGame" (click)="joinGame()" formtarget="_blank">Beitreten</button>
-
-  <button (click)="returnToStart()">Zurück zur Startseite</button>
-
+  <div class="www-dock">
+    <button type="button" class="www-btn www-btn--primary www-btn--block"
+            [disabled]="!canJoinGame" (click)="joinGame()">Beitreten</button>
+    <button type="button" class="www-btn www-btn--ghost www-btn--block" (click)="returnToStart()">Zurück</button>
+  </div>
 </div>
-<ng-container *ngIf="error">
-  <p style="color: orangered">
-    {{this.errorText}}
-  </p>
-</ng-container>

@@ -1,17 +1,38 @@
-<div class="content">
-  <h2>Warteraum</h2>
-  <p>Spiel-Code: <strong>{{gameId}}</strong></p>
+<div class="www-screen">
+  <div class="www-stack-lg">
+    <p class="www-kicker">Warteraum</p>
+    <h2>Teile den Code oder den Link</h2>
+  </div>
 
-  <h3>Spieler ({{players.length}})</h3>
-  <ul>
-    <li *ngFor="let player of players">{{player.playerName}}</li>
-  </ul>
+  <div class="www-card www-code-card">
+    <span class="www-code-card__code">{{ gameId }}</span>
+    <button type="button" class="www-btn www-btn--teal" (click)="copyLink()">
+      {{ copied ? 'Kopiert!' : 'Link kopieren' }}
+    </button>
+  </div>
 
-  <ng-container *ngIf="isHost; else waitingForHost">
-    <button [disabled]="!canStart" (click)="startGame()">Spiel starten</button>
-    <p *ngIf="!canStart">Warte auf mindestens {{lobby?.minimumPlayers}} Spieler…</p>
-  </ng-container>
-  <ng-template #waitingForHost>
-    <p>Warte darauf, dass der Host das Spiel startet…</p>
-  </ng-template>
+  <div class="www-field-group">
+    <p class="www-label">Spieler:innen · {{ players.length }}<span *ngIf="minimumPlayers"> / {{ minimumPlayers }}</span></p>
+    <div class="www-players">
+      <div class="www-player" *ngFor="let player of players">
+        <span class="www-avatar" [style.--hue]="avatarHue(player.playerName)">{{ initials(player.playerName) }}</span>
+        <span class="www-player__name">{{ player.playerName }}</span>
+      </div>
+      <div class="www-player www-player--empty" *ngFor="let slot of emptySlots">
+        <span class="www-avatar www-avatar--empty">+</span>
+        <span class="www-player__name">frei</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="www-dock">
+    <ng-container *ngIf="isHost; else waitingForHost">
+      <button type="button" class="www-btn www-btn--primary www-btn--block"
+              [disabled]="!canStart" (click)="startGame()">Spiel starten</button>
+      <p *ngIf="!canStart" class="www-center www-muted">Noch {{ missingPlayers }} Spieler:in bis zum Start</p>
+    </ng-container>
+    <ng-template #waitingForHost>
+      <p class="www-center www-muted">Warte darauf, dass der Host das Spiel startet…</p>
+    </ng-template>
+  </div>
 </div>

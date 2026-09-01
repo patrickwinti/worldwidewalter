@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { GameState } from "../../model/game-state";
 import { StateService } from "../../service/state.service";
 import { catchError, Observable, switchMap, tap, throwError } from "rxjs";
@@ -9,6 +9,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 @Component({
   selector: 'www-game-container',
   templateUrl: './game-container.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class GameContainerComponent implements OnInit {

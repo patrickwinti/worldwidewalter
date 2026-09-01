@@ -1,9 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { SelectionDto } from "../../../../dto/result-dto";
 
 @Component({
   selector: 'www-selection-disclosure',
   templateUrl: './selection-disclosure.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class SelectionDisclosureComponent {

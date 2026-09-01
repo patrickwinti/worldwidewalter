@@ -11,7 +11,7 @@ POSITIONAL=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --push) PUSH=1; shift ;;
-    -h|--help)./b
+    -h|--help)
       echo "Usage: $0 [--push] [image:tag]"
       echo "  Default tag: worldwidewalter:local"
       echo "  --push: also tag and push to ${GHCR_IMAGE}:<version>"

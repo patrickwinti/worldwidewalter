@@ -6,7 +6,7 @@ import { environment } from '../environments/environment';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { WelcomeComponent } from "./component/initialization/welcome/welcome.component";
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withXhr } from "@angular/common/http";
 import { InitializationContainerComponent } from './component/initialization/initialization-container.component';
 import { JoinComponent } from './component/initialization/join/join.component';
 import { LobbyComponent } from './component/initialization/lobby/lobby.component';
@@ -61,7 +61,7 @@ import { provideZoneChangeDetection } from '@angular/core';
   ],
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
     { provide: BASE_PATH, useValue: environment.apiUrl.replace(/\/api\/?$/, '') },
     {
       provide: HTTP_INTERCEPTORS,

@@ -5,6 +5,7 @@ import { WsService } from "../../../service/ws.service";
 import { InitializationState } from "../../../model/initialization-state";
 import { LobbyDto, PlayerDto } from "@api";
 import { firstValueFrom } from "rxjs";
+import { avatarHue, initials } from "../../../shared/avatar";
 
 @Component({
   selector: 'www-lobby',
@@ -61,6 +62,34 @@ export class LobbyComponent implements OnInit, OnDestroy {
     firstValueFrom(this.gameService.startGame(this.gameId)).then(
       () => { /* transition happens for everyone via the "started" broadcast */ },
       () => { /* ignore; the button simply stays available */ }
+    );
+  }
+
+  get minimumPlayers(): number {
+    return this.lobby?.minimumPlayers ?? 0;
+  }
+
+  get missingPlayers(): number {
+    return Math.max(0, this.minimumPlayers - this.players.length);
+  }
+
+  get emptySlots(): number[] {
+    return Array.from({ length: this.missingPlayers }, (_, i) => i);
+  }
+
+  readonly initials = initials;
+  readonly avatarHue = avatarHue;
+
+  copied = false;
+
+  copyLink(): void {
+    navigator.clipboard?.writeText(window.location.origin + '?gameId=' + this.gameId).then(
+      () => {
+        this.copied = true;
+        this.cd.markForCheck();
+        setTimeout(() => { this.copied = false; this.cd.markForCheck(); }, 2000);
+      },
+      () => { /* clipboard unavailable; the code is shown regardless */ }
     );
   }
 

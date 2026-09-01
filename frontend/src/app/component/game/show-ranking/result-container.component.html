@@ -1,24 +1,33 @@
-<ng-container *ngIf="result$ | async as result; else waitingForSelections">
-  <www-prompt-display [prompt]="prompt"
-                      [proposition]="getSphinxProposition(result)">
-  </www-prompt-display>
+<div class="www-screen">
+  <ng-container *ngIf="result$ | async as result; else waitingForSelections">
+    <div class="www-reveal">
+      <p class="www-kicker">Die Sphinx-Antwort war</p>
+      <www-prompt-display [prompt]="prompt"
+                          [proposition]="getSphinxProposition(result)">
+      </www-prompt-display>
+    </div>
 
-  <h2>Übersicht Vorschläge</h2>
-  <www-selection-disclosure [selections]="result.selections">
-  </www-selection-disclosure>
-  <br>
-  <br>
-  <h2>Ranking</h2>
-  <www-ranking-display [sortedResults]="sortRanking(result.ranking)">
-  </www-ranking-display>
+    <div class="www-field-group">
+      <p class="www-label">Ranking</p>
+      <www-ranking-display [sortedResults]="sortRanking(result.ranking)">
+      </www-ranking-display>
+    </div>
 
-  <div>
-    <button class="center" (click)="continue()">
-      Weiter
-    </button>
-  </div>
-</ng-container>
+    <details class="www-card www-disclosure">
+      <summary>Alle Vorschläge &amp; wer wen getippt hat</summary>
+      <www-selection-disclosure [selections]="result.selections">
+      </www-selection-disclosure>
+    </details>
 
-<ng-template #waitingForSelections>
-  <p style="text-align: center; margin-top: 2rem">Warte auf die anderen Spieler…</p>
-</ng-template>
+    <div class="www-dock">
+      <button type="button" class="www-btn www-btn--primary www-btn--block" (click)="continue()">Weiter</button>
+    </div>
+  </ng-container>
+
+  <ng-template #waitingForSelections>
+    <div class="www-wait">
+      <div class="www-wait__dots"><i></i><i></i><i></i></div>
+      <span>Warte auf die anderen Spieler…</span>
+    </div>
+  </ng-template>
+</div>

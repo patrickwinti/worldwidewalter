@@ -1,6 +1,6 @@
-<h3>
-  <ng-container *ngFor="let promptFragment of splitPrompt; index as i">
-    <span>{{promptFragment}}</span>
-    <span *ngIf="proposition[i]" style="background: #fcc603; color: #333333">{{proposition[i]}}</span>
+<p class="www-prompt">
+  <ng-container *ngFor="let promptFragment of splitPrompt; index as i; last as isLast">
+    <span>{{ promptFragment }}</span><!--
+ --><span *ngIf="!isLast" class="www-gap" [class.www-gap--filled]="proposition && proposition[i]">{{ (proposition && proposition[i]) || 'Walter' }}</span>
   </ng-container>
-</h3>
+</p>

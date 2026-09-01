@@ -6,13 +6,22 @@
   <button *ngFor="let proposition of propositionSelectionDto.propositions" type="button"
           class="www-choice"
           [class.www-choice--selected]="selectedId === proposition.id"
+          [class.www-choice--own]="isOwn(proposition)"
           [disabled]="proposition.readOnly || isSphinx()"
           (click)="pick(proposition)">
-    <span class="www-choice__tick"></span>
+    <span class="www-choice__tick" *ngIf="!isOwn(proposition)"></span>
+    <span class="www-choice__mark" *ngIf="isOwn(proposition)" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 14c3.3 0 6 2 6 4.5V20H6v-1.5C6 16 8.7 14 12 14Z"></path>
+        <circle cx="12" cy="8" r="3.5"></circle>
+      </svg>
+    </span>
     <span class="www-choice__text">
       {{ proposition.gaps.join(', ') }}
       <span *ngIf="proposition.numberOfAuthors > 1" class="www-choice__by">· {{ proposition.numberOfAuthors }} Autor:innen</span>
     </span>
+    <span class="www-choice__own-tag" *ngIf="isOwn(proposition)">Dein Vorschlag</span>
   </button>
 </div>
 

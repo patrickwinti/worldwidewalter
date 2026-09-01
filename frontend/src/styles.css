@@ -618,6 +618,40 @@ www-current-game-info { display: block; }
 }
 .www-choice__text { flex: 1; }
 .www-choice__by { color: var(--text-dim); font-size: var(--step--1); }
+
+/* the player's own proposition: shown, clearly not a votable option */
+.www-choice--own {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--surface-2),
+    var(--surface-2) 9px,
+    color-mix(in srgb, var(--surface-2) 55%, var(--ink)) 9px,
+    color-mix(in srgb, var(--surface-2) 55%, var(--ink)) 18px);
+  border-style: dashed;
+  border-color: var(--line-strong);
+}
+.www-choice--own .www-choice__text { color: var(--text-dim); }
+.www-choice__mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--text-dim);
+}
+.www-choice__own-tag {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: color-mix(in srgb, var(--teal) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--teal) 34%, transparent);
+}
+
 .www-choice--selected { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 10%, var(--surface)); }
 .www-choice--selected .www-choice__tick { border-color: var(--gold); background: var(--gold); }
 .www-choice--selected .www-choice__tick::after {

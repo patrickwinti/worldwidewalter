@@ -39,6 +39,11 @@ export class SelectPropositionComponent {
     return this.round.sphinx?.id === this.currentPlayerId;
   }
 
+  /** True for the player's own proposition(s) — shown but not selectable. */
+  isOwn(proposition: PropositionDto): boolean {
+    return proposition.readOnly && !this.isSphinx();
+  }
+
   showContinueButton(): boolean {
     // The sphinx no longer needs a manual button — they advance automatically once everyone
     // has selected. The button remains only for the edge case where a non-sphinx player has

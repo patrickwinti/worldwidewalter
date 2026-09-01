@@ -11,14 +11,18 @@ export class SphinxDisplayComponent {
   @Input() sphinx: PlayerDto;
   @Input() currentPlayerId: string;
 
-  getDisplayText(): string {
-    if (this.sphinx.id === this.currentPlayerId) {
-      return 'Du bist die Sphinx!\n' +
-        'Mit was würdest du \"WALTER\" ersetzen?' ;
-    } else {
-      return 'Die Sphinx ist: ' + this.sphinx.playerName + '.\n' +
-        'Mit was würde ' + this.sphinx.playerName + ' WALTER ersetzen?' ;
-    }
+  get isCurrentPlayer(): boolean {
+    return this.sphinx?.id === this.currentPlayerId;
+  }
+
+  get badgeText(): string {
+    return this.isCurrentPlayer ? 'Du bist die Sphinx' : 'Sphinx: ' + this.sphinx?.playerName;
+  }
+
+  get questionText(): string {
+    return this.isCurrentPlayer
+      ? 'Mit was würdest du „Walter“ ersetzen?'
+      : 'Mit was würde ' + this.sphinx?.playerName + ' „Walter“ ersetzen?';
   }
 }
 

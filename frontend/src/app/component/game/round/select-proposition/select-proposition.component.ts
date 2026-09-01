@@ -16,16 +16,23 @@ export class SelectPropositionComponent {
   @Input() currentPlayerId: string;
   @Output() selectedPropositionEmitter = new EventEmitter<string>();
 
+  selectedId: string | undefined;
+
   selectProposition(id: string | undefined): void {
     this.selectedPropositionEmitter.emit(id);
   }
 
-  createDisplayTextForProposition(proposition: PropositionDto) {
-    let displayText = proposition.gaps.join(', ');
-    if (proposition.numberOfAuthors > 1) {
-      displayText = displayText + ' (' + proposition.numberOfAuthors + ')'
+  /** Mark a proposition as the (not yet submitted) choice; submission happens on confirm. */
+  pick(proposition: PropositionDto): void {
+    if (!proposition.readOnly) {
+      this.selectedId = proposition.id;
     }
-    return displayText;
+  }
+
+  confirmSelection(): void {
+    if (this.selectedId !== undefined) {
+      this.selectedPropositionEmitter.emit(this.selectedId);
+    }
   }
 
   isSphinx(): boolean {

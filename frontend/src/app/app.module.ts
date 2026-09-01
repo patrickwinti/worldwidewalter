@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BASE_PATH } from '@api';
+import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -60,6 +62,7 @@ import { provideZoneChangeDetection } from '@angular/core';
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideHttpClient(withXhr(), withInterceptorsFromDi()),
+    { provide: BASE_PATH, useValue: environment.apiUrl.replace(/\/api\/?$/, '') },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpPollingInterceptor,

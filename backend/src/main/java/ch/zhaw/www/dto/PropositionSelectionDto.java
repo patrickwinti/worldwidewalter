@@ -2,6 +2,7 @@ package ch.zhaw.www.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -25,12 +26,15 @@ public class PropositionSelectionDto {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Schema(name = "PropositionDto")
     public static class Proposition {
         @NotNull
         private final String id;
         @NotNull
         private final List<String> gaps;
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private final int numberOfAuthors;
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         private final boolean readOnly;
     }
 }

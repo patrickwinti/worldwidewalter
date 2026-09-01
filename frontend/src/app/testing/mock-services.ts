@@ -22,8 +22,6 @@ export function getGameServiceMock(): jasmine.SpyObj<GameService> {
       'requestNewGame',
       'startGame',
       'getLobby',
-      'getGame',
-      'getGameAsSoonAsInGivenState',
       'submitProposition'
     ]
   )

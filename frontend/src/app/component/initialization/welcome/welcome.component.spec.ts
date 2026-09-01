@@ -4,7 +4,7 @@ import { WelcomeComponent } from './welcome.component';
 import { getGameServiceMock, getStateServiceMock } from "../../../testing/mock-services"
 import { of } from "rxjs";
 import { GameService } from "../../../service/game.service";
-import { GameCreatedDto } from "../../../dto/game-created-dto";
+import { GameCreatedDto } from "@api";
 import { StateService } from "../../../service/state.service";
 import { CookieService } from "../../../service/cookie.service";
 import { WsService } from "../../../service/ws.service";

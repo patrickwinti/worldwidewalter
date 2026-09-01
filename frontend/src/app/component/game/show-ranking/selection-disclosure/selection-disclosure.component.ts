@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { SelectionDto } from "../../../../dto/result-dto";
+import { SelectionDto } from "@api";
 
 @Component({
   selector: 'www-selection-disclosure',

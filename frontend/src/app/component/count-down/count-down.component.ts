@@ -17,7 +17,7 @@ import { Subject, takeUntil, timer } from "rxjs";
   standalone: false,
 })
 export class CountDownComponent implements OnInit, OnDestroy {
-  @Input() timeoutString: string;
+  @Input() timeoutString?: string | null;
   @Output() timeoutEmitter = new EventEmitter<void>();
 
   public secondsToTimeout: number;
@@ -41,6 +41,10 @@ export class CountDownComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    if (!this.timeoutString) {
+      // No deadline for this phase (the backend left it unset) — nothing to count down.
+      return;
+    }
     timer(0, 1000)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {

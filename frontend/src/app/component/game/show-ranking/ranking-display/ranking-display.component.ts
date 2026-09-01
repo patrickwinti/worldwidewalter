@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RankingDto } from "../../../../dto/result-dto";
+import { RankingDto } from "@api";
 import { avatarHue, initials } from "../../../../shared/avatar";
 
 @Component({

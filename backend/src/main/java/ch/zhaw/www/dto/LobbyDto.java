@@ -1,6 +1,8 @@
 package ch.zhaw.www.dto;
 
 import ch.zhaw.www.model.Game;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
@@ -12,9 +14,13 @@ import java.util.List;
  */
 @Data
 public class LobbyDto {
+    @NotNull
     private final List<PlayerDto> players;
+    @NotNull
     private final String hostId;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final boolean started;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private final int minimumPlayers;
 
     /**

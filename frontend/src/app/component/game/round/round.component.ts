@@ -1,11 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { StateService } from "../../../service/state.service";
 import { GameService } from "../../../service/game.service";
-import { RoundDto } from "../../../dto/round-dto";
+import { PropositionSelectionDto, PropositionSubmissionDto, RoundDto } from "@api";
 import { GameState } from "../../../model/game-state";
 import { filter, firstValueFrom, Observable, Subject, take, takeUntil } from "rxjs";
-import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
-import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
 import { HttpErrorResponse } from "@angular/common/http";
 import { containsNonEmptyString, isNonEmptyString } from "../../../shared/util";
 

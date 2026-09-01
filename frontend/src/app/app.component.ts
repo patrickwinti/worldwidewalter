@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { StateService } from "./service/state.service";
 import { GameState } from "./model/game-state";
 import { GameService } from "./service/game.service";
@@ -10,6 +10,7 @@ import { firstValueFrom } from "rxjs";
 @Component({
   selector: 'www-root',
   templateUrl: './app.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class AppComponent implements OnInit {

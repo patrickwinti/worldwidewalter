@@ -94,7 +94,7 @@ public class RoundController {
                 round.getSelectionSubmissionEnd()));
     }
     
-    @Operation(summary = "Retrieves the points for each player in a round")
+    @Operation(operationId = "getRoundResults", summary = "Retrieves the points for each player in a round")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
             @ApiResponse(responseCode = "404", description = "Round has not been found"),

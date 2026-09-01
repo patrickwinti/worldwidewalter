@@ -1,88 +1,107 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpContext } from "@angular/common/http";
+import { HttpContext } from "@angular/common/http";
 import { SKIP_LOADING } from "./http-polling.interceptor";
 import { Observable, retry } from "rxjs";
 import { AppConfigService } from "./app-config.service";
-import { GameDto } from "../dto/game-dto";
-import { PlayerJoinRequestDto } from "../dto/player-join-request-dto";
-import { PlayerDto } from "../dto/player-dto";
-import { RoundDto } from "../dto/round-dto";
-import { PropositionSubmissionDto } from "../dto/proposition-submission-dto";
-import { PropositionSelectionDto } from "../dto/proposition-selection-dto";
-import { ResultDto } from "../dto/result-dto";
-import { GameCreatedDto } from "../dto/game-created-dto";
-import { LobbyDto } from "../dto/lobby-dto";
-import { RoundStatusDto } from "../dto/round-status-dto";
+import { StateService } from "./state.service";
+import {
+  GameControllerService,
+  GameCreatedDto,
+  LobbyDto,
+  PlayerDto,
+  PlayerJoinRequestDto,
+  PropositionSelectionDto,
+  PropositionSubmissionDto,
+  ResultDto,
+  RoundControllerService,
+  RoundDto,
+  RoundStatusDto
+} from "@api";
 
 /** A player's answer is theirs alone, so a hiccup on the way to the server is retried. */
 const SUBMIT_RETRIES = 2;
 const SUBMIT_RETRY_DELAY_MS = 500;
 
+/**
+ * Thin facade over the OpenAPI-generated {@link GameControllerService} /
+ * {@link RoundControllerService} (generated from {@code ../openapi.json}).
+ *
+ * It keeps the call sites in the components unchanged, injects the current player id for the
+ * {@code X-PLAYER-ID} header parameter, and preserves the two behaviours the generated code
+ * does not know about:
+ * <ul>
+ *   <li>the 425 "Too Early" polling retry &mdash; handled by {@code HttpPollingInterceptor}
+ *       which still wraps every generated request;</li>
+ *   <li>{@code markAbsentAfterDestruction} using the Beacon API on page unload, which cannot
+ *       go through {@code HttpClient};</li>
+ *   <li>the retry around a player's own submission, so a single failed request does not
+ *       silently drop their answer.</li>
+ * </ul>
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class GameService {
 
-  private readonly BASE_URL = this.appConfigService.getBaseUrl();
-
-  constructor(private http: HttpClient,
+  constructor(private gameApi: GameControllerService,
+              private roundApi: RoundControllerService,
+              private stateService: StateService,
               private appConfigService: AppConfigService) {
   }
 
+  private get playerId(): string {
+    return this.stateService.getPlayerId();
+  }
+
   requestNewGame(playerName: string): Observable<GameCreatedDto> {
-    return this.http.post<GameCreatedDto>(this.BASE_URL + '/games', { playerName });
+    return this.gameApi.createGame({ playerName });
   }
 
   startGame(gameId: string): Observable<void> {
-    return this.http.post<void>(this.BASE_URL + '/games/' + gameId + '/start', null);
+    return this.gameApi.startGame(gameId, this.playerId);
   }
 
   getLobby(gameId: string): Observable<LobbyDto> {
-    return this.http.get<LobbyDto>(this.BASE_URL + '/games/' + gameId + '/lobby');
+    return this.gameApi.getLobby(gameId);
   }
 
   joinGame(playerJoinRequestDto: PlayerJoinRequestDto, gameId: string): Observable<PlayerDto> {
-    return this.http.post<PlayerDto>(this.BASE_URL + '/games/' + gameId + '/players', playerJoinRequestDto);
-  }
-
-
-  getGame(gameId: string): Observable<GameDto> {
-    return this.http.get<GameDto>(this.BASE_URL + '/games/' + gameId);
+    return this.gameApi.enterGame(gameId, playerJoinRequestDto);
   }
 
   enterRound(gameId: string): Observable<void> {
-    return this.http.put<void>(this.BASE_URL + '/games/' + gameId + '/rounds', null);
+    return this.gameApi.enterRound(gameId, this.playerId);
   }
 
   getRound(gameId: string): Observable<RoundDto> {
-    return this.http.get<RoundDto>(this.BASE_URL + '/games/' + gameId + '/rounds');
+    return this.gameApi.getRound(gameId, this.playerId);
   }
 
   submitProposition(roundId: string, proposition: PropositionSubmissionDto): Observable<void> {
-    return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions',
-      proposition).pipe(retry({ count: SUBMIT_RETRIES, delay: SUBMIT_RETRY_DELAY_MS }));
+    return this.roundApi.submitProposition(roundId, this.playerId, proposition)
+      .pipe(retry({ count: SUBMIT_RETRIES, delay: SUBMIT_RETRY_DELAY_MS }));
   }
 
   getAllPropositions(roundId: string): Observable<PropositionSelectionDto> {
-    return this.http.get<PropositionSelectionDto>(this.BASE_URL + '/rounds/' + roundId + '/propositions');
+    return this.roundApi.getAllPropositionForRound(roundId, this.playerId);
   }
 
   submitPropositionSelection(roundId: string, id: string): Observable<void> {
-    return this.http.post<void>(this.BASE_URL + '/rounds/' + roundId + '/propositions/' + id, null)
+    return this.roundApi.selectProposition(roundId, id, this.playerId)
       .pipe(retry({ count: SUBMIT_RETRIES, delay: SUBMIT_RETRY_DELAY_MS }));
   }
 
   getResultsForRound(roundId: string, skipLoading = false): Observable<ResultDto> {
-    return this.http.get<ResultDto>(this.BASE_URL + '/rounds/' + roundId + '/results',
-      { context: new HttpContext().set(SKIP_LOADING, skipLoading) })
+    return this.roundApi.getRoundResults(roundId, this.playerId, 'body', false,
+      { context: new HttpContext().set(SKIP_LOADING, skipLoading) });
   }
 
   getResults(gameId: string): Observable<ResultDto> {
-    return this.http.get<ResultDto>(this.BASE_URL + '/games/' + gameId + '/results')
+    return this.gameApi.getGameResults(gameId);
   }
 
   leaveGame(playerId: string, gameId: string): Observable<void> {
-    return this.http.delete<void>(this.BASE_URL + '/games/' + gameId + '/players/' + playerId)
+    return this.gameApi.leaveGame(gameId, playerId);
   }
 
   /**
@@ -91,15 +110,16 @@ export class GameService {
    * running game instead of losing it.
    */
   markAbsentAfterDestruction(playerId: string, gameId: string): boolean {
-    return navigator.sendBeacon(this.BASE_URL + '/games/' + gameId + '/players/' + playerId + '/disconnect')
+    return navigator.sendBeacon(
+      this.appConfigService.getBaseUrl() + '/games/' + gameId + '/players/' + playerId + '/disconnect');
   }
 
   endGame(gameId: string): Observable<void> {
-    return this.http.post<void>(this.BASE_URL + '/games/' + gameId + '/end', null);
+    return this.gameApi.endGame(gameId, this.playerId);
   }
 
   restartGame(gameId: string): Observable<void> {
-    return this.http.post<void>(this.BASE_URL + '/games/' + gameId + '/restart', null);
+    return this.gameApi.restartGame(gameId, this.playerId);
   }
 
   /**
@@ -107,11 +127,11 @@ export class GameService {
    * The same payload is pushed on the /topic/games/{gameId}/round WebSocket topic.
    */
   getRoundStatus(gameId: string): Observable<RoundStatusDto> {
-    return this.http.get<RoundStatusDto>(this.BASE_URL + '/games/' + gameId + '/rounds/status',
+    return this.gameApi.getRoundStatus(gameId, 'body', false,
       { context: new HttpContext().set(SKIP_LOADING, true) });
   }
 
   rejoinGame(gameId: string, playerId: string): Observable<PlayerDto> {
-    return this.http.post<PlayerDto>(this.BASE_URL + '/games/' + gameId + '/players/' + playerId + '/rejoin', null);
+    return this.gameApi.rejoinGame(gameId, playerId);
   }
 }

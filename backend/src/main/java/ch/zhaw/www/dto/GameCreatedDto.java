@@ -1,5 +1,6 @@
 package ch.zhaw.www.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -8,6 +9,8 @@ import lombok.Data;
  */
 @Data
 public class GameCreatedDto {
+    @NotNull
     private final String gameId;
+    @NotNull
     private final PlayerDto host;
 }

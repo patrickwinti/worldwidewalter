@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 
+# Generated from ../openapi.json by `npm run generate:api` (openapi-generator-cli)
+/src/app/api
+
 # Node
 /node_modules
 /node

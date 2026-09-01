@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EnterPropositionComponent } from './enter-proposition.component';
-import { RoundDto } from "../../../../dto/round-dto";
+import { RoundDto } from "@api";
 import { NO_ERRORS_SCHEMA } from "@angular/core";
 
 describe('EnterPropositionComponent', () => {

@@ -1,25 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { GameService } from './game.service';
 import { of } from "rxjs";
-import { getAppConfigServiceMock, getHttpClientMock } from "../testing/mock-services";
-import { HttpClient } from "@angular/common/http";
-import { AppConfigService } from "./app-config.service";
+import { getStateServiceMock } from "../testing/mock-services";
+import { GameControllerService, RoundControllerService } from "@api";
+import { StateService } from "./state.service";
 
 describe('GameService', () => {
   let service: GameService;
-  let httpMock = getHttpClientMock();
-  let appConfigService = getAppConfigServiceMock();
-  let baseUrl = 'baseUrl';
+  const gameApi = jasmine.createSpyObj<GameControllerService>('GameControllerService', ['createGame']);
+  const roundApi = jasmine.createSpyObj<RoundControllerService>('RoundControllerService', ['getRoundResults']);
+  const stateService = getStateServiceMock();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        {provide: HttpClient, useValue: httpMock},
-        {provide: AppConfigService, useValue: appConfigService}
+        { provide: GameControllerService, useValue: gameApi },
+        { provide: RoundControllerService, useValue: roundApi },
+        { provide: StateService, useValue: stateService }
       ]
     }).compileComponents();
 
-    appConfigService.getBaseUrl.and.returnValue(baseUrl);
     service = TestBed.inject(GameService);
   });
 
@@ -27,15 +27,11 @@ describe('GameService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should call http.get on click createGame', () => {
-    // arrange
-    httpMock.post.and.returnValue(of(undefined));
+  it('should delegate requestNewGame to the generated GameControllerService', () => {
+    gameApi.createGame.and.returnValue(of(undefined) as any);
 
-
-    // act
     service.requestNewGame('Host');
 
-    // assert
-    expect(httpMock.post).toHaveBeenCalledWith(baseUrl + '/games', { playerName: 'Host' })
+    expect(gameApi.createGame).toHaveBeenCalledWith({ playerName: 'Host' });
   });
 });

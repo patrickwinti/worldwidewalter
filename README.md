@@ -30,6 +30,19 @@ merged without having proper testing implemented.
 1. Run maven target `clean install -f pom.xml`
 2. Run in your terminal in the project directiory `java -jar backend/target/backend-{VERSIOn}-SNAPSHOT.jar`
 
+### API contract
+
+`openapi.json` (repo root) is the source of truth for the REST API. The frontend generates
+its DTOs and HTTP services from it automatically during the build (into the git-ignored
+`frontend/src/app/api/`). After changing a controller or a backend `dto/` class, regenerate
+and commit the spec:
+
+```bash
+cd backend && mvn -Dopenapi.generate=true test -Dtest=OpenApiSpecTest
+```
+
+`OpenApiSpecTest` fails the build if the committed `openapi.json` is out of date.
+
 ## Project Management
 
 * JIRA: https://worldwidewalter.atlassian.net/jira/software/projects/WWW/boards/1

@@ -1,6 +1,7 @@
 package ch.zhaw.www.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -14,7 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultDto {
+    @NotNull
     List<RankingDto> ranking;
+    @NotNull
     List<SelectionDto> selections;
 }
-

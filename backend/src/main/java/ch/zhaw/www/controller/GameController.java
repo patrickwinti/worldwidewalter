@@ -146,7 +146,7 @@ public class GameController {
         logger.log(Level.INFO, "left game successfully");
     }
     
-    @Operation(summary = "Retrieves the points for each player")
+    @Operation(operationId = "getGameResults", summary = "Retrieves the points for each player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Results table with player names and their point value"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),

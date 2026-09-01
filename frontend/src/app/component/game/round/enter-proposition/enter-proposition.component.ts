@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { RoundDto } from "../../../../dto/round-dto";
+import { RoundDto } from "@api";
 import { WalterReplacement } from "../../../../model/walterReplacement";
 import { containsNonEmptyString } from "../../../../shared/util";
 import { MAX_INPUT_LENGTH } from "../../../../shared/settings";

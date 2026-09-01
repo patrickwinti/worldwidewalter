@@ -41,7 +41,7 @@ export class HttpPollingInterceptor implements HttpInterceptor {
 
     return next.handle(requestWithHeader)
       .pipe(
-        retry({delay: this.shouldRetry}),
+        retry({delay: (response: HttpResponse<unknown>) => this.shouldRetry(response, skipLoading)}),
         finalize(() => {
           if (!skipLoading) {
             this.activeRequests--;
@@ -53,8 +53,16 @@ export class HttpPollingInterceptor implements HttpInterceptor {
       )
   }
 
-  private shouldRetry(response: HttpResponse<unknown>) {
+  /**
+   * "Too early" means the backend is waiting for the other players, not that something went
+   * wrong: keep polling, and let the loading overlay say so instead of looking like a slow
+   * request.
+   */
+  private shouldRetry(response: HttpResponse<unknown>, skipLoading: boolean) {
     if (response.status === HttpStatusCode.TooEarly) {
+      if (!skipLoading) {
+        this.loadingService.setWaitingForPlayers(true);
+      }
       return timer(1000);
     }
     throw response;

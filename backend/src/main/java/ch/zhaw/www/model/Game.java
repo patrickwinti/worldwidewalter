@@ -52,6 +52,8 @@ public class Game {
     private String hostId;
     @Getter
     private boolean started = false;
+    @Getter
+    private boolean ended = false;
     @Setter
     private Map<Player, Integer> sphinxCandidates = new HashMap<>();
     private final List<Prompt> prompts;
@@ -166,6 +168,26 @@ public class Game {
     }
 
     /**
+     * Whether every player the round waits for has submitted a proposition.
+     *
+     * @param round round to check
+     * @return true if no proposition is outstanding
+     */
+    public boolean hasAllPropositions(final Round round) {
+        return !isMissingPlayerProposition(round);
+    }
+
+    /**
+     * Whether every player the round waits for has submitted a selection.
+     *
+     * @param round round to check
+     * @return true if no selection is outstanding
+     */
+    public boolean hasAllSelections(final Round round) {
+        return !isMissingPlayerSelections(round);
+    }
+
+    /**
      * Number of players the round waits for before it advances to the next phase.
      * <p>
      * This counts every active player still present in the game — including a player with a
@@ -175,7 +197,7 @@ public class Game {
      *
      * @return the number of players expected to respond in the current round
      */
-    private long getExpectedResponderCount() {
+    public long getExpectedResponderCount() {
         return max(getPresentActivePlayersCount(), MIN_PLAYERS_TO_CONTINUE);
     }
 
@@ -187,10 +209,57 @@ public class Game {
      * @return the number of present active players
      */
     private long getPresentActivePlayersCount() {
+        return getPresentActivePlayers().size();
+    }
+
+    /**
+     * Active players of the current round that are still counted as present.
+     *
+     * @return the present active players
+     */
+    public List<Player> getPresentActivePlayers() {
         Instant now = InstantWrapper.getNow();
         return activePlayers.values().stream()
                 .filter(player -> player.isPresent(now, DISCONNECT_GRACE))
-                .count();
+                .toList();
+    }
+
+    /**
+     * Present players of the current round that still owe a proposition.
+     *
+     * @param round round to check
+     * @return the players the round is waiting for
+     */
+    public List<Player> getPlayersMissingProposition(final Round round) {
+        return getPresentActivePlayers().stream()
+                .filter(player -> round.getPropositions().stream()
+                        .noneMatch(proposition -> proposition.hasSubmitter(player.getId())))
+                .toList();
+    }
+
+    /**
+     * Present players of the current round that still owe a selection. The sphinx does not
+     * select and is therefore never included.
+     *
+     * @param round round to check
+     * @return the players the round is waiting for
+     */
+    public List<Player> getPlayersMissingSelection(final Round round) {
+        return getPresentActivePlayers().stream()
+                .filter(player -> !round.isSphinx(player.getId()))
+                .filter(player -> !round.getSelections().containsKey(player.getId()))
+                .toList();
+    }
+
+    /**
+     * Present players that have not yet continued into the current round.
+     *
+     * @return the players the round is waiting for before it starts
+     */
+    public List<Player> getPlayersNotEnteredRound() {
+        return getPresentPlayers().stream()
+                .filter(player -> !activePlayers.containsKey(player.getId()))
+                .toList();
     }
 
     /**
@@ -212,6 +281,30 @@ public class Game {
      */
     public void markStarted() {
         this.started = true;
+        this.ended = false;
+    }
+
+    /**
+     * Ends the game for everybody. No further round can be entered; the final ranking stays
+     * available.
+     */
+    public void markEnded() {
+        this.ended = true;
+    }
+
+    /**
+     * Puts the game back into the lobby for another match with the same players: scores are
+     * reset and the sphinx rotation starts over. The played rounds are kept so that the prompt
+     * deck continues where it left off instead of repeating the same prompts.
+     */
+    public void restart() {
+        points.replaceAll((playerId, value) -> 0);
+        activePlayers.clear();
+        sphinxCandidates.clear();
+        expectedContinueCount = 0;
+        roundReachedMinimumPlayers = false;
+        started = false;
+        ended = false;
     }
 
     /**
@@ -297,7 +390,14 @@ public class Game {
      */
     public boolean allExpectedPlayersEntered() {
         int expected = Math.min(expectedContinueCount, getPresentPlayers().size());
-        return getPresentActivePlayersCount() >= expected;
+        if (getPresentActivePlayersCount() >= expected) {
+            return true;
+        }
+        // Backstop: a player who leaves the results screen open would otherwise block the next
+        // round forever, because they stay present as long as their connection is alive.
+        return getCurrentRoundOptional()
+                .map(Round::hasWaitedForRemainingPlayers)
+                .orElse(false);
     }
     
     /**

@@ -6,8 +6,8 @@ import { GameState } from "../../../model/game-state";
 import { filter, firstValueFrom, Observable, Subject, take, takeUntil } from "rxjs";
 import { PropositionSelectionDto } from "../../../dto/proposition-selection-dto";
 import { PropositionSubmissionDto } from "../../../dto/proposition-submission-dto";
-import { HttpErrorResponse } from "@angular/common/http";
 import { containsNonEmptyString, isNonEmptyString } from "../../../shared/util";
+import { NotificationService } from "../../../service/notification.service";
 
 @Component({
   selector: 'www-round',
@@ -26,7 +26,8 @@ export class RoundComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   constructor(private stateService: StateService,
-              private gameService: GameService) {
+              private gameService: GameService,
+              private notificationService: NotificationService) {
   }
 
   ngOnInit(): void {
@@ -52,28 +53,32 @@ export class RoundComponent implements OnInit, OnDestroy {
 
   async submitSelection(selectedPropositionId: string): Promise<void> {
     if (isNonEmptyString(selectedPropositionId)) {
-      await firstValueFrom(this.gameService.submitPropositionSelection(this.round.id, selectedPropositionId)).then(
-        () => {
-          console.log('selection submission successful');
-        },
-        (error: HttpErrorResponse) => {
-          console.log('selection not successful, continuing');
+      try {
+        await firstValueFrom(this.gameService.submitPropositionSelection(this.round.id, selectedPropositionId));
+      } catch {
+        // The round moves on either way, but the player must not be left believing their vote
+        // counted when it never reached the backend.
+        this.notificationService.notify({
+          kind: 'selection-not-submitted',
+          message: 'Deine Auswahl konnte nicht gesendet werden.'
         });
+      }
     }
     this.stateService.setState(GameState.SHOW_RESULTS_AND_RANKING);
   }
 
   async sendProposition(gapReplacements: string[]): Promise<void> {
     if (containsNonEmptyString(gapReplacements)) {
-      await firstValueFrom(this.gameService.submitProposition(this.round.id, {
-        gaps: gapReplacements
-      } as PropositionSubmissionDto)).then(
-        () => {
-          console.log('submission successful');
-        },
-        (error: HttpErrorResponse) => {
-          console.log('submission not successful, continuing');
+      try {
+        await firstValueFrom(this.gameService.submitProposition(this.round.id, {
+          gaps: gapReplacements
+        } as PropositionSubmissionDto));
+      } catch {
+        this.notificationService.notify({
+          kind: 'proposition-not-submitted',
+          message: 'Dein Vorschlag konnte nicht gesendet werden.'
         });
+      }
     }
     this.stateService.setState(GameState.SELECT_PROPOSITION);
   }

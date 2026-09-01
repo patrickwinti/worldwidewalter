@@ -63,6 +63,46 @@ public class GameController {
         logger.log(Level.INFO, "game {0} started by {1}", new Object[]{gameId, playerId});
     }
 
+    @Operation(summary = "Host ends the game; the final ranking stays available")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Game ended"),
+            @ApiResponse(responseCode = "403", description = "Player is not the host"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games/{gameId}/end")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void endGame(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        gameService.endGame(gameId, playerId);
+        logger.log(Level.INFO, "game {0} ended by {1}", new Object[]{gameId, playerId});
+    }
+
+    @Operation(summary = "Host puts the game back into the lobby for another match, scores reset")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Game restarted"),
+            @ApiResponse(responseCode = "403", description = "Player is not the host"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games/{gameId}/restart")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void restartGame(@PathVariable String gameId, @Valid @RequestHeader("X-PLAYER-ID") String playerId) {
+        gameService.restartGame(gameId, playerId);
+        logger.log(Level.INFO, "game {0} restarted by {1}", new Object[]{gameId, playerId});
+    }
+
+    @Operation(summary = "Returns what the current round is waiting for and who is still missing")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Current round status"),
+            @ApiResponse(responseCode = "404", description = "Game has not been found"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @GetMapping(value = "/games/{gameId}/rounds/status", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<RoundStatusDto> getRoundStatus(@PathVariable String gameId) {
+        return ResponseEntity.ok(RoundStatusDto.from(gameService.getGame(gameId)));
+    }
+
     @Operation(summary = "Returns the current lobby state (joined players, host, started flag)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Current lobby state"),
@@ -82,6 +122,7 @@ public class GameController {
             @ApiResponse(responseCode = "400", description = "Missing player name"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game has reached max capacity"),
+            @ApiResponse(responseCode = "422", description = "Name is already taken in this game"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PostMapping(value = "/games/{gameId}/players", produces = "application/json", consumes = "application/json")
@@ -120,7 +161,7 @@ public class GameController {
                 game.getPoints()
                         .entrySet()
                         .stream()
-                        .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue()))
+                        .map(entry -> new RankingDto(game.getPlayerNameFromId(entry.getKey()), entry.getValue(), 0))
                         .toList(),
                 Collections.emptyList());
         
@@ -166,6 +207,7 @@ public class GameController {
             @ApiResponse(responseCode = "403", description = "Player cannot enter this round because it's either already running"),
             @ApiResponse(responseCode = "404", description = "Game has not been found"),
             @ApiResponse(responseCode = "409", description = "Game is at capacity"),
+            @ApiResponse(responseCode = "410", description = "Game has been ended by the host"),
             @ApiResponse(responseCode = "500", description = "Unknown error")
     })
     @PutMapping(value = "/games/{gameId}/rounds")
@@ -175,11 +217,18 @@ public class GameController {
         logger.log(Level.INFO, "{0} will participate next round", playerId);
     }
     
-    @Operation(summary = "Player leaves game by destroying webapp")
-    @PostMapping(value = "/games/{gameId}/players/{playerId}")
-    public void leaveGameAfterDestruction(@PathVariable String gameId, @Valid @PathVariable String playerId) {
-        gameService.leaveGame(gameId, playerId);
-        logger.log(Level.INFO, "left game ungracefully by destroying webapp");
+    @Operation(summary = "Player's client went away (tab closed or reloaded)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Player marked as absent"),
+            @ApiResponse(responseCode = "500", description = "Unknown error")
+    })
+    @PostMapping(value = "/games/{gameId}/players/{playerId}/disconnect")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void markPlayerAbsent(@PathVariable String gameId, @Valid @PathVariable String playerId) {
+        // Deliberately not a leave: the player keeps their seat and their points so they can
+        // come back after a reload. The disconnect grace period stops them blocking the round.
+        gameService.disconnectPlayer(gameId, playerId);
+        logger.log(Level.INFO, "player {0} went absent in game {1}", new Object[]{playerId, gameId});
     }
 
     @Operation(summary = "Player rejoins a game after disconnection")

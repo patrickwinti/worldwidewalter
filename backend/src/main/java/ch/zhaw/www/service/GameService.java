@@ -32,6 +32,32 @@ public interface GameService {
             throws GameError.NotFoundException, GameError.NotHostException, GameError.NotEnoughPlayersException;
 
     /**
+     * Ends the game for everybody. Only the host may end it. The final ranking stays available
+     * afterwards, but no further round can be entered.
+     *
+     * @param gameId   game identifier
+     * @param playerId player requesting the end (must be the host)
+     * @return the ended game
+     * @throws GameError.NotFoundException if game is not found
+     * @throws GameError.NotHostException  if the player is not the host
+     */
+    Game endGame(@NotNull String gameId, @NotNull String playerId)
+            throws GameError.NotFoundException, GameError.NotHostException;
+
+    /**
+     * Puts an ended game back into the lobby for another match with the same players, with the
+     * scores reset. Only the host may restart.
+     *
+     * @param gameId   game identifier
+     * @param playerId player requesting the restart (must be the host)
+     * @return the restarted game
+     * @throws GameError.NotFoundException if game is not found
+     * @throws GameError.NotHostException  if the player is not the host
+     */
+    Game restartGame(@NotNull String gameId, @NotNull String playerId)
+            throws GameError.NotFoundException, GameError.NotHostException;
+
+    /**
      * Reassigns the host to a random present player if the current host is no longer present
      * (left, or disconnected beyond the grace period) and the game has not started yet.
      * Best-effort and only touches the game when a reassignment actually happens.
@@ -57,6 +83,7 @@ public interface GameService {
      * @return new player
      * @throws GameError.NotFoundException     if game is not found
      * @throws GameError.FullCapacityException if game has no available seats
+     * @throws GameError.NameTakenException    if another player already uses that name
      */
     Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException;
     

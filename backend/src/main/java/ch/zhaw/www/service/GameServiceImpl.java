@@ -28,17 +28,17 @@ class GameServiceImpl implements GameService {
     private final GameProperties gameProperties;
     private final RoundService roundService;
     private final RandomProvider randomProvider;
-    private final LobbyNotifier lobbyNotifier;
+    private final GameNotifier gameNotifier;
 
     private final PromptRepository promptRepository;
 
     GameServiceImpl(EntityService entityService, GameProperties gameProperties, RoundService roundService,
-                    RandomProvider randomProvider, LobbyNotifier lobbyNotifier, PromptRepository promptRepository) {
+                    RandomProvider randomProvider, GameNotifier gameNotifier, PromptRepository promptRepository) {
         this.entityService = entityService;
         this.gameProperties = gameProperties;
         this.roundService = roundService;
         this.randomProvider = randomProvider;
-        this.lobbyNotifier = lobbyNotifier;
+        this.gameNotifier = gameNotifier;
         this.promptRepository = promptRepository;
     }
     
@@ -67,9 +67,7 @@ class GameServiceImpl implements GameService {
     public Game startGame(@NotNull String gameId, @NotNull String playerId)
             throws GameError.NotFoundException, GameError.NotHostException, GameError.NotEnoughPlayersException {
         Game game = entityService.editGame(gameId, g -> {
-            if (!g.isHost(playerId)) {
-                throw new GameError.NotHostException();
-            }
+            requireHost(g, playerId);
             if (!g.hasEnoughPlayersToStart()) {
                 throw new GameError.NotEnoughPlayersException();
             }
@@ -77,7 +75,33 @@ class GameServiceImpl implements GameService {
             LOGGER.log(Level.INFO, "Game {0} started by host {1}", new Object[]{gameId, playerId});
             return g;
         });
-        lobbyNotifier.notifyLobbyChanged(game);
+        gameNotifier.notifyLobbyChanged(game);
+        return game;
+    }
+
+    @Override
+    public Game endGame(@NotNull String gameId, @NotNull String playerId)
+            throws GameError.NotFoundException, GameError.NotHostException {
+        Game game = entityService.editGame(gameId, g -> {
+            requireHost(g, playerId);
+            g.markEnded();
+            LOGGER.log(Level.INFO, "Game {0} ended by host {1}", new Object[]{gameId, playerId});
+            return g;
+        });
+        gameNotifier.notifyRoundChanged(game);
+        return game;
+    }
+
+    @Override
+    public Game restartGame(@NotNull String gameId, @NotNull String playerId)
+            throws GameError.NotFoundException, GameError.NotHostException {
+        Game game = entityService.editGame(gameId, g -> {
+            requireHost(g, playerId);
+            g.restart();
+            LOGGER.log(Level.INFO, "Game {0} restarted by host {1}", new Object[]{gameId, playerId});
+            return g;
+        });
+        gameNotifier.notifyLobbyChanged(game);
         return game;
     }
 
@@ -92,7 +116,7 @@ class GameServiceImpl implements GameService {
             reassignHost(g);
             return g;
         });
-        lobbyNotifier.notifyLobbyChanged(game);
+        gameNotifier.notifyLobbyChanged(game);
     }
 
     /**
@@ -123,17 +147,18 @@ class GameServiceImpl implements GameService {
     public Player enterGame(@NotNull String gameId, @NotNull String playerName) throws GameError.NotFoundException, GameError.FullCapacityException {
         Player[] joined = new Player[1];
         Game game = entityService.editGame(gameId, g -> {
-            String uuid = UUID.randomUUID().toString();
-            StringBuilder name = new StringBuilder(playerName.trim());
-            while (g.getAllPlayers().anyMatch(player -> name.toString().equals(player.getName()))) {
-                name.append(randomProvider.getPostfix());
+            String name = playerName.trim();
+            // Names identify players in the round and in the results, so a duplicate is
+            // rejected and the player picks another one instead of being silently renamed.
+            if (g.getAllPlayers().anyMatch(player -> name.equalsIgnoreCase(player.getName()))) {
+                throw new GameError.NameTakenException(name);
             }
-            Player tempPlayer = new Player(uuid, name.toString());
+            Player tempPlayer = new Player(UUID.randomUUID().toString(), name);
             g.registerPlayer(tempPlayer);
             joined[0] = tempPlayer;
             return g;
         });
-        lobbyNotifier.notifyLobbyChanged(game);
+        gameNotifier.notifyLobbyChanged(game);
         return joined[0];
     }
 
@@ -146,7 +171,7 @@ class GameServiceImpl implements GameService {
             reassignHost(g);
             return g;
         });
-        lobbyNotifier.notifyLobbyChanged(game);
+        gameNotifier.notifyLobbyChanged(game);
     }
 
     @Override
@@ -155,6 +180,9 @@ class GameServiceImpl implements GameService {
             Player playerEnteringRound = checkPlayerInGame(game, playerId);
             if (!game.isStarted()) {
                 throw new GameError.NotStartedException();
+            }
+            if (game.isEnded()) {
+                throw new GameError.EndedException();
             }
             if (game.needsNewRound()) {
                 var round = roundService.createNewRound(game);
@@ -174,11 +202,12 @@ class GameServiceImpl implements GameService {
             }
             return game;
         });
+        gameNotifier.notifyRoundChanged(entityService.getGame(gameId));
     }
     
     @Override
     public Round getRoundOpenForPropositions(@NotNull String gameId, @NotNull String playerId) throws GameError.NotFoundException, RoundError.IllegalStateException {
-        Game game = entityService.getGame(gameId);
+        Game game = startRoundIfWaitElapsed(gameId);
         checkPlayerInGame(game, playerId);
         if (!game.hasActivePlayer(playerId) || !game.canAcceptPropositionsForCurrentRound()) {
             LOGGER.info(() -> "Game not in desired state");
@@ -187,13 +216,42 @@ class GameServiceImpl implements GameService {
         return game.getCurrentRound();
     }
     
+    /**
+     * Starts a round that is only still waiting for players who never continued, once the wait
+     * for them has elapsed. Clients enter a round once and then poll for it, so without this the
+     * backstop would never be reached: a single player idling on the results screen would keep
+     * everybody else waiting forever.
+     * <p>
+     * The game is read first and only written when the round actually starts, so that polling
+     * does not keep an abandoned game alive past the idle cleanup.
+     *
+     * @param gameId game identifier
+     * @return the game, with the round started if it was due
+     */
+    private Game startRoundIfWaitElapsed(@NotNull String gameId) {
+        Game game = entityService.getGame(gameId);
+        boolean roundWaitingToStart = game.isStarted()
+                && game.getCurrentRoundOptional().map(round -> round.getSphinx() == null).orElse(false)
+                && game.allExpectedPlayersEntered();
+        if (!roundWaitingToStart) {
+            return game;
+        }
+        Game started = entityService.editGame(gameId, g -> {
+            roundService.selectSphinx(g);
+            return g;
+        });
+        gameNotifier.notifyRoundChanged(started);
+        return started;
+    }
+
     @Override
     public void disconnectPlayer(@NotNull String gameId, @NotNull String playerId) {
         try {
-            entityService.editGame(gameId, game -> {
-                game.markPlayerDisconnected(playerId);
-                return game;
+            Game game = entityService.editGame(gameId, g -> {
+                g.markPlayerDisconnected(playerId);
+                return g;
             });
+            notifyPresenceChanged(game);
         } catch (GameError.NotFoundException e) {
             LOGGER.log(Level.WARNING, "Game {0} not found on player disconnect", gameId);
         }
@@ -202,12 +260,38 @@ class GameServiceImpl implements GameService {
     @Override
     public void connectPlayer(@NotNull String gameId, @NotNull String playerId) {
         try {
-            entityService.editGame(gameId, game -> {
-                game.markPlayerConnected(playerId);
-                return game;
+            Game game = entityService.editGame(gameId, g -> {
+                g.markPlayerConnected(playerId);
+                return g;
             });
+            notifyPresenceChanged(game);
         } catch (GameError.NotFoundException e) {
             LOGGER.log(Level.WARNING, "Game {0} not found on player connect", gameId);
+        }
+    }
+
+    /**
+     * Pushes a presence change to whichever view the game is currently in, so a player who
+     * drops out stops being an unexplained blank in the lobby list or in the round wait.
+     *
+     * @param game the game whose presence changed
+     */
+    private void notifyPresenceChanged(Game game) {
+        if (game.isStarted()) {
+            gameNotifier.notifyRoundChanged(game);
+        } else {
+            gameNotifier.notifyLobbyChanged(game);
+        }
+    }
+
+    /**
+     * @param game     the game to check
+     * @param playerId the player that must be the host
+     * @throws GameError.NotHostException if the player is not the host of the game
+     */
+    private static void requireHost(Game game, String playerId) {
+        if (!game.isHost(playerId)) {
+            throw new GameError.NotHostException();
         }
     }
 

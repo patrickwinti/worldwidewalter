@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class PropositionTest {
     
@@ -21,6 +22,18 @@ class PropositionTest {
         Set<ConstraintViolation<Proposition>> violations = validator.validate(proposition);
         
         assertEquals(1, violations.size());
+    }
+    
+    @Test
+    void submittingTheSamePropositionTwiceCountsThePlayerOnce() {
+        Proposition proposition = new Proposition(UUID.randomUUID().toString(), List.of("Car"));
+        String playerId = "player-1";
+        
+        proposition.submittedBy(playerId);
+        proposition.submittedBy(playerId);
+        
+        assertEquals(List.of(playerId), proposition.getPlayerIds());
+        assertFalse(proposition.hasDuplicates());
     }
     
     @Test

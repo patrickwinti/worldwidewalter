@@ -63,7 +63,9 @@ export function getLoadingServiceMock(): jasmine.SpyObj<LoadingService> {
     [
       'startLoading',
       'stopLoading',
-      'getIsLoadingObservable'
+      'getIsLoadingObservable',
+      'setWaitingForPlayers',
+      'getIsWaitingForPlayersObservable'
     ]
   )
 }

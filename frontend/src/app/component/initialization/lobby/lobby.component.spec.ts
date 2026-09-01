@@ -17,7 +17,7 @@ describe('LobbyComponent', () => {
   let wsService = jasmine.createSpyObj('WsService', ['subscribe', 'unsubscribe', 'connect', 'disconnect']);
 
   const lobby = (over: Partial<LobbyDto>): LobbyDto =>
-    ({players: [], hostId: 'host-1', started: false, minimumPlayers: 4, ...over});
+    ({players: [], hostId: 'host-1', started: false, minimumPlayers: 4, ended: false, ...over});
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({

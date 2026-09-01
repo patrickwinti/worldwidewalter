@@ -14,6 +14,7 @@ public class TestHelper {
     public static final Duration DEFAULT_PROPOSITION_DURATION = Duration.of(5, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_PROPOSITION_END_DURATION = Duration.of(1, ChronoUnit.MINUTES);
     public static final Duration DEFAULT_SUBMISSION_DURATION = Duration.of(1, ChronoUnit.MINUTES);
+    public static final Duration DEFAULT_CONTINUE_WAIT_DURATION = Duration.of(45, ChronoUnit.SECONDS);
     public static final int MIN_NUMBER_OF_PLAYERS = 4;
     public static final int MAX_NUMBER_OF_PLAYERS = 15;
     public static final int NUMBER_OF_ROUNDS_PER_TURN = 1;
@@ -63,7 +64,8 @@ public class TestHelper {
     }
     
     public static Round createRound(Duration duration) {
-        return new Round(getId(), PROMPT, duration, DEFAULT_PROPOSITION_END_DURATION, DEFAULT_SUBMISSION_DURATION);
+        return new Round(getId(), PROMPT, duration, DEFAULT_PROPOSITION_END_DURATION, DEFAULT_SUBMISSION_DURATION,
+                DEFAULT_CONTINUE_WAIT_DURATION);
     }
     
     public static Round createRound() {

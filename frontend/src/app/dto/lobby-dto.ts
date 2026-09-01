@@ -5,4 +5,6 @@ export interface LobbyDto {
   hostId: string;
   started: boolean;
   minimumPlayers: number;
+  /** True once the host ended the game; the lobby is then showing a finished match. */
+  ended: boolean;
 }

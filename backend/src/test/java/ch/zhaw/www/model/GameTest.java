@@ -341,6 +341,41 @@ class GameTest {
         assertEquals(NUMBER_OF_ROUNDS_PER_TURN, game.getSphinxCandidates().get(power));
     }
     
+    @Test
+    void roundStartsWithoutThePlayersThatNeverContinued() {
+        enableFixedClocked();
+        Game game = createGame();
+        game.addRound(createRound());
+        IntStream.range(0, 4).forEach(value -> addActivePlayer(game));
+        
+        game.addRound(createRound());
+        game.getAllPlayers().limit(3).forEach(game::moveToActivePlayers);
+        
+        assertFalse(game.allExpectedPlayersEntered());
+        
+        offsetFixedClockBy(DEFAULT_CONTINUE_WAIT_DURATION.plusSeconds(1));
+        
+        assertTrue(game.allExpectedPlayersEntered());
+    }
+    
+    @Test
+    void endedGameKeepsTheScoresAndRestartResetsThem() {
+        Game game = createGame();
+        Player player = registerPlayer(game);
+        game.markStarted();
+        game.addPoints(Map.of(player.getId(), 5));
+        
+        game.markEnded();
+        assertTrue(game.isEnded());
+        assertEquals(5, game.getPoints().get(player.getId()));
+        
+        game.restart();
+        assertFalse(game.isEnded());
+        assertFalse(game.isStarted());
+        assertEquals(0, game.getPoints().get(player.getId()));
+        assertFalse(game.hasActivePlayer(player.getId()));
+    }
+    
     private void addRoundOpenForPropositionSubmission(Game game, int numberOfPlayersToAdd) {
         Round round = createRound();
         game.addRound(round);

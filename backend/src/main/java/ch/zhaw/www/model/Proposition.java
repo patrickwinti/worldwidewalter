@@ -27,11 +27,16 @@ public class Proposition {
      * Adds player that submitted the given proposition.
      * Players that submitted duplicates of the prompt
      * will be added to the player IDs.
+     * <p>
+     * Submitting the same proposition twice (e.g. a retry, or a submission that races the
+     * expiring round timer) does not count the player twice.
      *
      * @param playerId player identifier
      */
     public void submittedBy(final String playerId) {
-        playerIds.add(playerId);
+        if (!playerIds.contains(playerId)) {
+            playerIds.add(playerId);
+        }
     }
 
     /**

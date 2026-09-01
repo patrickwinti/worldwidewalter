@@ -12,5 +12,8 @@ export interface SelectionDto {
 
 export interface RankingDto {
   playerName: string;
+  /** Running total across the whole game. */
   points: number;
+  /** What the round just played added to the total. */
+  roundPoints: number;
 }

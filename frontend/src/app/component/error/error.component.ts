@@ -53,6 +53,8 @@ export class ErrorComponent implements OnInit, OnDestroy {
           return 'Das Spiel wurde nicht gefunden.';
         case HttpStatusCode.Conflict:
           return 'Das Spiel ist bereits voll. Bitte zu einem anderen Zeitpunkt nochmals versuchen.';
+        case HttpStatusCode.Gone:
+          return 'Das Spiel wurde beendet.';
         case HttpStatusCode.TooEarly:
           return 'Es haben sich nicht genügend Spieler:innen in dem gegebenen Zeitfenster angemeldet. Versuch es noch einmal.';
       }

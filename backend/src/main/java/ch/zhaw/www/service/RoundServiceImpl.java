@@ -17,6 +17,7 @@ class RoundServiceImpl implements RoundService {
     private final GameProperties gameProperties;
     private final EntityService entityService;
     private final EvaluationService evaluationService;
+    private final GameNotifier gameNotifier;
     
     /**
      * Constructs a RoundServiceImpl object with the specified GameProperties and EntityService instances.
@@ -26,10 +27,12 @@ class RoundServiceImpl implements RoundService {
      */
     RoundServiceImpl(GameProperties gameProperties,
                      EntityService entityService,
-                     EvaluationService evaluationService) {
+                     EvaluationService evaluationService,
+                     GameNotifier gameNotifier) {
         this.gameProperties = gameProperties;
         this.entityService = entityService;
         this.evaluationService = evaluationService;
+        this.gameNotifier = gameNotifier;
     }
     
     @Override
@@ -68,7 +71,8 @@ class RoundServiceImpl implements RoundService {
                 game.consumePrompt(),
                 gameProperties.getPropositionSubmissionDuration(),
                 gameProperties.getRoundEnterLimitDuration(),
-                gameProperties.getSelectionSubmissionDuration());
+                gameProperties.getSelectionSubmissionDuration(),
+                gameProperties.getContinueWaitDuration());
     }
     
     @Override
@@ -87,8 +91,14 @@ class RoundServiceImpl implements RoundService {
                         proposition.submittedBy(playerId);
                         round.addProposition(proposition);
                     });
+            if (game.hasAllPropositions(round)) {
+                // Start the selection phase now instead of leaving its deadline anchored at the
+                // round start, which would add the unused proposition time to the selection time.
+                round.closePropositionPhase();
+            }
             return round;
         });
+        notifyRoundChanged(roundId);
     }
     
     @Override
@@ -101,11 +111,13 @@ class RoundServiceImpl implements RoundService {
                 var evaluation = evaluationService.evaluateSelection(round, propositionId, playerId);
                 evaluation.entrySet().removeIf(entry -> !game.hasActivePlayer(entry.getKey()));
                 game.addPoints(evaluation);
+                round.addPoints(evaluation);
                 return game;
             } else {
                 throw new RoundError.IllegalOperationException();
             }
         });
+        notifyRoundChanged(roundId);
     }
     
     @Override
@@ -133,6 +145,16 @@ class RoundServiceImpl implements RoundService {
     @Override
     public Game getGameForRound(String roundId) throws GameError.NotFoundException {
         return entityService.getGameForRound(roundId);
+    }
+    
+    /**
+     * Pushes the current round status to the game's subscribers so clients can show what the
+     * round is waiting for instead of polling blindly.
+     *
+     * @param roundId the round whose game should be notified
+     */
+    private void notifyRoundChanged(String roundId) {
+        gameNotifier.notifyRoundChanged(entityService.getGameForRound(roundId));
     }
     
     /**
